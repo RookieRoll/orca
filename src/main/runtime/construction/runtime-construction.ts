@@ -147,8 +147,6 @@ export abstract class OrcaRuntimeWithStateFields extends OrcaRuntimeWithLinearCo
       subscriptions: this.subscriptions,
       mobileNotifications: this.mobileNotifications,
       accounts: this.accounts,
-      mobileSpeech: this.mobileSpeech,
-      mobileDictation: this.mobileDictation,
       browserDrivers: this.browserDrivers,
       messageWaiters: this.messageWaiters
     })

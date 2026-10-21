@@ -32,7 +32,6 @@ const SETTINGS_NAV_TARGETS = [
   'privacy',
   'advanced',
   'dev',
-  'voice',
   'shortcuts',
   'stats',
   'ssh',

@@ -6,7 +6,6 @@ import {
   type RefObject
 } from 'react'
 import { hasVisibleOverlay } from '@/lib/visible-overlay'
-import { DICTATION_FOCUS_INPUT_EVENT } from '../dictation/dictation-control-events'
 import { routeNativeChatRootKeyToInput } from './native-chat-root-key-routing'
 import { shouldFocusNativeChatPaneFromPointerTarget } from './native-chat-typing-redirect'
 import {
@@ -17,7 +16,7 @@ import {
 // Revealed chat roots in this window: a floating panel can reveal one beside the workspace's.
 const revealedChatRoots = new Set<HTMLElement>()
 
-/** Brings focus to the chat's input when it is revealed, and sends keys typed or dictated in the
+/** Brings focus to the chat's input when it is revealed, and sends keys typed in the
  *  chat, or with nothing focused around it, to that input. */
 export function useNativeChatRootInputRouting(
   args: Omit<NativeChatComposerRevealFocusArgs, 'scheduleFrame'> & {
@@ -48,19 +47,11 @@ export function useNativeChatRootInputRouting(
         routeNativeChatRootKeyToInput(event, composerRef.current, questionAnswerInputRef.current)
       }
     }
-    const onDictationFocusInput = (): void => {
-      const active = root.ownerDocument.activeElement
-      if (root.contains(active) || ownsUnfocusedInput(active)) {
-        composerRef.current?.focus()
-      }
-    }
     revealedChatRoots.add(root)
     root.ownerDocument.addEventListener('keydown', onKeyDown)
-    root.ownerDocument.addEventListener(DICTATION_FOCUS_INPUT_EVENT, onDictationFocusInput)
     return () => {
       revealedChatRoots.delete(root)
       root.ownerDocument.removeEventListener('keydown', onKeyDown)
-      root.ownerDocument.removeEventListener(DICTATION_FOCUS_INPUT_EVENT, onDictationFocusInput)
     }
   }, [composerRef, questionAnswerInputRef, revealed, rootRef])
 

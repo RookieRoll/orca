@@ -89,10 +89,6 @@ export function createMainWindow(
   })()
 
   const settings = store?.getSettings()
-  browserManager.setDictationShortcutForwardingPredicate(() => {
-    // Why: webview guests expose no safe transcript insertion target; let Cmd/Ctrl+E reach the page instead of dropping dictation text.
-    return false
-  })
   const blur = settings?.windowBackgroundBlur ?? false
   // Why: only Windows acrylic is ever visible; macOS vibrancy+transparent sat behind our opaque background yet
   // forced per-frame WindowServer alpha compositing (#8482). Applies at creation only, so it needs a restart.
@@ -214,7 +210,6 @@ export function createMainWindow(
     state.clearInitialRevealFallbackTimer()
     closeLifecycle.dispose()
     focus.dispose()
-    browserManager.setDictationShortcutForwardingPredicate(null)
     powerMonitor.removeListener('resume', onSystemResume)
     clearTrustedUIRendererWebContentsId(rendererWebContentsId)
     state.dispose()

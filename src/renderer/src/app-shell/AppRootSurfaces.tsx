@@ -21,8 +21,7 @@ import { useLazyModalMounts } from './use-lazy-modal-mounts'
 import { usePreloadWorktreeJumpPalette, WorktreeJumpPalette } from './worktree-jump-palette-preload'
 import {
   selectAppRootSurfacePetEnabled,
-  selectAppRootSurfaceTelemetryOptedIn,
-  selectAppRootSurfaceVoiceEnabled
+  selectAppRootSurfaceTelemetryOptedIn
 } from './app-root-surface-settings'
 import type { FloatingWorkspacePanelState } from './use-floating-workspace-panel'
 import type { OnboardingGate } from './use-onboarding-and-feature-tips'
@@ -51,11 +50,6 @@ const AiVaultSessionHistoryDialog = lazy(
 const DeleteWorktreeDialog = lazy(() => import('../components/sidebar/DeleteWorktreeDialog'))
 const PreservedBranchBatchReviewModal = lazy(
   () => import('../components/sidebar/PreservedBranchBatchReviewModal')
-)
-const DictationController = lazy(() =>
-  import('../components/dictation/DictationController').then((module) => ({
-    default: module.DictationController
-  }))
 )
 const SshPassphraseDialog = lazy(() =>
   import('../components/settings/SshPassphraseDialog').then((module) => ({
@@ -142,20 +136,17 @@ export function AppRootSurfaces(props: {
   const activeModal = useAppStore((s) => s.activeModal)
   // Keep this always-mounted surface subscribed only to the settings fields it reads. A
   // settings object replacement for an unrelated preference should not rerender every overlay.
-  const voiceEnabled = useAppStore(selectAppRootSurfaceVoiceEnabled)
   const petEnabled = useAppStore(selectAppRootSurfacePetEnabled)
   const telemetryOptedIn = useAppStore(selectAppRootSurfaceTelemetryOptedIn)
   const statusBarVisible = useAppStore((s) => s.statusBarVisible)
   const persistedUIReady = useAppStore((s) => s.persistedUIReady)
   const petVisible = useAppStore((s) => s.petVisible)
-  const dictationState = useAppStore((s) => s.dictationState)
   const updateStatus = useAppStore((s) => s.updateStatus)
   const activeContextualTourId = useAppStore((s) => s.activeContextualTourId)
   const hasSshCredentialRequest = useAppStore((s) => s.sshCredentialQueue.length > 0)
 
   const shouldMountSetupGuideTelemetryObserver = persistedUIReady
   const shouldMountUpdateCard = shouldMountUpdateCardForStatus(updateStatus)
-  const shouldMountDictationController = voiceEnabled || dictationState !== 'idle'
   const renderPetOverlay = shouldRenderPetOverlay({ persistedUIReady, petEnabled, petVisible })
 
   return (
@@ -387,13 +378,6 @@ export function AppRootSurfaces(props: {
               onOnboardingChange={onboardingGate.setOnboarding}
             />
           </RecoverableRenderErrorBoundary>
-        </Suspense>
-      ) : null}
-      {shouldMountDictationController ? (
-        <Suspense fallback={null}>
-          <OverlayBoundary boundaryId="overlay.dictation" resetKey={activeView}>
-            <DictationController />
-          </OverlayBoundary>
         </Suspense>
       ) : null}
       <OverlayBoundary boundaryId="overlay.recent-tab-switcher" resetKey={activeView}>

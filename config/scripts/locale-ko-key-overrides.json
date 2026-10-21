@@ -2351,9 +2351,6 @@
   "auto.components.settings.NotificationsPane.b6fc369244": {
     "ko": "백그라운드 터미널에서 벨 문자가 출력됩니다."
   },
-  "auto.components.settings.OpenAiTranscriptionKeyDialog.07b26f2742": {
-    "ko": "키 지우기"
-  },
   "auto.components.settings.PrivacyPane.79a0f3c16c": {
     "ko": "텔레메트리는 다음에 의해 비활성화됩니다."
   },
@@ -2839,21 +2836,6 @@
   },
   "auto.components.settings.TerminalWindowSection.e56e7d6ea0": {
     "ko": "밝은 마젠타"
-  },
-  "auto.components.settings.VoicePane.118b3c2dee": {
-    "ko": "토글"
-  },
-  "auto.components.settings.VoicePane.174da92062": {
-    "ko": "길게 누르기"
-  },
-  "auto.components.settings.VoicePane.61a16c8141": {
-    "ko": "추출 중..."
-  },
-  "auto.components.settings.VoicePane.901985625d": {
-    "ko": "토글"
-  },
-  "auto.components.settings.VoicePane.b6536a1d12": {
-    "ko": "추출 중"
   },
   "auto.components.settings.WorkspaceDirectorySetting.1a2b3c4d5e": {
     "ko": "클라이언트 기본값"
@@ -3928,27 +3910,6 @@
   },
   "auto.components.settings.token.source.control.integration.cards.fcbe0469fd": {
     "ko": "공개 repos는 Git 원격에서 감지됩니다. 설정하세요"
-  },
-  "auto.components.settings.voice.pane.search.04c25a6fb0": {
-    "ko": "openai"
-  },
-  "auto.components.settings.voice.pane.search.064a9bd94a": {
-    "ko": "길게 누르기"
-  },
-  "auto.components.settings.voice.pane.search.3d8b853963": {
-    "ko": "음성"
-  },
-  "auto.components.settings.voice.pane.search.6fa48bcd41": {
-    "ko": "토글"
-  },
-  "auto.components.settings.voice.pane.search.d86f5600da": {
-    "ko": "모드"
-  },
-  "auto.components.settings.voice.pane.search.e360027a65": {
-    "ko": "마이크"
-  },
-  "auto.components.settings.voice.pane.search.f6e0dfa61c": {
-    "ko": "클라우드"
   },
   "auto.components.setup.guide.SetupGuideProgressRing.dac3a4724a": {
     "ko": "설정 단계 {{value1}}개 중 {{value0}}개 완료"
@@ -6086,9 +6047,6 @@
   "auto.components.settings.floating.workspace.search.6f183fa1b9": {
     "ko": "플로팅 터미널"
   },
-  "auto.components.settings.voice.pane.search.748b33e531": {
-    "ko": "받아쓰기를 켜고 끄거나, 키를 누르는 동안 받아쓰는 방식입니다."
-  },
   "auto.components.settings.VoiceMicrophoneSetting.unavailable": {
     "ko": "사용할 수 없음"
   },
@@ -6400,12 +6358,6 @@
   },
   "auto.components.settings.SshPane.syncedServerPlural": {
     "ko": "서버 {{count}}개를 동기화했습니다."
-  },
-  "auto.components.settings.VoicePane.dictationShortcutDescription": {
-    "ko": "{{shortcut}} 단축키를 눌러 포커스된 패널에 텍스트를 받아쓰세요."
-  },
-  "auto.components.settings.VoicePane.dictationModesDescription": {
-    "ko": "토글: {{shortcut}} 단축키를 한 번 누르면 받아쓰기를 시작하고, 다시 누르면 중지합니다. 길게 누르기: {{shortcut}} 단축키를 누르고 있는 동안 받아쓰기합니다."
   },
   "auto.components.settings.task.tracker.integration.cards.connectedSiteSingular": {
     "ko": "사이트 {{count}}개 연결됨"

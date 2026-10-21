@@ -78,7 +78,7 @@ describe('migratePlaintextCredentials', () => {
     ).toBe('mm-key')
   })
 
-  it('leaves sealed files, foreign ciphertext, and the speech JSON format alone', () => {
+  it('leaves sealed files and foreign ciphertext alone', () => {
     const sealedPath = join(dir, 'sealed.enc')
     const sealed = store.encryptString('already')
     writeFileSync(sealedPath, sealed)

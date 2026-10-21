@@ -3,7 +3,6 @@ import { cleanup, fireEvent, render } from '@testing-library/react'
 import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { captureInsertionTarget } from '../dictation/dictation-insertion-target'
 import type { NativeChatComposerHandle } from './native-chat-composer-types'
 import { useNativeChatRootInputRouting } from './use-native-chat-root-input-routing'
 
@@ -154,25 +153,4 @@ describe('useNativeChatRootInputRouting', () => {
     expect(insertTypedText).not.toHaveBeenCalled()
   })
 
-  it('gives dictation started from the transcript or with nothing focused to the composer', () => {
-    const view = render(<Chat revealed />)
-    const message = view.getByRole('textbox', { name: 'Message' })
-    fireEvent.pointerDown(view.getByTestId('transcript'))
-    expect(captureInsertionTarget()).toEqual({ kind: 'text', element: message })
-
-    message.blur()
-    expect(captureInsertionTarget()).toEqual({ kind: 'text', element: message })
-  })
-
-  it('leaves dictation with a focused field or a control outside the chat', () => {
-    render(<Chat revealed />)
-    const field = document.createElement('input')
-    const button = document.createElement('button')
-    document.body.append(field, button)
-    field.focus()
-    expect(captureInsertionTarget()).toEqual({ kind: 'text', element: field })
-
-    button.focus()
-    expect(captureInsertionTarget()).toBeNull()
-  })
 })

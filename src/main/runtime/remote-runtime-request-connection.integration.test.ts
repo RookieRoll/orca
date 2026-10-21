@@ -50,7 +50,6 @@ describe('remote runtime request connection integration', () => {
         getRuntimeId: () => 'fetch-runtime-test',
         getStartedAt: () => 1,
         cleanupSubscriptionsForConnection: () => {},
-        cancelMobileDictationForConnection: () => {},
         onClientDisconnected: () => {},
         listVisibleRepos: () => repos
       } as unknown as OrcaRuntimeService
@@ -138,7 +137,6 @@ describe('remote runtime request connection integration', () => {
           subscriptionCleanups.get(id)?.()
           subscriptionCleanups.delete(id)
         },
-        cancelMobileDictationForConnection: () => {},
         onClientDisconnected: () => {},
         showRepo: (selector: string) => {
           if (selector !== repo.id && selector !== `id:${repo.id}`) {
@@ -306,7 +304,6 @@ describe('remote runtime request connection integration', () => {
           subscriptionCleanups.get(id)?.()
           subscriptionCleanups.delete(id)
         },
-        cancelMobileDictationForConnection: () => {},
         onClientDisconnected: () => {},
         onClientEvent: (listener: (event: RuntimeClientEvent) => void) => {
           clientEventListeners.add(listener)
@@ -554,7 +551,6 @@ describe('remote runtime request connection integration', () => {
             }
           }
         },
-        cancelMobileDictationForConnection: () => {},
         onClientDisconnected: () => {},
         onClientEvent: (listener: (event: RuntimeClientEvent) => void) => {
           clientEventListeners.add(listener)

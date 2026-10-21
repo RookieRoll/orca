@@ -251,40 +251,4 @@ export function useTerminalPaneGlobalEffects({
     return () => window.removeEventListener(PASTE_TERMINAL_TEXT_EVENT, onPasteText)
   }, [tabId, managerRef, paneTransportsRef])
 
-  // Why: dictation events are dispatched globally; gate on isActiveRef so only
-  // the foreground terminal pane consumes the inserted text — otherwise text
-  // would be duplicated across all mounted but inactive tabs.
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return
-    }
-    const onDictationInsert = (event: Event): void => {
-      if (!isActiveRef.current) {
-        return
-      }
-      const detail = (
-        event as CustomEvent<string | { text?: string; tabId?: string; paneId?: number }>
-      ).detail
-      const text = typeof detail === 'string' ? detail : detail?.text
-      if (!text) {
-        return
-      }
-      if (typeof detail === 'object' && detail.tabId && detail.tabId !== tabId) {
-        return
-      }
-      const requestedPaneId = typeof detail === 'object' ? detail.paneId : undefined
-      handleTerminalProgrammaticTextPaste({
-        detail: {
-          tabId,
-          text,
-          ...(typeof requestedPaneId === 'number' ? { paneId: requestedPaneId } : {})
-        },
-        tabId,
-        getManager: () => managerRef.current,
-        getPaneTransports: () => paneTransportsRef.current
-      })
-    }
-    document.addEventListener('dictation:insertText', onDictationInsert)
-    return () => document.removeEventListener('dictation:insertText', onDictationInsert)
-  }, [isActiveRef, managerRef, paneTransportsRef, tabId])
 }

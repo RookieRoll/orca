@@ -190,8 +190,6 @@ export type {
   RuntimeGitLocalBranches,
   RuntimeRepoList,
   RuntimeRepoSearchRefs,
-  RuntimeSpeechModelSummary,
-  RuntimeSpeechSetupState,
   RuntimeWorktreeAgentRow,
   RuntimeWorktreeCreateResult,
   RuntimeWorktreeListResult,

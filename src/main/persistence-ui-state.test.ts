@@ -256,7 +256,7 @@ describe('Store', () => {
       store.updateUI({
         sidebarWidth: 400,
         showDotfilesByWorktree: { 'repo-1::/repo': false },
-        featureTipsSeenIds: ['voice-dictation'],
+        featureTipsSeenIds: ['agent-session-search'],
         contextualToursSeenIds: ['tasks'],
         featureInteractions: {
           tasks: { firstInteractedAt: 100, interactionCount: 1 }
@@ -270,7 +270,7 @@ describe('Store', () => {
       store.updateUI({
         sidebarWidth: 400,
         showDotfilesByWorktree: { 'repo-1::/repo': false },
-        featureTipsSeenIds: ['voice-dictation'],
+        featureTipsSeenIds: ['agent-session-search'],
         contextualToursSeenIds: ['tasks'],
         featureInteractions: {
           tasks: { firstInteractedAt: 100, interactionCount: 1 }
@@ -472,7 +472,7 @@ describe('Store', () => {
       worktreeMeta: {},
       settings: {},
       ui: {
-        featureTipsSeenIds: ['voice-dictation', 'unknown-tip', 'voice-dictation'],
+        featureTipsSeenIds: ['agent-session-search', 'unknown-tip', 'agent-session-search'],
         contextualToursSeenIds: ['tasks', 'unknown', 'tasks'] as never,
         featureInteractions: {
           tasks: { firstInteractedAt: 100 },
@@ -487,7 +487,7 @@ describe('Store', () => {
 
     const store = await createStore()
 
-    expect(store.getUI().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getUI().featureTipsSeenIds).toEqual(['agent-session-search'])
     expect(store.getUI().contextualToursSeenIds).toEqual(['tasks'])
     expect(store.getUI().featureInteractions).toEqual({
       tasks: { firstInteractedAt: 100, interactionCount: 1 },
@@ -553,11 +553,9 @@ describe('Store', () => {
   it('normalizes feature tip ids from direct UI writes', async () => {
     const store = await createStore()
 
-    store.updateUI({
-      featureTipsSeenIds: ['voice-dictation', 'unknown-tip', 'voice-dictation'] as never
-    })
+    store.updateUI({ featureTipsSeenIds: ['agent-session-search', 'agent-session-search'] })
 
-    expect(store.getUI().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getUI().featureTipsSeenIds).toEqual(['agent-session-search'])
   })
 
   it('recordFeatureInteraction increments from the current persisted UI state', async () => {

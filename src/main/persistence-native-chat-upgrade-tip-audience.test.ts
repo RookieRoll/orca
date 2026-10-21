@@ -233,11 +233,11 @@ describe('native chat upgrade tip audience', () => {
     const store = createStore()
     store.updateUI({ featureTipsSeenIds: ['native-chat-upgrade'] })
     // A paired client hydrated before the tip was shown marks another tip seen.
-    store.updateUI({ featureTipsSeenIds: ['voice-dictation'] })
+    store.updateUI({ featureTipsSeenIds: ['agent-session-search'] })
     store.flush()
     expect((await reopen()).getUI().featureTipsSeenIds).toEqual([
       'native-chat-upgrade',
-      'voice-dictation'
+      'agent-session-search'
     ])
   })
 })

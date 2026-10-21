@@ -56,9 +56,6 @@ export type NativeChatComposerFieldProps = {
    *  card where the host holds sends as cards (`queue`), else sent and held by the host (`send`). */
   afterStop?: NativeChatAfterStopSend
   attachDisabled: boolean
-  dictationDisabled: boolean
-  isDictating: boolean
-  isDictationHoldMode: boolean
   imeEnterGesture: ReturnType<typeof useImeEnterGestureOwnership>
   onDraftChange: (value: string, element: NativeChatComposerInput) => void
   onTextareaSelect: (element: NativeChatComposerInput) => void
@@ -71,9 +68,6 @@ export type NativeChatComposerFieldProps = {
   onChooseMentionFile: (path: string) => void
   onRemoveImageAttachment: (id: string) => void
   onAttach: () => void
-  onDictationToggle: () => void
-  onDictationHoldStart: () => void
-  onDictationHoldEnd: () => void
   onSend: () => void
   onStop?: () => void
   sessionOptionsSurface: SessionOptionsSurface | null
@@ -142,9 +136,6 @@ export function NativeChatComposerField({
   isStopping = false,
   afterStop,
   attachDisabled,
-  dictationDisabled,
-  isDictating,
-  isDictationHoldMode,
   imeEnterGesture,
   onDraftChange,
   onTextareaSelect,
@@ -157,9 +148,6 @@ export function NativeChatComposerField({
   onChooseMentionFile,
   onRemoveImageAttachment,
   onAttach,
-  onDictationToggle,
-  onDictationHoldStart,
-  onDictationHoldEnd,
   onSend,
   onStop,
   sessionOptionsSurface,
@@ -348,18 +336,12 @@ export function NativeChatComposerField({
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
               <NativeChatComposerActions
                 attachDisabled={attachDisabled}
-                dictationDisabled={dictationDisabled}
                 sendDisabled={sendButtonDisabled}
                 sendBlockedReason={sendBlockedReason}
                 draftNotSaved={draftNotSaved}
                 isWorking={isWorking}
                 isStopping={isStopping}
-                isDictating={isDictating}
-                isDictationHoldMode={isDictationHoldMode}
                 onAttach={onAttach}
-                onDictationToggle={onDictationToggle}
-                onDictationHoldStart={onDictationHoldStart}
-                onDictationHoldEnd={onDictationHoldEnd}
                 onSend={onSend}
                 onStop={onStop}
                 sessionOptionsSurface={sessionOptionsSurface}

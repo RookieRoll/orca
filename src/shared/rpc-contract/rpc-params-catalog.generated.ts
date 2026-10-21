@@ -517,14 +517,6 @@ import {
   SkillsGetInstallProgressParams
 } from './skills-params'
 import {
-  DictationChunk,
-  DictationHandle,
-  DictationSetup,
-  DictationStart,
-  OpenAiSpeechKeySet,
-  SpeechModelAction
-} from './speech-params'
-import {
   RepoAddRemote,
   SshBrowseDir,
   SshConnect,
@@ -1315,17 +1307,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'skills.removeInstall': SkillRemoveRequestSchema,
   'skills.share': AgentSkillShareRequestSchema,
   'skills.uploadChunk': SkillUploadChunkRequestSchema,
-  'speech.dictation.cancel': DictationHandle,
-  'speech.dictation.chunk': DictationChunk,
-  'speech.dictation.finish': DictationHandle,
-  'speech.dictation.setup': DictationSetup,
-  'speech.dictation.start': DictationStart,
-  'speech.models.delete': SpeechModelAction,
-  'speech.models.download': SpeechModelAction,
-  'speech.models.list': null,
-  'speech.openAiKey.clear': null,
-  'speech.openAiKey.set': OpenAiSpeechKeySet,
-  'speech.openAiKey.status': null,
   'ssh.addTarget': SshTargetAdd,
   'ssh.browseDir': SshBrowseDir,
   'ssh.connect': SshConnect,

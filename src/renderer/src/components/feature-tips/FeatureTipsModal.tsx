@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type JSX } from 'react'
 import { toast } from 'sonner'
-import { getDefaultVoiceSettings } from '../../../../shared/constants'
 import { isInNativeChatUpgradeTipAudience } from '../../../../shared/native-chat-upgrade-tip-audience'
 import {
   ORCHESTRATION_ENABLED_STORAGE_KEY,
@@ -24,15 +23,12 @@ import { translate } from '@/i18n/i18n'
 import { NativeChatUpgradeTipDialog } from './NativeChatUpgradeTipDialog'
 import { SessionSearchTipDialog } from './SessionSearchTipDialog'
 import { useSessionSearchTipSetup } from './use-session-search-tip-setup'
-import { VoiceDictationTipDialog } from './VoiceDictationTipDialog'
 
 export default function FeatureTipsModal(): JSX.Element | null {
   const activeModal = useAppStore((s) => s.activeModal)
   const closeModal = useAppStore((s) => s.closeModal)
   const openSettingsPage = useAppStore((s) => s.openSettingsPage)
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
-  const settings = useAppStore((s) => s.settings)
-  const updateSettings = useAppStore((s) => s.updateSettings)
   const updateSettingsOrThrow = useAppStore((s) => s.updateSettingsOrThrow)
   const seenTipIds = useAppStore((s) => s.featureTipsSeenIds)
   const featureInteractions = useAppStore((s) => s.featureInteractions)
@@ -102,13 +98,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
     openSettingsPage()
   }
 
-  const openVoiceSettings = (): void => {
-    markCurrentTipSeen()
-    closeModal()
-    openSettingsTarget({ pane: 'voice', repoId: null })
-    openSettingsPage()
-  }
-
   const openSessionSearchSettings = (): void => {
     markCurrentTipSeen()
     closeModal()
@@ -167,19 +156,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
           getOrcaCliFeatureTipTelemetrySource(modalData.source)
         )
         closeModal()
-        break
-      }
-      case 'enable-voice': {
-        const voice = settings?.voice ?? getDefaultVoiceSettings()
-        void updateSettings({
-          voice: {
-            ...voice,
-            enabled: true
-          }
-        })
-        closeModal()
-        openSettingsTarget({ pane: 'voice', repoId: null })
-        openSettingsPage()
         break
       }
       case 'enable-session-search': {
@@ -341,20 +317,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
     )
   }
 
-  if (currentTip.action !== 'enable-voice') {
-    currentTip.action satisfies never
-    return null
-  }
-
-  return (
-    <VoiceDictationTipDialog
-      open={isOpen}
-      tip={currentTip}
-      primaryBusy={primaryBusy}
-      onOpenChange={handleOpenChange}
-      onPrimaryAction={() => void handlePrimaryAction()}
-      onSkip={handleSkip}
-      onVoiceSettingsClick={openVoiceSettings}
-    />
-  )
+  currentTip.action satisfies never
+  return null
 }

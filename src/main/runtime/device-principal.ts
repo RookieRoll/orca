@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
 
 /**
  * Who an authenticated paired socket is. Socket bookkeeping (close, revoke) keys on `deviceId`;
- * per-client runtime state (terminal drivers, dictation, file grants) keys on `clientId`.
+ * per-client runtime state (terminal drivers, file grants) keys on `clientId`.
  */
 export type DevicePrincipal = {
   deviceId: string

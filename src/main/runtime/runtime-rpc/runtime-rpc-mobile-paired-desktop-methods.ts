@@ -20,14 +20,6 @@ export const PAIRED_DESKTOP_METHODS = [
   'mobileRelay.hosts.worktrees',
   // The sidebar's Project grouping inputs, as the desktop window last published them.
   'mobileRelay.projectSections',
-  'speech.dictation.cancel',
-  'speech.dictation.chunk',
-  'speech.dictation.finish',
-  'speech.dictation.setup',
-  'speech.dictation.start',
-  'speech.models.delete',
-  'speech.models.download',
-  'speech.models.list',
   // The Mac also forwards it to every open server connection of that phone.
   'runtime.clientCapabilities.update',
   // The Mac republishes host changes it already observes.

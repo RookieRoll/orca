@@ -14,7 +14,6 @@ import { SKILL_INSTALL_CAPABILITY } from '../../../shared/skill-install-capabili
  * It covers every way a host hands the runtime a service: constructor options, positional
  * constructor arguments, `runtime.set*` and `rpc.set*`, and the process-wide host ports installed
  * at preflight. The last two once went unrecorded, so orcad shipped without a stats collector
- * (#31112) and without speech (#31174) while this test passed.
  */
 
 type Root = 'electron' | 'orcad'
@@ -438,8 +437,6 @@ describe('runtime composition parity (Electron vs orcad)', () => {
       'host:setAppEnvironment',
       'host:setSecretStore',
       'host:setRuntimeBrowserCommandsFactory',
-      // #31174: without it every speech call refuses with speech_unavailable.
-      'host:setSpeechServiceFactories'
     ]) {
       expect(electron, shared).toContain(shared)
       expect(orcad, shared).toContain(shared)

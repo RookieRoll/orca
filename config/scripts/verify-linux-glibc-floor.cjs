@@ -55,14 +55,6 @@ const COMPAT_SLOT_GLIBC_FLOOR = glibcFloorProfile(
   [1, 3, 7]
 )
 
-// Why: the sherpa-onnx speech prebuilt is a third-party manylinux binary that
-// already requires GLIBCXX_3.4.29 (GCC 11 / Ubuntu 21.10+, 22.04 LTS). It loads
-// lazily in the speech worker (src/main/speech/stt-worker.ts), never at app
-// launch, so it cannot cause the #9902 startup crash. Exempt it from the
-// libstdc++ floor (its glibc is still gated) rather than fail the release on a
-// pre-existing, non-launch condition — speech needs libstdc++ >= GCC 11.
-const LIBSTDCXX_FLOOR_EXEMPT = /(?:^|[/\\])sherpa-onnx/
-
 // VER_FLG_WEAK: a version need whose references are all weak. The loader
 // tolerates its absence (resolves to null and the caller's fallback runs)
 // instead of refusing to load, so a weak need must not count as a requirement.
@@ -155,16 +147,12 @@ function isLibstdcxxNode(name) {
 
 /**
  * Version needs from `filePath` that would prevent loading on the floor OS.
- * `sherpa-onnx` is exempt from the libstdc++ floor (see LIBSTDCXX_FLOOR_EXEMPT)
- * but its glibc needs are still checked.
  */
-function findFloorViolations(needs, filePath = '', glibcFloor = DESKTOP_GLIBC_FLOOR) {
-  const exemptLibstdcxx = LIBSTDCXX_FLOOR_EXEMPT.test(filePath)
+function findFloorViolations(needs, glibcFloor = DESKTOP_GLIBC_FLOOR) {
   return needs.filter(
     (need) =>
       !need.weak &&
-      isVersionNodeAboveFloor(need.name, glibcFloor) &&
-      !(exemptLibstdcxx && isLibstdcxxNode(need.name))
+      isVersionNodeAboveFloor(need.name, glibcFloor)
   )
 }
 
@@ -485,7 +473,7 @@ function verifyLinuxGlibcFloor(rootDir, options = {}) {
     const { versionNeeds, neededLibraries, isStatic } = readDynamicInfo(filePath, objdumpPath)
     const isMuslTarget = isMuslTemplatePayload(filePath, neededLibraries, versionNeeds)
     // Remote musl payloads use their host's C++ runtime, not Ubuntu's libstdc++ or libutil.
-    const floorViolations = findFloorViolations(versionNeeds, filePath, glibcFloor).filter(
+    const floorViolations = findFloorViolations(versionNeeds, glibcFloor).filter(
       (need) => !isMuslTarget || !isLibstdcxxNode(need.name)
     )
     // Only pay for `objdump -T` when a relocated-symbol provider is not already

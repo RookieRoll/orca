@@ -60,6 +60,19 @@ describe('retired managed servers experiment', () => {
   })
 })
 
+describe('retired voice settings', () => {
+  it('drops legacy voice settings while preserving unrelated saved settings', () => {
+    const normalized = normalizeLegacyProfile({
+      voice: { enabled: true, dictationMode: 'toggle' },
+      terminalFocusFollowsMouse: true
+    })
+    const serialized = JSON.parse(JSON.stringify(normalized))
+
+    expect(serialized).not.toHaveProperty('voice')
+    expect(serialized.terminalFocusFollowsMouse).toBe(true)
+  })
+})
+
 describe('retired chat default selectors', () => {
   it('keeps Chat UI on while dropping both older keys from a saved profile', () => {
     const normalized = normalizeLegacyProfile({

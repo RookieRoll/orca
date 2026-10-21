@@ -21,7 +21,6 @@ export const ORCAD_CHILD_ENTRY_POINTS = {
   workerThreadChildProcess:
     'src/main/worker-thread-child-process/worker-thread-child-process-entry.ts',
   claudeProfileSetup: 'src/main/claude-accounts/claude-profile-setup-worker-entry.ts',
-  sttWorker: 'src/main/speech/stt-worker.ts'
 }
 
 /** Each child ships flat beside orcad.js under its source basename; the runtime resolvers look there. */

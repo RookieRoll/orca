@@ -1,18 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { getDefaultVoiceSettings } from '../../../../shared/constants'
-import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import { getFeatureTipForModal } from './feature-tip-modal-state'
 
 // Session search defaults on so tests about the older tips don't see the session-search tip first.
-function makeSettings(
-  voiceEnabled = false,
-  sessionSearchEnabled = true
-): Pick<GlobalSettings, 'voice' | 'aiVaultSearch'> {
+function makeSettings(sessionSearchEnabled = true): { aiVaultSearch: { enabled: boolean; historyDays: null } } {
   return {
-    voice: {
-      ...getDefaultVoiceSettings(),
-      enabled: voiceEnabled
-    },
     aiVaultSearch: { enabled: sessionSearchEnabled, historyDays: null }
   }
 }
@@ -21,15 +12,15 @@ describe('feature tip modal state', () => {
   it('keeps rendering the opened tip after app open has marked it seen', () => {
     const tip = getFeatureTipForModal({
       cliInstalled: false,
-      modalData: { tipId: 'voice-dictation' },
-      seenTipIds: ['voice-dictation'],
+      modalData: { tipId: 'agent-session-search' },
+      seenTipIds: ['agent-session-search'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
       settings: makeSettings(),
       webClient: false
     })
 
-    expect(tip?.id).toBe('voice-dictation')
+    expect(tip?.id).toBe('agent-session-search')
   })
 
   it('falls back to the CLI tip first when no modal tip id is pinned', () => {
@@ -50,7 +41,7 @@ describe('feature tip modal state', () => {
     const tip = getFeatureTipForModal({
       cliInstalled: false,
       modalData: {},
-      seenTipIds: ['voice-dictation'],
+      seenTipIds: ['agent-session-search'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
       settings: makeSettings(),
@@ -78,7 +69,7 @@ describe('feature tip modal state', () => {
     const tip = getFeatureTipForModal({
       cliInstalled: false,
       modalData: {},
-      seenTipIds: ['voice-dictation', 'orca-cli', 'cmd-j-palette'],
+      seenTipIds: ['agent-session-search', 'orca-cli', 'cmd-j-palette'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
       settings: makeSettings(),
@@ -92,7 +83,7 @@ describe('feature tip modal state', () => {
     const tip = getFeatureTipForModal({
       cliInstalled: true,
       modalData: {},
-      seenTipIds: ['voice-dictation', 'cmd-j-palette'],
+      seenTipIds: ['agent-session-search', 'cmd-j-palette'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
       settings: makeSettings(),
@@ -109,7 +100,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['cmd-j-palette'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {
-        'voice-dictation': { firstInteractedAt: 100, interactionCount: 1 }
+        'agent-session-search': { firstInteractedAt: 100, interactionCount: 1 }
       },
       settings: makeSettings(),
       webClient: false

@@ -67,6 +67,7 @@ type RetiredGlobalSettings = {
   opencodeGoApiKey?: unknown
   experimentalStructuredNativeChat?: unknown
   openAgentTabsInChatByDefault?: unknown
+  voice?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -81,6 +82,7 @@ export function stripRetiredGlobalSettings(
     opencodeGoApiKey: _legacyOpenCodeGoApiKey,
     experimentalStructuredNativeChat: _legacyStructuredNativeChat,
     openAgentTabsInChatByDefault: _legacyChatDefaultView,
+    voice: _retiredVoiceSettings,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacySetupScriptLaunchMode
@@ -91,6 +93,7 @@ export function stripRetiredGlobalSettings(
   void _legacyOpenCodeGoApiKey
   void _legacyStructuredNativeChat
   void _legacyChatDefaultView
+  void _retiredVoiceSettings
   return rest
 }
 

@@ -55,24 +55,26 @@ describe('createUISlice feature tips', () => {
     })
     const store = createUIStore()
 
-    store.getState().markFeatureTipsSeen(['voice-dictation'])
-    store.getState().markFeatureTipsSeen(['voice-dictation'])
+    store.getState().markFeatureTipsSeen(['agent-session-search'])
+    store.getState().markFeatureTipsSeen(['agent-session-search'])
 
-    expect(store.getState().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getState().featureTipsSeenIds).toEqual(['agent-session-search'])
     expect(setMock).toHaveBeenCalledTimes(1)
-    expect(setMock).toHaveBeenCalledWith({ featureTipsSeenIds: ['voice-dictation'] })
+    expect(setMock).toHaveBeenCalledWith({ featureTipsSeenIds: ['agent-session-search'] })
   })
 
   it('normalizes persisted feature tip ids during hydration', () => {
     const store = createUIStore()
 
     store.getState().hydratePersistedUI(
-      makePersistedUI({
-        featureTipsSeenIds: ['voice-dictation', 'unknown', 'voice-dictation'] as never
-      })
+      makePersistedUI(
+        JSON.parse(
+          '{"featureTipsSeenIds":["agent-session-search","unknown","agent-session-search"]}'
+        )
+      )
     )
 
-    expect(store.getState().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getState().featureTipsSeenIds).toEqual(['agent-session-search'])
   })
 })
 

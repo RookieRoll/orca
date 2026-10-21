@@ -64,7 +64,6 @@ export const CLI_COMMAND_NAMES = [
   'set',
   'skills',
   'snapshot',
-  'speech',
   'status',
   'storage',
   'tab',

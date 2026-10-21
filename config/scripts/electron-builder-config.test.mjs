@@ -569,8 +569,6 @@ describe('arch-aware packaging guard', () => {
   const HOST_ARCH = process.arch === 'arm64' ? 3 : 1
   const OTHER_ARCH = process.arch === 'arm64' ? 1 : 3
   const OTHER_ARCH_NAME = process.arch === 'arm64' ? 'x64' : 'arm64'
-  const SHERPA_PLATFORM = process.platform === 'win32' ? 'win' : process.platform
-  const otherSherpa = `sherpa-onnx-${SHERPA_PLATFORM}-${OTHER_ARCH_NAME}`
 
   // beforePack also hash-verifies the mobile web bundle, which the unit-test job never builds.
   // Point it at a real bundle built into a temp dir: these tests are about the native-variant
@@ -626,22 +624,6 @@ describe('arch-aware packaging guard', () => {
       ).toThrow(`${templateDir} holds an ORCA_LAYOUT_OWNER=main build`)
     } finally {
       await rm(templateDir, { recursive: true, force: true })
-    }
-  })
-
-  it('requires the other architecture natives to be installed', () => {
-    const otherSherpaInstalled = existsSync(
-      join(REPO_ROOT, 'node_modules', otherSherpa, 'package.json')
-    )
-    const otherSherpaExpected = Object.hasOwn(
-      require('../../package.json').optionalDependencies,
-      otherSherpa
-    )
-    if (otherSherpaExpected && !otherSherpaInstalled) {
-      expect(() => packHost(OTHER_ARCH)).toThrow(otherSherpa)
-      expect(() => packHost(OTHER_ARCH)).toThrow('pnpm install:release')
-    } else if (process.platform !== 'win32') {
-      expect(() => packHost(OTHER_ARCH)).not.toThrow()
     }
   })
 

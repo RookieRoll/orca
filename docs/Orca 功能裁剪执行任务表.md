@@ -28,7 +28,7 @@
 | B1 | C17 终端主题导入 | 删除入口/解析并确认保留主题功能无回归 |
 | B2 | 语音、宠物、遥测与上传/更新 | 删除对应功能和后台副作用，U10 本地导出保留 |
 | B3 | 账号/用量与平台集成 | 删除 F 全组及 J 删除项；保留 Jira（J16）和 Git 基础能力 |
-| B4 | 远程、WSL、移动与中继 | 删除 L/M；确认本地 daemon、工作区、PTY 不受影响 |
+| B4 | 远程、WSL、移动与中继 | B2 完成后先执行 B4-CLIENT；再按 B4-SERVICES 与三个 B4-DEVICE-TOOLS 子项分别交付；保留本地 daemon、工作区、PTY |
 | B5 | 分享、组织、Profile 与跨主机隔离 | 删除 O08–O13、U01–U04 等；O02 本机执行保留 |
 | B6 | Agent 适配裁剪 | 删除 W02/W04/W05/W08–W40 专用适配；Codex/Pi/Claude/OpenCode 保留 |
 | B7 | 公共依赖、构建与回归收尾 | 清理死依赖/入口/IPC/i18n/快捷键/默认后台行为，完成保留项和反向检查 |
@@ -124,10 +124,10 @@
 | R07 | Android 应用与权限操作 | B4 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | R08 | Android 日志与 UI 树 | B4 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | R09 | 模拟器 Agent 工具与技能 | B4 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| T01 | 语音输入 | B2-VOC | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| T02 | 麦克风选择与快捷录音模式 | B2-VOC | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| T03 | 本地语音模型 | B2-VOC | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| T04 | 云端语音识别 | B2-VOC | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
+| T01 | 语音输入 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/renderer/src/components/dictation/`、`src/main/ipc/speech.ts`、`src/preload/api/speech-*`、`src/main/runtime/rpc/methods/speech.ts` | 桌面/共享 src 专属链已按有界验收移除；114 个存活 TS-family 改动语法解析零诊断。全仓 mobile 客户端语音调用仍在，待紧接执行 B4-CLIENT 整体删除。 |
+| T02 | 麦克风选择与快捷录音模式 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/renderer/src/hooks/use-audio-capture.ts`、dictation UI/hooks、`src/main/ipc/speech.ts` | Orca 专属录音/设备选择链已按有界验收移除；浏览器/OS 通用媒体权限保留。mobile 专属录音仍待 B4-CLIENT 整体删除。 |
+| T03 | 本地语音模型 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/main/speech/model-*`、`src/renderer/src/components/settings/Voice*`、`src/main/ipc/speech.ts` | 桌面/共享 src 本地模型管理与 UI 已按有界验收移除；mobile 专属模型/客户端引用留待 B4-CLIENT 整体删除。 |
+| T04 | 云端语音识别 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/main/speech/openai-transcription-client.ts`、`src/main/ipc/speech.ts`、`src/shared/rpc-contract/` | 桌面/共享 src 云转写与 RPC schema 已按有界验收移除；生成 RPC catalog 检查通过。全仓 mobile 语音尚待 B4-CLIENT，不宣称全仓语音清空。 |
 | T05 | 桌面宠物 | B2-PET | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | T06 | 宠物导入与管理 | B2-PET | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | U01 | 本地 Profile | B5-PROFILE | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -215,7 +215,7 @@
 
 | 包 ID | 范围 | 状态 | 负责人 | 依赖 | 独立交付/完成证据 |
 |---|---|---|---|---|---|
-| B2-VOC | T01–T04 语音输入/模型/转写与快捷录音模式清理（整体交付） | 只读盘点中 | 待分配 | B0；与 B4-MOBILE 的 speech runtime RPC 文件串行 | 只读盘点已完成，实施尚未开始。由一个执行者整体完成 T01–T04，避免 UI/IPC/RPC/runtime 中间态不可用；纳入共享 mobile speech 专属链。删除语音专属录音/模型/转写和云音频上传，保留通用麦克风选择、浏览器媒体权限及被其他功能复用的音频基础设施。 |
+| B2-VOC | T01–T04 语音输入/模型/转写与快捷录音模式清理（整体交付） | 完成 | graphify_build | B0；B4-CLIENT 紧随 B2 批次整体删除 `mobile/**` | 完成桌面/共享 src 范围的有界验收；保留通用麦克风选择、浏览器媒体权限及复用音频基础设施。独立 mobile 客户端仍有语音调用，属于 M01–M15 全删范围；不改造将整体删除的客户端，B2 不得宣称全仓 mobile 语音已清空。源码证据：114 个存活 TS-family 改动语法解析零诊断、9 个改动 JSON 可解析、RPC catalog 官方生成与 `--check`、diff-check 通过。23 个唯一测试文件共 397 passed、5 个因缺少既有 Windows native build artifacts 环境失败（其中 3 个 credential migration、2 个 packaging config）、8 skipped；两项修复后的 feature-tip fixture 分别 45/45、26/26 通过。另有 5 个 native-chat field 测试文件因内存预算未运行。相对基线 `a111650acd7154140d1d788749b6103a47589283` 的 changed-code gate 输入为 38 文件/97 新增行；gate 因资源限制中止，完整结果未知，仅完成 code-quality（0 findings）、casting（最初报告两处 fixture 强转，修复后的定向扫描确认新增行无相交诊断）和 focused plugins（0 findings）；type-aware、React Doctor、design-system 与 SAFETY rationale 未完成。全量类型检查未完成且结果未知。 |
 | B2-PET | T05–T06 桌面宠物及导入管理 | 待执行 | 待分配 | B0 | 移除专属 UI/API/后台行为；确认 Codex sprite defaults 是否被保留能力复用。 |
 | B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 待执行 | 待分配 | B0 | 移除上传 handler/network/菜单动作，保留本地崩溃资料导出；不得删除本地 crash diagnostics。 |
 | B2-TELEMETRY | U11 遥测采集/发送清理 | 待执行 | 待分配 | B0；B2-VOC/B2-PET/B2-UPLOAD 后清理残余调用 | 禁止默认及用户路径中的遥测网络发送；保留本地诊断、Agent状态/流程所需非遥测代码；公共 shared schema 由唯一执行者串行改。 |
@@ -224,7 +224,12 @@
 | B5-SHARE | P05–P07 私有 Skills 分发/版本/WSL目标清理 | 待执行 | 待分配 | B0；B4-WSL 完成后清理 WSL 目标残余 | 保留本地 Skills/MCP/插件能力；删除私有分发、安装源、版本回滚和 WSL 目标专属流程。 |
 | B5-ISOLATION | O08–O13 Cloud VM、recipe、资源管理及 Docker 隔离裁剪 | 待执行 | 待分配 | B0 | 去除远程/云/Docker 专属环境，保留 O02 本机隔离及普通本地进程执行；复核共享执行器。 |
 | B5-CROSS | B5 与 B2/B4 重叠的跨功能共享入口及配置收尾 | 待执行 | 待分配 | B5-PROFILE/B5-SHARE/B5-ISOLATION；依文件冲突串行 | 只清理由多个范围交叉形成的残余入口；每个共享文件事先指定唯一执行者，附保留依赖检索。 |
-| B4-MOBILE | M01–M15、R01–R09 移动端/中继/模拟器清理 | 待执行 | 待分配 | B0；B2-VOC 完成后处理共用 speech runtime RPC 残余 | 移除移动客户端/中继和设备模拟器路径；保留本地 daemon、普通终端与本地 PTY。移动 speech 专属链随 B2-VOC 整体交付；B4 负责确认无移动端/中继 RPC 残余，不拆分修改共享 runtime 文件。 |
+| B4-CLIENT | M01–M15 独立移动客户端整体删除 | 待执行 | 待分配 | B2-VOC 完成；然后优先执行 | 删除整个 `mobile/**`（当前 Git 跟踪清单 3,859 条路径），覆盖 iOS/Android/Web 客户端与其语音闭包；不在将删除的客户端内做语音兼容改造。必须紧接 B2-VOC，两个任务之间不发布，也不声称全仓语音清理完成。 |
+| B4-SERVICES | M04–M08 配对、中继与设备服务删除（跨端服务实现子范围） | 待执行 | 待分配 | B4-CLIENT；B0 | 清理仓库根目录的移动配对、设备认证/通信与 cloudrelay 服务入口；M04–M08 的客户端侧由 B4-CLIENT 删除，此任务负责跨端服务实现侧。路径需实施前盘点，避免误删本地 daemon/普通本地终端能力。 |
+| B4-DEVICE-TOOLS | R01–R09 模拟器工具总项 | 待执行 | 待分配 | B4-CLIENT；B0 | 总项由以下三个互斥子任务覆盖，分别独立审核/提交推送；不改动保留的本地 daemon、普通终端与本地 PTY。 |
+| B4-DEVICE-IOS | R01–R03 iOS 模拟器设备、画面/输入与辅助功能树 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除 iOS 模拟器发现/接入、画面与输入、辅助功能树相关代码；实施前盘点精确代码入口。 |
+| B4-DEVICE-ANDROID | R04–R08 Android SDK/AVD、画面/输入、应用权限与日志/UI 树 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除 Android SDK/设备发现、AVD、画面流/输入、应用权限操作及日志/UI 树相关代码；实施前盘点精确代码入口。 |
+| B4-DEVICE-AGENT | R09 模拟器 Agent 工具与技能 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除模拟器 Agent 工具与技能入口；实施前盘点其与保留 Codex/Pi Agent registry 的边界。 |
 | B7-COMMON | 公共依赖/构建/类型/IPC/快捷键/i18n/默认后台/测试清理 | 待执行 | 待分配 | B1–B6 所有代码包完成 | 独立清理确认无保留用途的死代码/依赖；锁文件只由指定者改；运行对应类型、构建、合同与回归证据。 |
 
 ### B5 跨功能边界单列
@@ -248,6 +253,6 @@
 | B2-TELEMETRY（U11） | `src/main/telemetry/`、`src/preload/api/telemetry-api.ts`、`src/renderer/src/lib/telemetry.ts`、`src/renderer/src/components/TelemetryFirstLaunchSurface.tsx`；`src/shared/telemetry-*` 和 feature 专属埋点待引用盘点 | 与 crash 本地诊断严格分开；shared schema/通用埋点由协调者统一改或按文件点名，不能整组目录删除。 |
 | B2-UPDATER（U06/U07） | `src/main/updater.ts`、`src/main/updater/`、`src/main/window/main-window-updater.ts`、`src/preload/api/updater-{bridge,api}.ts`、renderer `UpdateCard.tsx` / `UpdateErrorCardContent.tsx` | 候选文件含发布/serve/退出生命周期公共逻辑；先画 import/call graph，明确移除自动更新和更新专属下载安装，保留 Electron、serve supervisor、正常退出/安装包恢复中实际共用部分。 |
 | B3-PLATFORM（J01–J15,J17–J18） | GitHub/GitLab/Linear/Bitbucket/Azure 等 preload API、main handler、renderer task-page 入口待盘点 | J16 Jira 必须保留；Git基础能力由 I 组保留；平台专用文件可以独立，但共享 GitHub client 不可整体删除。 |
-| B4-REMOTE（L/M/R/K16–K18） | `src/main/wsl*`、`src/wsl-guest/`、`src/preload/api/{ssh,wsl,mobile,legacy-relay}*`、renderer remote runtime/terminal 传输入口 | 高度复用本地 daemon/PTTY；本批可按 SSH、WSL、mobile/relay、simulator、browser remote 子组拆分，但共享协议/terminal transport 需协调者集中分配。 |
+| B4-REMOTE（L/K16–K18） | `src/main/wsl*`、`src/wsl-guest/`、`src/preload/api/{ssh,wsl,legacy-relay}*`、renderer remote runtime/terminal 传输入口；移动端归 B4-CLIENT，根配对/中继归 B4-SERVICES，模拟器归 B4-DEVICE-TOOLS | 高度复用本地 daemon/PTTY；共享协议/terminal transport 需协调者指定唯一执行者，并按批次串行修改。浏览器条件能力继续保留。 |
 | B6-AGENT（W 删除项） | `src/main` 中各 provider 适配目录、preload provider registry、renderer agent provider catalog（精确文件待盘点） | 保留 W01/W03/W06/W07；Claude/OpenCode 专用适配仍保留，Codex/Pi 是本地真实验证 Agent。共享 agent registry 由单一负责人编辑。 |
 | B7-COMMON | package/build/type/IPC/快捷键/i18n/后台默认任务/测试清理 | 各功能批次完成后由协调者分配残余项；不抢改上游批次正在编辑的文件。 |

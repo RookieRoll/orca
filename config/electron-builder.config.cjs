@@ -140,7 +140,7 @@ const bundledPluginResources = {
   from: 'resources/plugins/launch',
   to: 'plugins/launch'
 }
-// Why: the main bundle, packaged CLI, SSH paths, and speech worker all execute
+// Why: the main bundle, packaged CLI, and SSH paths all execute
 // from package directories where pnpm's symlink farm is absent. Copy the exact
 // runtime dependency closure to Resources/node_modules so bare require() calls
 // do not fall through to a developer checkout's node_modules.
@@ -161,20 +161,6 @@ const commonExtraResources = [
   nativeChatVisualsResource,
   emojiShortcodeDatasetResource
 ]
-// Why: native speech addons must be real files outside app.asar; copy only the
-// package matching the artifact target instead of every optional variant.
-const macSpeechNativeResource = {
-  from: 'node_modules/sherpa-onnx-darwin-${arch}',
-  to: 'node_modules/sherpa-onnx-darwin-${arch}'
-}
-const linuxSpeechNativeResource = {
-  from: 'node_modules/sherpa-onnx-linux-${arch}',
-  to: 'node_modules/sherpa-onnx-linux-${arch}'
-}
-const winSpeechNativeResource = {
-  from: 'node_modules/sherpa-onnx-win-x64',
-  to: 'node_modules/sherpa-onnx-win-x64'
-}
 // electron-builder replaces these defaults when `depends` is configured; retain
 // Electron's loader requirements alongside Orca's headless-host dependencies.
 const debElectronRuntimeDependencies = [
@@ -324,10 +310,6 @@ module.exports = {
     // Why: bundled plugins ship via extraResources to resources/plugins/launch;
     // packing the source tree into app.asar would duplicate those exact bytes.
     '!resources/plugins/launch/**',
-    // Why: speech packages are copied selectively through the platform
-    // extraResources entry below; keeping them in app.asar would ship every
-    // native variant (and duplicate the selected one).
-    '!node_modules/sherpa-onnx*{,/**/*}',
     // Why: the Windows CLI shim ships via extraResources to resources/bin/orca.cmd
     // (beside the native resources/bin/orca.exe). Packing the source tree into
     // app.asar too lets asarUnpack:['resources/**'] extract a second copy at
@@ -575,7 +557,6 @@ module.exports = {
     extraResources: [
       ...commonExtraResources,
       ...windowsRuntimeResources,
-      winSpeechNativeResource,
       {
         from: 'resources/win32/bin/orca.cmd',
         to: 'bin/orca.cmd'
@@ -663,7 +644,6 @@ module.exports = {
     extraResources: [
       ...commonExtraResources,
       ...createPackagedRuntimeNodeModuleResources('darwin'),
-      macSpeechNativeResource,
       {
         from: 'resources/darwin/bin/orca',
         to: 'bin/orca'
@@ -731,7 +711,6 @@ module.exports = {
     extraResources: [
       ...commonExtraResources,
       ...createPackagedRuntimeNodeModuleResources('linux'),
-      linuxSpeechNativeResource,
       {
         from: 'native/wayland-clipboard/.build/${arch}/orca-wayland-clipboard',
         to: 'bin/orca-wayland-clipboard'

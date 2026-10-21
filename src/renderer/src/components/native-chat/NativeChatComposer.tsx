@@ -17,7 +17,6 @@ import { useNativeChatFileDrops } from './use-native-chat-file-drops'
 import { useNativeChatComposerKeyDown } from './use-native-chat-composer-keydown'
 import { useNativeChatSendLifecycle } from './use-native-chat-send-lifecycle'
 import { useNativeChatSessionOptions } from './use-native-chat-session-options'
-import { useNativeChatDictation } from './use-native-chat-dictation'
 import { useNativeChatSessionOptionCommand } from './use-native-chat-session-option-command'
 import { useNativeChatPickerCommandDispatch } from './use-native-chat-picker-command-dispatch'
 import type {
@@ -225,7 +224,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
       setNotice
     })
 
-    const dictation = useNativeChatDictation(textareaRef, disabled)
     const { dispatch: dispatchSessionOptionCommand, isDispatching: isDispatchingSessionOption } =
       useNativeChatSessionOptionCommand({
         agent,
@@ -379,9 +377,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
           disabled ||
           (structuredTransport?.runtime === 'remote' && structuredTransport.sessionPending === true)
         }
-        dictationDisabled={dictation.dictationDisabled}
-        isDictating={dictation.isDictating}
-        isDictationHoldMode={dictation.isDictationHoldMode}
         imeEnterGesture={imeEnterGesture}
         onDraftChange={handleDraftChange}
         onTextareaSelect={(element) => {
@@ -407,9 +402,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         onChooseMentionFile={completeMention}
         onRemoveImageAttachment={(id) => removeImageAttachment(id)}
         onAttach={pickAttachments}
-        onDictationToggle={dictation.toggleDictation}
-        onDictationHoldStart={dictation.startHoldDictation}
-        onDictationHoldEnd={dictation.stopHoldDictation}
         onSend={send}
         onStop={interrupt}
         sessionOptionsSurface={sessionOptionsSurface}

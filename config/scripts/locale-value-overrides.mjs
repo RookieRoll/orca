@@ -339,7 +339,6 @@ export const LOCALE_VALUE_OVERRIDES = {
     'No workspace ports detected': '未检测到工作区端口',
     'No local ports detected': '未检测到本地端口',
     'No ports detected': '未检测到端口',
-    'No speech detected.': '未检测到语音。',
     'No enabled AI agent was detected on this workspace host.':
       '此工作区主机上未检测到已启用的 AI 智能体。',
     'The selected agent was not detected on this workspace host.':

@@ -61,7 +61,6 @@ export const HOST_OPERATION_OWNERSHIP = {
   sidebarInputs: 'host',
   sidebarSession: 'host',
   skills: 'host',
-  speech: 'host',
   ssh: 'host',
   stats: 'host',
   status: 'host',

@@ -61,7 +61,6 @@ import { registerPluginHandlers } from '../plugins'
 import { registerUIHandlers, setTrustedUIRendererWebContentsId } from '../ui'
 import { registerEmulatorFrameStreamHandlers } from '../emulator-frame-stream'
 import { registerEmulatorVideoStreamHandlers } from '../emulator-video-stream'
-import { registerSpeechHandlers } from '../speech'
 import { registerTerminalRenderDesyncEvidenceHandler } from '../terminal-render-desync-evidence'
 import { registerOrcaProfileHandlers } from '../orca-profiles'
 import { registerCodexAccountHandlers } from '../codex-accounts'
@@ -298,5 +297,4 @@ export function registerCoreHandlers(
     }
   })
   registerUpdaterHandlers(store)
-  registerSpeechHandlers(store)
 }

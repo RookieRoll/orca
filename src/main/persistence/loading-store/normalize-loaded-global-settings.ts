@@ -1,5 +1,4 @@
 import { normalizeNativeChatAppearanceSettings } from '../../../shared/native-chat-appearance-settings'
-import { getDefaultVoiceSettings } from '../../../shared/constants'
 import { normalizePRBotAuthorOverrides } from '../../../shared/pr-bot-author-overrides'
 import { normalizeTerminalQuickCommands } from '../../../shared/terminal-quick-commands'
 import { normalizeOpenInApplications } from '../../../shared/open-in-applications'
@@ -172,9 +171,5 @@ export function normalizeLoadedGlobalSettings(
       migratedSourceControlAi,
       parsed.settings?.commitMessageAi ?? defaults.settings.commitMessageAi
     ),
-    voice: {
-      ...getDefaultVoiceSettings(),
-      ...parsed.settings?.voice
-    }
   }
 }

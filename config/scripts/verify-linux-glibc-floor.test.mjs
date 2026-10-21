@@ -82,29 +82,11 @@ describe('verify-linux-glibc-floor parsing', () => {
   })
 
   it('flags strong too-new glibc + libstdc++ needs, skipping weak and ungated families', () => {
-    const violations = findFloorViolations(parseVersionNeeds(OBJDUMP_P), '/opt/app/pty.node')
+    const violations = findFloorViolations(parseVersionNeeds(OBJDUMP_P))
     const names = violations.map((v) => v.name).sort()
     // GLIBC_2.34, GLIBC_ABI_DT_RELR, GLIBCXX_3.4.29 fail; weak GLIBC_2.18 and
     // GLIBC_2.2.5 are excluded.
     expect(names).toEqual(['GLIBCXX_3.4.29', 'GLIBC_2.34', 'GLIBC_ABI_DT_RELR'].sort())
-  })
-
-  it('exempts sherpa-onnx from the libstdc++ floor but still gates its glibc', () => {
-    const needs = [
-      { library: 'libstdc++.so.6', name: 'GLIBCXX_3.4.29', weak: false },
-      { library: 'libc.so.6', name: 'GLIBC_2.34', weak: false }
-    ]
-    // A launch-critical module: both are violations.
-    expect(
-      findFloorViolations(needs, '/opt/app/node_modules/node-pty/pty.node').map((v) => v.name)
-    ).toEqual(['GLIBCXX_3.4.29', 'GLIBC_2.34'])
-    // sherpa: GLIBCXX exempt (lazy speech prebuilt), glibc still enforced.
-    expect(
-      findFloorViolations(
-        needs,
-        '/opt/app/node_modules/sherpa-onnx-linux-x64/sherpa-onnx.node'
-      ).map((v) => v.name)
-    ).toEqual(['GLIBC_2.34'])
   })
 
   it('reports no violations when every strong need is at or below the floor', () => {
@@ -118,14 +100,14 @@ describe('verify-linux-glibc-floor parsing', () => {
         '    0x00 0x00 04 GLIBCXX_3.4.22'
       ].join('\n')
     )
-    expect(findFloorViolations(needs, '/opt/app/pty.node')).toEqual([])
+    expect(findFloorViolations(needs)).toEqual([])
   })
 })
 
 describe('floor profiles', () => {
   const needs = (...names) => names.map((name) => ({ library: 'libc.so.6', name, weak: false }))
   const flagged = (list, floor) =>
-    findFloorViolations(list, '/opt/orcad/pty.node', floor).map((v) => v.name)
+    findFloorViolations(list, floor).map((v) => v.name)
 
   it('keeps the desktop default at Ubuntu 20.04', () => {
     expect(DESKTOP_GLIBC_FLOOR.label).toContain('glibc 2.31')
@@ -276,7 +258,7 @@ describe.skipIf(process.platform === 'win32')('verifyLinuxGlibcFloor', () => {
         '  *bad*)      printf "    0x0 0x00 03 GLIBC_2.34\\n    0x0 0x00 04 GLIBC_2.2.5\\n" ;;',
         '  *relr*)     printf "    0x0 0x00 05 GLIBC_ABI_DT_RELR\\n    0x0 0x00 04 GLIBC_2.2.5\\n" ;;',
         '  *weakonly*) printf "    0x0 0x02 06 GLIBC_2.32\\n    0x0 0x00 04 GLIBC_2.2.5\\n" ;;',
-        '  *cxx*|*sherpa*)',
+        '  *cxx*)',
         '    printf "  required from libstdc++.so.6:\\n    0x0 0x00 07 GLIBCXX_3.4.29\\n" ;;',
         '  *)          printf "    0x0 0x00 08 GLIBC_2.28\\n    0x0 0x00 04 GLIBC_2.2.5\\n" ;;',
         'esac',
@@ -329,16 +311,13 @@ describe.skipIf(process.platform === 'win32')('verifyLinuxGlibcFloor', () => {
     }
   })
 
-  it('passes weak/at-floor needs and the exempt sherpa-onnx libstdc++ prebuilt', async () => {
+  it('passes weak and at-floor needs', async () => {
     const root = await mkdtemp(join(tmpdir(), 'orca-glibc-under-'))
     try {
       const objdumpPath = await writeStubObjdump(root)
-      const sherpaDir = join(root, 'app', 'node_modules', 'sherpa-onnx-linux-x64')
-      await mkdir(sherpaDir, { recursive: true })
       await writeFile(join(root, 'app', 'good-pty.node'), ELF_HEADER)
       await writeFile(join(root, 'app', 'weakonly-lib.so'), ELF_HEADER) // weak GLIBC_2.32 → OK
       await writeFile(join(root, 'app', 'orca-ide'), ELF_HEADER)
-      await writeFile(join(sherpaDir, 'sherpa-onnx.node'), ELF_HEADER) // GLIBCXX_3.4.29, exempt
 
       expect(() => verifyLinuxGlibcFloor(join(root, 'app'), { objdumpPath })).not.toThrow()
     } finally {

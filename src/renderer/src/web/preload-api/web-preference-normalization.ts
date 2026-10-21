@@ -169,10 +169,6 @@ export function mergeSettings(
       updates.agentDefaultArgs ?? base.agentDefaultArgs
     ),
     agentDefaultEnv: normalizeTuiAgentEnvRecord(updates.agentDefaultEnv ?? base.agentDefaultEnv),
-    voice: {
-      ...(base.voice ?? defaults.voice),
-      ...updates.voice
-    } as NonNullable<GlobalSettings['voice']>,
     activeRuntimeEnvironmentId: Object.hasOwn(updates, 'activeRuntimeEnvironmentId')
       ? (updates.activeRuntimeEnvironmentId ?? null)
       : (base.activeRuntimeEnvironmentId ?? null),
@@ -186,6 +182,7 @@ export function mergeSettings(
     ),
     uiLanguage: normalizeUiLanguage(updates.uiLanguage ?? base.uiLanguage)
   }
+  Reflect.deleteProperty(merged, 'voice')
   return {
     ...merged,
     ...normalizeAutoRenameBranchFromWorkDefaultOn(merged, {

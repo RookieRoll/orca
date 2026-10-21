@@ -2,7 +2,6 @@ import type { GlobalSettingsBase } from './global-settings-base'
 import type { ExecutionHostId } from './execution-host'
 import type { OrcaWorkspaceLayout } from './orca-workspace-layout'
 import type { GitHubProjectSettings } from './github/project-types'
-import type { VoiceSettings } from './speech-types'
 import type { AiVaultSearchSettings } from './ai-vault-search-settings'
 import type { GitLabProjectSettings } from './gitlab-types'
 import type { TaskProvider } from './task-providers'
@@ -536,8 +535,6 @@ export type GlobalSettings = GlobalSettingsBase & {
   /** One-shot cohort marker for the tab-switch keybinding swap. 'pending' =
    *  pre-existing install (seed pins old chords, then flips to 'done'); 'done' = fresh install. */
   tabSwitchKeybindingSeed?: 'pending' | 'done'
-  /** Local voice/dictation config. Optional for pre-voice profiles; getDefaultSettings() hydrates defaults via the persistence merge. */
-  voice?: VoiceSettings
   /** Transcript full-text search consent + retention. Absent means off; nothing indexes until the user opts in. */
   aiVaultSearch?: AiVaultSearchSettings
 }
