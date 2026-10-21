@@ -38,10 +38,6 @@ vi.mock('electron', () => ({
   }
 }))
 
-vi.mock('./feedback', () => ({
-  submitFeedback: vi.fn()
-}))
-
 vi.mock('../crash-reporting/crash-breadcrumb-store', () => ({
   getCrashBreadcrumbSnapshot: vi.fn(() => []),
   recordCoalescedCrashBreadcrumb: (...args: unknown[]) =>
@@ -54,7 +50,7 @@ vi.mock('../observability', () => ({
   getDiagnosticsStatus: vi.fn()
 }))
 
-vi.mock('../observability/diagnostic-upload-endpoint', () => ({
+vi.mock('../observability/diagnostic-orca-channel', () => ({
   resolveDiagnosticOrcaChannel: vi.fn()
 }))
 
@@ -69,10 +65,8 @@ function registerHandlersWithStubStore(): void {
     getLatestPending: vi.fn(),
     getById: vi.fn(),
     dismiss: vi.fn(),
-    markSent: vi.fn(),
     listRecent: vi.fn(),
-    record: vi.fn(),
-    formatDiagnosticText: vi.fn()
+    record: vi.fn()
   } as never)
 }
 

@@ -22,14 +22,6 @@ export type DiagnosticsBundlePayload = {
   readonly bytes: number
   readonly spanCount: number
 }
-export type DiagnosticsUploadPayload =
-  | {
-      readonly ticketId: string
-    }
-  | {
-      readonly canceled: true
-    }
-
 export type MemoryApi = {
   getSnapshot: () => Promise<MemorySnapshot>
 }
@@ -39,8 +31,6 @@ export type DiagnosticsApi = {
   collectBundle: (lookbackMinutes?: number) => Promise<DiagnosticsBundlePayload>
   openBundlePreview: (bundleSubmissionId: string) => Promise<void>
   discardBundlePreview: (bundleSubmissionId: string) => Promise<void>
-  uploadBundle: (bundleSubmissionId: string) => Promise<DiagnosticsUploadPayload>
-  deleteBundle: (ticketId: string) => Promise<void>
 }
 
 export type TelemetryApi = {
@@ -50,8 +40,7 @@ export type TelemetryApi = {
   /** Flip the persisted opt-in preference. Subject to a per-session
    *  consent-mutation rate limit on the main side (≤5/session). */
   telemetrySetOptIn: (optedIn: boolean) => Promise<void>
-  /** Diagnostic file controls (telemetry-error-tracking.md §User controls). Main does the FS/network
-   *  work and retains upload payloads so the renderer can't read or substitute arbitrary bytes. */
+  /** Local diagnostic file controls. */
   diagnostics: DiagnosticsApi
   /** Read-only effective consent state (+ reason if disabled) — env vars are main-side state the renderer can't read directly. */
   telemetryGetConsentState: () => Promise<TelemetryConsentState>

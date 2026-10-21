@@ -5,12 +5,10 @@ import path from 'node:path'
 import { app } from 'electron'
 import { grantDirAclAsync, isPermissionError } from '../win32-utils'
 import {
-  formatCrashReportText,
   sanitizeCrashReportBreadcrumbs,
   sanitizeCrashReportDetails,
   type CrashReportCreateInput,
-  type CrashReportRecord,
-  type CrashReportStatus
+  type CrashReportRecord
 } from '../../shared/crash-reporting'
 
 const MAX_REPORTS = 5
@@ -141,63 +139,31 @@ export class CrashReportStore {
     return this.readReports()
   }
 
-  async markSent(id: string): Promise<CrashReportRecord | null> {
-    return this.transitionPending(id, 'sent')
-  }
-
-  async markDismissedSent(id: string): Promise<CrashReportRecord | null> {
-    return this.transitionStatus(id, 'dismissed', 'sent')
-  }
-
   async dismiss(id: string): Promise<CrashReportRecord | null> {
-    return this.transitionPending(id, 'dismissed')
-  }
-
-  async formatDiagnosticText(id: string, notes?: string): Promise<string | null> {
-    const reports = await this.readReports()
-    const report = reports.find((candidate) => candidate.id === id)
-    return report ? formatCrashReportText(report, notes) : null
-  }
-
-  async getById(id: string): Promise<CrashReportRecord | null> {
-    const reports = await this.readReports()
-    return reports.find((report) => report.id === id) ?? null
-  }
-
-  private async transitionPending(
-    id: string,
-    status: Exclude<CrashReportStatus, 'pending'>
-  ): Promise<CrashReportRecord | null> {
-    return this.transitionStatus(id, 'pending', status)
-  }
-
-  private async transitionStatus(
-    id: string,
-    from: CrashReportStatus,
-    status: Exclude<CrashReportStatus, 'pending'>
-  ): Promise<CrashReportRecord | null> {
     return this.withWrite(async (reports) => {
       let result: CrashReportRecord | null = null
       const anchor = reports.find((report) => report.id === id)
       const nextReports = reports.map((report) => {
         if (report.id !== id) {
-          // Why: one Electron crash can emit GPU/Network/renderer exits in a
-          // burst. Once one report is handled, sibling pending records should
-          // not re-open the crash prompt as separate crashes.
-          if (anchor && anchor.status === from && isRelatedCrashEvent(anchor, report)) {
+          if (anchor && anchor.status === 'pending' && isRelatedCrashEvent(anchor, report)) {
             return { ...report, status: 'dismissed' as const }
           }
           return report
         }
-        if (report.status !== from) {
+        if (report.status !== 'pending') {
           result = report
           return report
         }
-        result = { ...report, status }
+        result = { ...report, status: 'dismissed' }
         return result
       })
       return { reports: nextReports, result }
     })
+  }
+
+  async getById(id: string): Promise<CrashReportRecord | null> {
+    const reports = await this.readReports()
+    return reports.find((report) => report.id === id) ?? null
   }
 
   private async withWrite<T>(

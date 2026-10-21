@@ -18,7 +18,6 @@ const configuration = {
   version: '1.2.3-rc.4',
   packageManager: 'pnpm@12.14.0',
   identity: 'rc',
-  diagnosticsTokenUrl: 'https://example.test/diagnostics',
   telemetryKeySha256: 'b'.repeat(64)
 }
 
@@ -81,7 +80,6 @@ function configurationFixture(version = '1.2.3') {
   }
   const env = {
     ORCA_BUILD_IDENTITY: 'stable',
-    ORCA_DIAGNOSTICS_TOKEN_URL: 'https://example.test/diagnostics',
     ORCA_POSTHOG_WRITE_KEY: 'release-key'
   }
   return { root, env }
@@ -110,8 +108,7 @@ describe('release JavaScript configuration', () => {
     expect(releaseJavascriptConfiguration(root, devEnv)).toMatchObject({
       identity: 'dev',
       version: '0.0.0-adhoc.test',
-      telemetryKeySha256: null,
-      diagnosticsTokenUrl: env.ORCA_DIAGNOSTICS_TOKEN_URL
+      telemetryKeySha256: null
     })
     expect(() =>
       releaseJavascriptConfiguration(root, { ...devEnv, ORCA_BUILD_IDENTITY: 'stable' })
@@ -146,7 +143,7 @@ describe('release JavaScript configuration', () => {
     ).toThrow('Invalid JavaScript build identity')
   })
 
-  it('checks the source checkout and diagnostics endpoint in development mode', () => {
+  it('checks the source checkout in development mode', () => {
     const { root, env } = configurationFixture()
     const devEnv = {
       ...env,
@@ -160,9 +157,6 @@ describe('release JavaScript configuration', () => {
         ORCA_RELEASE_JAVASCRIPT_SOURCE_SHA: 'b'.repeat(40)
       })
     ).toThrow('Release checkout differs from bundle source')
-    expect(() =>
-      releaseJavascriptConfiguration(root, { ...devEnv, ORCA_DIAGNOSTICS_TOKEN_URL: '' })
-    ).toThrow('Missing release diagnostics URL')
   })
 })
 
@@ -211,7 +205,6 @@ describe('release JavaScript transfer', () => {
     'version',
     'packageManager',
     'identity',
-    'diagnosticsTokenUrl',
     'telemetryKeySha256'
   ])('rejects a different %s before replacing the current build', (field) => {
     const options = fixture()

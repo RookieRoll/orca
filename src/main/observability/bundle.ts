@@ -1,10 +1,5 @@
-// Diagnostic bundle collection + upload (Mode 3, telemetry-error-tracking.md): the one
-// user-initiated network path from the error-tracking lane to Orca infra. The per-bundle
-// submission ID NEVER carries install_id (security-review Issue 8), and main retains the
-// uploadable payload so a compromised renderer can't substitute bytes after preview.
-// Server endpoint contract lives in telemetry-error-tracking.md §Endpoint contract; we
-// ship only the client, with the hardening invariants it controls (content-type pinning,
-// upload body-size cap, token-handling discipline).
+// Collects a bounded, redacted local bundle for user review. The per-bundle ID never carries
+// install_id, and main retains payload bytes so the renderer cannot substitute them.
 
 import { randomBytes } from 'node:crypto'
 import { readFileSync, statSync } from 'node:fs'
@@ -35,7 +30,7 @@ export type CollectedBundle = {
   readonly bundleSubmissionId: string
   /** UTF-8 NDJSON payload — header line + N redacted span lines. */
   readonly payload: string
-  /** Byte length of `payload`. Pre-checked against the 4 MiB upload cap. */
+  /** Byte length of `payload`, bounded to 4 MiB. */
   readonly bytes: number
   /** Span-line count, for the preview window's "N spans" label. */
   readonly spanCount: number
@@ -137,7 +132,7 @@ function collectNewestRecords(
         continue
       }
       if (bytes + redactedBytes > budgetBytes) {
-        // Hard ceiling matches the upload endpoint's 4 MiB; check before appending so the preview uploads as-is.
+        // Check the local bundle ceiling before appending a record.
         return { lines, bytes }
       }
       lines.push(redacted)
@@ -167,7 +162,7 @@ function takeNewestLines(
 
 /**
  * Read the last N minutes of NDJSON across the rotated family into a redacted bundle payload.
- * Main keeps the uploadable payload so a compromised renderer can't substitute bytes after preview.
+ * Main keeps the local payload so a compromised renderer can't substitute bytes after preview.
  */
 export function collectBundle(opts: CollectBundleOptions): CollectedBundle {
   const lookbackMs = (opts.lookbackMinutes ?? DEFAULT_LOOKBACK_MINUTES) * 60 * 1000

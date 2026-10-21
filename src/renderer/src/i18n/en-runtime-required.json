@@ -358,10 +358,9 @@
       "crash": {
         "report": {
           "CrashReportDialog": {
-            "56a3dfa283": "Failed to send crash report.",
             "835037edc9": "· Orca",
             "b175e90213": "No crash report is available.",
-            "b2e36f53a1": "Failed to send crash report. Diagnostic ticket {{value0}} was uploaded but not linked."
+            "ead6fc0510": "No automatic crash report was captured on this device."
           }
         }
       },
@@ -1409,6 +1408,14 @@
         "OrchestrationSkillAgentCoverage": {
           "fullCoverage_one": "All 1 detected agent has the skill.",
           "fullCoverage_other": "All {{value0}} detected agents have the skill."
+        },
+        "PrivacyDiagnosticBundleControls": {
+          "62340d4439": "Your local review file is ready ({{value0}}). Open it to review its contents, or discard it.",
+          "fd7b3891af": "You opened the local review file ({{value0}}). You can discard it when finished."
+        },
+        "PrivacyDiagnosticsRows": {
+          "5a7cbe069a": "DO_NOT_TRACK=1 is set — creating local diagnostic files is disabled.",
+          "63d03261d1": "ORCA_TELEMETRY_DISABLED=1 is set — creating local diagnostic files is disabled."
         },
         "PrivacyPane": {
           "afec8b03be": "ci"
@@ -2920,6 +2927,22 @@
         "symlink": "Symbolic links cannot be attached.",
         "unsupported": "Unsupported file type."
       },
+      "feedback": {
+        "image": {
+          "attachments": {
+            "additionalErrors": "{{count}} additional images could not be attached.",
+            "compressed": "{{fileName}} was compressed from {{originalSize}} to {{size}} to fit the attachment limit.",
+            "dimensionsTooLarge": "{{fileName}} has dimensions that are too large to preview safely.",
+            "empty": "{{fileName}} is empty.",
+            "fallbackName": "Image attachment",
+            "invalidImage": "{{fileName}} is not a valid supported image.",
+            "tooLarge": "{{fileName}} is larger than {{maxSize}}.",
+            "tooMany": "You can attach up to {{maxCount}} images.",
+            "totalTooLarge": "{{fileName}} would bring the attachments over {{maxSize}} in total.",
+            "unsupportedType": "{{fileName}} is not a supported image type."
+          }
+        }
+      },
       "file": {
         "preview": {
           "webClientUnavailable": "Document previews aren't available in the web client."
@@ -3225,13 +3248,6 @@
         "usageLimitWindowWeekly": "weekly",
         "usageLimitWindowWeeklyModel": "weekly model",
         "writeFailed": "Orca couldn't hand this message to the agent, so it was not sent."
-      },
-      "find": {
-        "close": "Close",
-        "label": "Find in chat",
-        "nextMatch": "Next match",
-        "noResults": "No results",
-        "previousMatch": "Previous match"
       },
       "notices": {
         "compaction": "Context compacted",

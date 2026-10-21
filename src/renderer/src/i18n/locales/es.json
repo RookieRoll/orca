@@ -5503,30 +5503,6 @@
           "822ff300ad": "Descartar",
           "5bfd5c8779": "Descartar scripts de configuración"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "Cancelar",
-          "8de03e23c5": "Envíalo solo con tu feedback escrito o conecta `gh` para incluir tu identidad de GitHub.",
-          "d20439c560": "Comprobando identidad de GitHub...",
-          "5b120b9634": "Enviar de forma anónima",
-          "c9e5ea0791": "GitHub:",
-          "d46ddd66fc": "¿Qué podríamos mejorar?",
-          "3460258a54": "Sigue en X",
-          "26108d3699": "Únete a Discord",
-          "d245c4ef6c": "Issues de GitHub",
-          "9b33530b3d": "Otras formas de contactarnos",
-          "a828fa4aee": "Comparte qué funciona, qué está roto o qué debería hacer Orca después.",
-          "0eb643f07f": "Enviar feedback",
-          "60b721e857": "No se pudo enviar el feedback. Inténtalo de nuevo.",
-          "7a46c228b8": "Gracias por el feedback.",
-          "a2fd890d9e": "Introduce feedback antes de enviarlo.",
-          "f2e42e1307": "Enviar",
-          "69969ba364": "Envío…",
-          "imageReadFailed": "Could not read the attached images. Try attaching them again.",
-          "attachWhileSending": "Wait for the current feedback to finish sending before attaching more images.",
-          "imagesNotDelivered": "Feedback sent, but image delivery could not be confirmed.",
-          "imagesNotIncluded": "Comentarios enviados. No se pudieron subir tus capturas de pantalla y no se incluyeron.",
-          "imagesRejected": "Comentarios enviados. Tus capturas de pantalla eran demasiado grandes para subirlas y no se incluyeron."
-        },
         "SidebarFilter": {
           "e3b3898218": "Agregar proyecto",
           "92a23e6d07": "Restablecer filtros",
@@ -5593,7 +5569,6 @@
           "5f83d86d92": "Changelog",
           "cdc87f897e": "Documentación",
           "e565171a7c": "Atajos de teclado",
-          "4cf5b868d7": "Enviar comentarios",
           "a428c25998": "Ajustes",
           "2991a0106c": "Ayuda",
           "4e8f5710d3": "No se pudo reiniciar Orca.",
@@ -6474,12 +6449,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Developer",
           "parkTerminal": "Park terminal"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "preparing": "Preparando archivos adjuntos…",
-          "attachImages": "Attach",
-          "removeImage": "Remove {{fileName}}",
-          "screenshotsHint": "Adjunta hasta {{count}} capturas de pantalla, {{maxSize}} en total"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "Ningún espacio de trabajo coincide",
@@ -7978,24 +7947,14 @@
         "PrivacyDiagnosticBundleControls": {
           "dc8404a930": "Crear archivo de diagnóstico",
           "a5acaffdb6": "Desechar",
-          "aca2c8a367": "Enviar a soporte",
           "798b6f0be5": "Abrir archivo de revisión",
-          "2ae9a6b63e": "Hecho",
-          "7f14a1733c": "Eliminar archivo enviado",
-          "2801d4ce22": "Copiar ID de referencia",
-          "d8be621237": "Abre primero el archivo de revisión.",
-          "61676df223": "Diagnósticos enviados. Comparte este ID de referencia con soporte: {{value0}}.",
-          "fd7b3891af": "Abriste el archivo de revisión ({{value0}}). Envía ese archivo a soporte o descártalo.",
-          "62340d4439": "Tu archivo de revisión está listo ({{value0}}). Ábrelo para ver qué se enviaría y luego elige si quieres enviarlo a soporte.",
-          "19ec5e29b3": "Recopila actividad reciente y errores de la app en un archivo depurado que puedes revisar antes de enviarlo. Nada se sube hasta que elijas enviarlo."
+          "fd7b3891af": "Abriste el archivo local de revisión ({{value0}}). Puedes descartarlo cuando termines.",
+          "62340d4439": "El archivo local de revisión está listo ({{value0}}). Ábrelo para revisar su contenido o descártalo.",
+          "19ec5e29b3": "Crea en este dispositivo un archivo de diagnóstico redactado para que puedas revisarlo. No se carga nada."
         },
         "PrivacyDiagnosticsSection": {
-          "af2fc82cde": "Enviar diagnósticos de la app a soporte",
-          "c18cbe45df": "Se eliminaron los diagnósticos enviados",
-          "7a4944595b": "No se pudo copiar el ID de referencia",
-          "13eb2c65a1": "ID de referencia copiado",
+          "af2fc82cde": "Revisar los diagnósticos locales de la aplicación",
           "860bca9ec9": "Archivo de revisión descartado",
-          "49fc6c80e8": "Diagnósticos enviados",
           "db3228e01a": "Archivo de revisión abierto",
           "a2b3505c77": "Archivo de revisión creado"
         },
@@ -10413,9 +10372,8 @@
             "83a6cd79b3": "no rastrear",
             "f7a2d9f137": "Variables de entorno que deshabilitan la transmisión de telemetría.",
             "e058a3c98d": "Variables de entorno de telemetría",
-            "1686c07fee": "soporte",
             "c0494ff48a": "diagnósticos",
-            "8b08f32366": "Diagnósticos de la aplicación y controles para compartir con soporte.",
+            "8b08f32366": "Controles de diagnóstico local de la aplicación.",
             "6d258d2ed6": "Diagnósticos",
             "ead1deded2": "compartir",
             "27a27b2f63": "optar por no participar",
@@ -11274,8 +11232,8 @@
           "applyRuntimeChange": "Aplicar cambio de runtime"
         },
         "PrivacyDiagnosticsRows": {
-          "5a7cbe069a": "DO_NOT_TRACK=1 está configurado: crear y enviar archivos de diagnóstico está deshabilitado.",
-          "63d03261d1": "ORCA_TELEMETRY_DISABLED=1 está configurado: crear y enviar archivos de diagnóstico está deshabilitado.",
+          "5a7cbe069a": "DO_NOT_TRACK=1 está configurado: la creación de archivos de diagnóstico locales está deshabilitada.",
+          "63d03261d1": "ORCA_TELEMETRY_DISABLED=1 está configurado: la creación de archivos de diagnóstico locales está deshabilitada.",
           "d37e92a06b": "ORCA_DIAGNOSTICS_DISABLED=1 está configurado: los diagnósticos de la app están desactivados.",
           "5ebb31e1fb": "Se está ejecutando en CI: los diagnósticos están desactivados.",
           "e27c8d45bf": "Los diagnósticos están desactivados por una variable de entorno."
@@ -16284,32 +16242,14 @@
       "crash": {
         "report": {
           "CrashReportDialog": {
-            "b4951cd27c": "Enviar informe",
-            "88fea8e84e": "No enviar",
+            "88fea8e84e": "Cerrar",
             "50b00dc327": "Copiar detalles",
             "6d3ebe216a": "Texto de diagnóstico",
             "835037edc9": "· Orca",
-            "56a3dfa283": "No se pudo enviar el informe de fallas.",
-            "8e24fe4f75": "Informe de fallo enviado.",
             "8b8473c544": "Se copió el informe de fallos.",
             "b175e90213": "No hay ningún informe de fallo disponible.",
             "765591798d": "Comprobando informes de fallos...",
-            "b2e36f53a1": "No se pudo enviar el informe de fallo. Se subió el ticket de diagnóstico {{value0}}, pero no se vinculó.",
-            "ead6fc0510": "No se capturó ningún informe de fallo automático. Aun así puedes enviar detalles e incluir logs de diagnóstico recientes cuando estén disponibles.",
-            "b082f27490": "Adjuntar logs de diagnóstico recientes",
-            "e59f0b9427": "Envía un paquete limitado de logs redactados junto con el informe."
-          },
-          "submit": {
-            "notice": {
-              "unknownError": "The crash report request failed before it returned a reason.",
-              "ticketUploaded": "Diagnostic ticket {{value0}} was uploaded but not linked.",
-              "uncheckDiagnostics": "Uncheck \"Attach recent diagnostic logs\" and try again, or copy the details.",
-              "checkConnection": "Check your connection and try again, or copy the details.",
-              "notSent": "Crash report wasn't sent",
-              "copyDetails": "Copy Details",
-              "sentWithoutDiagnostics": "Crash report sent without diagnostic logs",
-              "diagnosticsReason": "Diagnostic logs were not attached: {{value0}}"
-            }
+            "ead6fc0510": "No se capturó ningún informe automático de fallo en este dispositivo."
           },
           "copy": {
             "copyFailed": "No se pudieron copiar los detalles del informe de fallo."

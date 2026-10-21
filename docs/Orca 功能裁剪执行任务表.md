@@ -178,7 +178,7 @@
 
 | 范围 | 任务 | 状态 | 负责人 | 检查证据 / 阻塞 |
 |---|---|---|---|---|
-| U10 | 将崩溃资料能力收敛为用户触发的本地导出；移除上传入口、远端目标、自动发送和上传后台链路。 | 待执行 | 待分配 | 入口与副作用待盘点；验收须确认导出只写本机且不发网络请求。 |
+| U10 | 将崩溃资料能力收敛为用户触发的本地查看/复制；移除反馈表单、上传入口、远端目标、自动发送和上传后台链路。 | 代码及双方静态审查完成（回归未跑） | cleanup_tracker（renderer UI）；graphify_build（backend/shared） | 双方静态复核完成；官方locale/runtime目录校验和38个存活TS-family语法检查通过。回归因当时可用内存2.21 GiB未启动。已推送的前一提交为7b8fe8743dc537ea7c5221b189875700b94470fc，且远端cleanup/function-pruning已只读核对一致。保留collect/open/discard本机诊断预览及崩溃报告查看、脱敏复制、dismiss。诊断bundle仍是带TTL的本机临时文件，复制不是Save As；本任务不新增保存流程。 |
 | N13 | 仅本地嵌套编排；移除跨主机/远程 worker 路由，保留本机父子 worker 行为。 | 待执行 | 待分配 | 路由、序列化和调用入口待盘点；需证明无远程目标。 |
 | O02 | 仅本机隔离/执行；移除远程主机及云执行目标。 | 待执行 | 待分配 | daemon 与执行目标选择待盘点；保留普通本机进程执行。 |
 | V14 | 仅本地协商；删除远程版本协商/兼容分支，保留本地组件协商需要。 | 待执行 | 待分配 | 协议调用链待盘点；混合版本远程兼容不再属于此轮目标。 |
@@ -217,7 +217,7 @@
 |---|---|---|---|---|---|
 | B2-VOC | T01–T04 语音输入/模型/转写与快捷录音模式清理（整体交付） | 完成 | graphify_build | B0；B4-CLIENT 紧随 B2 批次整体删除 `mobile/**` | 完成桌面/共享 src 范围的有界验收；保留通用麦克风选择、浏览器媒体权限及复用音频基础设施。独立 mobile 客户端仍有语音调用，属于 M01–M15 全删范围；不改造将整体删除的客户端，B2 不得宣称全仓 mobile 语音已清空。源码证据：114 个存活 TS-family 改动语法解析零诊断、9 个改动 JSON 可解析、RPC catalog 官方生成与 `--check`、diff-check 通过。23 个唯一测试文件共 397 passed、5 个因缺少既有 Windows native build artifacts 环境失败（其中 3 个 credential migration、2 个 packaging config）、8 skipped；两项修复后的 feature-tip fixture 分别 45/45、26/26 通过。另有 5 个 native-chat field 测试文件因内存预算未运行。相对基线 `a111650acd7154140d1d788749b6103a47589283` 的 changed-code gate 输入为 38 文件/97 新增行；gate 因资源限制中止，完整结果未知，仅完成 code-quality（0 findings）、casting（最初报告两处 fixture 强转，修复后的定向扫描确认新增行无相交诊断）和 focused plugins（0 findings）；type-aware、React Doctor、design-system 与 SAFETY rationale 未完成。全量类型检查未完成且结果未知。 |
 | B2-PET | T05–T06 桌面宠物及导入管理 | 待执行 | 待分配 | B0 | 移除专属 UI/API/后台行为；确认 Codex sprite defaults 是否被保留能力复用。 |
-| B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 待执行 | 待分配 | B0 | 移除上传 handler/network/菜单动作，保留本地崩溃资料导出；不得删除本地 crash diagnostics。 |
+| B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 代码及双方静态审查完成（回归未跑） | cleanup_tracker（renderer UI）；graphify_build（backend/shared） | B0 | renderer已移除 feedback 菜单/表单与图片、prefill、drop、draft/store闭包；诊断UI仅保留本机collect/open/discard；崩溃报告移除身份/发送/上传错误，仅保留本地查看、脱敏Copy、Dismiss。UI与backend静态复核完成；六种locale及runtime catalog同步/校验通过，Oxc解析38个存活TS-family文件0错误、0空文件。配置侧 release-javascript-artifact 两文件属于本任务，独立审查通过。回归因当时可用内存2.21 GiB未启动；本任务独立提交、不在本次推送。前一提交7b8fe8743dc537ea7c5221b189875700b94470fc已由用户手动推送，远端分支SHA匹配。U11 telemetry consent未改。临时bundle/TTL不是用户Save As导出。 |
 | B2-TELEMETRY | U11 遥测采集/发送清理 | 待执行 | 待分配 | B0；B2-VOC/B2-PET/B2-UPLOAD 后清理残余调用 | 禁止默认及用户路径中的遥测网络发送；保留本地诊断、Agent状态/流程所需非遥测代码；公共 shared schema 由唯一执行者串行改。 |
 | B2-UPDATER | U06/U07 自动更新、下载安装与更新推荐清理 | 待执行 | 待分配 | B0 | 去除自动检查、下载、安装、推荐及对应入口；证明 Electron 启动/退出/本机 serve 监督未受损。 |
 | B5-PROFILE | U01–U04 本地 Profile/云账号/组织/切换裁剪 | 待执行 | 待分配 | B0 | 去除组织/云 Profile 流程并确认仍需保留的本地配置归属；共享设置/store 由协调者串行分配。 |
@@ -252,7 +252,7 @@
 |---|---|---|
 | B2-VOC（T01–T04） | `src/renderer/src/store/slices/dictation.ts`、`src/renderer/src/components/feature-tips/VoiceDictationTipDialog.tsx`、`VoiceDictationFeatureTipVisual.tsx`；具体录音/模型实现、IPC、RPC 与 mobile speech runtime 调用链由同一执行者继续核对 | 整体交付；移除语音专属录音/模型/转写与快捷录音模式。保留通用麦克风选择和 browser media permission；shared speech runtime RPC 文件由 B2-VOC 唯一执行者改完后交 B4 只读复核，避免并行修改。共享设置/telemetry schema需协调者另行点名。 |
 | B2-PET（T05–T06） | `src/preload/api/pet-bridge.ts`、`pet-api.ts`；`src/shared/pet-types.ts`；renderer pet UI 待盘点 | 专属入口/资源由一人处理；`src/shared/codex-pet-sprite-defaults.ts` 先核对是否普通 Codex 编码使用，不可按文件名直接删除。 |
-| B2-UPLOAD（U10） | `src/preload/api/feedback-bridge.ts`、`crash-reports-bridge.ts`、`crash-report-api.ts`；`src/shared/feedback-submit-contract.ts`；renderer feedback UI 与主进程 handler 待调用链盘点 | 专人负责移除发送/上传，保留用户触发本地导出；不得与 `src/main/crash-reporting/` 本地诊断维护者并行改同一文件。 |
+| B2-UPLOAD（U10） | `src/renderer/src/components/sidebar/SidebarSettingsHelpMenu.tsx` 及 feedback dialog/image/drop/environment-prefill/draft/store/image-attachment闭包；`PrivacyDiagnosticsSection.tsx`/`PrivacyDiagnosticBundleControls.tsx`；`CrashReportDialogSurface.tsx`/`use-crash-report-copy.ts`。backend/shared由 graphify_build负责 `src/preload/api/{feedback,diagnostics,crash-reports}*`、`src/shared/{feedback-submit-contract,crash-reporting}*` 与主进程上传handler | 文件所有权按renderer UI与backend/shared分开；renderer只调用 getStatus/collectBundle/openBundlePreview/discardBundlePreview 和 crash report get/dismiss/copy契约。保留 `bundleSubmissionId` 作为本机临时预览map key，不作为上传票据。不得与 `src/main/crash-reporting/` 本地采集/复制实现维护者并行改同一文件。 |
 | B2-TELEMETRY（U11） | `src/main/telemetry/`、`src/preload/api/telemetry-api.ts`、`src/renderer/src/lib/telemetry.ts`、`src/renderer/src/components/TelemetryFirstLaunchSurface.tsx`；`src/shared/telemetry-*` 和 feature 专属埋点待引用盘点 | 与 crash 本地诊断严格分开；shared schema/通用埋点由协调者统一改或按文件点名，不能整组目录删除。 |
 | B2-UPDATER（U06/U07） | `src/main/updater.ts`、`src/main/updater/`、`src/main/window/main-window-updater.ts`、`src/preload/api/updater-{bridge,api}.ts`、renderer `UpdateCard.tsx` / `UpdateErrorCardContent.tsx` | 候选文件含发布/serve/退出生命周期公共逻辑；先画 import/call graph，明确移除自动更新和更新专属下载安装，保留 Electron、serve supervisor、正常退出/安装包恢复中实际共用部分。 |
 | B3-PLATFORM（J01–J15,J17–J18） | GitHub/GitLab/Linear/Bitbucket/Azure 等 preload API、main handler、renderer task-page 入口待盘点 | J16 Jira 必须保留；Git基础能力由 I 组保留；平台专用文件可以独立，但共享 GitHub client 不可整体删除。 |

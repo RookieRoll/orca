@@ -47,14 +47,13 @@ export const getPrivacyPaneSearchEntries = createLocalizedCatalog(() => [
     title: translate('auto.components.settings.privacy.search.6d258d2ed6', 'Diagnostics'),
     description: translate(
       'auto.components.settings.privacy.search.8b08f32366',
-      'App diagnostics and support sharing controls.'
+      'Local app diagnostics controls.'
     ),
     keywords: [
       ...translateSearchKeyword(
         'auto.components.settings.privacy.search.c0494ff48a',
         'diagnostics'
-      ),
-      ...translateSearchKeyword('auto.components.settings.privacy.search.1686c07fee', 'support')
+      )
     ]
   },
   {

@@ -5,7 +5,7 @@
 // same NDJSON record shape our local sink expects (`type: 'effect-span'`,
 // `traceId`, `spanId`, `parentSpanId?`, `attributes`, `events`, `exit`).
 // The compact shape keeps local diagnostic files readable and cheap to
-// collect for user-reviewed support uploads.
+// collect into a user-reviewed local bundle.
 //
 // Concurrency model: in-process span tree maintained via Node's
 // `AsyncLocalStorage`, so a child span created inside an `await` chain

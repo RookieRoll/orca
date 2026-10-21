@@ -41,13 +41,6 @@ import {
   type CollectBundleOptions,
   type CollectedBundle
 } from './bundle'
-import {
-  deleteBundle as _deleteBundle,
-  uploadBundle as _uploadBundle,
-  type DeleteBundleOptions,
-  type UploadBundleOptions,
-  type UploadBundleResult
-} from './diagnostic-bundle-upload'
 import { setActiveSink, startSpan } from './tracer'
 import { setSecurePathHardeningReporter } from '../../shared/secure-path-hardening-report'
 
@@ -74,7 +67,6 @@ export type ObservabilityConsent = {
     | 'orca_diagnostics_disabled'
     | 'ci'
 }
-
 function envOn(name: string): boolean {
   const v = process.env[name]
   if (!v) {
@@ -236,7 +228,7 @@ export function getDiagnosticsStatus(): DiagnosticsStatus {
 /** Collect a bundle from the live trace folder. The `appVersion` /
  *  `platform` / `arch` / `osRelease` / `orcaChannel` inputs come from main
  *  and are baked into the bundle header. NEVER pass `install_id` here —
- *  the bundle's identity is the per-bundle submission ID, not the
+ *  the bundle's identity is the per-bundle ID, not the
  *  PostHog-lane install_id (Issue 8 in the security review). */
 export function collectDiagnosticBundle(
   meta: Pick<
@@ -246,7 +238,7 @@ export function collectDiagnosticBundle(
 ): CollectedBundle {
   // Flush the active sink first so the very latest spans are present in the
   // file when we read it back. Without this, the user's most-recent action
-  // before clicking Share might miss the bundle by a few hundred ms — which
+  // before opening the preview might miss the bundle by a few hundred ms — which
   // is exactly the case "the thing I just did" they want diagnosed.
   if (sink) {
     sink.flush()
@@ -261,16 +253,4 @@ export function collectDiagnosticBundle(
     daemonLogMaxFiles: DAEMON_LOG_MAX_FILES,
     ...meta
   })
-}
-
-/** Upload a collected bundle payload. Returns the ticket ID on success;
- *  throws on any of the failure modes documented in `bundle.ts`. */
-export async function uploadDiagnosticBundle(
-  opts: UploadBundleOptions
-): Promise<UploadBundleResult> {
-  return _uploadBundle(opts)
-}
-
-export async function deleteDiagnosticBundle(opts: DeleteBundleOptions): Promise<void> {
-  return _deleteBundle(opts)
 }

@@ -1,10 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
-import type {
-  CrashReportCopySubmissionFailure,
-  CrashReportRecord
-} from '../../../../shared/crash-reporting'
+import type { CrashReportRecord } from '../../../../shared/crash-reporting'
 
 export const CRASH_REPORT_COPY_FAILURE_TOAST_ID = 'crash-report-copy-failure'
 
@@ -26,11 +23,10 @@ function showCopyFailure(description?: string): void {
 export function useCrashReportCopy(
   report: CrashReportRecord | null,
   notes: string
-): (submissionFailure?: CrashReportCopySubmissionFailure) => Promise<void> {
+): () => Promise<void> {
   const reportId = report?.id ?? null
   const notesRef = useRef({ reportId, value: notes })
-  // Why: a submission toast can outlive the render that created it while the
-  // user edits or changes reports; keep live notes scoped to that report.
+  // Keep edited notes scoped to the report captured by a copy action.
   if (notesRef.current.reportId === reportId) {
     notesRef.current.value = notes
   } else {
@@ -39,12 +35,11 @@ export function useCrashReportCopy(
   const reportNotes = notesRef.current
 
   return useCallback(
-    async (submissionFailure?: CrashReportCopySubmissionFailure): Promise<void> => {
+    async (): Promise<void> => {
       try {
         const result = await window.api.crashReports.copyLatestDiagnostics({
           ...(report ? { reportId: report.id } : {}),
-          notes: reportNotes.value,
-          ...(submissionFailure ? { submissionFailure } : {})
+          notes: reportNotes.value
         })
         if (!result.ok) {
           showCopyFailure(result.error)

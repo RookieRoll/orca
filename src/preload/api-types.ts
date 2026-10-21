@@ -22,7 +22,7 @@ import type { AppApi, E2EApi, PlatformApi } from './api/app-api'
 import type { AutomationsApi } from './api/automation-api'
 import type { BrowserApi } from './api/browser-api'
 import type { CliApi } from './api/cli-install-api'
-import type { CrashReportsApi, FeedbackApi } from './api/crash-report-api'
+import type { CrashReportsApi } from './api/crash-report-api'
 import type { DashboardApi, TerminalPreviewApi } from './api/dashboard-api'
 import type { DocPreviewApi } from './api/doc-preview-api'
 import type { EmulatorApi } from './api/emulator-api'
@@ -85,7 +85,6 @@ export type PreloadApi = {
   workspaceSpace: WorkspaceSpaceApi
   workspacePorts: WorkspacePortsApi
   pty: PtyApi
-  feedback: FeedbackApi
   crashReports: CrashReportsApi
   export: ExportApi
   gh: Merged<GithubPullRequestApi & GithubWorkItemApi & GithubAccountApi>
@@ -218,7 +217,6 @@ export type {
 export type {
   DiagnosticsBundlePayload,
   DiagnosticsStatusPayload,
-  DiagnosticsUploadPayload,
   MemoryApi,
   StatsApi
 } from './api/telemetry-api'

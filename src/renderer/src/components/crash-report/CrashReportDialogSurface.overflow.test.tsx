@@ -6,8 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CrashReportRecord } from '../../../../shared/crash-reporting'
 import { CrashReportDialogSurface } from './CrashReportDialogSurface'
 
-const viewer = vi.fn(async () => null)
-
 vi.mock('./use-crash-report-copy', () => ({
   useCrashReportCopy: () => vi.fn(async () => {})
 }))
@@ -45,14 +43,6 @@ function crashReport(error: string): CrashReportRecord {
   }
 }
 
-beforeEach(() => {
-  viewer.mockClear()
-  Object.defineProperty(window, 'api', {
-    configurable: true,
-    value: { gh: { viewer } }
-  })
-})
-
 afterEach(() => cleanup())
 
 describe('CrashReportDialogSurface overflow containment', () => {
@@ -67,7 +57,7 @@ describe('CrashReportDialogSurface overflow containment', () => {
         onReportChange={() => {}}
       />
     )
-    await waitFor(() => expect(viewer).toHaveBeenCalledOnce())
+    await waitFor(() => expect(outputText(container)).toContain(unbrokenError))
 
     const dialog = container.querySelector('[role="dialog"]')
     const output = dialog?.querySelector('pre')
@@ -82,3 +72,7 @@ describe('CrashReportDialogSurface overflow containment', () => {
     expect(output?.parentElement?.className).toContain('min-w-0')
   })
 })
+
+function outputText(container: HTMLElement): string {
+  return container.querySelector('pre')?.textContent ?? ''
+}
