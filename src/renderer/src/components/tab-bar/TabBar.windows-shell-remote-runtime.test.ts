@@ -53,9 +53,8 @@ describe('TabBar PowerShell launch wiring', () => {
     vi.unstubAllGlobals()
   })
 
-  it('uses the paired host platform to show Windows shell rows in a Mac browser', async () => {
+  it('uses the paired host platform to show Windows shell rows in a Mac client', async () => {
     vi.stubGlobal('navigator', { userAgent: 'Macintosh' })
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     vi.stubGlobal('window', {
       api: {
         wsl: {
@@ -123,7 +122,6 @@ describe('TabBar PowerShell launch wiring', () => {
 
   it('uses the active remote host platform to show Windows shell rows in a Mac desktop client', async () => {
     vi.stubGlobal('navigator', { userAgent: 'Macintosh' })
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', false)
     vi.stubGlobal('window', {
       api: {
         wsl: {
@@ -197,7 +195,6 @@ describe('TabBar PowerShell launch wiring', () => {
     // rows, so the LOCAL Windows-WSL project-runtime menu (hostPlatform 'win32')
     // is unaffected by this suppression.
     vi.stubGlobal('navigator', { userAgent: 'Windows' })
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', false)
     vi.stubGlobal('window', {
       api: {
         wsl: {

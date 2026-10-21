@@ -29,10 +29,6 @@ vi.mock('@/store', () => ({
     selector({ settings: storeMocks.settings, updateSettings: storeMocks.updateSettings })
 }))
 
-vi.mock('@/lib/desktop-window-chrome', () => ({
-  isPairedWebClientWindow: () => false
-}))
-
 vi.mock('@/components/ui/tooltip', () => ({
   Tooltip: ({ children }: { children: ReactNode }) => <>{children}</>,
   TooltipTrigger: ({ children }: { children: ReactNode }) => <>{children}</>,

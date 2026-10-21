@@ -30,10 +30,7 @@ export function shouldShowRemoteDownloadAction(
   const hasDownloadCapability = node.isDirectory
     ? Boolean(connectionId && supportsFolderDownload)
     : Boolean(connectionId || runtimeDownloadContext)
-  return (
-    hasDownloadCapability &&
-    (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ !== true
-  )
+  return hasDownloadCapability
 }
 
 export function shouldShowCopyFileAction(
@@ -49,7 +46,6 @@ export function shouldShowCopyFileAction(
   // keep this to a single concrete file reference until multi-file copy exists.
   return (
     (!connectionId || !node.isDirectory) &&
-    selectionSize === 1 &&
-    (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ !== true
+    selectionSize === 1
   )
 }

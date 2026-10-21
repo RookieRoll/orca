@@ -70,13 +70,6 @@ describe('useCodexSharedSettingsNotice', () => {
     expect(isSeen()).toBe(false)
   })
 
-  it('stays quiet in a paired web client window', async () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    resetStore({ tabsByWorktree: codexTab })
-    await mountHook(useCodexSharedSettingsNotice)
-    expect(toastInfoMock).not.toHaveBeenCalled()
-  })
-
   it('shows once the persisted seen flag loads after mount', async () => {
     // Why seen: true: the store's default until persisted UI arrives.
     resetStore({ codexSharedSettingsNoticeSeen: true, tabsByWorktree: codexTab })

@@ -20,7 +20,6 @@ function readiness(endpoint = 'ws://[::1]:6768/runtime?mode=paired#fragment'): S
       }),
       endpoint,
       deviceId: 'device-1',
-      webClientUrl: null,
       scope: 'runtime',
       qr: null
     }

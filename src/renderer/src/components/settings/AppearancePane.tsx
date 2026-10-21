@@ -31,7 +31,6 @@ import type { UseGhosttyImportReturn } from './useGhosttyImport'
 import { AppIconSelector } from './AppIconSelector'
 import { normalizeAppIconId } from '../../../../shared/app-icon'
 import { getRendererAppPlatform } from '@/lib/renderer-app-platform'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { SHOW_UI_LANGUAGE_SETTING } from '@/i18n/supported-languages'
 import { translate } from '@/i18n/i18n'
 import {
@@ -68,7 +67,7 @@ export function AppearancePane({
   terminalFontSuggestions,
   onRequestFontSuggestions,
   systemPrefersDark,
-  ghostty,
+  ghostty
 }: AppearancePaneProps): React.JSX.Element {
   const searchQuery = useAppStore((state) => state.settingsSearchQuery)
   const appearanceAccordionDeepLink = useAppStore((state) => state.appearanceAccordionDeepLink)
@@ -76,11 +75,8 @@ export function AppearancePane({
     (state) => state.clearAppearanceAccordionDeepLink
   )
   const isSearching = normalizeSettingsSearchQuery(searchQuery).length > 0
-  const isWebClient = isWebClientLocation()
-  // Why: the system tray behavior is desktop-Electron Windows-only; a Windows
-  // browser web client has no local tray to control.
-  const isDesktopWindows = getRendererAppPlatform() === 'win32' && !isWebClient
-  const isDesktopMac = getRendererAppPlatform() === 'darwin' && !isWebClient
+  const isDesktopWindows = getRendererAppPlatform() === 'win32'
+  const isDesktopMac = getRendererAppPlatform() === 'darwin'
 
   // Why: Terminal / Window settings were too easy to miss when only Interface
   // started open; keep sections independently collapsible but expanded by default.
@@ -145,7 +141,7 @@ export function AppearancePane({
   const terminalSearchEntries = [
     { title: terminalTitle },
     ...getTerminalAppearanceSearchEntries({
-      showDesktopThemeImports: !isWebClient
+      showDesktopThemeImports: true
     })
   ]
   const windowSearchEntries = [

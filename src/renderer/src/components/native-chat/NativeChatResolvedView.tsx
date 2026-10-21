@@ -14,7 +14,6 @@ import {
 } from './use-native-chat-reveal-latest'
 import { useNativeChatLaunchPromptDeliveryNotice } from './use-native-chat-launch-prompt-delivery-notice'
 import { NativeChatComposer, type NativeChatComposerHandle } from './NativeChatComposer'
-import { useNativeChatFontSize } from './use-native-chat-font-size'
 import { useNativeChatFind } from './use-native-chat-find'
 import { NativeChatFindBar } from './NativeChatFindBar'
 import { useNativeChatCanSend } from './use-native-chat-can-send'
@@ -316,8 +315,6 @@ export function NativeChatResolvedView({
     { sessionId, isVisible }
   )
 
-  // Only the focused conversation accepts chat text-size shortcuts.
-  useNativeChatFontSize(isConversation && isVisible && isFocusedGroup, rootRef)
   const find = useNativeChatFind(isVisible && isFocusedGroup, rootRef, composerRef, messageListRef)
   const contextMenu = useNativeChatContextMenu({
     rootRef,

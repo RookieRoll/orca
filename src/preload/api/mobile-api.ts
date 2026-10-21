@@ -62,7 +62,6 @@ export type MobileApi = {
     | {
         available: true
         pairingUrl: string
-        webClientUrl: string | null
         endpoint: string
         deviceId: string
       }

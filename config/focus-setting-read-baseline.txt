@@ -403,10 +403,3 @@
 2 src/renderer/src/store/terminals/terminal-active-workspace-creation.ts
 1 src/renderer/src/store/terminals/terminal-tab-appearance.ts
 1 src/renderer/src/store/terminals/terminal-tab-close-providers.ts
-1 src/renderer/src/web/preload-api/web-app-api.ts
-3 src/renderer/src/web/preload-api/web-preference-normalization.ts
-22 src/renderer/src/web/preload-api/web-preferences-store.ts
-13 src/renderer/src/web/preload-api/web-settings-api.ts
-9 src/renderer/src/web/preload-api/web-ui-api.ts
-3 src/renderer/src/web/preload-api/web-workspace-session-api.ts
-3 src/renderer/src/web/web-preload-api.ts

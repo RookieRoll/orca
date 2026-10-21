@@ -110,10 +110,6 @@ export function formatSparseDirectoryPreview(directories: string[]): string {
   return directories.length <= 4 ? preview : `${preview}, +${directories.length - 4} more`
 }
 
-export function isWebClient(): boolean {
-  return Boolean((window as unknown as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__)
-}
-
 export function getDirectoryName(folderPath: string): string {
   const normalized = folderPath.replace(/[\\/]+$/, '')
   const parts = normalized.split(/[\\/]+/)

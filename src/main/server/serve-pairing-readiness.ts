@@ -39,7 +39,6 @@ export async function buildServePairingReadiness(
           url: offer.pairingUrl,
           endpoint: offer.endpoint,
           deviceId: offer.deviceId,
-          webClientUrl: offer.webClientUrl,
           scope: options.mobilePairing ? 'mobile' : 'runtime',
           qr: options.mobilePairing ? await renderServePairingQr(offer.pairingUrl) : null
         }

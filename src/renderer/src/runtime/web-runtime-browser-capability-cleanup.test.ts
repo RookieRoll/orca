@@ -45,10 +45,9 @@ vi.mock('@/lib/agent-launch-prompt-delivery', () => ({
   seedNativeChatLaunchDraftForAgentTab: vi.fn()
 }))
 
-describe('paired browser capability cleanup', () => {
+describe('runtime browser capability cleanup', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     stubRuntimeEnvironmentBridge({ call: mocks.runtimeCall })
   })
 

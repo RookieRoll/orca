@@ -20,7 +20,6 @@ import { DELEGATED_PHONE_NAME_MAX_CHARS } from '../../../shared/delegated-mobile
 import { allocateTerminalSubscriptionStreamId } from '../rpc/methods/terminal/terminal-subscription-stream-id'
 import { isStructuredNativeChatDefaultFor } from '../rpc/methods/structured-agent-session-policy'
 import {
-  createWebClientUrl,
   DEVICE_REGISTRY_UNAVAILABLE_GUIDANCE,
   E2EE_KEY_UNAVAILABLE_GUIDANCE,
   pairingUnavailable,
@@ -151,7 +150,6 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
         pairingUrl: string
         endpoint: string
         deviceId: string
-        webClientUrl: string | null
       } {
     if (this.pairingInitializationFailure) {
       return this.pairingInitializationFailure
@@ -204,9 +202,7 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
       available: true,
       pairingUrl,
       endpoint,
-      deviceId: device.deviceId,
-      webClientUrl:
-        this.webClientRoot && scope === 'runtime' ? createWebClientUrl(endpoint, pairingUrl) : null
+      deviceId: device.deviceId
     }
   }
 

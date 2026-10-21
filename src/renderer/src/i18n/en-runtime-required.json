@@ -11,6 +11,12 @@
       "title": "Meet your Agents tab"
     }
   },
+  "app": {
+    "recoverableError": {
+      "webDescription": "Retry the web client or reconnect to the paired runtime.",
+      "webTitle": "Orca web hit a renderer error."
+    }
+  },
   "auto": {
     "App": {
       "1b9d9d065f": "settings",
@@ -1424,7 +1430,8 @@
         "ReleaseChannelSection": {
           "adhocWarning": "Adhoc builds come from a branch that has not landed, and the Windows ones are unsigned. Whoever cut one may abandon it — keep a stable build handy.",
           "dailyWarning": "Daily builds ship straight from main with no test gate, and the Windows ones are unsigned. Keep a stable build handy.",
-          "hourlyWarning": "Hourly builds ship straight from main with no test gate, and the Windows ones are unsigned. Keep a stable build handy."
+          "hourlyWarning": "Hourly builds ship straight from main with no test gate, and the Windows ones are unsigned. Keep a stable build handy.",
+          "webUnavailable": "Switching builds is only available in the desktop app."
         },
         "RemoteServerUpdateDialog": {
           "checkAgain": "Check for Server Updates",
@@ -1555,14 +1562,19 @@
           "stepOpenShare": "Open Settings → Remote Orca Servers → Share this host."
         },
         "RuntimePairingUrlGenerator": {
+          "13704d635e": "Copied web client URL.",
+          "1ca2e5194d": "Use this URL from a browser that can reach the selected address.",
           "279e0dcb57": "127.0.0.1 only works on this computer. Use a LAN, Tailscale, or custom address for another device.",
           "2e5c4e3c93": "Pair another Orca client",
           "6b9ca3e69b": "Open in browser",
+          "6dd594a507": "Generated web client URL.",
           "849825e829": "Paste this pairing URL into another Orca client.",
           "8de0f84fff": "Generate Access Link",
           "add-custom": "Add custom address…",
           "b91e36a986": "web",
+          "browserLinkLabel": "Browser link",
           "de6d5cff95": "This computer (",
+          "f7cafdc9f3": "Browser link unavailable in this build. The pairing URL still works for Orca clients.",
           "intentQuestion": "Where will this link be opened?",
           "localOnly": "This computer only",
           "pairedRunsAsYou": "A paired client can run commands as you on this computer.",
@@ -1577,6 +1589,7 @@
           "2309068a6f": "destructive",
           "23931df7e8": "Remote Hosts",
           "23c6874fdf": "AI Capabilities",
+          "7686cb5c36": "Connect this browser to a saved Orca server.",
           "8bd117d669": "Interface",
           "9abb9be3bc": "Set Up",
           "b5ee17826b": "Pair remote Orca runtimes for persistent sessions, richer remote state, and web or mobile handoff.",
@@ -1686,6 +1699,7 @@
           "e2b0ee267f": "stale"
         },
         "ZcodePlanAccountsSection": {
+          "hostOnly": "Change the plan site and API key in the desktop app on the computer running Orca.",
           "keyRequired": "GLM Coding Plan API key is required."
         },
         "accounts": {
@@ -1764,9 +1778,11 @@
         },
         "artifacts": {
           "account": "Orca account",
+          "allowPublishingWebDescription": "Desktop only. Open Settings → Artifacts on the host device to change this setting.",
           "connected": "Connected",
           "enable": "Enable Artifacts",
           "enableDescription": "Add Artifacts to the sidebar so you can open and delete shared files.",
+          "enableStepWebDescription": "Open Settings → Artifacts in the Orca desktop app on the host device and enable publishing.",
           "openArtifactsDescription": "View and delete links shared through your account.",
           "signInRequired": "Sign in is required to upload and manage artifacts."
         },
@@ -1930,8 +1946,10 @@
           "terminalQuickCommands": "Commands are saved on this client, then scoped globally or to a project setup so they run from the selected terminal context."
         },
         "shareSkills": {
+          "allowAgentPublishingWebDescription": "Desktop only. Open Settings → Share Skills on the host device to change this setting.",
           "refreshLinks": "Refresh",
-          "showButton": "Show Skills button"
+          "showButton": "Show Skills button",
+          "signInWebDescription": "Publishing and link management are available in the Orca desktop app."
         },
         "ssh": {
           "search": {
@@ -2776,6 +2794,17 @@
           }
         }
       },
+      "web": {
+        "preloadApi": {
+          "accounts": {
+            "claudeWslDefaultUnavailable": "Switching a WSL lane back to the system default is only available in the desktop app.",
+            "signInHostOnly": "Adding or re-signing an account is only available in the desktop app on the computer running Orca."
+          },
+          "cursorAccounts": {
+            "hostOnly": "Cursor sign-in details are only readable on the computer running Orca."
+          }
+        }
+      },
       "workspace": {
         "cleanup": {
           "WorkspaceCleanupDialog": {
@@ -2871,7 +2900,8 @@
         "f6300deb8b": "New Browser Tab"
       },
       "useSettingsNavigationMetadata": {
-        "5235c215ca": "Choose which task providers appear in the Tasks page and sidebar."
+        "5235c215ca": "Choose which task providers appear in the Tasks page and sidebar.",
+        "floatingWorkspaceWebDescription": "Global terminal and markdown tabs."
       }
     },
     "lib": {
@@ -2889,6 +2919,11 @@
         "permissionDenied": "Permission denied.",
         "symlink": "Symbolic links cannot be attached.",
         "unsupported": "Unsupported file type."
+      },
+      "file": {
+        "preview": {
+          "webClientUnavailable": "Document previews aren't available in the web client."
+        }
       },
       "terminal": {
         "shortcut": {
@@ -2924,6 +2959,17 @@
         "timedOut": "Timed out loading check details."
       }
     },
+    "startup": {
+      "webHostUnreachable": {
+        "description": "Nothing was lost. Orca will reload when the host answers, and won't save changes until then.",
+        "retry": "Retry now",
+        "title": "Couldn't reach your Orca host"
+      },
+      "webPairingRefused": {
+        "retry": "Try again",
+        "title": "Orca refused this browser"
+      }
+    },
     "store": {
       "slices": {
         "settings": {
@@ -2943,6 +2989,65 @@
           "fa9299a66f": "Your new worktree is current, but local {{value0}} is {{value1}} {{value2}} behind. AI diffs may miss recent commits."
         }
       }
+    },
+    "web": {
+      "WebConnect": {
+        "27393856e4": "orca://pair?code=...",
+        "2cf9e5a294": "Clear saved server",
+        "3affe7de3a": "Paste a pairing URL from an Orca server that this browser can reach.",
+        "4a4c017be1": "Endpoint:",
+        "7a566540de": "Pairing URL or code",
+        "b411ec0069": "Connect",
+        "cb4d287238": "Server name",
+        "e3bcd082ac": "Connect to Orca",
+        "mobileScopeRejected": "This QR code grants limited (mobile) access. To use the full web app, open the browser access link from Settings → Runtime Environments → Share this Orca server → New Link."
+      },
+      "pairingSecurity": {
+        "hide": "Hide",
+        "sessionNoEd25519": "This pairing lasts only while this tab is open, because this browser cannot create secure sign-in keys (Ed25519). Use a current browser for a pairing it remembers.",
+        "storedCodeNoEd25519": "This browser keeps a reusable pairing code, because it cannot create secure sign-in keys (Ed25519). Use a current browser and pair again for a safer pairing."
+      },
+      "runtimeAuth": {
+        "deviceDowngraded": "This Orca server no longer supports this browser’s sign-in key (it may have been downgraded). Update the server, or pair this browser again.",
+        "insecureOrigin": "Orca refused to pair from this page: it is plain http on another machine, so anyone on the network path could replace it and take the pairing code. Open the web client over https, at localhost on this computer, or through an SSH tunnel. To allow it anyway, the server operator can restart Orca with ORCA_ALLOW_INSECURE_WEB_PAIRING=1.",
+        "unauthorized": "Unauthorized. Pair this web client again."
+      },
+      "web": {
+        "preload": {
+          "api": {
+            "0a69fcd8bc": "platforms must be an object with darwin, linux, or win32 sections.",
+            "10898045f3": "Shortcut for \"{{value0}}\" was ignored: Use a string array.",
+            "275a776357": "Hover extraction is unavailable in the web client.",
+            "31bea294d5": "Grab mode is unavailable in the web client.",
+            "31bfe8ae1a": "Unavailable in the web client.",
+            "32f15bdb0f": "Unknown platform \"{{value0}}\" was ignored.",
+            "36761d9604": "Unknown keybinding action \"{{value0}}\" was ignored.",
+            "52bee9d8a0": "Conflicting custom shortcuts were ignored: {{value0}}.",
+            "67ec964791": "Cookie import is unavailable in the web client.",
+            "76122208ca": "Shortcut for \"{{value0}}\" was ignored: {{value1}}",
+            "8dfcb7a351": "Selection screenshots are unavailable in the web client.",
+            "9fc90740b6": "Commit message generation is unavailable in the web client.",
+            "b8a1618172": "Pull request detail generation is unavailable in the web client.",
+            "d2e43e426a": "{{value0}} must be an object.",
+            "e57c82d276": "Commit message model discovery is unavailable in the web client.",
+            "fb290366b2": "Unavailable on web."
+          }
+        },
+        "runtime": {
+          "environment": {
+            "07f788de83": "WebSocket"
+          }
+        }
+      },
+      "webPreloadApi": {
+        "aiVaultUnavailableForHost": "Agent Session History is not available for this execution host.",
+        "loopbackPairingBlocked": "This access link points back to this device.",
+        "remotePairingInvalidDetails": "This access link contains invalid connection details.",
+        "remotePairingRepairUnavailable": "Re-pairing is not available in the browser. Pair this browser with the server again.",
+        "remotePairingSaveFailed": "Orca verified the host but could not save it. Check browser storage and try again.",
+        "remotePairingUnreachable": "Cannot reach Orca at {{endpoint}}.",
+        "runtimeEnvironmentManuallyDisconnected": "Runtime environment is manually disconnected."
+      }
     }
   },
   "browser": {
@@ -2957,6 +3062,9 @@
     }
   },
   "components": {
+    "jiraIssueTitleField": {
+      "webUnavailable": "Jira title generation is unavailable in the web client."
+    },
     "native-chat": {
       "ask": {
         "asked": "Asked:",
@@ -3118,6 +3226,13 @@
         "usageLimitWindowWeeklyModel": "weekly model",
         "writeFailed": "Orca couldn't hand this message to the agent, so it was not sent."
       },
+      "find": {
+        "close": "Close",
+        "label": "Find in chat",
+        "nextMatch": "Next match",
+        "noResults": "No results",
+        "previousMatch": "Previous match"
+      },
       "notices": {
         "compaction": "Context compacted",
         "contextCleared": "Context cleared",
@@ -3159,7 +3274,8 @@
         "notAgent": {
           "subtitle": "This terminal is not running a recognized coding agent.",
           "title": "No conversation here"
-        }
+        },
+        "pairHost": "Pair a host to view agent chat history."
       },
       "status": {
         "failedAfter": "Failed after {{value0}}",
@@ -3367,6 +3483,11 @@
         "storageUnavailable": "Your disk may be full or read-only. Free up space, then restart Orca.",
         "unknown": "Restart Orca to try again."
       }
+    }
+  },
+  "sessionHistory": {
+    "settings": {
+      "webUnsupported": "Turn on session search from the Orca desktop app on that computer."
     }
   },
   "settings": {

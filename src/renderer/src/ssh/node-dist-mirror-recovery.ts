@@ -5,7 +5,6 @@ import {
 } from '../../../shared/node-dist-mirror'
 import type { SshManagedServerStatus } from '../../../shared/ssh-types'
 import { translate } from '@/i18n/i18n'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { useAppStore } from '@/store'
 import {
   isSshConnectInFlight,
@@ -29,7 +28,7 @@ export function thisComputerNodeMirrorRecovery(
   ownerEnvironmentId: string | null,
   configuredMirror = useAppStore.getState().settings?.nodeDistMirrorUrl
 ): NodeMirrorRecovery | null {
-  if (ownerEnvironmentId || isPairedWebClientWindow()) {
+  if (ownerEnvironmentId) {
     return null
   }
   return nodeMirrorRecovery(status, configuredMirror)

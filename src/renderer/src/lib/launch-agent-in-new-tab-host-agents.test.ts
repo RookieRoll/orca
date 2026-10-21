@@ -26,7 +26,6 @@ vi.mock('@/lib/local-preflight-context', () => ({
   getLocalProjectExecutionRuntimeContext: vi.fn(),
   getLocalRepoProjectExecutionRuntimeContext: vi.fn()
 }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => false }))
 vi.mock('@/runtime/runtime-rpc-client', () => ({ callRuntimeRpc: mocks.callRuntimeRpc }))
 vi.mock('@/lib/structured-agent-launch-settlement', () => ({}))
 

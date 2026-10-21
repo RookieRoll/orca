@@ -30,7 +30,6 @@ import { useSidebarWorktreeFilters } from './worktree-list/listing/use-filters'
 import { useSidebarWorktreeSelection } from './worktree-list/navigation/use-selection'
 import { useWindowSidebarListModel } from './worktree-list/listing/use-window-list-model'
 import { useMainSidebarListModel } from './worktree-list/listing/use-main-list-model'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { ORCA_SIDEBAR_INPUTS_IS_MAIN } from '../../../../shared/sidebar-inputs-switch'
 import { useWorktreeStatusMutations } from './worktree-list/drag/use-status-mutations'
 import { shouldFiltersHideAllRows } from './sidebar-empty-state-gate'
@@ -46,9 +45,9 @@ type WorktreeListProps = {
   onWorkspaceBoardDragPreviewCancel?: () => void
 }
 
-// Switch point: this host's window lists main's inputs; a paired web client builds its own view.
+// Switch point: this host's window lists main's inputs.
 const useSidebarListModel =
-  ORCA_SIDEBAR_INPUTS_IS_MAIN && !isPairedWebClientWindow()
+  ORCA_SIDEBAR_INPUTS_IS_MAIN
     ? useMainSidebarListModel
     : useWindowSidebarListModel
 

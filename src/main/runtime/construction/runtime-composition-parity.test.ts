@@ -429,7 +429,6 @@ describe('runtime composition parity (Electron vs orcad)', () => {
       'ctor:getLocalProvider',
       'ctor:onTerminalAgentStatus',
       'ctor:agentSessionClaimSigner',
-      'rpc-option:webClientRoot',
       'rpc-option:wsPort',
       'runtime.setAccountServices',
       // #31112: without it `stats.summary` answers {} and mobile home shows zeros.

@@ -1,16 +1,11 @@
 import { app } from 'electron'
 import { notifyServeSupervisorReady } from '../serve-update-handoff'
 import { clearServeAbortPark } from '../../shared/serve-abort-park'
-import { findBundledWebClientRoot } from '../../shared/bundled-web-client-root'
 import { buildServePairingReadiness, servePublishMode } from '../server/serve-pairing-readiness'
 import { mainProcessState as state } from './main-process-state'
 import { getServeOptions, type ServeOptions } from './serve-options'
 
 export { getServeOptions, type ServeOptions }
-
-export function getBundledWebClientRoot(): string | undefined {
-  return findBundledWebClientRoot(app.getAppPath())
-}
 
 export async function printServeReady(options: ServeOptions): Promise<void> {
   const runtime = state.runtime

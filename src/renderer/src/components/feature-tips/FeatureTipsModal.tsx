@@ -18,7 +18,6 @@ import {
   trackOrcaCliFeatureTipSetupResult
 } from './feature-tip-telemetry'
 import { useMountedRef } from '@/hooks/useMountedRef'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { translate } from '@/i18n/i18n'
 import { NativeChatUpgradeTipDialog } from './NativeChatUpgradeTipDialog'
 import { SessionSearchTipDialog } from './SessionSearchTipDialog'
@@ -48,8 +47,7 @@ export default function FeatureTipsModal(): JSX.Element | null {
     seenTipIds,
     featureInteractions,
     inNativeChatUpgradeTipAudience: isInNativeChatUpgradeTipAudience(nativeChatUpgradeTipVariant),
-    settings,
-    webClient: isWebClientLocation()
+    settings
   })
   const sessionSearchSetup = useSessionSearchTipSetup({
     dialogOpen: isOpen && currentTip?.id === 'agent-session-search'

@@ -390,7 +390,7 @@ describe('packaged runtime resources', () => {
           { recursive: true }
         )
         await seedBundledRipgrep(resourcesDir)
-        await seedPackagedServePayload(resourcesDir)
+        await seedPackagedServeSelectionEntry(resourcesDir)
 
         const unpackedMainDir = join(resourcesDir, 'app.asar.unpacked', 'out', 'main')
         await mkdir(unpackedMainDir, { recursive: true })
@@ -457,7 +457,7 @@ describe('packaged runtime resources', () => {
           { recursive: true }
         )
         await seedBundledRipgrep(resourcesDir)
-        await seedPackagedServePayload(resourcesDir)
+        await seedPackagedServeSelectionEntry(resourcesDir)
         // Layout fixtures use a cross-arch slice; native PTY probes need real packaged binaries.
         const target =
           process.arch === 'x64'
@@ -535,20 +535,11 @@ async function stubObjdump(root) {
   process.env.PATH = `${directory}${delimiter}${process.env.PATH ?? ''}`
 }
 
-async function seedPackagedServePayload(resourcesDir) {
+async function seedPackagedServeSelectionEntry(resourcesDir) {
   const { SERVE_SELECTION_ENTRY } = require('./verify-packaged-serve-payload.cjs')
   const entry = join(resourcesDir, 'app.asar.unpacked', 'out', ...SERVE_SELECTION_ENTRY.split('/'))
   await mkdir(dirname(entry), { recursive: true })
   await writeFile(entry, '')
-  const webDir = join(resourcesDir, 'app.asar.unpacked', 'out', 'renderer')
-  await mkdir(join(webDir, 'assets'), { recursive: true })
-  await mkdir(join(resourcesDir, 'app.asar.unpacked', 'out', 'cli'), { recursive: true })
-  await writeFile(join(webDir, 'web-index.html'), '<script src="./assets/web.js"></script>')
-  await writeFile(join(webDir, 'assets', 'web.js'), '')
-  await writeFile(
-    join(webDir, '.orca-web-client-files.json'),
-    JSON.stringify(['web-index.html', 'assets/web.js'])
-  )
 }
 
 async function seedBundledRipgrep(resourcesDir) {

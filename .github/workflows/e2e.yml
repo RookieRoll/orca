@@ -118,8 +118,7 @@ jobs:
           path: ${{ steps.deps.outputs.native-cache-path }}
           key: ${{ steps.deps.outputs.native-cache-key }}
 
-      # Why: building here avoids parallel builds inside Playwright globalSetup;
-      # paired-browser specs also need the standalone web bundle.
+      # Why: building here avoids parallel builds inside Playwright globalSetup.
       - name: Build E2E outputs
         env:
           VITE_EXPOSE_STORE: 'true'
@@ -141,9 +140,6 @@ jobs:
           else
             echo "Older ref: let each consumer build and install its CLI."
           fi
-
-      - name: Project shared E2E web client
-        run: pnpm run build:web-from-renderer
 
       - wait: e2e-cli
 
@@ -265,7 +261,6 @@ jobs:
           ORCA_BACKGROUND_LAUNCH: '1'
           SKIP_BUILD: '1'
           ORCA_E2E_FORWARD_APP_LOGS: '1'
-          ORCA_E2E_WEB_CLIENT: '1'
         run: |
           mkdir -p ci-shards
           pnpm exec playwright test --config tests/playwright.config.ts --project=electron-headless --list --reporter=json > ci-shards/discovery.json
@@ -277,7 +272,7 @@ jobs:
       - name: Run E2E tests (${{ matrix.shard_name }})
         env:
           PLAYWRIGHT_JSON_OUTPUT_FILE: ci-shards/results.json
-        run: xvfb-run --auto-servernum bash .github/scripts/e2e-with-window-manager.sh env SKIP_BUILD=1 ORCA_E2E_FORWARD_APP_LOGS=1 ORCA_E2E_WEB_CLIENT=1 pnpm run test:e2e --test-list=ci-shards/selected.txt --reporter=list,json
+        run: xvfb-run --auto-servernum bash .github/scripts/e2e-with-window-manager.sh env SKIP_BUILD=1 ORCA_E2E_FORWARD_APP_LOGS=1 pnpm run test:e2e --test-list=ci-shards/selected.txt --reporter=list,json
 
       - name: Summarize E2E failures
         if: always()
@@ -365,7 +360,7 @@ jobs:
             echo "Changed specs are all owned by dedicated lanes."
             exit 0
           fi
-          E2E_ENV=(SKIP_BUILD=1 ORCA_E2E_FORWARD_APP_LOGS=1 ORCA_E2E_WEB_CLIENT=1)
+          E2E_ENV=(SKIP_BUILD=1 ORCA_E2E_FORWARD_APP_LOGS=1)
           E2E_PROJECT_ARGS=()
           if [ -n "$LAYOUT_OWNER" ]; then
             test -f out/main/ORCA_LAYOUT_OWNER_MAIN

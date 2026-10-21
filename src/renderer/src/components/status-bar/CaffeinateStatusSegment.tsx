@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAppStore } from '@/store'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { translate } from '@/i18n/i18n'
 import {
   getAgentAwakeLidNote,
@@ -69,10 +68,6 @@ export function CaffeinateStatusSegment({
       unsubscribe()
     }
   }, [])
-
-  if (isPairedWebClientWindow()) {
-    return null
-  }
 
   const mode = serviceStatus.mode === configuredMode ? serviceStatus.mode : configuredMode
   const active =

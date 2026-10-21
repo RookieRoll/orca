@@ -31,7 +31,6 @@ function readiness(runtimeId: string, port: number): ServeReadiness {
       }),
       endpoint,
       deviceId: 'device-1',
-      webClientUrl: null,
       scope: 'runtime',
       qr: null
     }

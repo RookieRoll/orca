@@ -43,7 +43,6 @@ describe('MachineNameField', () => {
 
   afterEach(() => {
     cleanup()
-    Reflect.deleteProperty(window, '__ORCA_WEB_CLIENT__')
   })
 
   it('shows the detected name as the blank default and lets the user set an override', async () => {
@@ -119,15 +118,5 @@ describe('MachineNameField', () => {
     await act(async () => {})
 
     expect(container.firstElementChild).toHaveClass('mp-pairing-machine', 'space-y-2')
-  })
-
-  it('renders nothing in the web client, which has no machine of its own to name', async () => {
-    Object.defineProperty(window, '__ORCA_WEB_CLIENT__', { configurable: true, value: true })
-    mocks.getStatus.mockResolvedValue({ machineName: 'remote-host' })
-    mocks.holder.state = { settings: { machineName: '' }, updateSettings: mocks.updateSettings }
-    const { container } = render(<MachineNameField />)
-    await act(async () => {})
-
-    expect(container).toBeEmptyDOMElement()
   })
 })

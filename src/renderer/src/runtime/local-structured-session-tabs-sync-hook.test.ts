@@ -6,14 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   start: vi.fn(async (_sync: { isDisposed: () => boolean }) => undefined),
   held: false,
-  isWebClient: false,
   heldListeners: new Array<(held: boolean) => void>()
 }))
 
 vi.mock('./local-structured-session-tabs-sync/subscription', () => ({
   startLocalStructuredSessionTabsSync: mocks.start
 }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.isWebClient }))
 
 import { useAppStore } from '../store'
 import { useLocalStructuredSessionTabsSync } from './local-structured-session-tabs-sync'
@@ -36,7 +34,6 @@ async function mountSync(): Promise<void> {
 beforeEach(() => {
   mocks.start.mockClear()
   mocks.held = false
-  mocks.isWebClient = false
   mocks.heldListeners.splice(0)
   resetLocalStructuredChatsForTests()
   Object.defineProperty(window, 'api', {
@@ -129,13 +126,4 @@ describe("this machine's structured chat mirror", () => {
     expect(mocks.start).toHaveBeenCalledOnce()
   })
 
-  it('never runs in the browser client, which has no runtime of its own', async () => {
-    mocks.isWebClient = true
-    setStructuredChat(true)
-    mocks.held = true
-
-    await mountSync()
-
-    expect(mocks.start).not.toHaveBeenCalled()
-  })
 })

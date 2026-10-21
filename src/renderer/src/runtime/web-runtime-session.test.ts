@@ -200,7 +200,6 @@ describe('refreshWebRuntimeSessionTabsSnapshot', () => {
 
 describe('activateWebRuntimeSessionWorktree', () => {
   beforeEach(() => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     mocks.getState.mockReturnValue({
       settings: {
         activeRuntimeEnvironmentId: ENVIRONMENT_ID

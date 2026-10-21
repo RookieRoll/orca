@@ -27,11 +27,9 @@ export type FeatureTipSettings = {
 }
 
 export function isSessionSearchFeatureTipCompleted(
-  settings: FeatureTipSettings | null | undefined,
-  webClient: boolean
+  settings: FeatureTipSettings | null | undefined
 ): boolean {
-  // Why: the browser client cannot index transcripts, so there is nothing to turn on.
-  return webClient || resolveAiVaultSearchSettings(settings).enabled
+  return resolveAiVaultSearchSettings(settings).enabled
 }
 
 /** Unseen tips whose feature the user has not already set up, in display order. */
@@ -41,13 +39,12 @@ export function getPendingFeatureTips(args: {
   featureInteractions: FeatureInteractionState
   inNativeChatUpgradeTipAudience: boolean
   settings: FeatureTipSettings | null | undefined
-  webClient: boolean
 }): FeatureTip[] {
   return getOrderedUnseenFeatureTips({
     seenTipIds: new Set(args.seenTipIds),
     completedTipIds: getCompletedFeatureTipIds({
       cliInstalled: args.cliInstalled,
-      sessionSearchTipCompleted: isSessionSearchFeatureTipCompleted(args.settings, args.webClient),
+      sessionSearchTipCompleted: isSessionSearchFeatureTipCompleted(args.settings),
       inNativeChatUpgradeTipAudience: args.inNativeChatUpgradeTipAudience,
       featureInteractions: args.featureInteractions
     })
@@ -66,7 +63,6 @@ export function getFeatureTipsAppOpenDecision(args: {
   promptedThisSession: boolean
   settings: FeatureTipSettings | null | undefined
   suppressedByOnboardingThisSession: boolean
-  webClient: boolean
 }): FeatureTipsAppOpenDecision {
   if (args.onboarding !== null && shouldShowOnboarding(args.onboarding)) {
     return { kind: 'suppress-for-onboarding' }
@@ -91,8 +87,7 @@ export function getFeatureTipsAppOpenDecision(args: {
     cliInstalled: args.cliInstalled,
     featureInteractions: args.featureInteractions,
     inNativeChatUpgradeTipAudience: args.inNativeChatUpgradeTipAudience,
-    settings: args.settings,
-    webClient: args.webClient
+    settings: args.settings
   })[0]
   return nextTip ? { kind: 'open', tipId: nextTip.id } : { kind: 'skip' }
 }

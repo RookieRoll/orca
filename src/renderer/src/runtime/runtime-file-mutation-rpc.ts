@@ -1,5 +1,4 @@
 import type { RuntimeStatus } from '../../../shared/runtime-types'
-import { RUNTIME_CONNECTION_CHANGED_MESSAGE } from '../web/web-runtime-request-registry'
 import { assertFileMutationOwnershipCapability } from '../../../shared/file-mutation-ownership'
 import { callRuntimeRpc } from './runtime-rpc-client'
 import { RuntimeRpcCallError } from './runtime-rpc-result'
@@ -10,6 +9,7 @@ import {
 import { getRuntimeEnvironmentConnectionGeneration } from '@/store/slices/runtime-status'
 
 type RuntimeFileMutationTarget = { kind: 'environment'; environmentId: string }
+const RUNTIME_CONNECTION_CHANGED_MESSAGE = 'Runtime connection changed; try again.'
 export type RuntimeFileImportSession = {
   target: RuntimeFileMutationTarget
   expectedEnvironmentPairingRevision: number | undefined

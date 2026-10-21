@@ -11,7 +11,6 @@ import {
   trackOrcaCliFeatureTipShown
 } from '../components/feature-tips/feature-tip-telemetry'
 import { useAppStore } from '../store'
-import { isWebClientLocation } from '../lib/web-client-location'
 import type { OnboardingState } from '../../../shared/onboarding-state-types'
 import { isInNativeChatUpgradeTipAudience } from '../../../shared/native-chat-upgrade-tip-audience'
 
@@ -131,8 +130,7 @@ export function useOnboardingAndFeatureTips() {
       persistedUIReady,
       promptedThisSession: promptedThisSessionRef.current,
       settings,
-      suppressedByOnboardingThisSession: suppressedByOnboardingThisSessionRef.current,
-      webClient: isWebClientLocation()
+      suppressedByOnboardingThisSession: suppressedByOnboardingThisSessionRef.current
     })
 
     if (featureTipsDecision.kind === 'suppress-for-onboarding') {

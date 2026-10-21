@@ -2,7 +2,7 @@
  * The seeding predicate answers one question for both remote flavors: does some other party own
  * terminal creation for this workspace right now? Three answers, and only `none` seeds.
  */
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type * as AgentStatusModule from '@/lib/agent-status'
 import { createTestStore, makeWorktree } from '@/store/slices/store-test-helpers'
 import { ensureWorktreeHasInitialTerminal } from '@/lib/worktree-initial-terminal-seeding'
@@ -386,16 +386,4 @@ it('waits for rival SSH HUB owners, then accepts the surviving runtime owner', (
     'unverifiable'
   )
   expect(resolveWorkspaceTerminalHostAuthority({ ...state, repos: [hubA] }, WT)).toBe('live')
-})
-
-afterEach(() => vi.unstubAllGlobals())
-it.each([WT, FOLDER])('leaves local terminal ownership with the real paired web host: %s', (id) => {
-  vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-  const state: WorkspaceTerminalHostAuthorityState = {
-    settings: { activeRuntimeEnvironmentId: null },
-    runtimeEnvironments: [{ id: 'paired-host' }],
-    worktreesByRepo: { repo: [{ id: WT, repoId: 'repo', hostId: 'local' }] },
-    folderWorkspaces: [{ id: 'folder-1', projectGroupId: 'group', executionHostId: 'local' }]
-  }
-  expect(resolveWorkspaceTerminalHostAuthority(state, id)).toBe('live')
 })

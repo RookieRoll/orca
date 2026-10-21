@@ -36,7 +36,6 @@ import {
 import { useStatusBarController } from './use-status-bar-controller'
 import { isOwnerNotSetUpPlaceholder } from './owner-usage-rate-limits'
 import { StatusBarVisibilityMenu } from './StatusBarVisibilityMenu'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 
 const PetStatusSegment = lazyWithRetry(() =>
   import('./PetStatusSegment').then((module) => ({ default: module.PetStatusSegment }))
@@ -294,9 +293,7 @@ export function StatusBarSurface({
         data-overflowing={overflowing}
       >
         <div ref={segmentsRef} className="flex w-max items-center gap-3">
-          {!isPairedWebClientWindow() ? (
-            <CaffeinateStatusSegment iconOnly={segmentsIconOnly} />
-          ) : null}
+          <CaffeinateStatusSegment iconOnly={segmentsIconOnly} />
           <RemoteServerUpdateStatusSegment iconOnly={segmentsIconOnly} />
           <SkillUpdateStatusSegment iconOnly={segmentsIconOnly} />
           <NativeChatResumeStatusSegment iconOnly={segmentsIconOnly} />

@@ -9,7 +9,6 @@ import {
 import { keybindingMatchesAction } from '../../../../shared/keybindings'
 import { getShortcutPlatform } from '@/lib/shortcut-platform'
 import { isEditableTarget } from '@/lib/editable-target'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { useAppStore } from '../../store'
 import type { NativeChatComposerHandle } from './native-chat-composer-types'
 import type { NativeChatMessageListHandle } from './use-native-chat-reveal-latest'
@@ -21,8 +20,8 @@ export type NativeChatFind = {
   query: string
   setQuery: (query: string) => void
   close: () => void
-  /** Opens the bar, or refocuses it when open; absent where the chat's find does not run. */
-  open: ((returnFocusTo?: Element | null) => void) | undefined
+  /** Opens the bar, or refocuses it when open. */
+  open: (returnFocusTo?: Element | null) => void
   /** For the chat root's onKeyDownCapture: an Escape while open closes the bar. */
   onKeyDownCapture: (event: ReactKeyboardEvent) => void
   rootRef: RefObject<HTMLDivElement | null>
@@ -103,8 +102,7 @@ export function useNativeChatFind(
   )
 
   useEffect(() => {
-    // Out of scope in the web client: the browser's own find keeps Mod+F there.
-    if (!enabled || isWebClientLocation()) {
+    if (!enabled) {
       return
     }
     const platform = getShortcutPlatform()
@@ -162,7 +160,7 @@ export function useNativeChatFind(
     query,
     setQuery,
     close,
-    open: isWebClientLocation() ? undefined : open,
+    open,
     onKeyDownCapture,
     rootRef,
     barRef,

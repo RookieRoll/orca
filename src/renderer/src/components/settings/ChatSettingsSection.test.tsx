@@ -56,7 +56,6 @@ beforeEach(() => {
 
 function renderChat(
   enabled: boolean | undefined,
-  showDesktopOnlySettings = true,
   hasUnsavedChatPromptChanges = false,
   overrides: Partial<GlobalSettings> = {}
 ) {
@@ -76,11 +75,9 @@ function renderChat(
         searchEntries={[
           ...getChatAppearanceSearchEntries(),
           ...getChatBehaviorSearchEntries(),
-          ...(showDesktopOnlySettings
-            ? [getChatNamingSearchEntry(), getChatInlineVisualsSearchEntry()]
-            : [])
+          getChatNamingSearchEntry(),
+          getChatInlineVisualsSearchEntry()
         ]}
-        showDesktopOnlySettings={showDesktopOnlySettings}
         isMounted
         hasUnsavedChatPromptChanges={hasUnsavedChatPromptChanges}
       />
@@ -123,7 +120,7 @@ describe('Chat settings page', () => {
   })
 
   it.each([false, true])('displays saved provider choice %s when disabled in Agents', (on) => {
-    renderChat(true, true, false, {
+    renderChat(true, false, {
       nativeChatProviders: { claude: on },
       disabledTuiAgents: ['claude']
     })
@@ -132,25 +129,24 @@ describe('Chat settings page', () => {
     expect(toggle.hasAttribute('disabled')).toBe(true)
   })
 
-  it('keeps Chat appearance on paired web without ineffective host naming controls or search results', () => {
-    const { container } = renderChat(true, false)
+  it('renders Chat provider, naming, and inline-visual controls on desktop', () => {
+    const { container } = renderChat(true)
     expect(screen.getByRole('spinbutton', { name: 'Text size' })).toBeTruthy()
-    expect(container.querySelector('#chat-names')).toBeNull()
-    expect(screen.queryByRole('switch', { name: 'Open Claude as a chat' })).toBeNull()
-    expect(screen.queryByRole('switch', { name: 'Name chats automatically' })).toBeNull()
-    expect(screen.queryByRole('switch', { name: 'Toggle inline visuals' })).toBeNull()
+    expect(container.querySelector('#chat-names')).toBeTruthy()
+    expect(screen.getByRole('switch', { name: 'Open Claude as a chat' })).toBeTruthy()
+    expect(screen.getByRole('switch', { name: 'Name chats automatically' })).toBeTruthy()
+    expect(screen.getByRole('switch', { name: 'Toggle inline visuals' })).toBeTruthy()
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: true,
       nativeChatEnabled: true,
       repos: []
     })
     const results = buildCmdJSettingsResults(sections).filter((entry) => entry.sectionId === 'chat')
     expect(results.some((entry) => entry.targetSectionId === 'chat-text-size')).toBe(true)
-    expect(results.some((entry) => entry.targetSectionId === 'chat-names')).toBe(false)
-    expect(results.some((entry) => entry.targetSectionId === 'chat-providers')).toBe(false)
-    expect(results.some((entry) => entry.targetSectionId === 'chat-inline-visuals')).toBe(false)
+    expect(results.some((entry) => entry.targetSectionId === 'chat-names')).toBe(true)
+    expect(results.some((entry) => entry.targetSectionId === 'chat-providers')).toBe(true)
+    expect(results.some((entry) => entry.targetSectionId === 'chat-inline-visuals')).toBe(true)
   })
 
   it.each([false, undefined])('is absent with structured chat set to %s', (enabled) => {
@@ -230,7 +226,6 @@ describe('Chat settings page', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       hostQueuesMessages: true,
       repos: []
@@ -255,7 +250,6 @@ describe('Chat settings page', () => {
       const sections = buildSettingsNavigationMetadata({
         isMac: true,
         isWindows: false,
-        isWebClient: false,
         nativeChatEnabled: true,
         hostQueuesMessages,
         repos: []
@@ -288,7 +282,7 @@ describe('Chat settings page', () => {
 
   it('uses the existing French translations for moved Behavior controls', async () => {
     await i18n.changeLanguage('fr')
-    const { container } = renderChat(true, true, false, {
+    const { container } = renderChat(true, false, {
       nativeChatInheritShellEnvironment: false,
       nativeChatShellEnvironmentVariables: ['FOO']
     })
@@ -319,7 +313,6 @@ describe('Chat settings page', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       repos: []
     })
@@ -346,7 +339,6 @@ describe('Chat settings page', () => {
           updateSettings={vi.fn()}
           writeSourceControlAiSettings={async () => {}}
           searchEntries={[]}
-          showDesktopOnlySettings
           isMounted
         />
       </ActiveSettingsSectionProvider>
@@ -366,7 +358,6 @@ describe('Chat settings page', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       repos: []
     })
@@ -391,7 +382,6 @@ describe('Chat settings page', () => {
       const sections = buildSettingsNavigationMetadata({
         isMac: false,
         isWindows: true,
-        isWebClient: false,
         nativeChatEnabled: true,
         repos: []
       })
@@ -409,7 +399,7 @@ describe('Chat settings page', () => {
   )
 
   it('retains the unsaved naming draft when search no longer matches Chat', () => {
-    const { element, rerender, container } = renderChat(true, true, true)
+    const { element, rerender, container } = renderChat(true, true)
     const template = screen.getByText('Command template').nextElementSibling
     if (!(template instanceof HTMLTextAreaElement)) {
       throw new Error('Command template textarea is missing')
@@ -431,7 +421,6 @@ describe('Chat settings page', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       repos: []
     })
@@ -464,7 +453,6 @@ describe('Chat settings page', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       repos: []
     })

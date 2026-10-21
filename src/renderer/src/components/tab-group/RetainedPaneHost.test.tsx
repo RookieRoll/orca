@@ -12,7 +12,6 @@ let anchors: HTMLDivElement[]
 let unregisterAnchors: (() => void)[]
 
 beforeEach(() => {
-  vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
   vi.stubGlobal(
     'ResizeObserver',
     class {

@@ -27,7 +27,6 @@ const READINESS: ServeReadiness = {
     }),
     endpoint: 'ws://127.0.0.1:6791',
     deviceId: 'device-id',
-    webClientUrl: null,
     scope: 'runtime' as const,
     qr: null
   }

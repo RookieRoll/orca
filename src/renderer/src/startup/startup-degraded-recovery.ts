@@ -3,14 +3,6 @@ import { translate } from '@/i18n/i18n'
 import { useAppStore } from '../store'
 import { getStartupErrorFallbackUI } from '../lib/startup-ui-hydration'
 import {
-  announceWebHostUnreachableAtStartup,
-  isWebHostUnreachableAtStartup
-} from './startup-web-host-unreachable'
-import {
-  announceWebPairingRefusedAtStartup,
-  isWebPairingRefusedAtStartup
-} from './startup-web-pairing-refused'
-import {
   collectTerminalProviderSnapshotPtyIds,
   refreshTerminalProviderSnapshotCapabilities
 } from '../components/terminal/terminal-provider-snapshot-capability'
@@ -91,18 +83,7 @@ export async function recoverFromDegradedStartup(args: DegradedStartupRecoveryAr
   if (fallbackUI) {
     hydratePersistedUI(fallbackUI, 'startup')
   }
-  const hostUnreachable = await isWebHostUnreachableAtStartup(error)
-  if (isCancelled()) {
-    return
-  }
-  if (hostUnreachable) {
-    // Still no-save until the reload: the host's catalog never loaded, so saving now would prune it.
-    announceWebHostUnreachableAtStartup(abortSignal)
-  } else if (isWebPairingRefusedAtStartup(error)) {
-    announceWebPairingRefusedAtStartup(error)
-  } else {
-    announceDegradedStartup()
-  }
+  announceDegradedStartup()
   if (reconnectStarted) {
     // Why (issue #1158): re-running reconnect over its partially-mutated state would double-set ptyIds and drain pending* twice — force the flag, clear pending*.
     forceWorkspaceSessionReady()

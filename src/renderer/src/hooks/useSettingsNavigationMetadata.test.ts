@@ -3,7 +3,6 @@ import { matchesSettingsSearch } from '../components/settings/settings-search'
 import { describe, expect, it } from 'vitest'
 import { buildSettingsNavigationMetadata } from './useSettingsNavigationMetadata'
 import type { Repo } from '../../../shared/repo-types'
-import { getCodexTerminalServerIsolationTitle } from '../components/settings/codex-terminal-server-isolation-copy'
 
 const repo = {
   id: 'repo-1',
@@ -17,7 +16,6 @@ function ids(
   args: {
     isMac?: boolean
     isWindows?: boolean
-    isWebClient?: boolean
     isDev?: boolean
     isLinearConnected?: boolean
   } = {}
@@ -25,7 +23,6 @@ function ids(
   return buildSettingsNavigationMetadata({
     isMac: args.isMac ?? false,
     isWindows: args.isWindows ?? false,
-    isWebClient: args.isWebClient ?? false,
     isDev: args.isDev ?? false,
     isLinearConnected: args.isLinearConnected ?? false,
     repos: [repo]
@@ -39,7 +36,6 @@ describe('settings navigation metadata', () => {
       const sections = buildSettingsNavigationMetadata({
         isMac: false,
         isWindows: false,
-        isWebClient: false,
         nativeChatEnabled: enabled,
         repos: []
       })
@@ -59,7 +55,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: true,
       repos: []
     })
@@ -75,12 +70,11 @@ describe('settings navigation metadata', () => {
   })
 
   it('puts AI capability panes at the top on desktop', () => {
-    expect(ids().slice(0, 10)).toEqual([
+    expect(ids().slice(0, 9)).toEqual([
       'agents',
       'accounts',
       'orchestration',
       'computer-use',
-      'voice',
       'orca-account',
       'setup-guide',
       'general',
@@ -93,7 +87,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
     const agents = sections.find((section) => section.id === 'agents')
@@ -115,22 +108,16 @@ describe('settings navigation metadata', () => {
     const linearSection = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       isLinearConnected: true,
       repos: [repo]
     }).find((section) => section.id === 'linear')
     expect(linearSection?.group).toBe('capabilities')
   })
 
-  it('keeps the Linear capability section available on web clients when connected', () => {
-    expect(ids({ isWebClient: true, isLinearConnected: true })).toContain('linear')
-  })
-
   it('places Mobile under Set Up instead of its own sidebar group', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -141,7 +128,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
     const automations = sections.find((section) => section.id === 'automations')
@@ -167,111 +153,28 @@ describe('settings navigation metadata', () => {
     const desktopSections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
     const account = desktopSections.find((section) => section.id === 'orca-account')
 
     expect(account?.group).toBe('setup')
     expect(account?.searchEntries[0]?.title).toBe('Orca account')
-    expect(ids({ isWebClient: true })).not.toContain('orca-account')
-  })
-
-  it('puts web-safe AI capability panes at the top while hiding desktop-only panes', () => {
-    expect(ids({ isWebClient: true }).slice(0, 6)).toEqual([
-      'agents',
-      'accounts',
-      'orchestration',
-      'setup-guide',
-      'general',
-      'integrations'
-    ])
-  })
-
-  it('keeps desktop-only Settings panes out of web metadata', () => {
-    const webSections = buildSettingsNavigationMetadata({
-      isMac: false,
-      isWindows: false,
-      isWebClient: true,
-      repos: [repo]
-    })
-    const webIds = webSections.map((section) => section.id)
-
-    expect(webIds).not.toContain('browser')
-    expect(webIds).not.toContain('ssh')
-    expect(webIds).not.toContain('mobile')
-    expect(webIds).not.toContain('computer-use')
-    expect(webIds).not.toContain('voice')
-    expect(webIds).not.toContain('advanced')
-    expect(webIds).toContain('servers')
-    expect(webIds).toContain('repo-repo-1')
-    const floatingWorkspace = webSections.find((section) => section.id === 'floating-workspace')
-    expect(floatingWorkspace?.description).toBe('Global terminal and markdown tabs.')
-    expect(floatingWorkspace?.searchEntries.flatMap((entry) => entry.keywords)).not.toContain(
-      'browser'
-    )
-    const shortcuts = webSections.find((section) => section.id === 'shortcuts')
-    expect(shortcuts?.searchEntries.map((entry) => entry.title)).not.toContain('New browser tab')
-    expect(shortcuts?.searchEntries.map((entry) => entry.title)).not.toContain(
-      'New mobile emulator tab'
-    )
-    const agents = webSections.find((section) => section.id === 'agents')
-    expect(agents?.searchEntries.map((entry) => entry.title)).not.toContain('Nested worker depth')
-    const orchestration = webSections.find((section) => section.id === 'orchestration')
-    expect(orchestration?.searchEntries.map((entry) => entry.title)).not.toContain(
-      'Nested worker depth'
-    )
-  })
-
-  it('lists the host-only Codex server setting in desktop Agents search only', () => {
-    const agentTitles = (isWebClient: boolean): string[] | undefined =>
-      buildSettingsNavigationMetadata({
-        isMac: false,
-        isWindows: false,
-        isWebClient,
-        repos: [repo]
-      })
-        .find((section) => section.id === 'agents')
-        ?.searchEntries.map((entry) => entry.title)
-
-    expect(agentTitles(false)).toContain(getCodexTerminalServerIsolationTitle())
-    expect(agentTitles(true)).not.toContain(getCodexTerminalServerIsolationTitle())
-  })
-
-  it('keeps the Browser shortcut searchable for a capable web runtime', () => {
-    const sections = buildSettingsNavigationMetadata({
-      isMac: false,
-      isWindows: false,
-      isWebClient: true,
-      managedBrowserCreationEnabled: true,
-      mobileEmulatorCreationEnabled: false,
-      repos: [repo]
-    })
-    const shortcutTitles = sections
-      .find((section) => section.id === 'shortcuts')
-      ?.searchEntries.map((entry) => entry.title)
-
-    expect(shortcutTitles).toContain('New browser tab')
-    expect(shortcutTitles).not.toContain('New mobile emulator tab')
   })
 
   it('does not mark installable AI capabilities as beta in the sidebar metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: true,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
 
     expect(sections.find((section) => section.id === 'computer-use')?.badge).toBeUndefined()
-    expect(sections.find((section) => section.id === 'voice')?.badge).toBeUndefined()
   })
 
   it('places Cloud VM under Experimental instead of as a beta sidebar item', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
     const experimental = sections.find((section) => section.id === 'experimental')
@@ -284,18 +187,16 @@ describe('settings navigation metadata', () => {
     expect(entry?.targetSectionId).toBe('ephemeral-vms')
   })
 
-  it('places Plugins under Experimental on desktop and omits it on the web', () => {
+  it('places Plugins under Experimental', () => {
     const desktopSections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [repo]
     })
     const desktopIds = desktopSections.map((section) => section.id)
 
     expect(desktopSections.find((section) => section.id === 'plugins')?.group).toBe('experimental')
     expect(desktopIds.indexOf('plugins')).toBe(desktopIds.indexOf('experimental') + 1)
-    expect(ids({ isWebClient: true })).not.toContain('plugins')
   })
 
   it('omits Windows project runtime search entries when the active host is unsupported', () => {
@@ -303,7 +204,6 @@ describe('settings navigation metadata', () => {
       isMac: false,
       isWindows: false,
       isWindowsTerminalHost: false,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -322,7 +222,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: true,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -340,7 +239,6 @@ describe('settings navigation metadata', () => {
       isMac: false,
       isWindows: false,
       isWindowsTerminalHost: true,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -361,7 +259,6 @@ describe('settings navigation metadata', () => {
       isWindows: false,
       isLocalWindowsHost: false,
       isWindowsTerminalHost: true,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -384,7 +281,6 @@ describe('settings navigation metadata', () => {
       isWindows: true,
       isLocalWindowsHost: true,
       isWindowsTerminalHost: false,
-      isWebClient: false,
       repos: [repo]
     })
 
@@ -411,7 +307,7 @@ describe('settings navigation metadata', () => {
     expect(desktopIds.indexOf('privacy')).toBeLessThan(desktopIds.indexOf('advanced'))
   })
 
-  // Note: this exercises the isDev parameter and isWebClient branches only.
+  // Note: production safety rests on the hard `import.meta.env.DEV` term in the builder.
   // Production safety rests on the hard `import.meta.env.DEV` term in the
   // builder, which is compile-time-inlined per build and cannot be flipped from
   // a test (vitest always runs with DEV=true) — don't mistake this for full
@@ -419,7 +315,6 @@ describe('settings navigation metadata', () => {
   it('shows Dev tools only in desktop development metadata', () => {
     expect(ids()).not.toContain('dev')
     expect(ids({ isDev: true })).toContain('dev')
-    expect(ids({ isDev: true, isWebClient: true })).not.toContain('dev')
   })
 
   it('renders one repo nav section per project even across execution hosts', () => {
@@ -431,7 +326,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [
         {
           id: 'local-1',
@@ -468,7 +362,6 @@ describe('settings navigation metadata', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       repos: [
         { ...clone, id: 'clone-a', path: '/work/app', displayName: 'app' },
         { ...clone, id: 'clone-b', path: '/work/app-b', displayName: 'app-b' }

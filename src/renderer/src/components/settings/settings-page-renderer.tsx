@@ -95,8 +95,7 @@ export function renderSettingsPage(context: SettingsRenderContext): React.JSX.El
       />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        {!model.isWebClient &&
-        shouldShowSettingsHostScopePicker(model.settingsHostScope, model.runtimeEnvironments) ? (
+        {shouldShowSettingsHostScopePicker(model.settingsHostScope, model.runtimeEnvironments) ? (
           <SettingsHostScopePicker
             scope={model.settingsHostScope}
             environments={model.runtimeEnvironments}

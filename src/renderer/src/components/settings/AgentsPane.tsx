@@ -15,7 +15,6 @@ import {
   getAgentWorkspaceTrustTitle
 } from './agent-workspace-trust-copy'
 import { SettingsSubsectionHeader, SettingsSwitchRow } from './SettingsFormControls'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { getAgentsPaneSearchEntries } from './agents-search'
 import {
   buildAgentAvailabilitySettingsUpdate,
@@ -81,19 +80,10 @@ export function AgentsPane({
           wslCapabilitiesLoading={wslCapabilitiesLoading}
         />
         <AgentStatusHooksSetting settings={settings} updateSettings={updateSettings} />
-        {!isPairedWebClientWindow() ? (
-          <>
-            <AgentWorkspaceTrustSetting settings={settings} updateSettings={updateSettings} />
-            <CodexTerminalServerIsolationSetting
-              settings={settings}
-              updateSettings={updateSettings}
-            />
-          </>
-        ) : null}
+        <AgentWorkspaceTrustSetting settings={settings} updateSettings={updateSettings} />
+        <CodexTerminalServerIsolationSetting settings={settings} updateSettings={updateSettings} />
         <AgentGeneratedTabTitlesSetting settings={settings} updateSettings={updateSettings} />
-        {!isPairedWebClientWindow() ? (
-          <AgentAwakeSetting settings={settings} updateSettings={updateSettings} />
-        ) : null}
+        <AgentAwakeSetting settings={settings} updateSettings={updateSettings} />
         <AgentCacheTimerSection settings={settings} updateSettings={updateSettings} />
       </section>
     </div>

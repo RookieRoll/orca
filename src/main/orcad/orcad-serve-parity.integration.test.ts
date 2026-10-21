@@ -3,16 +3,12 @@
  * first, desktop-serve flag parity on stdout (the readiness contract), the browser client the
  * CLI hands orcad, and the shared-profile refusal while the desktop app holds the profile.
  */
-import { existsSync, mkdirSync, mkdtempSync, realpathSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, realpathSync, writeFileSync } from 'node:fs'
 import { tmpdir, userInfo } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { runProcess, spawnProcess } from '@orca/process-host'
 import { ORCAD_NODE_RUNTIME_MARKER_FILENAME } from '../../shared/orcad-artifacts'
-import {
-  findBundledWebClientRoot,
-  WEB_CLIENT_INDEX_FILENAME
-} from '../../shared/bundled-web-client-root'
 import { orcadServeArgs } from '../../shared/orcad-serve-argv'
 import {
   ORCAD_NATIVE_PREFLIGHT_FLAG,
@@ -194,35 +190,6 @@ describe.skipIf(skip)('orca serve on orcad', () => {
     expect(result.stderr).toContain('The Orca desktop app')
   }, 90_000)
 
-  // #30120: the CLI never handed orcad the app's web client, so no URL was printed and GETs hung.
-  it('serves the web client the CLI hands it, and answers other paths with 404', async () => {
-    const userData = realpathSync(
-      mkdtempSync(join(process.platform === 'win32' ? tmpdir() : '/tmp', 'orca-serve-web-'))
-    )
-    roots.push(userData)
-    const appRoot = profile()
-    mkdirSync(join(appRoot, 'out', 'web'), { recursive: true })
-    writeFileSync(join(appRoot, 'out', 'web', WEB_CLIENT_INDEX_FILENAME), '<title>orca web</title>')
-    // The argv `orca serve` builds, but on loopback.
-    const args = orcadServeArgs(
-      { json: true, port: '0' },
-      findBundledWebClientRoot(appRoot),
-      '127.0.0.1'
-    )
-    try {
-      const { readiness } = await serveOnce(userData, args)
-      const webClientUrl: unknown = readiness.pairing?.webClientUrl
-      expect(webClientUrl).toEqual(expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+\//u))
-      const index = await fetch(new URL(`/${WEB_CLIENT_INDEX_FILENAME}`, String(webClientUrl)))
-      expect(index.status).toBe(200)
-      expect(await index.text()).toBe('<title>orca web</title>')
-      const unknown = await fetch(new URL('/no-such-page', String(webClientUrl)))
-      expect(unknown.status).toBe(404)
-    } finally {
-      await stopServeProfile(userData, null)
-    }
-  }, 150_000)
-
   // A short /tmp root keeps the POSIX daemon socket path legal; Windows uses a named pipe.
   it('keeps a live terminal across a serve restart on the shared profile (D7)', async () => {
     const userData = realpathSync(
@@ -280,7 +247,7 @@ async function serveDaemonPid(userData: string): Promise<number> {
 }
 
 type ServeReadiness = {
-  pairing?: { webClientUrl?: unknown }
+  pairing?: { url?: unknown }
   health?: { terminalDaemon?: { state?: string; pid: number } }
 }
 

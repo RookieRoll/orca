@@ -316,9 +316,6 @@ export function createStructuredSessionMocks() {
         return new Promise(() => {})
       }
     }),
-    useNativeChatFontSize: () => ({
-      useNativeChatFontSize: () => undefined
-    }),
     useNativeChatFileLinkContext: () => ({
       useNativeChatFileLinkContext: () => mocks.fileLinkContext
     }),

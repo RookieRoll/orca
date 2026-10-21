@@ -42,8 +42,7 @@ export function useSettingsPageEffects(
     setPendingNavRequestTick,
     settings,
     settingsNavigationTarget,
-    settingsProjectList,
-    showDesktopOnlySettings
+    settingsProjectList
   } = model
   const {
     closeSettingsPageWithPromptGuard,

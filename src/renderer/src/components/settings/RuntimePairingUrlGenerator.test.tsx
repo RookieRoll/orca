@@ -35,14 +35,12 @@ describe('RuntimePairingUrlGenerator', () => {
     runtimePairingLinkCache.intent = 'another'
     runtimePairingLinkCache.generatedAddress = null
     runtimePairingLinkCache.runtimePairingUrl = null
-    runtimePairingLinkCache.webClientUrl = null
     runtimePairingLinkCache.runtimePairingDeviceId = null
     mocks.listNetworkInterfaces.mockReset()
     mocks.listRuntimeAccessGrants.mockReset().mockResolvedValue({ grants: [] })
     mocks.getRuntimePairingUrl.mockReset().mockResolvedValue({
       available: true,
       pairingUrl: 'orca://pair#runtime',
-      webClientUrl: 'http://127.0.0.1:6768/web-index.html?pairing=runtime',
       endpoint: 'ws://127.0.0.1:6768',
       deviceId: 'runtime-1'
     })

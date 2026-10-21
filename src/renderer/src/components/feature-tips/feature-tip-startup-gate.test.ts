@@ -57,7 +57,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'open', tipId: 'orca-cli' })
   })
@@ -75,7 +74,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'suppress-for-onboarding' })
   })
@@ -93,7 +91,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: true,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -111,7 +108,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'open', tipId: 'orca-cli' })
   })
@@ -129,7 +125,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'open', tipId: 'cmd-j-palette' })
   })
@@ -147,7 +142,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -165,7 +159,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -183,7 +176,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -201,7 +193,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -221,7 +212,6 @@ describe('feature tip startup gate', () => {
         promptedThisSession: false,
         settings: makeSettings(),
         suppressedByOnboardingThisSession: false,
-        webClient: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -245,7 +235,6 @@ describe('feature tip startup gate', () => {
 
   function decideForExistingUser(args: {
     sessionSearchEnabled: boolean
-    webClient: boolean
     featureTipsSeenIds?: ('agent-session-search' | 'orca-cli')[]
   }): ReturnType<typeof getFeatureTipsAppOpenDecision> {
     return getFeatureTipsAppOpenDecision({
@@ -258,13 +247,12 @@ describe('feature tip startup gate', () => {
       inNativeChatUpgradeTipAudience: false,
       promptedThisSession: false,
       settings: makeSettings(false, args.sessionSearchEnabled),
-      suppressedByOnboardingThisSession: false,
-      webClient: args.webClient
+      suppressedByOnboardingThisSession: false
     })
   }
 
   it('opens the session search tip first while search is off', () => {
-    expect(decideForExistingUser({ sessionSearchEnabled: false, webClient: false })).toEqual({
+    expect(decideForExistingUser({ sessionSearchEnabled: false })).toEqual({
       kind: 'open',
       tipId: 'agent-session-search'
     })
@@ -274,25 +262,20 @@ describe('feature tip startup gate', () => {
     expect(
       decideForExistingUser({
         sessionSearchEnabled: false,
-        webClient: false,
         featureTipsSeenIds: ['agent-session-search']
       })
     ).toEqual({ kind: 'open', tipId: 'orca-cli' })
   })
 
-  it('skips the session search tip when search is already on or on a web client', () => {
-    expect(decideForExistingUser({ sessionSearchEnabled: true, webClient: false })).toEqual({
-      kind: 'open',
-      tipId: 'orca-cli'
-    })
-    expect(decideForExistingUser({ sessionSearchEnabled: false, webClient: true })).toEqual({
+  it('skips the session search tip when search is already on', () => {
+    expect(decideForExistingUser({ sessionSearchEnabled: true })).toEqual({
       kind: 'open',
       tipId: 'orca-cli'
     })
   })
 
   it('treats a profile with no session search settings as search off', () => {
-    expect(isSessionSearchFeatureTipCompleted({}, false)).toBe(false)
+    expect(isSessionSearchFeatureTipCompleted({})).toBe(false)
   })
 
   describe('native chat upgrade tip', () => {
@@ -310,8 +293,7 @@ describe('feature tip startup gate', () => {
         persistedUIReady: true,
         promptedThisSession: false,
         settings: makeSettings(false, false),
-        suppressedByOnboardingThisSession: false,
-        webClient: false
+        suppressedByOnboardingThisSession: false
       })
     }
 

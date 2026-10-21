@@ -194,7 +194,6 @@ export class RuntimeRpcLifecycle extends RuntimeRpcWebSocketDispatch {
     const wsTransport = new WebSocketTransport({
       host: options.host,
       port: options.port,
-      staticRoot: this.webClientRoot,
       ...(options.fallbackPort !== undefined ? { fallbackPort: options.fallbackPort } : {}),
       ...(options.preferPinnedPort ? { preferPinnedPort: true } : {}),
       ...(options.requirePinnedPort ? { requirePinnedPort: true } : {}),

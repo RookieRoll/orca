@@ -26,16 +26,6 @@ describe('headless paired runtime startup diagnostics', () => {
     )
   })
 
-  it('redacts encoded pairing material from web-client URLs', () => {
-    const pairingUrl = encodeURIComponent('orca://pairing-secret')
-    const diagnostic = new HeadlessPairedRuntimeStartupDiagnosticBuffer()
-
-    diagnostic.append(Buffer.from(`https://host/web-index.html#pairing=${pairingUrl}\n`))
-
-    expect(diagnostic.read()).toBe('https://host/web-index.html#pairing=[redacted]\n')
-    expect(diagnostic.read()).not.toContain('pairing-secret')
-  })
-
   it('drops oversized unfinished lines instead of retaining a pairing fragment', () => {
     const diagnostic = new HeadlessPairedRuntimeStartupDiagnosticBuffer()
     diagnostic.append(Buffer.from(`orca://${'secret'.repeat(1_500)}`))
@@ -58,27 +48,10 @@ describe('headless paired runtime readiness', () => {
       parseHeadlessPairedRuntimePairingOffer(
         JSON.stringify({
           type: 'orca_server_ready',
-          pairing: { available: true, url: 'orca://pairing-secret', webClientUrl: null }
+          pairing: { available: true, url: 'orca://pairing-secret' }
         })
       )
     ).toEqual({ pairingUrl: 'orca://pairing-secret' })
   })
 
-  it('preserves an available web-client URL', () => {
-    expect(
-      parseHeadlessPairedRuntimePairingOffer(
-        JSON.stringify({
-          type: 'orca_server_ready',
-          pairing: {
-            available: true,
-            url: 'orca://pairing-secret',
-            webClientUrl: 'https://example.test/web-index.html#pairing=secret'
-          }
-        })
-      )
-    ).toEqual({
-      pairingUrl: 'orca://pairing-secret',
-      webClientUrl: 'https://example.test/web-index.html#pairing=secret'
-    })
-  })
 })

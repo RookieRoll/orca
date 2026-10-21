@@ -9,7 +9,6 @@ import {
   NATIVE_CHAT_PASTE_REQUEST_EVENT
 } from '@/lib/native-chat-paste-request'
 import { APP_MENU_PASTE_EVENT } from '@/lib/app-menu-paste'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { pasteTextIntoTextControl, TEXT_CONTROL_PASTE_MAX_BYTES } from '@/lib/text-control-paste'
 import type { NativeChatComposerHandle } from './NativeChatComposer'
 
@@ -31,11 +30,7 @@ export function useNativeChatPasteBridge({
       if (origin) {
         if (findNativeChatPasteField(origin, rootRef.current) === origin) {
           origin.focus({ preventScroll: true })
-          if (isWebClientLocation()) {
-            origin.dispatchEvent(new NativeChatPasteRequest())
-          } else {
-            window.api.ui.performNativePaste({ mode })
-          }
+          window.api.ui.performNativePaste({ mode })
         } else {
           toast.error(nativeChatPasteUnavailableNotice())
         }

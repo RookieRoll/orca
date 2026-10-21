@@ -44,7 +44,6 @@ function activateAndExpectNoRelaunch(
 }
 
 afterEach(() => {
-  delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
   vi.unstubAllGlobals()
   resetWebSessionTabsSnapshotFreshnessForTests()
   resetWebRuntimeWakeTerminalRespawnForTests()
@@ -280,13 +279,12 @@ describe('activateAndRevealWorktree', () => {
     expect(revealWorktreeInSidebar).toHaveBeenCalledWith(worktree.id, { behavior: 'auto' })
   })
 
-  it('asks the host runtime to activate the worktree in the paired web client', async () => {
+  it('asks the host runtime to activate the worktree', async () => {
     const worktree = makeWebRuntimeWorktree()
     const callRuntimeEnvironment = vi.fn().mockResolvedValue({
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
 
     useAppStore.setState({
@@ -348,7 +346,6 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
 
     useAppStore.setState({
@@ -412,7 +409,6 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
 
     useAppStore.setState({
@@ -462,7 +458,6 @@ describe('activateAndRevealWorktree', () => {
   it('does not respawn when the host snapshot still has terminal tabs', async () => {
     const worktree = makeWorktree()
     const callRuntimeEnvironment = vi.fn()
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
 
     useAppStore.setState({
       repos: [
@@ -532,7 +527,7 @@ describe('activateAndRevealWorktree', () => {
     expect(callRuntimeEnvironment).not.toHaveBeenCalled()
   })
 
-  it('respawns a host terminal when waking a slept web workspace with dead local PTYs', async () => {
+  it('respawns a host terminal when waking a remote workspace with dead local PTYs', async () => {
     const worktree = makeWebRuntimeWorktree()
     const callRuntimeEnvironment = vi
       .fn()
@@ -544,7 +539,6 @@ describe('activateAndRevealWorktree', () => {
         ok: true,
         result: { tabId: 'host-tab-1', terminal: 'term_host' }
       })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({
       call: callRuntimeEnvironment,
       subscribe: vi.fn()
@@ -622,7 +616,6 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { tabId: 'host-tab-1', terminal: 'term_host' }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({
       call: callRuntimeEnvironment,
       subscribe: vi.fn()

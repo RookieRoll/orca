@@ -53,7 +53,6 @@ export const mobileApi = {
     | {
         available: true
         pairingUrl: string
-        webClientUrl: string | null
         endpoint: string
         deviceId: string
       }

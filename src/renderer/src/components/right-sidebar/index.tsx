@@ -17,10 +17,7 @@ import {
 import { translate } from '@/i18n/i18n'
 import { RightSidebarPanelContent } from './right-sidebar-panel-content'
 import { useMeasuredWidth } from './right-sidebar-measured-width'
-import {
-  isPairedWebClientWindow,
-  shouldRenderDesktopWindowChrome
-} from '@/lib/desktop-window-chrome'
+import { shouldRenderDesktopWindowChrome } from '@/lib/desktop-window-chrome'
 import { getRendererAppPlatform } from '@/lib/renderer-app-platform'
 import { ActivityBarPositionMenu } from './activity-bar-position-menu'
 import { RightSidebarTopActivityBar } from './right-sidebar-top-activity-bar'
@@ -32,8 +29,7 @@ const ACTIVITY_BAR_SIDE_WIDTH = 40
 
 function RightSidebarInner(): React.JSX.Element {
   const hasDesktopWindowChrome = shouldRenderDesktopWindowChrome({
-    platform: getRendererAppPlatform(),
-    isWebClient: isPairedWebClientWindow()
+    platform: getRendererAppPlatform()
   })
   const rightSidebarShortcut = useShortcutLabel('sidebar.right.toggle')
   const rightSidebarOpen = useAppStore((s) => s.rightSidebarOpen)

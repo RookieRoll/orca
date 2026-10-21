@@ -67,7 +67,6 @@ function readiness(published: PairingOffer | null): ServeReadiness {
           url: encodePairingOffer({ ...published, endpoint: 'ws://127.0.0.1:6768' }),
           endpoint: 'ws://127.0.0.1:6768',
           deviceId: published.pairedDeviceId!,
-          webClientUrl: null,
           scope: 'runtime',
           qr: null
         }

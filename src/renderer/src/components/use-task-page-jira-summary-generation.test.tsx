@@ -91,17 +91,6 @@ afterEach(() => {
 })
 
 describe('Jira title generation lifecycle', () => {
-  it('keeps the form usable without desktop generation in the web client', async () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    Object.defineProperty(window, 'api', { configurable: true, value: {} })
-    const { result } = setup()
-    expect(result.current.newJiraIssueSummaryAvailable).toBe(false)
-    await act(async () => result.current.handleGenerateNewJiraIssueSummary())
-    act(() => result.current.setNewJiraIssueTitle('Manually written title'))
-    expect(result.current.newJiraIssueTitle).toBe('Manually written title')
-    expect(mocks.generate).not.toHaveBeenCalled()
-  })
-
   it.each([
     { ...initialProps, body: 'A different description' },
     { ...initialProps, sourceHost: 'remote-2' },

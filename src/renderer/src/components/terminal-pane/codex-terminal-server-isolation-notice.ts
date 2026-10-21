@@ -3,7 +3,6 @@ import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
 import type { AppState } from '@/store/types'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { CODEX_TERMINAL_SERVER_ISOLATION_SETTINGS_TARGET_ID } from '@/lib/settings-navigation-types'
 import { isCodexTerminalServerIsolationEnabled } from '../../../../shared/codex-terminal-server-isolation'
 import { whenCodexTerminalAppears } from './codex-terminal-presence'
@@ -65,8 +64,7 @@ export function useCodexTerminalServerIsolationNotice(): void {
   const due = useAppStore(isNoticeDue)
 
   useEffect(() => {
-    // Why: a paired web client's terminals follow the host's setting, not this window's.
-    if (!due || isPairedWebClientWindow()) {
+    if (!due) {
       return
     }
     return whenCodexTerminalAppears(showCodexTerminalServerIsolationNotice)

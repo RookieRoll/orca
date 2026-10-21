@@ -24,48 +24,34 @@ import {
 import type { SettingsNavigationBuildOptions } from './settings-navigation-build-options'
 
 export function buildRemoteSettingsSections(
-  {
-    isMac,
-    isWindowsTerminalHost,
-    isWebClient,
-    isDev,
-    repos,
-    projectGrouping
-  }: SettingsNavigationBuildOptions,
+  { isMac, isWindowsTerminalHost, isDev, repos, projectGrouping }: SettingsNavigationBuildOptions,
   runtimeEnvironmentsSearchEntry: SettingsNavSection['searchEntries'][number],
   reposById: ReadonlyMap<string, Repo>
 ): SettingsNavSection[] {
-  const showDesktopOnlySettings = !isWebClient
   return [
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'ssh',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.94a5afe910', 'SSH Hosts'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.31e57d1c70',
-              'Use existing machines over SSH for files, terminals, Git, and workspaces.'
-            ),
-            icon: Cable,
-            searchEntries: getSshPaneSearchEntries(),
-            group: 'remote'
-          }
-        ]
-      : []),
+    {
+      id: 'ssh',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.94a5afe910', 'SSH Hosts'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.31e57d1c70',
+        'Use existing machines over SSH for files, terminals, Git, and workspaces.'
+      ),
+      icon: Cable,
+      searchEntries: getSshPaneSearchEntries(),
+      group: 'remote'
+    },
     {
       id: 'servers',
       title: translate(
         'auto.hooks.useSettingsNavigationMetadata.de0c2907a1',
         'Remote Orca Servers'
       ),
-      description: isWebClient
-        ? 'Connect this browser to a saved Orca server.'
-        : 'Run Orca on another machine and work on it from here.',
+      description: 'Run Orca on another machine and work on it from here.',
       icon: Server,
       searchEntries: [runtimeEnvironmentsSearchEntry],
       group: 'remote'
     },
-    ...(showDesktopOnlySettings && isMac
+    ...(isMac
       ? [
           {
             id: 'developer-permissions',
@@ -97,24 +83,20 @@ export function buildRemoteSettingsSections(
       searchEntries: getPrivacyPaneSearchEntries(),
       group: 'security'
     },
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'advanced',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.580a04cd81', 'Advanced'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.e338c507c1',
-              'Low-level compatibility settings for troubleshooting.'
-            ),
-            icon: Wrench,
-            searchEntries: getAdvancedPaneSearchEntries(),
-            group: 'advanced'
-          }
-        ]
-      : []),
+    {
+      id: 'advanced',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.580a04cd81', 'Advanced'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.e338c507c1',
+        'Low-level compatibility settings for troubleshooting.'
+      ),
+      icon: Wrench,
+      searchEntries: getAdvancedPaneSearchEntries(),
+      group: 'advanced'
+    },
     // Why: dev tooling must not be reachable from packaged/web builds even if
     // this pure metadata builder is called manually with isDev=true.
-    ...(showDesktopOnlySettings && import.meta.env.DEV && isDev
+    ...(import.meta.env.DEV && isDev
       ? [
           {
             id: 'dev',
@@ -143,21 +125,17 @@ export function buildRemoteSettingsSections(
       searchEntries: getExperimentalPaneSearchEntries(),
       group: 'experimental'
     },
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'plugins',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.pluginsTitle', 'Plugins'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.pluginsDescription',
-              'Install and manage experimental Orca plugins.'
-            ),
-            icon: Blocks,
-            searchEntries: getPluginsPaneSearchEntries(),
-            group: 'experimental'
-          }
-        ]
-      : []),
+    {
+      id: 'plugins',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.pluginsTitle', 'Plugins'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.pluginsDescription',
+        'Install and manage experimental Orca plugins.'
+      ),
+      icon: Blocks,
+      searchEntries: getPluginsPaneSearchEntries(),
+      group: 'experimental'
+    },
     // Why: one nav row per project, not per repo row — a project set up on
     // multiple hosts (local + a Remote Orca Server) collapses to a single
     // entry. Same inputs as the panes so this list matches them.

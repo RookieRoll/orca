@@ -84,9 +84,8 @@ describe('electron-builder config', () => {
     expect(packs('out/main/index.js')).toBe(true)
     expect(packs('out/web/web-index.html')).toBe(false)
     expect(packs('out/web/assets/shared.js')).toBe(false)
+    expect(packs('out/web/stale.js')).toBe(false)
     expect(packs('out/mobile-web/stale.js')).toBe(false)
-    expect(packs('out/renderer/web-index.html')).toBe(true)
-    expect(packs('out/renderer/.orca-web-client-files.json')).toBe(true)
   })
 
   it.each(['file', 'directory'])('keeps a root notes %s out of app.asar', async (kind) => {
@@ -411,25 +410,6 @@ describe('electron-builder config', () => {
     expect(
       isUnpacked(join('/app', 'out', 'main', `${entryName}.js`), { isDirectory: () => false })
     ).toBe(true)
-  })
-
-  // Why: opening a packed file reads a one-time /tmp extract; once a /tmp sweep removes it, the
-  // web client answers an empty 500 until restart (#27976).
-  it('unpacks the web client a host serves by opening its files', () => {
-    const matcher = new FileMatcher(
-      '/app',
-      '/dest',
-      (value) => value,
-      electronBuilderConfig.asarUnpack
-    )
-    const isUnpacked = matcher.createFilter()
-    for (const webPath of [
-      'out/renderer/web-index.html',
-      'out/renderer/assets/index-abc123.js',
-      'out/renderer/.orca-web-client-files.json'
-    ]) {
-      expect(isUnpacked(join('/app', webPath), { isDirectory: () => false })).toBe(true)
-    }
   })
 
   it('keeps the worker-thread hang watchdog inside app.asar', () => {

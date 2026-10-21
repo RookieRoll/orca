@@ -67,7 +67,6 @@ function deferred<T>() {
 }
 
 beforeEach(() => {
-  delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
   clearRuntimeCompatibilityCacheForTests()
   resetRuntimeCatalogListingForTests()
   vi.clearAllMocks()
@@ -447,8 +446,7 @@ describe('createSettingsSlice runtime switching', () => {
     })
   })
 
-  it('does not close host-owned mirrored resources when a paired web client switches servers', async () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+  it('does not close host-owned mirrored resources when switching runtimes', async () => {
     const store = createTestStore()
     store.setState({
       settings: { activeRuntimeEnvironmentId: 'env-1' } as AppState['settings'],

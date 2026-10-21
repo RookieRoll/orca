@@ -7,7 +7,6 @@ import type { CodexConfigSyncStatus } from '../../../../shared/codex-config-sync
 import { toast } from 'sonner'
 import { useAppStore } from '../../store'
 import { translate } from '@/i18n/i18n'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import {
   emptyClaudeAccountsState,
   emptyCodexAccountsState,
@@ -136,19 +135,16 @@ export function AccountsPane({
   const localAccountRuntimeSentenceLabel = getRuntimeSentenceLabel(localAccountRuntime)
   // Why: users read the remote-scoped list as their desktop accounts being
   // deleted (#8186); say they are intact and link the default-runtime control.
-  // The web client has no desktop-owned accounts and cannot select Local
-  // desktop, so promising a switch back would be a dead end there.
-  const remoteAccountScopeNotice =
-    isRemoteAccountScope && !isWebClientLocation() ? (
-      <ProviderHostScopeControl
-        labelPrefix={translate(
-          'auto.components.settings.AccountsPane.accountScopePrefix',
-          'Account scope'
-        )}
-        scope={getRemoteAccountsPaneScope(remoteServerName)}
-        className="text-xs"
-      />
-    ) : null
+  const remoteAccountScopeNotice = isRemoteAccountScope ? (
+    <ProviderHostScopeControl
+      labelPrefix={translate(
+        'auto.components.settings.AccountsPane.accountScopePrefix',
+        'Account scope'
+      )}
+      scope={getRemoteAccountsPaneScope(remoteServerName)}
+      className="text-xs"
+    />
+  ) : null
 
   const [codexAccounts, setCodexAccounts] =
     useState<CodexRateLimitAccountsState>(emptyCodexAccountsState)

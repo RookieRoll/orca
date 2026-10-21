@@ -1,7 +1,6 @@
 import { toast } from 'sonner'
 import { translate } from '@/i18n/i18n'
 import { blobToBase64, convertImageBlobToPng } from '@/lib/image-blob-png'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { CLIPBOARD_IMAGE_TOO_LARGE_ERROR } from '../../../../shared/clipboard-image'
 
 /** The chat context menu offers "Copy image" for elements carrying this attribute. */
@@ -9,8 +8,7 @@ const COPY_IMAGE_SRC_SELECTOR = '[data-native-chat-copy-image-src]'
 
 /** Full-size source to copy for an image, or undefined when it has none. */
 export function copyableNativeChatImageSrc(src: string | undefined): string | undefined {
-  // The web client's image clipboard write is a no-op.
-  return isWebClientLocation() ? undefined : src
+  return src
 }
 
 export type NativeChatCopyImage = () => Promise<Blob>

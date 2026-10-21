@@ -44,12 +44,12 @@ function ChatPersistenceHarness({ model }: { model: SettingsPersistenceModel }) 
   )
 }
 
-it('passes the existing paired-web capability through the actual Chat renderer', () => {
+it('renders Chat naming controls through the actual Chat renderer', () => {
   useAppStore.setState({ settingsSearchQuery: '' })
   const model = settingsModel()
-  render(<ChatPersistenceHarness model={{ ...model, showDesktopOnlySettings: false }} />)
+  render(<ChatPersistenceHarness model={model} />)
   expect(screen.getByRole('spinbutton', { name: 'Text size' })).toBeTruthy()
-  expect(screen.queryByRole('switch', { name: 'Name chats automatically' })).toBeNull()
+  expect(screen.getByRole('switch', { name: 'Name chats automatically' })).toBeTruthy()
   expect(persist).not.toHaveBeenCalled()
 })
 

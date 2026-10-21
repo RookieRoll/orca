@@ -181,19 +181,6 @@ describe('a link to this computer printed in a paired-server terminal', () => {
     expect(onOpenFailure).toHaveBeenCalledWith(expect.objectContaining({ verdict: 'unverifiable' }))
   })
 
-  it('never treats a paired web client filesystem as this computer', async () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    hostDisowns('/Users/me/notes.md')
-    const onOpenFailure = vi.fn()
-
-    openDetectedFilePath('/Users/me/notes.md', null, null, { ...serverWorkspace, onOpenFailure })
-    await flushDoubleRaf()
-
-    expect(statMock).not.toHaveBeenCalled()
-    expect(openFileMock).not.toHaveBeenCalled()
-    expect(onOpenFailure).toHaveBeenCalledWith(expect.objectContaining({ verdict: 'unverifiable' }))
-  })
-
   it('opens a path the host granted read-only from the host, never from this computer', async () => {
     runtimeEnvironmentCallMock.mockResolvedValueOnce({
       id: 'rpc-1',

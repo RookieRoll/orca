@@ -34,13 +34,11 @@ export function serveOptionArgs(args: ServeOrcaAppArgs, prefix: '--' | '--serve-
 /** `bindHost` exists for tests, which must not listen on every interface. */
 export function orcadServeArgs(
   args: ServeOrcaAppArgs,
-  webClientRoot?: string,
   bindHost = '0.0.0.0'
 ): string[] {
   return [
     '--bind',
     bindHost,
-    ...serveOptionArgs(args, '--'),
-    ...(webClientRoot ? ['--web-client-root', webClientRoot] : [])
+    ...serveOptionArgs(args, '--')
   ]
 }

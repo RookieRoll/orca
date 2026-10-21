@@ -49,7 +49,6 @@ describe('activateAndRevealWorktree', () => {
             }
           : { ok: false, error: { code: 'test', message: 'stop after recording the request' } }
     )
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
     seedEmptyActivatableWorktree(worktree)
     const settings = useAppStore.getState().settings
@@ -118,7 +117,6 @@ describe('activateAndRevealWorktree', () => {
       ok: false,
       error: { code: 'test', message: 'stop after recording the request' }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
     seedEmptyActivatableWorktree(worktree)
     useAppStore.setState((state) => ({
@@ -170,7 +168,6 @@ describe('activateAndRevealFolderWorkspace', () => {
             }
           : { ok: false, error: { code: 'test', message: 'stop after recording the request' } }
     )
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment })
     const settings = useAppStore.getState().settings
     useAppStore.setState({
@@ -231,8 +228,7 @@ describe('activateAndRevealFolderWorkspace', () => {
 })
 
 describe('ensureWorktreeHasInitialTerminal', () => {
-  it('does not create a local fallback tab in the paired web runtime client', () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+  it('does not create a local fallback tab when a runtime owns the workspace', () => {
     useAppStore.setState((state) => ({
       settings: state.settings
         ? { ...state.settings, activeRuntimeEnvironmentId: 'web-runtime-1' }
@@ -257,8 +253,7 @@ describe('ensureWorktreeHasInitialTerminal', () => {
     expect(store.setActiveTab).not.toHaveBeenCalled()
   })
 
-  it('queues returned setup fallback on an existing web runtime tab', () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+  it('queues returned setup fallback on an existing runtime tab', () => {
     useAppStore.setState((state) => ({
       settings: state.settings
         ? { ...state.settings, activeRuntimeEnvironmentId: 'web-runtime-1' }
@@ -312,8 +307,7 @@ describe('ensureWorktreeHasInitialTerminal', () => {
     )
   })
 
-  it('holds the issue command for the first mirrored web runtime tab when none exists yet', () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+  it('holds the issue command for the first mirrored runtime tab when none exists yet', () => {
     useAppStore.setState((state) => ({
       settings: state.settings
         ? { ...state.settings, activeRuntimeEnvironmentId: 'web-runtime-1' }

@@ -12,7 +12,6 @@ import {
   findIndexedProjectGroupOwner
 } from './worktree-runtime-owner-index'
 import type { SingleRuntimeLegacyOwnerState } from './single-runtime-legacy-owner'
-import { getPairedWebClientEnvironmentId } from './paired-web-client-host'
 
 type RuntimeExecutionHost = Extract<ParsedExecutionHost, { kind: 'runtime' }>
 
@@ -108,14 +107,14 @@ export function getRuntimeEnvironmentIdForFolderWorkspace(
     folderWorkspace?.connectionId?.trim() ||
     projectGroup?.connectionId?.trim()
   ) {
-    return getPairedWebClientEnvironmentId(state)
+    return null
   }
   const restoredRuntimeHost = getRestoredRuntimeHostForFolderWorkspace(state, folderWorkspaceId)
   if (restoredRuntimeHost) {
     return restoredRuntimeHost.environmentId
   }
   // Why not the Active Server focus: the client stamps every server folder on arrival.
-  return getPairedWebClientEnvironmentId(state)
+  return null
 }
 
 export function getExplicitRuntimeEnvironmentIdForFolderWorkspace(
@@ -181,6 +180,5 @@ export function getExecutionHostIdForFolderWorkspace(
   if (restoredRuntimeHost) {
     return restoredRuntimeHost.id
   }
-  const environmentId = getPairedWebClientEnvironmentId(state)
-  return environmentId ? toRuntimeExecutionHostId(environmentId) : 'local'
+  return 'local'
 }

@@ -19,22 +19,18 @@ export function useSettingsTerminalModel(
   const scopeEnvironmentId = runtimeTargetEnvironmentId(model.settingsHostScope.target)
   const windowsTerminalCapabilityOwnerKey = useWindowsTerminalCapabilityOwnerKey(scopeEnvironmentId)
   const runtimeTarget = model.settingsHostScope.target
-  const capabilityLoadTarget = useMemo(
-    () => (model.isWebClient ? { kind: 'local' as const } : runtimeTarget),
-    [model.isWebClient, runtimeTarget]
-  )
   const hasActiveRuntimeEnvironment = scopeEnvironmentId !== null
   const needsRepoWindowsRuntimeCapabilities = [...navigation.neededSectionIds].some((sectionId) =>
     sectionId.startsWith('repo-')
   )
   const needsLocalWindowsRuntimeCapabilities =
-    (model.isWindows || model.isWebClient) &&
+    model.isWindows &&
     (navigation.neededSectionIds.has('agents') || navigation.neededSectionIds.has('general'))
   // Why: a server that is no longer saved has no capabilities to load; never probe another host.
   const shouldLoadWindowsTerminalCapabilities =
     model.settingsHostScope.available &&
     (hasActiveRuntimeEnvironment ||
-      ((model.isWindows || model.isWebClient) &&
+      (model.isWindows &&
         (navigation.neededSectionIds.has('terminal') ||
           navigation.neededSectionIds.has('accounts') ||
           needsRepoWindowsRuntimeCapabilities ||
@@ -44,30 +40,26 @@ export function useSettingsTerminalModel(
     shouldLoadWindowsTerminalCapabilities,
     true,
     windowsTerminalCapabilityOwnerKey,
-    capabilityLoadTarget
+    runtimeTarget
   )
   // Why: global agent and project defaults belong to the desktop, not its active remote.
   const remoteViewLocalWindowsRuntimeCapabilities = useLocalWindowsTerminalCapabilities(
-    needsLocalWindowsRuntimeCapabilities &&
-      runtimeTarget.kind === 'environment' &&
-      !model.isWebClient,
+    needsLocalWindowsRuntimeCapabilities && runtimeTarget.kind === 'environment',
     true,
     'local'
   )
   const localWindowsRuntimeCapabilities =
-    runtimeTarget.kind === 'local' || model.isWebClient
+    runtimeTarget.kind === 'local'
       ? windowsTerminalCapabilities
       : remoteViewLocalWindowsRuntimeCapabilities
   // Why: only supported-but-unavailable WSL (Windows) should render disabled controls, not unsupported WSL (macOS/Linux).
   const runtimeWslSupportedPlatform = isWindowsTerminalCapabilityHost({
     isWindowsRenderer: model.isWindows,
-    isWebClient: model.isWebClient,
     target: runtimeTarget,
     hostPlatform: windowsTerminalCapabilities.hostPlatform
   })
   const localWslSupportedPlatform = isWindowsTerminalCapabilityHost({
     isWindowsRenderer: model.isWindows,
-    isWebClient: model.isWebClient,
     target: { kind: 'local' },
     hostPlatform: localWindowsRuntimeCapabilities.hostPlatform
   })

@@ -9,7 +9,6 @@ function context(overrides: Partial<CmdJQuickActionContext> = {}): CmdJQuickActi
     activeWorktree: null,
     isLoading: false,
     sshStatus: null,
-    runtimeMode: 'local-desktop',
     activeGroupId: 'research-group',
     openNewBrowserTab: vi.fn().mockResolvedValue(undefined),
     openBrowserUrl: vi.fn().mockResolvedValue(undefined),

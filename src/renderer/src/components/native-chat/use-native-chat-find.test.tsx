@@ -17,12 +17,11 @@ import type { NativeChatComposerHandle } from './NativeChatComposer'
 
 const mocks = vi.hoisted(() => {
   const bindings: { current?: KeybindingOverrides } = {}
-  return { bindings, web: false }
+  return { bindings }
 })
 vi.mock('../../store', () => ({
   useAppStore: { getState: () => ({ keybindings: mocks.bindings.current }) }
 }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.web }))
 vi.mock('@/i18n/i18n', () => ({ translate: (_key: string, fallback: string) => fallback }))
 
 /** `element` is the rendered composer field, set when it mounts. */
@@ -704,13 +703,6 @@ describe('native chat find', () => {
     expect(document.activeElement).toBe(screen.getByTestId('card-field'))
   })
 
-  it('leaves Mod+F to the browser in the web client', () => {
-    mocks.web = true
-    const composer = composerHandle()
-    render(<Chat composer={composer} transcript={TRANSCRIPT} />)
-    expect(pressModF(composer.element).defaultPrevented).toBe(false)
-    expect(findInput()).toBeNull()
-  })
   it('picks the first visible match while typing without scrolling or leaving the end', () => {
     const reveal = vi.fn()
     const composer = composerHandle()

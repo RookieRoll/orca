@@ -115,7 +115,7 @@ describe('resolveAdvertisedPairingHostname', () => {
     ['::1', '::1'],
     ['[::1]:6768', '::1'],
     ['ws://127.0.0.1:6768', '127.0.0.1'],
-    ['http://localhost:6768/web-index.html', 'localhost'],
+    ['http://localhost:6768/status', 'localhost'],
     ['100.64.1.20', '100.64.1.20'],
     ['192.168.1.5:6768', '192.168.1.5'],
     ['desktop', 'desktop'],

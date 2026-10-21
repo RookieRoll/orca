@@ -2,7 +2,7 @@
 
 import { renderHook } from '@testing-library/react'
 import { createRef } from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BROWSER_SCREENCAST_RUNTIME_CAPABILITY } from '../../../shared/protocol-version'
 import { buildCmdJActionResults } from '@/components/cmd-j/palette-results'
 import { getCmdJQuickActions } from '@/components/cmd-j/quick-actions'
@@ -69,7 +69,6 @@ function renderQuickActions(initialStatuses: Map<string, unknown>, query: string
 
 describe('worktree jump palette quick action availability', () => {
   beforeEach(() => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     mocks.state = {
       activeView: 'terminal',
       activeWorktreeId: WORKTREE_ID,
@@ -81,10 +80,6 @@ describe('worktree jump palette quick action availability', () => {
       settings: { activeRuntimeEnvironmentId: RUNTIME_ID }
     }
   })
-  afterEach(() => {
-    delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
-  })
-
   it.each([
     ['new browser tab', 'new-browser-tab'],
     ['brex.com', 'navigate-to-url']

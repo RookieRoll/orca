@@ -2,7 +2,6 @@ import { ArrowRight, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useOrcaProfileAuthStatusRefresh } from '@/hooks/use-orca-profile-auth-status-refresh'
 import { translate } from '@/i18n/i18n'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { useAppStore } from '@/store'
 import { SettingsSwitchRow } from './SettingsFormControls'
 import { OrcaSignInButton, OrcaSignInWaitNotice } from '../OrcaSignInProgress'
@@ -16,7 +15,6 @@ export function ShareSkillsSettingsPane(): React.JSX.Element {
   const updateSettings = useAppStore((state) => state.updateSettings)
   const authStatus = useAppStore((state) => state.orcaProfileAuthStatus)
   const signedIn = authStatus?.state === 'connected'
-  const isWebClient = isWebClientLocation()
   const agentSharingEnabled = settings?.agentSkillSharingEnabled === true
 
   useOrcaProfileAuthStatusRefresh()
@@ -81,33 +79,23 @@ export function ShareSkillsSettingsPane(): React.JSX.Element {
           'auto.components.settings.shareSkills.allowAgentPublishing',
           'Allow agents and the Orca CLI to publish skill links'
         )}
-        description={
-          isWebClient
-            ? translate(
-                'auto.components.settings.shareSkills.allowAgentPublishingWebDescription',
-                'Desktop only. Open Settings → Share Skills on the host device to change this setting.'
-              )
-            : translate(
-                'auto.components.settings.shareSkills.allowAgentPublishingDescription',
-                'Let commands publish explicitly named installed skills. Skill folders can contain scripts, configuration, or secrets, so this is off by default.'
-              )
-        }
+        description={translate(
+          'auto.components.settings.shareSkills.allowAgentPublishingDescription',
+          'Let commands publish explicitly named installed skills. Skill folders can contain scripts, configuration, or secrets, so this is off by default.'
+        )}
         checked={agentSharingEnabled}
-        disabled={isWebClient}
         onChange={() => void updateSettings({ agentSkillSharingEnabled: !agentSharingEnabled })}
       />
 
-      {!isWebClient ? (
-        <SettingsSwitchRow
-          label={translate('auto.components.settings.shareSkills.showButton', 'Show Skills Button')}
-          description={translate(
-            'auto.components.settings.shareSkills.showButtonDescription',
-            'Show the Skills shortcut in the sidebar.'
-          )}
-          checked={settings?.showSkillsButton === true}
-          onChange={() => void updateSettings({ showSkillsButton: !settings?.showSkillsButton })}
-        />
-      ) : null}
+      <SettingsSwitchRow
+        label={translate('auto.components.settings.shareSkills.showButton', 'Show Skills Button')}
+        description={translate(
+          'auto.components.settings.shareSkills.showButtonDescription',
+          'Show the Skills shortcut in the sidebar.'
+        )}
+        checked={settings?.showSkillsButton === true}
+        onChange={() => void updateSettings({ showSkillsButton: !settings?.showSkillsButton })}
+      />
 
       {!signedIn ? (
         <section className="flex flex-wrap items-center gap-4 py-5">
@@ -119,31 +107,24 @@ export function ShareSkillsSettingsPane(): React.JSX.Element {
               )}
             </h3>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {isWebClient
-                ? translate(
-                    'auto.components.settings.shareSkills.signInWebDescription',
-                    'Publishing and link management are available in the Orca desktop app.'
-                  )
-                : translate(
-                    'auto.components.settings.shareSkills.signInDescription',
-                    'Use your Orca account to publish bundles and manage their links. Recipients do not need an account.'
-                  )}
+              {translate(
+                'auto.components.settings.shareSkills.signInDescription',
+                'Use your Orca account to publish bundles and manage their links. Recipients do not need an account.'
+              )}
             </p>
           </div>
-          {!isWebClient ? (
-            <OrcaSignInButton size="sm" disabled={authStatus?.configured !== true}>
-              {authStatus?.state === 'reconnect-required'
-                ? translate('auto.components.settings.shareSkills.signInAgain', 'Sign in again')
-                : translate('auto.components.settings.shareSkills.signIn', 'Sign in to Orca')}
-            </OrcaSignInButton>
-          ) : null}
-          {!isWebClient ? <OrcaSignInWaitNotice className="basis-full" /> : null}
+          <OrcaSignInButton size="sm" disabled={authStatus?.configured !== true}>
+            {authStatus?.state === 'reconnect-required'
+              ? translate('auto.components.settings.shareSkills.signInAgain', 'Sign in again')
+              : translate('auto.components.settings.shareSkills.signIn', 'Sign in to Orca')}
+          </OrcaSignInButton>
+          <OrcaSignInWaitNotice className="basis-full" />
         </section>
       ) : null}
 
       {/* Why: the link inventory grows without bound and belongs with the page
           that publishes it; settings keeps the preference and the way over. */}
-      {signedIn && !isWebClient ? (
+      {signedIn ? (
         <section className="flex flex-wrap items-center gap-4 py-5">
           <div className="min-w-0 flex-1 space-y-1">
             <h3 className="text-sm font-medium">
@@ -190,30 +171,28 @@ export function ShareSkillsSettingsPane(): React.JSX.Element {
           ))}
         </ol>
 
-        {!isWebClient ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-auto w-full justify-start whitespace-normal rounded-md border border-border/60 bg-muted/20 px-4 py-3 text-left hover:bg-muted/35 hover:text-foreground"
-            onClick={openSkillsPage}
-          >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground">
-              <BookOpen className="size-4" />
+        <Button
+          type="button"
+          variant="ghost"
+          className="h-auto w-full justify-start whitespace-normal rounded-md border border-border/60 bg-muted/20 px-4 py-3 text-left hover:bg-muted/35 hover:text-foreground"
+          onClick={openSkillsPage}
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground">
+            <BookOpen className="size-4" />
+          </span>
+          <span className="min-w-0 flex-1 space-y-0.5">
+            <span className="block text-sm font-medium text-foreground">
+              {translate('auto.components.settings.shareSkills.openSkills', 'Open Skills')}
             </span>
-            <span className="min-w-0 flex-1 space-y-0.5">
-              <span className="block text-sm font-medium text-foreground">
-                {translate('auto.components.settings.shareSkills.openSkills', 'Open Skills')}
-              </span>
-              <span className="block text-xs font-normal text-muted-foreground">
-                {translate(
-                  'auto.components.settings.shareSkills.openSkillsDescription',
-                  'Publish a bundle, install from a link, or manage installed and shared skills.'
-                )}
-              </span>
+            <span className="block text-xs font-normal text-muted-foreground">
+              {translate(
+                'auto.components.settings.shareSkills.openSkillsDescription',
+                'Publish a bundle, install from a link, or manage installed and shared skills.'
+              )}
             </span>
-            <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground" />
-          </Button>
-        ) : null}
+          </span>
+          <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground" />
+        </Button>
       </section>
     </div>
   )

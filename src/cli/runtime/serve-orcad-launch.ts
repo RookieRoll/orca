@@ -70,13 +70,11 @@ export function serveWithOrcad(
   args: ServeOrcaAppArgs,
   userDataPath: string,
   /** The caller's environment without `ELECTRON_RUN_AS_NODE`. */
-  baseEnv: NodeJS.ProcessEnv,
-  /** The app's browser client; the slot does not carry one, so orcad serves it from here. */
-  webClientRoot?: string,
+  baseEnv: NodeJS.ProcessEnv
 ): Promise<number> {
   const spec: ProcessSpec = {
     program: selection.runtime,
-    args: [selection.entry, ...orcadServeArgs(args, webClientRoot)],
+    args: [selection.entry, ...orcadServeArgs(args)],
     detached: args.recipeJson === true,
     cwd: dirname(selection.entry),
     stdio: args.recipeJson === true ? ['ignore', 'pipe', 'inherit'] : 'inherit',

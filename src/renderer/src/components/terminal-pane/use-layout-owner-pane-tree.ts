@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { useAppStore } from '@/store'
 import { pairedServerMirrors } from '@/runtime/paired-server-workspace'
 import {
@@ -54,7 +53,6 @@ export function useLayoutOwnerPaneTree(controller: TerminalPaneCloseController):
       // By host kind, as frames decide it: a paired-server tab may not have bound a remote PTY yet.
       pairedServerMirrors(useAppStore.getState())(worktreeId) ||
       isHostAuthoritativeLayout({
-        isWebClient: isWebClientLocation(),
         ptyIdsByLeafId: restoredLayout.ptyIdsByLeafId
       })
     ) {

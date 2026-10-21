@@ -26,7 +26,6 @@ type SharedRuntimeFileWatch = {
   start: Promise<void>
   unsubscribe: (() => void) | null
   remoteSubscriptionId: string | null
-  keepStreamUntilReady: boolean
   closed: boolean
   ready: boolean
 }
@@ -101,7 +100,6 @@ function createSharedRuntimeFileWatch(
     start: Promise.resolve(),
     unsubscribe: null,
     remoteSubscriptionId: null,
-    keepStreamUntilReady: isWebRuntimeFileWatchSharedSocket(),
     closed: false,
     ready: false
   }
@@ -137,9 +135,7 @@ function createSharedRuntimeFileWatch(
       if (shared.closed || sharedRuntimeFileWatches.get(key) !== shared) {
         subscription.unsubscribe()
         shared.unsubscribe = null
-        if (!shared.keepStreamUntilReady) {
-          unwatchSharedRuntimeFileWatch(shared)
-        }
+        unwatchSharedRuntimeFileWatch(shared)
       }
     })
     .catch((err) => {
@@ -164,9 +160,7 @@ function handleSharedRuntimeFileWatchResponse(
       if (shared.closed) {
         shared.unsubscribe?.()
         shared.unsubscribe = null
-        if (!shared.keepStreamUntilReady) {
-          unwatchSharedRuntimeFileWatch(shared)
-        }
+        unwatchSharedRuntimeFileWatch(shared)
       } else if (event.type === 'ready' && !shared.ready) {
         shared.ready = true
         for (const listener of Array.from(shared.listeners)) {
@@ -225,20 +219,9 @@ function closeSharedRuntimeFileWatch(key: string, shared: SharedRuntimeFileWatch
   }
   shared.closed = true
   sharedRuntimeFileWatches.delete(key)
-  if (shared.keepStreamUntilReady) {
-    // Why: WebRuntimeClient owns shared-socket file-watch cleanup, including
-    // pre-ready cancellation ownership and late-ready files.unwatch.
-    shared.unsubscribe?.()
-    shared.unsubscribe = null
-    return
-  }
   shared.unsubscribe?.()
   shared.unsubscribe = null
   unwatchSharedRuntimeFileWatch(shared)
-}
-
-function isWebRuntimeFileWatchSharedSocket(): boolean {
-  return Boolean((globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__)
 }
 
 function unwatchSharedRuntimeFileWatch(shared: SharedRuntimeFileWatch): void {

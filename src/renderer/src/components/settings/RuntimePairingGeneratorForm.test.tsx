@@ -12,7 +12,6 @@ function renderForm(
   generated?: {
     address: string
     runtimePairingUrl: string
-    webClientUrl: string
   }
 ): string {
   return renderToStaticMarkup(
@@ -24,7 +23,6 @@ function renderForm(
         selectedAddress={selectedAddress}
         refreshingNetworkInterfaces={false}
         isGeneratingPairing={false}
-        webClientUrl={generated?.webClientUrl ?? null}
         runtimePairingUrl={generated?.runtimePairingUrl ?? null}
         copiedTarget={null}
         generatedAddress={generated?.address ?? null}
@@ -59,7 +57,6 @@ describe('RuntimePairingGeneratorForm', () => {
     const markup = renderForm('another', '100.76.32.125', {
       address: '192.168.1.10',
       runtimePairingUrl: 'orca://pair?code=stale-secret',
-      webClientUrl: 'https://example.test/?pair=stale-secret'
     })
 
     expect(markup).toContain('The connection address changed.')

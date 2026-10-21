@@ -16,7 +16,6 @@ import {
 const mocks = vi.hoisted(() => ({
   createRemote: vi.fn(),
   getState: vi.fn(),
-  pairedWeb: false,
   state: {} as Record<string, unknown>
 }))
 
@@ -28,9 +27,6 @@ vi.mock('@/runtime/web-runtime-browser-creation', () => ({
   createWebRuntimeSessionBrowserTab: (...args: unknown[]) => mocks.createRemote(...args)
 }))
 
-vi.mock('./desktop-window-chrome', () => ({
-  isPairedWebClientWindow: () => mocks.pairedWeb
-}))
 
 const WORKSPACE_ID = 'repo-1::/repo/worktree'
 
@@ -63,7 +59,6 @@ function browserCapableRuntime(environmentId: string): Record<string, unknown> {
 beforeEach(() => {
   mocks.createRemote.mockReset().mockResolvedValue(true)
   mocks.getState.mockReset().mockImplementation(() => mocks.state)
-  mocks.pairedWeb = false
   mocks.state = {}
 })
 
@@ -459,35 +454,6 @@ describe('openWorkspaceBrowserTab', () => {
     expect(createBrowserTab).not.toHaveBeenCalled()
   })
 
-  it('keeps runtime browser actions unavailable in a paired-web floating workspace', async () => {
-    mocks.pairedWeb = true
-    mocks.state = {
-      activeWorktreeId: FLOATING_TERMINAL_WORKTREE_ID,
-      activeWorkspaceExecutionHostId: toRuntimeExecutionHostId('hub-a'),
-      ...browserCapableRuntime('hub-a'),
-      createBrowserTab: vi.fn(),
-      defaultBrowserSessionProfileId: 'client-profile',
-      defaultBrowserSessionProfileIdByHostId: {}
-    }
-
-    expect(
-      canOpenWorkspaceBrowserTabOnRuntime(
-        mocks.state as never,
-        FLOATING_TERMINAL_WORKTREE_ID,
-        'hub-a'
-      )
-    ).toBe(false)
-    await expect(
-      openWorkspaceBrowserTab({
-        workspaceId: FLOATING_TERMINAL_WORKTREE_ID,
-        url: 'http://localhost:3000/',
-        intent: { kind: 'url' },
-        expectedRuntimeEnvironmentId: 'hub-a'
-      })
-    ).rejects.toThrow('Unable to open URL.')
-    expect(mocks.createRemote).not.toHaveBeenCalled()
-    expect(mocks.state.createBrowserTab).not.toHaveBeenCalled()
-  })
 
   // Two dev servers on one host must not share a tab title.
   it('keeps the port in local-dev tab titles', async () => {
@@ -705,12 +671,4 @@ describe('links from a managed server reached over SSH', () => {
     )
   })
 
-  it('offers no in-app browser from the paired web client', () => {
-    mocks.pairedWeb = true
-    mocks.state = sshDeployedRuntimeState(sshDeployment)
-
-    expect(canOpenWorkspaceBrowserTabOnRuntime(mocks.getState(), WORKSPACE_ID, 'orcad-env')).toBe(
-      false
-    )
-  })
 })

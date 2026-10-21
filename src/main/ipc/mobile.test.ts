@@ -477,11 +477,10 @@ describe('registerMobileHandlers', () => {
     })
   })
 
-  it('generates runtime-scoped pairing urls for web and desktop clients', async () => {
+  it('generates runtime-scoped pairing urls for other Orca clients', async () => {
     const createPairingOffer = vi.fn().mockReturnValue({
       available: true,
       pairingUrl: 'orca://pair#runtime',
-      webClientUrl: 'http://100.64.1.20:6768/web-index.html?pairing=runtime',
       endpoint: 'ws://100.64.1.20:6768',
       deviceId: 'runtime-1'
     })
@@ -498,7 +497,6 @@ describe('registerMobileHandlers', () => {
     ).resolves.toEqual({
       available: true,
       pairingUrl: 'orca://pair#runtime',
-      webClientUrl: 'http://100.64.1.20:6768/web-index.html?pairing=runtime',
       endpoint: 'ws://100.64.1.20:6768',
       deviceId: 'runtime-1'
     })
@@ -525,7 +523,6 @@ describe('registerMobileHandlers', () => {
     createPairingOffer: vi.fn().mockReturnValue({
       available: true,
       pairingUrl: 'orca://pair#runtime',
-      webClientUrl: `http://${address}/web-index.html?pairing=runtime`,
       endpoint: `ws://${address}`,
       deviceId: 'runtime-local'
     }),

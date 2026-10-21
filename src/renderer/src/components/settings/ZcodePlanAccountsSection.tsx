@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { ExternalLink, Loader2, Lock, LockOpen, RefreshCw, ShieldCheck } from 'lucide-react'
 import { AgentIcon } from '@/lib/agent-catalog'
 import { translate } from '@/i18n/i18n'
@@ -68,16 +67,14 @@ export function ZcodePlanAccountsSection({
   const [refreshing, setRefreshing] = useState(false)
   const now = useNow(60_000)
 
-  const webClient = isWebClientLocation()
-  const credentialEditable = !webClient && access === 'ready'
+  const credentialEditable = access === 'ready'
   const accessNotice = usageCredentialAccessNotice(host, access)
-  const site =
-    usageSettings.settings?.zcodePlanSite ?? (!webClient && hostLabel === null ? 'zai' : undefined)
+  const site = usageSettings.settings?.zcodePlanSite ?? (hostLabel === null ? 'zai' : undefined)
   const siteEditable = credentialEditable && usageSettings.settings !== null
   const unreadableNotice = usageCredentialUnreadableNotice(host, status?.apiKeyUnreadable)
   const keyEditable =
     credentialEditable && !usageCredentialSealedElsewhere(host, status?.apiKeyUnreadable)
-  const detailsUnavailable = webClient || status?.detailsUnavailable === true
+  const detailsUnavailable = status?.detailsUnavailable === true
   const consoleUrl = site ? ZCODE_PLAN_SITE_CONSOLE_URLS[site] : undefined
   const apiKeyConfigured = status?.apiKeyConfigured === true
 
@@ -246,15 +243,6 @@ export function ZcodePlanAccountsSection({
         ) : null}
       </div>
 
-      {webClient ? (
-        <p className="text-xs text-muted-foreground">
-          {translate(
-            'auto.components.settings.ZcodePlanAccountsSection.hostOnly',
-            'Change the plan site and API key in the desktop app on the computer running Orca.'
-          )}
-        </p>
-      ) : null}
-
       <SearchableSetting
         title={translate(
           'auto.components.settings.ZcodePlanAccountsSection.siteTitle',
@@ -375,7 +363,7 @@ export function ZcodePlanAccountsSection({
         </p>
       </SearchableSetting>
 
-      {!webClient && hostLabel === null ? <ZcodeCliSetupSection /> : null}
+      {hostLabel === null ? <ZcodeCliSetupSection /> : null}
 
       {usageWindows.length > 0 ? (
         <SearchableSetting

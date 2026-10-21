@@ -6,7 +6,6 @@ import type { SshConnectionState } from '../../../shared/ssh-types'
 import { isWebRuntimeSessionActive } from '@/runtime/web-runtime-session-environment'
 import { resolveExplicitWorktreeOperationRouteResult } from '@/lib/worktree-operation-catalog-route'
 import { resolveWorktreeOperationRouteResultForHost } from '@/lib/worktree-operation-route'
-import { getPairedWebClientEnvironmentId } from '@/lib/paired-web-client-host'
 import {
   findFolderWorkspaceOwner,
   getExplicitRuntimeEnvironmentIdForFolderWorkspace
@@ -92,8 +91,7 @@ export function resolveWorkspaceTerminalHostAuthority(
       return 'unverifiable'
     }
     const environmentId =
-      getExplicitRuntimeEnvironmentIdForFolderWorkspace(state, folderId) ??
-      getPairedWebClientEnvironmentId(state)
+      getExplicitRuntimeEnvironmentIdForFolderWorkspace(state, folderId)
     // Folder workspaces were never host-replaced, so direct SSH keeps `none`.
     return isWebRuntimeSessionActive(environmentId) ? 'live' : 'none'
   }
@@ -110,7 +108,7 @@ export function resolveWorkspaceTerminalHostAuthority(
   const route = resolution.kind === 'resolved' ? resolution.route : null
   // A focused runtime routes legacy operations; only owner evidence grants terminal authority.
   if (
-    isWebRuntimeSessionActive(route?.runtimeEnvironmentId ?? getPairedWebClientEnvironmentId(state))
+    isWebRuntimeSessionActive(route?.runtimeEnvironmentId)
   ) {
     return 'live'
   }

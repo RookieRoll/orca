@@ -4,16 +4,12 @@ import { useShallow } from 'zustand/react/shallow'
 // Why: this registry mirrors the Settings sidebar in one neutral module so
 // Cmd+J and Settings visibility cannot drift. Keep it free of Settings pane UI
 // imports; the boundary is enforced by a focused architecture test.
-import {
-  getRuntimeEnvironmentsSearchEntry,
-  getWebRuntimeEnvironmentsSearchEntry
-} from '@/components/settings/runtime-environments-search'
+import { getRuntimeEnvironmentsSearchEntry } from '@/components/settings/runtime-environments-search'
 import { getTerminalPaneSearchEntries } from '@/components/settings/terminal-search'
 import { isMacUserAgent, isWindowsUserAgent } from '@/components/terminal-pane/pane-helpers'
 import { useLinearProviderConnected } from '@/hooks/useLinearProviderConnected'
 import { getClientCreationActionPolicy } from '@/lib/client-creation-action-policy'
 import type { SettingsNavSection } from '@/lib/settings-navigation-types'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import {
   isWindowsTerminalCapabilityHost,
   useWindowsTerminalCapabilities
@@ -34,18 +30,15 @@ import { buildRemoteSettingsSections } from './settings-navigation-remote-sectio
 import { buildWorkflowSettingsSections } from './settings-navigation-workflow-sections'
 import { useWindowsTerminalCapabilityOwnerKey } from './useWindowsTerminalCapabilityOwnerKey'
 
-export { isWebClientLocation } from '@/lib/web-client-location'
-
 export function buildSettingsNavigationMetadata({
   isMac,
   isWindows,
   isLocalWindowsHost = isWindows,
   isWindowsTerminalHost = isWindows,
-  isWebClient,
   nativeChatEnabled = false,
   hostQueuesMessages = false,
-  managedBrowserCreationEnabled = !isWebClient,
-  mobileEmulatorCreationEnabled = !isWebClient,
+  managedBrowserCreationEnabled = true,
+  mobileEmulatorCreationEnabled = true,
   isDev = import.meta.env.DEV,
   isLinearConnected = false,
   repos,
@@ -55,7 +48,6 @@ export function buildSettingsNavigationMetadata({
   isWindows: boolean
   isLocalWindowsHost?: boolean
   isWindowsTerminalHost?: boolean
-  isWebClient: boolean
   nativeChatEnabled?: boolean
   hostQueuesMessages?: boolean
   managedBrowserCreationEnabled?: boolean
@@ -70,9 +62,7 @@ export function buildSettingsNavigationMetadata({
     isWindowsTerminalHost,
     isMac
   })
-  const runtimeEnvironmentsSearchEntry = isWebClient
-    ? getWebRuntimeEnvironmentsSearchEntry()
-    : getRuntimeEnvironmentsSearchEntry()
+  const runtimeEnvironmentsSearchEntry = getRuntimeEnvironmentsSearchEntry()
   const reposById = new Map<string, Repo>()
   for (const repo of repos) {
     if (!reposById.has(repo.id)) {
@@ -84,7 +74,6 @@ export function buildSettingsNavigationMetadata({
     isWindows,
     isLocalWindowsHost,
     isWindowsTerminalHost,
-    isWebClient,
     nativeChatEnabled,
     hostQueuesMessages,
     managedBrowserCreationEnabled,
@@ -130,32 +119,25 @@ export function useSettingsNavigationMetadata(): SettingsNavSection[] {
   const hostQueuesMessages = useStructuredAgentSessionHostQueuesMessages({ kind: 'local' })
   const isMac = isMacUserAgent()
   const isWindows = isWindowsUserAgent()
-  const isWebClient = isWebClientLocation()
   const isLinearConnected = useLinearProviderConnected()
   const windowsTerminalCapabilityOwnerKey = useWindowsTerminalCapabilityOwnerKey(
     settings?.activeRuntimeEnvironmentId
   )
   // Why: navigation is shared with the palette, which has no host picker.
   const runtimeTarget = defaultScopeHost(settings)
-  const capabilityLoadTarget = isWebClient ? { kind: 'local' as const } : runtimeTarget
   const windowsTerminalCapabilities = useWindowsTerminalCapabilities(
-    isWindows || isWebClient || runtimeTarget.kind === 'environment',
+    isWindows || runtimeTarget.kind === 'environment',
     false,
     windowsTerminalCapabilityOwnerKey,
-    capabilityLoadTarget
+    runtimeTarget
   )
   const isLocalWindowsHost = isWindowsTerminalCapabilityHost({
     isWindowsRenderer: isWindows,
-    isWebClient,
     target: { kind: 'local' },
-    hostPlatform:
-      isWebClient || runtimeTarget.kind === 'local'
-        ? windowsTerminalCapabilities.hostPlatform
-        : null
+    hostPlatform: runtimeTarget.kind === 'local' ? windowsTerminalCapabilities.hostPlatform : null
   })
   const isWindowsTerminalHost = isWindowsTerminalCapabilityHost({
     isWindowsRenderer: isWindows,
-    isWebClient,
     target: runtimeTarget,
     hostPlatform: windowsTerminalCapabilities.hostPlatform
   })
@@ -170,7 +152,6 @@ export function useSettingsNavigationMetadata(): SettingsNavSection[] {
         isWindows,
         isLocalWindowsHost,
         isWindowsTerminalHost,
-        isWebClient,
         nativeChatEnabled,
         hostQueuesMessages,
         managedBrowserCreationEnabled,
@@ -189,7 +170,6 @@ export function useSettingsNavigationMetadata(): SettingsNavSection[] {
       isWindows,
       isLocalWindowsHost,
       isWindowsTerminalHost,
-      isWebClient,
       nativeChatEnabled,
       hostQueuesMessages,
       managedBrowserCreationEnabled,

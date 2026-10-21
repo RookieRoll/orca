@@ -18,7 +18,6 @@ import type {
 } from '../../../../shared/ai-vault-types'
 import type { AiVaultSearchScopeIdentity } from '../../../../shared/ai-vault-search-scope'
 import { resolveAiVaultSearchSettings } from '../../../../shared/ai-vault-search-settings'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { useAppStore } from '@/store'
 import { aiVaultSearchHitToSession } from './ai-vault-search-session'
 
@@ -157,7 +156,7 @@ export function useAiVaultPanelSearch(
   const trimmed = query.trim()
   const hasQuery = trimmed.length > 0
   const needsLocalConsent =
-    executionHostScope === 'local' && !isWebClientLocation() && !policy.enabled
+    executionHostScope === 'local' && !policy.enabled
   // Why: another computer's index is not this client's to turn on (a relay keeps its
   // own off by design), so once a single host says its search is off, the box goes
   // back to the title filter for that host instead of walling the list (#22453).

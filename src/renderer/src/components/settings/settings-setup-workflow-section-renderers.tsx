@@ -15,7 +15,7 @@ export function renderOrcaAccountSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="orca-account"
       title={translate('auto.components.settings.orcaAccount.title', 'Orca Account')}
@@ -27,7 +27,7 @@ export function renderOrcaAccountSettingsSection(
     >
       {view.isSectionMounted('orca-account') ? <OrcaAccountSettingsPane /> : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderSetupGuideSettingsSection(context: SettingsRenderContext): React.JSX.Element {
@@ -101,7 +101,7 @@ export function renderMobileSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="mobile"
       title={translate('auto.components.settings.Settings.c40dadaac8', 'Mobile')}
@@ -114,7 +114,7 @@ export function renderMobileSettingsSection(
     >
       {view.isSectionMounted('mobile') ? <MobileSettingsPane /> : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderAutomationsSettingsSection(

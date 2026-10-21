@@ -3,10 +3,6 @@ import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../../shared/constants'
 import { folderWorkspaceKey } from '../../../../shared/workspace-scope'
 import type { AppState } from '../types'
 import { createTestStore, makeWorktree, seedStore, TEST_REPO } from './store-test-helpers'
-import {
-  FLOATING_BROWSER_UNAVAILABLE_MESSAGE,
-  MANAGED_BROWSER_UNAVAILABLE_MESSAGE
-} from '@/lib/client-creation-action-policy'
 
 // Main's answer to the window's layout commands, as a switch-on build sends them.
 vi.mock('@/runtime/runtime-rpc-client', async (importOriginal) =>
@@ -30,13 +26,6 @@ vi.mock('@/store/slices/browser/paired-browser-tab-creator', () => ({
 vi.mock('@/lib/focus-terminal-tab-surface', () => ({
   focusTerminalTabSurface: vi.fn()
 }))
-
-vi.mock('@/lib/web-client-location', () => ({
-  isWebClientLocation: () =>
-    Boolean((globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__)
-}))
-
-const pairedWebFlag = globalThis as { __ORCA_WEB_CLIENT__?: boolean }
 
 function browserCapableRuntimeStatus(
   environmentId: string
@@ -70,16 +59,11 @@ function seedActiveWorkspace(store: ReturnType<typeof createTestStore>): void {
 
 describe('Cmd+J lifted creation actions', () => {
   beforeEach(() => {
-    pairedWebFlag.__ORCA_WEB_CLIENT__ = true
     createWebRuntimeSessionBrowserTabMock.mockReset()
     createWebRuntimeSessionTerminalMock.mockReset()
   })
 
-  afterEach(() => {
-    delete pairedWebFlag.__ORCA_WEB_CLIENT__
-  })
-
-  it('rejects without a local browser fallback when paired-web creation fails', async () => {
+  it('rejects without a local browser fallback when remote browser creation fails', async () => {
     // Why: a remote-owned workspace must stay remote-owned. If the remote host
     // cannot create the page, we must NOT silently open a local desktop tab —
     // that produces confusing split ownership (issue #5321). Mirrors the
@@ -137,58 +121,7 @@ describe('Cmd+J lifted creation actions', () => {
     expect(store.getState().browserTabsByWorktree['wt-1'] ?? []).toEqual([])
   })
 
-  it('rejects local browser tabs for explicitly local paired-web workspaces', async () => {
-    createWebRuntimeSessionBrowserTabMock.mockResolvedValue(false)
-    const store = createTestStore()
-    seedActiveWorkspace(store)
-    store.setState({
-      repos: [{ ...TEST_REPO, executionHostId: 'local' }],
-      worktreesByRepo: {
-        [TEST_REPO.id]: [makeWorktree({ id: 'wt-1', repoId: TEST_REPO.id, hostId: 'local' })]
-      },
-      settings: { activeRuntimeEnvironmentId: 'focused-runtime' } as AppState['settings']
-    })
-
-    await expect(store.getState().openNewBrowserTabInActiveWorkspace('group-1')).rejects.toThrow(
-      MANAGED_BROWSER_UNAVAILABLE_MESSAGE
-    )
-
-    expect(createWebRuntimeSessionBrowserTabMock).not.toHaveBeenCalled()
-    expect(store.getState().browserTabsByWorktree['wt-1'] ?? []).toEqual([])
-  })
-
-  it('rejects floating browsers while preserving floating terminal creation', async () => {
-    createWebRuntimeSessionBrowserTabMock.mockResolvedValue(false)
-    createWebRuntimeSessionTerminalMock.mockResolvedValue(false)
-    const store = createTestStore()
-    seedStore(store, {
-      activeWorktreeId: FLOATING_TERMINAL_WORKTREE_ID,
-      settings: { activeRuntimeEnvironmentId: 'runtime-1' } as AppState['settings'],
-      groupsByWorktree: {
-        [FLOATING_TERMINAL_WORKTREE_ID]: [
-          {
-            id: 'group-1',
-            worktreeId: FLOATING_TERMINAL_WORKTREE_ID,
-            activeTabId: null,
-            tabOrder: []
-          }
-        ]
-      },
-      activeGroupIdByWorktree: { [FLOATING_TERMINAL_WORKTREE_ID]: 'group-1' }
-    })
-
-    await expect(store.getState().openNewBrowserTabInActiveWorkspace('group-1')).rejects.toThrow(
-      FLOATING_BROWSER_UNAVAILABLE_MESSAGE
-    )
-    await store.getState().openNewTerminalTabInActiveWorkspace('group-1')
-
-    expect(createWebRuntimeSessionBrowserTabMock).not.toHaveBeenCalled()
-    expect(createWebRuntimeSessionTerminalMock).not.toHaveBeenCalled()
-    expect(store.getState().browserTabsByWorktree[FLOATING_TERMINAL_WORKTREE_ID] ?? []).toEqual([])
-    expect(store.getState().tabsByWorktree[FLOATING_TERMINAL_WORKTREE_ID] ?? []).toHaveLength(1)
-  })
-
-  it('does not fall back to a local terminal tab when paired-web creation fails', async () => {
+  it('does not fall back to a local terminal tab when remote creation fails', async () => {
     createWebRuntimeSessionTerminalMock.mockResolvedValue(false)
     const store = createTestStore()
     seedActiveWorkspace(store)
@@ -260,7 +193,6 @@ describe('Cmd+J lifted creation actions', () => {
   })
 
   it('creates desktop remote-server terminal tabs through the owning runtime', async () => {
-    delete pairedWebFlag.__ORCA_WEB_CLIENT__
     createWebRuntimeSessionTerminalMock.mockResolvedValue(false)
     const store = createTestStore()
     seedActiveWorkspace(store)
@@ -291,7 +223,6 @@ describe('Cmd+J lifted creation actions', () => {
   })
 
   it('fails terminal creation closed for duplicate repo IDs owned by different HUBs', async () => {
-    delete pairedWebFlag.__ORCA_WEB_CLIENT__
     const store = createTestStore()
     seedActiveWorkspace(store)
     store.setState({
@@ -312,7 +243,6 @@ describe('Cmd+J lifted creation actions', () => {
   })
 
   it('keeps desktop terminal creation local when a local worktree overrides a runtime repo owner', async () => {
-    delete pairedWebFlag.__ORCA_WEB_CLIENT__
     createWebRuntimeSessionTerminalMock.mockResolvedValue(false)
     const store = createTestStore()
     seedActiveWorkspace(store)

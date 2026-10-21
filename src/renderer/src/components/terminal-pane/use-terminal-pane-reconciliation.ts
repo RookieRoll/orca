@@ -53,7 +53,6 @@ export function useTerminalPaneReconciliation(controller: TerminalPaneCloseContr
     }
     if (
       !isHostAuthoritativeLayout({
-        isWebClient: !!(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__,
         ptyIdsByLeafId: restoredLayout.ptyIdsByLeafId
       })
     ) {

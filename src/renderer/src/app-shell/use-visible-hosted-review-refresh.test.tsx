@@ -6,13 +6,11 @@ import { useVisibleHostedReviewRefresh } from './use-visible-hosted-review-refre
 const mocks = vi.hoisted(() => ({
   refresh: vi.fn(async () => true),
   getState: vi.fn(() => ({})),
-  subscribe: vi.fn(() => vi.fn()),
-  web: vi.fn(() => false)
+  subscribe: vi.fn(() => vi.fn())
 }))
 vi.mock('@/store', () => ({
   useAppStore: { getState: mocks.getState, subscribe: mocks.subscribe }
 }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: mocks.web }))
 vi.mock('@/store/github/visible-hosted-review-refresh-targets', () => ({
   visibleHostedReviewRefreshInputsChanged: () => true,
   getVisibleHostedReviewWorkspaces: () => [],

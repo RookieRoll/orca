@@ -76,7 +76,6 @@ afterEach(() => resetWebSessionCloseIntentForTests())
 
 describe('moveWebRuntimeSessionTab', () => {
   beforeEach(() => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     mocks.getState.mockReturnValue({
       settings: {
         activeRuntimeEnvironmentId: ENVIRONMENT_ID
@@ -92,7 +91,7 @@ describe('moveWebRuntimeSessionTab', () => {
     vi.clearAllMocks()
   })
 
-  it('moves paired web tabs through the host session API without an eager stale refresh', async () => {
+  it('moves runtime tabs through the host session API without an eager stale refresh', async () => {
     const runtimeCall = vi.fn().mockResolvedValueOnce({
       id: 'move',
       ok: true,

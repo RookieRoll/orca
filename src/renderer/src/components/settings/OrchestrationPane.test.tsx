@@ -165,7 +165,6 @@ describe('OrchestrationPane', () => {
     mocks.panelProps.length = 0
     mocks.skillInstalled = true
     mocks.updateSettings.mockReset()
-    delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
   })
 
   it('keeps skill setup visible after install and shows agent coverage plus examples', () => {
@@ -238,19 +237,6 @@ describe('OrchestrationPane', () => {
     })
     expect(mocks.updateSettings).not.toHaveBeenCalled()
     expect(input.value).toBe('1')
-  })
-
-  it('keeps host-only nested depth out of paired web clients', () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
-    const markup = renderToStaticMarkup(<OrchestrationPane {...getPaneProps()} />)
-
-    expect(markup).not.toContain('Nested worker depth')
-    expect(
-      matchesSettingsSearch(
-        'nested worker',
-        getOrchestrationPaneSearchEntries({ includeNestedWorkerDepth: false })
-      )
-    ).toBe(false)
   })
 
   it('passes the install command, which also updates, without a manual-copy path', async () => {

@@ -34,7 +34,6 @@
 1 tests/e2e/fixtures/daemon-lifecycle-entry.ts
 2 tests/e2e/github-cli-stall-repro.spec.ts
 1 tests/e2e/github-created-issue-start-prefill.spec.ts
-1 tests/e2e/headless-paired-remote-terminal-reveal-grid.spec.ts
 1 tests/e2e/headless-serve-desktop-activation.spec.ts
 5 tests/e2e/helpers/headless-paired-runtime-host.ts
 1 tests/e2e/helpers/native-chat-view.ts
@@ -50,7 +49,6 @@
 2 tests/e2e/live-background-terminal-mount-authority.spec.ts
 1 tests/e2e/local-worktree-visibility-runtime-active.spec.ts
 1 tests/e2e/markdown-tab-scroll-restore.spec.ts
-2 tests/e2e/multi-client-navigation-isolation.spec.ts
 2 tests/e2e/native-chat-history-prepend-anchor.spec.ts
 2 tests/e2e/native-chat-startup-option-pickers.unit.test.ts
 1 tests/e2e/nested-agent-idle-session-owner.spec.ts
@@ -65,13 +63,10 @@
 1 tests/e2e/paired-remote-terminal-host-restart-background-sync.spec.ts
 1 tests/e2e/paired-remote-terminal-parked-reveal-interactivity.spec.ts
 4 tests/e2e/paired-remote-terminal-parked-scrollback-survives.spec.ts
-3 tests/e2e/paired-remote-terminal-stall-recovery.spec.ts
-1 tests/e2e/paired-startup-exec-readiness.spec.ts
 1 tests/e2e/plugin-marketplace-content.spec.ts
 2 tests/e2e/pr11346-selected-runtime-identity-oracle.ts
 5 tests/e2e/project-group-manual-sort.spec.ts
 1 tests/e2e/relay-region-correction.unit.test.ts
-2 tests/e2e/remote-session-bulk-open-freeze-repro.spec.ts
 2 tests/e2e/remote-terminal-input-delivery-model.unit.test.ts
 4 tests/e2e/remote-terminal-input-model-link.ts
 1 tests/e2e/remote-terminal-tab-retirement.unit.test.ts

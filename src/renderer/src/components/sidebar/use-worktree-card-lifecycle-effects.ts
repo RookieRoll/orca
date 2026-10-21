@@ -3,7 +3,7 @@ import { getRepoExecutionHostId } from '../../../../shared/execution-host'
 
 import { isMacAppDataPath } from '@/lib/passive-macos-app-data-access'
 import { installWindowVisibilityInterval, isWindowVisible } from '@/lib/window-visibility-interval'
-import { isWebClient, type WorktreeCardProps } from './worktree-card-model'
+import type { WorktreeCardProps } from './worktree-card-model'
 import type { useWorktreeCardFoundation } from './use-worktree-card-foundation'
 import type { useWorktreeCardReviewDetails } from './use-worktree-card-review-details'
 
@@ -63,7 +63,6 @@ export function useWorktreeCardLifecycleEffects({
       !hoverDetailsOpen ||
       !isWindowVisible() ||
       shouldRefreshHostedReview ||
-      isWebClient() ||
       !repo ||
       isFolder ||
       worktree.isBare ||
@@ -110,9 +109,7 @@ export function useWorktreeCardLifecycleEffects({
 
   // Why: same as above for issues — hidden-surface polling only burns GitHub calls for invisible data.
   useEffect(() => {
-    // Why: per-card decoration lookups from the browser flood the RPC path at paired-web startup; the host is authoritative.
     if (
-      isWebClient() ||
       !repo ||
       isFolder ||
       !worktree.linkedIssue ||
@@ -136,7 +133,6 @@ export function useWorktreeCardLifecycleEffects({
       !newCardStyle ||
       !hoverDetailsOpen ||
       showIssue ||
-      isWebClient() ||
       !repo ||
       isFolder ||
       !worktree.linkedIssue ||

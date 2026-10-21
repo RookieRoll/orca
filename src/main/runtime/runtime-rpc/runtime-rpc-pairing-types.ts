@@ -54,7 +54,6 @@ export type OrcaRuntimeRpcServerOptions = {
    * has to outrank both, and `ensureNetworkExposure()` has to refuse rather than widen.
    */
   pinnedBindHost?: string
-  webClientRoot?: string
   // Why: test-only overrides for the two constants below; production must not pass these (defaults set by §3.1).
   keepaliveIntervalMs?: number
   longPollCap?: number
@@ -85,7 +84,6 @@ export type MobilePairingOfferAvailable = {
   pairingUrl: string
   endpoint: string
   deviceId: string
-  webClientUrl: string | null
   /** Mode the offer actually encodes. */
   connectionMode: MobilePairingConnectionMode
 }
@@ -131,20 +129,3 @@ export type MobilePairingConnectionContext = Readonly<{
 }>
 
 // Why: keepalive frames count as socket activity, resetting both idle timers so long-polls outlive the 30s/60s idle caps. See §3.1.
-
-export function createWebClientUrl(endpoint: string, pairingUrl: string): string {
-  const url = new URL(endpoint)
-  url.protocol = url.protocol === 'wss:' ? 'https:' : 'http:'
-  url.pathname = webClientPathForEndpoint(url.pathname)
-  url.search = ''
-  // Why: pairing URLs carry full credentials; the fragment keeps them out of proxy logs and Referer headers.
-  url.hash = `pairing=${encodeURIComponent(pairingUrl)}`
-  return url.toString()
-}
-
-export function webClientPathForEndpoint(pathname: string): string {
-  if (!pathname || pathname === '/') {
-    return '/web-index.html'
-  }
-  return `${pathname.replace(/\/$/, '')}/web-index.html`
-}

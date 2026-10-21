@@ -27,10 +27,9 @@ import {
 import type { SettingsNavigationBuildOptions } from './settings-navigation-build-options'
 
 export function buildWorkflowSettingsSections(
-  { isWebClient }: SettingsNavigationBuildOptions,
+  _options: SettingsNavigationBuildOptions,
   terminalPaneSearchEntries: SettingsNavSection['searchEntries']
 ): SettingsNavSection[] {
-  const showDesktopOnlySettings = !isWebClient
   return [
     {
       id: 'automations',
@@ -141,54 +140,38 @@ export function buildWorkflowSettingsSections(
       searchEntries: getQuickCommandsPaneSearchEntries(),
       group: 'workflows'
     },
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'browser',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.8c197f74a1', 'Browser'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.e815fd01bd',
-              'Home page, link routing, and session cookies.'
-            ),
-            icon: Globe,
-            searchEntries: getBrowserPaneCombinedSearchEntries(),
-            group: 'workflows'
-          }
-        ]
-      : []),
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'mobile-emulator',
-            title: translate(
-              'auto.hooks.useSettingsNavigationMetadata.1e761cff2b',
-              'Mobile Emulator'
-            ),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.3d65d3f1b9',
-              'Configure mobile emulator support for Orca and coding agents.'
-            ),
-            icon: TabletSmartphone,
-            searchEntries: getMobileEmulatorSearchEntries(),
-            group: 'workflows'
-          }
-        ]
-      : []),
+    {
+      id: 'browser',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.8c197f74a1', 'Browser'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.e815fd01bd',
+        'Home page, link routing, and session cookies.'
+      ),
+      icon: Globe,
+      searchEntries: getBrowserPaneCombinedSearchEntries(),
+      group: 'workflows'
+    },
+    {
+      id: 'mobile-emulator',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.1e761cff2b', 'Mobile Emulator'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.3d65d3f1b9',
+        'Configure mobile emulator support for Orca and coding agents.'
+      ),
+      icon: TabletSmartphone,
+      searchEntries: getMobileEmulatorSearchEntries(),
+      group: 'workflows'
+    },
     {
       id: 'floating-workspace',
       title: translate('auto.hooks.useSettingsNavigationMetadata.65b19f5bde', 'Floating Workspace'),
-      description: showDesktopOnlySettings
-        ? translate(
-            'auto.hooks.useSettingsNavigationMetadata.2d0659f6f0',
-            'Global terminal, browser, and markdown tabs.'
-          )
-        : translate(
-            'auto.hooks.useSettingsNavigationMetadata.floatingWorkspaceWebDescription',
-            'Global terminal and markdown tabs.'
-          ),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.2d0659f6f0',
+        'Global terminal, browser, and markdown tabs.'
+      ),
       icon: PanelsTopLeft,
       searchEntries: getFloatingWorkspaceSearchEntries({
-        includeBrowser: showDesktopOnlySettings
+        includeBrowser: true
       }),
       group: 'workflows'
     }

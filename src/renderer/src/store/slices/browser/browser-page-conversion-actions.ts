@@ -7,8 +7,6 @@ import type {
 import type { BrowserPage } from '../../../../../shared/browser-workspace-types'
 import { planBrowserPageConversion } from '../browser-page-conversion'
 import { findPage, findWorkspace, mirrorWorkspaceFromActivePage } from '../browser-page-records'
-import { assertManagedBrowserMaterializationAllowed } from '@/lib/client-creation-action-policy'
-import { runtimeEnvironmentIdWithLegacyFallbackUnlessTwin } from '@/lib/worktree-runtime-owner'
 import { closeRemoteBrowserPageInOwningEnvironment } from './browser-remote-close'
 import { releaseDocPreviewGrant } from '@/lib/doc-preview-grants'
 import { isLocalBrowserPageOwner } from './browser-host-state'
@@ -21,28 +19,6 @@ export function createBrowserPageConversionActions(
 ): Pick<BrowserSlice, 'convertBrowserPage' | 'reopenClosedBrowserPage' | 'setActiveBrowserPage'> {
   return {
     convertBrowserPage: (pageId, target, options) => {
-      // Why the same assert as createBrowserTab: a conversion materializes a browser surface the
-      // same way a creation does, and a paired web client that cannot host one must refuse here too.
-      // Ownership is resolved ONCE, on the plan's own terms — property-present-undefined means
-      // worktree-inferred — so the assert and the plan cannot disagree about what is being built.
-      const oldPageForOwnership = findPage(get().browserPagesByWorkspace, pageId)
-      const declaredOwnership =
-        target.kind === 'workspace-doc'
-          ? null
-          : 'browserRuntimeEnvironmentId' in target
-            ? target.browserRuntimeEnvironmentId
-            : (oldPageForOwnership?.browserRuntimeEnvironmentId ?? null)
-      assertManagedBrowserMaterializationAllowed(
-        get(),
-        declaredOwnership !== undefined
-          ? declaredOwnership
-          : oldPageForOwnership
-            ? runtimeEnvironmentIdWithLegacyFallbackUnlessTwin(
-                get(),
-                oldPageForOwnership.worktreeId
-              )
-            : null
-      )
       let converted: BrowserPage | null = null
       let docPageIdToRelease: string | null = null
       let remotePageToClose: { worktreeId: string; handle: RemoteBrowserPageHandle } | null = null

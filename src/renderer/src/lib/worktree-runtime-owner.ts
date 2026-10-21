@@ -15,7 +15,6 @@ import {
 import { getActiveWorkspaceExecutionHostId } from './active-workspace-host'
 import { getSingleFocusedRuntimeEnvironmentId } from './single-runtime-legacy-owner'
 import { isEphemeralSetupTerminalWorktreeId } from '../../../shared/ephemeral-setup-terminal-worktree-id'
-import { getPairedWebClientEnvironmentId } from './paired-web-client-host'
 import {
   findFolderWorkspaceOwner,
   getExecutionHostIdForFolderWorkspace,
@@ -35,9 +34,8 @@ function getExecutionHostIdFromWorktreeHost(
 }
 
 /** A row that names no host is this machine's: the client stamps every server row on arrival. */
-function getUnstampedExecutionHostId(state: WorktreeRuntimeOwnerState): ExecutionHostId {
-  const environmentId = getPairedWebClientEnvironmentId(state)
-  return environmentId ? toRuntimeExecutionHostId(environmentId) : 'local'
+function getUnstampedExecutionHostId(): ExecutionHostId {
+  return 'local'
 }
 
 /**
@@ -101,7 +99,7 @@ export function getKnownExecutionHostIdForWorktree(
   if (hasExplicitOwner) {
     return getRepoExecutionHostId(repo)
   }
-  return getUnstampedExecutionHostId(state)
+  return getUnstampedExecutionHostId()
 }
 
 export function getExecutionHostIdForWorktree(
@@ -119,7 +117,7 @@ export function getExecutionHostIdForWorktree(
       : null
   return setupEnvironmentId
     ? toRuntimeExecutionHostId(setupEnvironmentId)
-    : getUnstampedExecutionHostId(state)
+    : getUnstampedExecutionHostId()
 }
 
 /**

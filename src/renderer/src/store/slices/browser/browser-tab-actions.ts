@@ -5,10 +5,7 @@ import {
   ORCA_BROWSER_BLANK_URL
 } from '../../../../../shared/constants'
 import type { BrowserSlice, BrowserSliceGet, BrowserSliceSet } from './browser-slice-contract'
-import {
-  assertManagedBrowserMaterializationAllowed,
-  getClientCreationActionPolicy
-} from '@/lib/client-creation-action-policy'
+import { getClientCreationActionPolicy } from '@/lib/client-creation-action-policy'
 import {
   buildBrowserPage,
   buildWorkspaceFromPage,
@@ -38,7 +35,6 @@ export function createBrowserTabActions(
 > {
   return {
     createBrowserTab: (worktreeId, url, options) => {
-      assertManagedBrowserMaterializationAllowed(get(), options?.browserRuntimeEnvironmentId)
       const workspaceId = createBrowserUuid()
       const browserPageId = options?.browserPageId
       if (

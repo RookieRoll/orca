@@ -19,7 +19,6 @@ const ORCA_WORKSPACES_PATH = path.join('workspace', '.orca-workspaces')
 
 afterEach(() => {
   vi.clearAllMocks()
-  delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
   vi.unstubAllGlobals()
   resetWebSessionTabsSnapshotFreshnessForTests()
   resetWebRuntimeWakeTerminalRespawnForTests()
@@ -71,7 +70,6 @@ describe('empty remote worktree activation', () => {
         snapshotVersion: 1
       }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({
       call: callRuntimeEnvironment,
       subscribe: vi.fn()
@@ -133,7 +131,6 @@ describe('empty remote worktree activation', () => {
       ok: false,
       error: { code: 'terminal_create_failed', message: 'Host refused the terminal' }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({
       call: callRuntimeEnvironment,
       subscribe: vi.fn()
@@ -181,7 +178,6 @@ describe('empty remote worktree activation', () => {
     // the defect this PR exists to close.
     const worktree = makeWorktree()
     const callRuntimeEnvironment = vi.fn()
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment, subscribe: vi.fn() })
 
     useAppStore.setState({
@@ -220,7 +216,6 @@ describe('empty remote worktree activation', () => {
     // restructure moved this line, and reverting only this arm broke no other test.
     const worktree = makeWorktree()
     const callRuntimeEnvironment = vi.fn()
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment, subscribe: vi.fn() })
 
     useAppStore.setState({
@@ -271,7 +266,6 @@ describe('empty remote worktree activation', () => {
     // PTYs are gone. Tombstone-irrelevant, and the case the seed guard must not swallow.
     const worktree = makeWorktree()
     const callRuntimeEnvironment = vi.fn().mockResolvedValueOnce({ ok: true, result: {} })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
     stubRuntimeEnvironmentBridge({ call: callRuntimeEnvironment, subscribe: vi.fn() })
 
     useAppStore.setState({

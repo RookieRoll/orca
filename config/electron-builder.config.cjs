@@ -34,8 +34,7 @@ const {
 const { writeMacBuildCompatibility } = require('./scripts/mac-build-compatibility.cjs')
 const { verifyPackagedPluginResources } = require('./scripts/verify-packaged-plugin-resources.cjs')
 const {
-  assertPackagedServeSelectionEntry,
-  assertPackagedWebClient
+  assertPackagedServeSelectionEntry
 } = require('./scripts/verify-packaged-serve-payload.cjs')
 const {
   assertBundledRipgrepInstalled,
@@ -282,9 +281,9 @@ module.exports = {
     // for decoding minified crash traces. The app never loads them (no
     // sourceMappingURL is emitted), and packing them would add ~34MB to app.asar.
     '!out/**/*.map',
-    // Why: Vite's manifest is only used to project the paired web client.
+    // Why: Vite's manifest is build metadata, not a runtime input.
     '!out/renderer/.vite{,/**/*}',
-    // The installed browser serves its allowlisted assets from the unpacked renderer.
+    // Retired standalone WebConnect builds can remain in an ignored local output directory.
     '!out/web{,/**/*}',
     // Why: stopped builds may leave this ignored bundle behind; never package it from stale output.
     '!out/mobile-web{,/**/*}',
@@ -338,8 +337,6 @@ module.exports = {
   // entries reached solely from the Electron main process stay packed, since
   // asar redirects their app.asar paths.
   // Why: `orca serve` runs the orcad selection entry under ELECTRON_RUN_AS_NODE too (#27307).
-  // Why out/renderer: its assets are opened by path, and opening a packed file
-  // reads a /tmp extract Electron makes once and never remakes, so a /tmp sweep broke them (#27976).
   asarUnpack: [
     'out/package.json',
     'out/cli/**',
@@ -369,7 +366,6 @@ module.exports = {
     'out/main/parcel-watcher-process-entry.js',
     'out/main/orcad/orcad-local-serve-selection-entry.js',
     'out/main/chunks/**',
-    'out/renderer/**',
     'resources/**',
     'node_modules/ws/**',
     'node_modules/tweetnacl/**',
@@ -491,7 +487,6 @@ module.exports = {
     // Why: inspect electron-builder's real output so a broken extraResources
     // mapping fails packaging before bundled content reaches users.
     verifyPackagedPluginResources(resourcesDir)
-    assertPackagedWebClient(resourcesDir)
     assertPackagedServeSelectionEntry(resourcesDir)
     finalizePackagedRipgrep(resourcesDir)
     await finalizePackagedOrcadTemplate(resourcesDir, {

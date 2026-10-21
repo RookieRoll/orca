@@ -14,7 +14,7 @@ export function renderAdvancedSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="advanced"
       title={translate('auto.components.settings.Settings.1c87f8d024', 'Advanced')}
@@ -28,12 +28,12 @@ export function renderAdvancedSettingsSection(
         <AdvancedPane settings={model.settings} updateSettings={model.updateSettings} />
       ) : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderDevSettingsSection(context: SettingsRenderContext): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings && import.meta.env.DEV ? (
+  return import.meta.env.DEV ? (
     <SettingsSection
       id="dev"
       title={translate('auto.components.settings.Settings.dev', 'Dev Tools')}
@@ -88,11 +88,11 @@ export function renderPluginsSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <PluginsSettingsSection
       mounted={view.isSectionMounted('plugins')}
       settings={model.settings}
       updateSettings={model.updateSettingsOrThrow}
     />
-  ) : null
+  )
 }

@@ -2,7 +2,6 @@
 import { createServer as createHttpServer, type Server as HttpServer } from 'node:http'
 import { WebSocketServer, type WebSocket } from 'ws'
 import type { RpcTransport } from './transport'
-import { answerWithoutWebClient, createStaticWebClientHandler } from './static-web-client-handler'
 import {
   attachNodeWebSocketLifecycle,
   clearNodeWebSocketPreAuthTimer,
@@ -35,8 +34,6 @@ export type WebSocketTransportOptions = {
   heartbeatNow?: () => number
   // Why: test-only override. Production uses PRE_AUTH_TIMEOUT_MS.
   preAuthTimeoutMs?: number
-  // Why: the pairing server can also serve the browser client, avoiding a second static server.
-  staticRoot?: string
   // Why: devices paired while the fallback port was active point at it, so it must bind first on later launches or those pairings strand (STA-1511).
   fallbackPort?: number
   // Why: serve --port clients dial the pinned port; prefer it first so a stale fallback can't steal the pin (issue #8535). Default keeps fallback-first (STA-1511).
@@ -52,7 +49,6 @@ export class WebSocketTransport implements RpcTransport {
   private readonly port: number
   private readonly heartbeat: RemoteRuntimeServerHeartbeat
   private readonly preAuthTimeoutMs: number
-  private readonly staticRoot: string | undefined
   private readonly fallbackPort: number | undefined
   private readonly preferPinnedPort: boolean
   private readonly requirePinnedPort: boolean
@@ -73,7 +69,6 @@ export class WebSocketTransport implements RpcTransport {
     heartbeatIntervalMs,
     heartbeatNow,
     preAuthTimeoutMs,
-    staticRoot,
     fallbackPort,
     preferPinnedPort,
     requirePinnedPort,
@@ -87,7 +82,6 @@ export class WebSocketTransport implements RpcTransport {
       WEBSOCKET_TRANSPORT_MAX_CONNECTIONS
     )
     this.preAuthTimeoutMs = preAuthTimeoutMs ?? PRE_AUTH_TIMEOUT_MS
-    this.staticRoot = staticRoot
     this.fallbackPort = fallbackPort
     this.preferPinnedPort = preferPinnedPort === true
     this.requirePinnedPort = requirePinnedPort === true
@@ -194,9 +188,10 @@ export class WebSocketTransport implements RpcTransport {
   private async tryListen(port: number): Promise<void> {
     await assertPortNotShadowingListener(this.host, port)
     // Why the 404: with no 'request' listener Node never answers plain HTTP, so it hung (#30100).
-    const httpServer = createHttpServer(
-      this.staticRoot ? createStaticWebClientHandler(this.staticRoot) : answerWithoutWebClient
-    )
+    const httpServer = createHttpServer((_request, response) => {
+      response.writeHead(404)
+      response.end('Not Found')
+    })
 
     await new Promise<void>((resolve, reject) => {
       httpServer.once('error', reject)

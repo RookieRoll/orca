@@ -8,7 +8,6 @@ import { useNativeChatFind } from '../native-chat/use-native-chat-find'
 
 vi.mock('@/store', () => ({ useAppStore: { getState: () => ({ keybindings: undefined }) } }))
 vi.mock('../../store', () => ({ useAppStore: { getState: () => ({ keybindings: undefined }) } }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => false }))
 
 afterEach(() => {
   cleanup()

@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { useAppStore } from '../store'
 import { isMac } from './app-window-chrome'
 import { selectWindowVisibilityActions } from './window-visibility-actions-selector'
@@ -27,7 +26,7 @@ export function useWindowVisibilityEffects(): void {
   // is clipped off-screen until a manual resize. Relay the genuine hidden→visible reveal so main
   // runs the same full repaint (size jiggle) that show/restore/resume get, recomputing the layout.
   useEffect(() => {
-    if (!isMac || isPairedWebClientWindow()) {
+    if (!isMac) {
       return
     }
     const handler = (): void => {

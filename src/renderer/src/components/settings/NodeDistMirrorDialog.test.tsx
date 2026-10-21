@@ -147,16 +147,6 @@ describe('Use a Node.js mirror', () => {
     expect(state.activeModal).toBe('none')
   })
 
-  it('offers nothing in a paired browser, whose settings are not this computer’s', () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    try {
-      render(<Host status={blocked} />)
-      expect(screen.queryByRole('button')).toBeNull()
-    } finally {
-      vi.unstubAllGlobals()
-    }
-  })
-
   it('opens the setting instead when a mirror was set after the toast appeared', () => {
     useAppStore.getState().setSshConnectionState('ssh-1', {
       targetId: 'ssh-1',

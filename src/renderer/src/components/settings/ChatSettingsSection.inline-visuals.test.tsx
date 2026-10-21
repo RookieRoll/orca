@@ -43,7 +43,6 @@ function renderChat(nativeChatInlineVisuals: boolean | undefined) {
           updateSettings={updateSettings}
           writeSourceControlAiSettings={async () => {}}
           searchEntries={[getChatInlineVisualsSearchEntry()]}
-          showDesktopOnlySettings
           isMounted
         />
       </ActiveSettingsSectionProvider>,
@@ -82,7 +81,6 @@ describe('Inline visuals on the Chat settings page', () => {
       const sections = buildSettingsNavigationMetadata({
         isMac: false,
         isWindows: false,
-        isWebClient: false,
         nativeChatEnabled: true,
         repos: []
       })

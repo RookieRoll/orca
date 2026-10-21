@@ -309,7 +309,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     const buttons = findButtons(element)
@@ -327,7 +327,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findTerminalThemeCatalogSection(lightElement)?.props.preferredTarget).toBe('light')
@@ -339,7 +339,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findTerminalThemeCatalogSection(darkElement)?.props.preferredTarget).toBe('dark')
@@ -351,7 +351,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findTerminalThemeCatalogSection(darkAliasElement)?.props.preferredTarget).toBe('dark')
@@ -363,7 +363,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findTerminalThemeCatalogSection(darkPhraseElement)?.props.preferredTarget).toBe('dark')
@@ -377,7 +377,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findComponentByTypeName(element, 'TerminalAdvancedTypographyControls')).toBeNull()
@@ -391,7 +391,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findComponentByTypeName(element, 'TerminalFontSizeSetting')).toBeNull()
@@ -406,7 +406,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findButtons(element).some((button) => button.text === 'Import from Ghostty')).toBe(true)
@@ -420,55 +420,12 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     expect(findComponentByTypeName(element, 'TerminalAdvancedTypographyControls')).not.toBeNull()
     expect(findComponentByTypeName(element, 'TerminalFontSizeSetting')).not.toBeNull()
   })
-
-  it('hides the theme import affordance on paired web clients', () => {
-    vi.stubGlobal('window', {
-      __ORCA_WEB_CLIENT__: true,
-      location: { pathname: '/web-index.html' }
-    })
-
-    const element = TerminalAppearanceSection({
-      settings: {} as never,
-      updateSettings: () => {},
-      systemPrefersDark: true,
-      terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
-    })
-
-    expect(findButtons(element).some((button) => button.text === 'Import from Ghostty')).toBe(false)
-    expect(findGhosttyImportModal(element)).toBeNull()
-  })
-
-  it.each([false, true])(
-    'hides Ghostty search results on web clients with forceVisiblePrimary=%s',
-    (forceVisiblePrimary) => {
-      vi.stubGlobal('window', { __ORCA_WEB_CLIENT__: true })
-      mockSettingsSearchQuery = 'ghostty'
-
-      const element = TerminalAppearanceSection({
-        settings: {} as never,
-        updateSettings: () => {},
-        systemPrefersDark: true,
-        terminalFontSuggestions: [],
-        ghostty: ghosttyMock,
-        forceVisiblePrimary
-      })
-
-      expect(findButtons(element).some((button) => button.text === 'Import from Ghostty')).toBe(
-        false
-      )
-      expect(findGhosttyImportModal(element)).toBeNull()
-      if (!forceVisiblePrimary) {
-        expect(findComponentByTypeName(element, 'SettingsSubsectionHeader')).toBeNull()
-      }
-    }
-  )
 
   it('passes hook state to GhosttyImportModal', () => {
     const element = TerminalAppearanceSection({
@@ -476,7 +433,7 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
       updateSettings: () => {},
       systemPrefersDark: true,
       terminalFontSuggestions: [],
-      ghostty: ghosttyMock,
+      ghostty: ghosttyMock
     })
 
     const modal = findGhosttyImportModal(element)
@@ -488,5 +445,4 @@ describe('TerminalAppearanceSection ghostty import wiring', () => {
     expect(modal?.props.onApply).toBe(ghosttyMock.handleApply)
     expect(modal?.props.onOpenChange).toBe(ghosttyMock.handleOpenChange)
   })
-
 })

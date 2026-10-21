@@ -16,8 +16,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['agent-session-search'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip?.id).toBe('agent-session-search')
@@ -30,8 +29,7 @@ describe('feature tip modal state', () => {
       seenTipIds: [],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip?.id).toBe('orca-cli')
@@ -44,8 +42,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['agent-session-search'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip?.id).toBe('orca-cli')
@@ -58,8 +55,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['orca-cli'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip?.id).toBe('cmd-j-palette')
@@ -72,8 +68,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['agent-session-search', 'orca-cli', 'cmd-j-palette'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip).toBeNull()
@@ -86,8 +81,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['agent-session-search', 'cmd-j-palette'],
       inNativeChatUpgradeTipAudience: false,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip).toBeNull()
@@ -102,8 +96,7 @@ describe('feature tip modal state', () => {
       featureInteractions: {
         'agent-session-search': { firstInteractedAt: 100, interactionCount: 1 }
       },
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip).toBeNull()
@@ -118,8 +111,7 @@ describe('feature tip modal state', () => {
           seenTipIds: [],
           inNativeChatUpgradeTipAudience,
           featureInteractions: {},
-          settings: makeSettings(),
-          webClient: false
+          settings: makeSettings()
         })
       ).toBeNull()
     }
@@ -132,8 +124,7 @@ describe('feature tip modal state', () => {
       seenTipIds: ['native-chat-upgrade'],
       inNativeChatUpgradeTipAudience: true,
       featureInteractions: {},
-      settings: makeSettings(),
-      webClient: false
+      settings: makeSettings()
     })
 
     expect(tip?.id).toBe('native-chat-upgrade')

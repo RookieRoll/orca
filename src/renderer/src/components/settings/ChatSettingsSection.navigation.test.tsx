@@ -39,7 +39,6 @@ function NavigationHarness({
   const sections = buildSettingsNavigationMetadata({
     isMac: false,
     isWindows: false,
-    isWebClient: false,
     nativeChatEnabled: enabled,
     repos: []
   })
@@ -104,7 +103,6 @@ function NavigationHarness({
             getChatNamingSearchEntry(),
             getChatInlineVisualsSearchEntry()
           ]}
-          showDesktopOnlySettings
           isMounted
         />
       </ActiveSettingsSectionProvider>

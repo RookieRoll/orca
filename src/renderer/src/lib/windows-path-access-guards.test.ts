@@ -52,11 +52,8 @@ describe('getWindowsPathAccess (renderer)', () => {
     expect(getWindowsPathAccess('local')).toBeNull()
   })
 
-  it('is null off Windows and in a web client', () => {
+  it('is null off Windows', () => {
     vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (Macintosh)' })
-    expect(getWindowsPathAccess(WSL_OWNER)).toBeNull()
-    vi.stubGlobal('navigator', { userAgent: WINDOWS_UA })
-    vi.stubGlobal('window', { __ORCA_WEB_CLIENT__: true })
     expect(getWindowsPathAccess(WSL_OWNER)).toBeNull()
   })
 

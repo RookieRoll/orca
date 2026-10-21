@@ -65,8 +65,6 @@ it('retains direct SSH file materialization and excludes directories', async () 
   expect(writeClipboardFile).toHaveBeenCalledWith({ filePath: file.path, connectionId: 'target' })
 })
 
-it('retains the single-file and desktop-client limits', () => {
+it('retains the single-file limit', () => {
   expect(shouldShowCopyFileAction(file, null, 2)).toBe(false)
-  vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-  expect(shouldShowCopyFileAction(file)).toBe(false)
 })

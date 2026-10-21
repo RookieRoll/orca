@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { runProcessSync } from '@orca/process-host'
 import { afterEach, describe, expect, it } from 'vitest'
+import { getTarProgram } from '../../src/shared/zip-extractor-command'
 import {
   javascriptInventory,
   packReleaseJavascript,
@@ -36,8 +37,6 @@ function fixture() {
     'preload/index.js',
     'renderer/index.html',
     'renderer/.vite/manifest.json',
-    'renderer/.orca-web-client-files.json',
-    'web/web-index.html',
     'package.json',
     'renderer/wasm/viewer.wasm',
     'main/index.js.map'
@@ -187,6 +186,24 @@ describe('release JavaScript transfer', () => {
     writeFileSync(join(options.root, 'out', 'stale.js'), 'old')
     restoreReleaseJavascript(options)
     expect(javascriptInventory(join(options.root, 'out'))).toEqual(before)
+  })
+
+  it('excludes a stale standalone web client from release archives', () => {
+    const options = fixture()
+    mkdirSync(join(options.root, 'out', 'web', 'assets'), { recursive: true })
+    writeFileSync(join(options.root, 'out', 'web', 'web-index.html'), 'stale web client')
+    writeFileSync(join(options.root, 'out', 'web', 'assets', 'stale.js'), 'stale asset')
+
+    const manifest = packReleaseJavascript(options)
+    expect(manifest.files.some((file) => file.path.startsWith('web/'))).toBe(false)
+
+    const result = runProcessSync({
+      program: getTarProgram(),
+      args: ['-tzf', join(options.artifactDir, 'release-javascript.tar.gz')],
+      cwd: options.root
+    })
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stdout.split(/\r?\n/).some((entry) => entry.startsWith('out/web/'))).toBe(false)
   })
 
   it.each([

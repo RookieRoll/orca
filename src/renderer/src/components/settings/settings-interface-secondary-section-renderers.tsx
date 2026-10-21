@@ -44,7 +44,6 @@ export type ChatSettingsRenderContext = {
     | 'setHasUnsavedChatPromptChanges'
     | 'sourceControlAiPromptDiscardSignal'
     | 'hasUnsavedChatPromptChanges'
-    | 'showDesktopOnlySettings'
   >
   interactions: Pick<SettingsRenderContext['interactions'], 'writeSourceControlAiSettingsOrThrow'>
   navigation: Pick<SettingsRenderContext['navigation'], 'getSectionSearchEntries'>
@@ -62,7 +61,6 @@ export function renderChatSettingsSection(context: ChatSettingsRenderContext): R
       chatPromptDiscardSignal={model.sourceControlAiPromptDiscardSignal}
       hasUnsavedChatPromptChanges={model.hasUnsavedChatPromptChanges}
       searchEntries={navigation.getSectionSearchEntries('chat')}
-      showDesktopOnlySettings={model.showDesktopOnlySettings}
       isMounted={view.isSectionMounted('chat')}
     />
   )
@@ -89,7 +87,7 @@ export function renderNotificationsSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="notifications"
       title={translate('auto.components.settings.Settings.9907545fa3', 'Notifications')}
@@ -103,7 +101,7 @@ export function renderNotificationsSettingsSection(
         <NotificationsPane settings={model.settings} updateSettings={model.updateSettings} />
       ) : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderShortcutsSettingsSection(context: SettingsRenderContext): React.JSX.Element {

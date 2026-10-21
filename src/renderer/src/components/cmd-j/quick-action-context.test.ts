@@ -102,7 +102,6 @@ describe('Cmd+J quick action context', () => {
     const context = {
       ...ctx({ activeWorktreeId: null, activeGroupId: null, isLoading: true }),
       activeWorktree: null,
-      runtimeMode: 'local-desktop' as const,
       openNewBrowserTab: async () => {},
       openBrowserUrl: async () => {},
       openNewMarkdownFile: async () => {},
@@ -137,7 +136,6 @@ describe('Cmd+J quick action context', () => {
     const baseContext = {
       ...ctx({}),
       activeWorktree: null,
-      runtimeMode: 'local-desktop' as const,
       openNewBrowserTab: async () => {},
       openBrowserUrl: async () => {},
       openNewMarkdownFile: async () => {},
@@ -149,9 +147,6 @@ describe('Cmd+J quick action context', () => {
 
     for (const actionId of workspaceActions) {
       expect(actionById.get(actionId)?.isAvailable(baseContext)).toEqual({ available: true })
-      expect(
-        actionById.get(actionId)?.isAvailable({ ...baseContext, runtimeMode: 'paired-web' })
-      ).toEqual({ available: true })
       expect(
         actionById.get(actionId)?.isAvailable({
           ...baseContext,
@@ -321,7 +316,6 @@ describe('Cmd+J quick action context', () => {
     const context = {
       ...ctx({ activeGroupId: null }),
       activeWorktree: null,
-      runtimeMode: 'local-desktop' as const,
       openNewBrowserTab: async () => {},
       openBrowserUrl: async () => {},
       openNewMarkdownFile: async () => {},
@@ -340,53 +334,12 @@ describe('Cmd+J quick action context', () => {
     expect(calls).toEqual([])
   })
 
-  it('omits unsupported paired-web browser execution without affecting terminal or markdown', async () => {
-    const calls: string[] = []
-    const actions = new Map(getCmdJQuickActions().map((action) => [action.id, action]))
-    const context = {
-      ...ctx({}),
-      activeWorktree: null,
-      runtimeMode: 'paired-web' as const,
-      managedBrowserCreationEnabled: false,
-      openNewBrowserTab: async () => {
-        calls.push('browser')
-      },
-      openBrowserUrl: async () => {
-        calls.push('browser-url')
-      },
-      openNewMarkdownFile: async () => {
-        calls.push('markdown')
-      },
-      openNewTerminalTab: async () => {
-        calls.push('terminal')
-      },
-      openCreateWorkspace: () => {},
-      deleteActiveWorkspace: () => {},
-      openAddQuickCommand: () => {}
-    } satisfies CmdJQuickActionContext
-
-    expect(actions.get('new-browser-tab')?.isAvailable(context)).toEqual({
-      available: false,
-      reason: 'client-action-unsupported'
-    })
-    await expect(actions.get('new-browser-tab')?.run(context)).resolves.toEqual({
-      status: 'unavailable',
-      reason: 'client-action-unsupported'
-    })
-    expect(actions.get('new-markdown-file')?.isAvailable(context)).toEqual({ available: true })
-    expect(actions.get('new-terminal-tab')?.isAvailable(context)).toEqual({ available: true })
-    await actions.get('new-markdown-file')?.run(context)
-    await actions.get('new-terminal-tab')?.run(context)
-    expect(calls).toEqual(['markdown', 'terminal'])
-  })
-
   it('runtime re-check invokes the current workspace delete action when available', async () => {
     const calls: string[] = []
     const action = getCmdJQuickActions().find((entry) => entry.id === 'delete-workspace')
     const context = {
       ...ctx({ activeGroupId: null }),
       activeWorktree: null,
-      runtimeMode: 'local-desktop' as const,
       openNewBrowserTab: async () => {},
       openBrowserUrl: async () => {},
       openNewMarkdownFile: async () => {},
@@ -408,7 +361,6 @@ describe('Cmd+J quick action context', () => {
     const context = {
       ...ctx({}),
       activeWorktree: null,
-      runtimeMode: 'local-desktop' as const,
       openNewBrowserTab: async () => {},
       openBrowserUrl: async () => {},
       openNewMarkdownFile: async () => {},

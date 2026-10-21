@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AppState } from '../types'
 import {
   createBrowserMockApi,
@@ -31,23 +31,7 @@ describe('createBrowserSlice runtime guard', () => {
     })
   })
 
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
-  it('rejects direct client-local materialization in the web client', () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    const store = createTestStore()
-
-    expect(() => store.getState().createBrowserTab('wt-1', 'about:blank')).toThrow(
-      'must be created by a capable paired runtime'
-    )
-    expect(store.getState().browserTabsByWorktree['wt-1']).toBeUndefined()
-    expect(store.getState().createUnifiedTab).not.toHaveBeenCalled()
-  })
-
   it('rejects direct remote materialization without the provider capability', () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     const store = createTestStore()
     store.setState({ runtimeStatusByEnvironmentId: runtimeStatuses([]) })
 
@@ -249,35 +233,6 @@ describe('createBrowserSlice runtime guard', () => {
       url: 'https://accounts.google.com/',
       sessionProfileId: 'profile-1'
     })
-  })
-
-  it('rejects a paired-web sign-in tab when the remote host cannot stream browsers', async () => {
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    const store = createTestStore()
-    store.setState({
-      activeWorktreeId: 'wt-remote',
-      settings: settingsWithRuntime('env-1'),
-      runtimeStatusByEnvironmentId: runtimeStatuses([]),
-      worktreesByRepo: {
-        'repo-1': [
-          {
-            id: 'wt-remote',
-            repoId: 'repo-1',
-            hostId: 'local',
-            runtimeOwnerEnvironmentId: 'env-1'
-          } as never
-        ]
-      }
-    })
-
-    await expect(
-      store
-        .getState()
-        .openBrowserProfileTabInActiveWorkspace('https://accounts.google.com/', 'profile-1')
-    ).resolves.toBe(false)
-
-    expect(createWebRuntimeSessionBrowserTabMock).not.toHaveBeenCalled()
-    expect(store.getState().browserTabsByWorktree['wt-remote']).toBeUndefined()
   })
 
   it('does not create a local fallback tab when remote browser creation throws', async () => {

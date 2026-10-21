@@ -139,7 +139,6 @@ describe('SettingsSidebar', () => {
     const sections = buildSettingsNavigationMetadata({
       isMac: false,
       isWindows: false,
-      isWebClient: false,
       nativeChatEnabled: enabled,
       repos: []
     }).filter((section) => section.group === 'interface')

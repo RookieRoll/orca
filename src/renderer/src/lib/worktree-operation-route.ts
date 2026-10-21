@@ -16,7 +16,6 @@ import {
   resolveIndexedWorktreeOwner
 } from './worktree-runtime-owner-index'
 import { resolveExplicitWorktreeOperationRouteResult } from './worktree-operation-catalog-route'
-import { onPairedWebClientHost } from './paired-web-client-host'
 import {
   findFolderWorkspaceOwner,
   getExecutionHostIdForFolderWorkspace,
@@ -189,10 +188,10 @@ function resolveSelectedHostRoute(
   if (selectedHost.kind !== 'ssh') {
     return {
       kind: 'resolved',
-      route: onPairedWebClientHost(state, {
+      route: {
         executionHostId: selectedHost.id,
         runtimeEnvironmentId: null
-      })
+      }
     }
   }
   const hubOwners = collectHubOwnerEnvironmentIds(state, worktreeId, selectedHost.id)
@@ -204,10 +203,10 @@ function resolveSelectedHostRoute(
   }
   return {
     kind: 'resolved',
-    route: onPairedWebClientHost(state, {
+    route: {
       executionHostId: selectedHost.id,
       runtimeEnvironmentId: hubOwners.environmentIds.values().next().value ?? null
-    })
+    }
   }
 }
 
@@ -260,9 +259,7 @@ export function resolveWorktreeOperationRouteResult(
   worktreeId: string
 ): WorktreeOperationRouteResolution {
   const resolution = resolveOwnerRouteResult(state, worktreeId)
-  return resolution.kind === 'resolved'
-    ? { kind: 'resolved', route: onPairedWebClientHost(state, resolution.route) }
-    : resolution
+  return resolution
 }
 
 function resolveOwnerRouteResult(

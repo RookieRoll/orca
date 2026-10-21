@@ -25,10 +25,8 @@ import type { SettingsNavigationBuildOptions } from './settings-navigation-build
 
 export function buildCapabilitySettingsSections({
   isLocalWindowsHost,
-  isWebClient,
   isLinearConnected
 }: SettingsNavigationBuildOptions): SettingsNavSection[] {
-  const showDesktopOnlySettings = !isWebClient
   return [
     {
       id: 'agents',
@@ -39,10 +37,10 @@ export function buildCapabilitySettingsSections({
       ),
       icon: Bot,
       searchEntries: getAgentsPaneSearchEntries({
-        includeAgentAwake: !isWebClient,
+        includeAgentAwake: true,
         includeAgentRuntime: isLocalWindowsHost,
-        includeAgentWorkspaceTrust: !isWebClient,
-        includeCodexTerminalServerIsolation: !isWebClient
+        includeAgentWorkspaceTrust: true,
+        includeCodexTerminalServerIsolation: true
       }),
       group: 'capabilities'
     },
@@ -69,9 +67,7 @@ export function buildCapabilitySettingsSections({
         'Coordinate multiple coding agents through Orca.'
       ),
       icon: Network,
-      searchEntries: getOrchestrationPaneSearchEntries({
-        includeNestedWorkerDepth: !isWebClient
-      }),
+      searchEntries: getOrchestrationPaneSearchEntries(),
       group: 'capabilities'
     },
     // Why: only surfaced once Linear is connected — a capability that needs a
@@ -91,45 +87,35 @@ export function buildCapabilitySettingsSections({
           }
         ]
       : []),
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'computer-use',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.b35e92364b', 'Computer Use'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.0059bd17f3',
-              'Enable agents to control any app on your computer.'
-            ),
-            icon: MousePointerClick,
-            searchEntries: getComputerUsePaneSearchEntries(),
-            group: 'capabilities'
-          },
-        ]
-      : [])
+    {
+      id: 'computer-use',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.b35e92364b', 'Computer Use'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.0059bd17f3',
+        'Enable agents to control any app on your computer.'
+      ),
+      icon: MousePointerClick,
+      searchEntries: getComputerUsePaneSearchEntries(),
+      group: 'capabilities'
+    }
   ]
 }
 
 export function buildSetupSettingsSections({
-  isLocalWindowsHost,
-  isWebClient
+  isLocalWindowsHost
 }: SettingsNavigationBuildOptions): SettingsNavSection[] {
-  const showDesktopOnlySettings = !isWebClient
   return [
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'orca-account',
-            title: translate('auto.components.settings.orcaAccount.title', 'Orca Account'),
-            description: translate(
-              'auto.components.settings.orcaAccount.description',
-              'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
-            ),
-            icon: CircleUserRound,
-            searchEntries: getOrcaAccountSettingsSearchEntries(),
-            group: 'setup'
-          }
-        ]
-      : []),
+    {
+      id: 'orca-account',
+      title: translate('auto.components.settings.orcaAccount.title', 'Orca Account'),
+      description: translate(
+        'auto.components.settings.orcaAccount.description',
+        'Share work instantly and reach your desktop from Orca Mobile wherever you are.'
+      ),
+      icon: CircleUserRound,
+      searchEntries: getOrcaAccountSettingsSearchEntries(),
+      group: 'setup'
+    },
     {
       id: 'setup-guide',
       title: translate(
@@ -185,20 +171,16 @@ export function buildSetupSettingsSections({
       searchEntries: getIntegrationsPaneSearchEntries(),
       group: 'setup'
     },
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'mobile',
-            title: translate('auto.hooks.useSettingsNavigationMetadata.1cd25673df', 'Mobile'),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.95a1886d94',
-              'Control terminals and agents from your phone.'
-            ),
-            icon: Smartphone,
-            searchEntries: getMobileSettingsPaneSearchEntries(),
-            group: 'setup'
-          }
-        ]
-      : [])
+    {
+      id: 'mobile',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.1cd25673df', 'Mobile'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.95a1886d94',
+        'Control terminals and agents from your phone.'
+      ),
+      icon: Smartphone,
+      searchEntries: getMobileSettingsPaneSearchEntries(),
+      group: 'setup'
+    }
   ]
 }

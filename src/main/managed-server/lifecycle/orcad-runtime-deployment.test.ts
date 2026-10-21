@@ -114,7 +114,6 @@ function readiness(endpoint = 'ws://127.0.0.1:6768') {
       }),
       endpoint,
       deviceId: 'device-1',
-      webClientUrl: null,
       scope: 'runtime',
       qr: null
     }

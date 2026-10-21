@@ -76,17 +76,15 @@ export function useSettingsNavigationModel(
         })
       )
     }
-    if (model.showDesktopOnlySettings) {
-      next.set(
-        'computer-use',
-        getAgentSkillNavInstallStatus({
-          name: COMPUTER_USE_SKILL_NAME,
-          installed: computerUseSkillInstalled,
-          loading: computerUseSkillLoading,
-          inventory: applicableFreshnessInventory
-        })
-      )
-    }
+    next.set(
+      'computer-use',
+      getAgentSkillNavInstallStatus({
+        name: COMPUTER_USE_SKILL_NAME,
+        installed: computerUseSkillInstalled,
+        loading: computerUseSkillLoading,
+        inventory: applicableFreshnessInventory
+      })
+    )
     return next
   }, [
     computerUseSkillInstalled,
@@ -96,7 +94,6 @@ export function useSettingsNavigationModel(
     linearSkills,
     model.linearConnected,
     model.settings,
-    model.showDesktopOnlySettings,
     model.skillFreshnessApplies,
     model.skillFreshnessInventory,
     orchestrationSkillInstalled,

@@ -195,7 +195,6 @@ export function registerMobileHandlers(
       return {
         available: true as const,
         pairingUrl: offer.pairingUrl,
-        webClientUrl: offer.webClientUrl,
         endpoint: offer.endpoint,
         deviceId: offer.deviceId
       }

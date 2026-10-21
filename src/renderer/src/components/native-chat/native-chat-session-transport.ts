@@ -1,5 +1,4 @@
 import type { NativeChatApi, NativeChatAppendedMessages } from '../../../../preload/api-types'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { callRuntimeRpc } from '@/runtime/runtime-rpc-client'
 import { RuntimeRpcCallError } from '@/runtime/runtime-rpc-result'
 import type { RuntimeClientTarget } from '../../../../shared/runtime-client-target'
@@ -36,10 +35,7 @@ export function toRuntimeNativeChatErrorMessage(err: unknown): string {
   return RUNTIME_NATIVE_CHAT_READ_ERROR
 }
 
-/** Delegates straight to the local Electron IPC bridge. On the web client
- *  `window.api.nativeChat` already bridges to the paired runtime, so web keeps
- *  using this adapter (R3). Preserves whatever `subscribe` returns (sync fn on
- *  desktop, promise on the web bridge) — the hook's teardown handles both (R6). */
+/** Delegates straight to the local Electron IPC bridge. */
 const localNativeChatTransport: NativeChatSessionTransport = {
   readSession: (agent, sessionId, limit, transcriptPath) =>
     window.api.nativeChat.readSession(agent, sessionId, limit, transcriptPath),
@@ -260,13 +256,11 @@ function createRuntimeNativeChatTransport(environmentId: string): NativeChatSess
   }
 }
 
-/** Select the read/subscribe transport for a pane. Route to the remote runtime
- *  only for a `runtime:`-owned pane on a non-web client (KTD-2); web and
- *  local/`ssh:`-owned panes keep the local adapter. */
+/** Select the read/subscribe transport for a pane by its runtime owner. */
 export function getNativeChatSessionTransport(
   runtimeEnvironmentId: string | null
 ): NativeChatSessionTransport {
-  if (runtimeEnvironmentId && !isWebClientLocation()) {
+  if (runtimeEnvironmentId) {
     return createRuntimeNativeChatTransport(runtimeEnvironmentId)
   }
   return localNativeChatTransport

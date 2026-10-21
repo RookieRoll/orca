@@ -7,7 +7,6 @@ import { useProjectHostSetupProjection } from '@/store/selectors'
 import { useSystemPrefersDark } from '@/components/terminal-pane/use-system-prefers-dark'
 import { isMacUserAgent, isWindowsUserAgent } from '@/components/terminal-pane/pane-helpers'
 import { useConfirmationDialog } from '@/components/confirmation-dialog-context'
-import { isWebClientLocation } from '@/hooks/useSettingsNavigationMetadata'
 import {
   COMPUTER_USE_SKILL_NAME,
   LINEAR_AGENT_SKILL_NAMES,
@@ -93,8 +92,6 @@ export function useSettingsStoreModel() {
   const systemPrefersDark = useSystemPrefersDark()
   const isWindows = isWindowsUserAgent()
   const isMac = isMacUserAgent()
-  const isWebClient = isWebClientLocation()
-  const showDesktopOnlySettings = !isWebClient
   // Why: mirror the nav registry's gate so the Linear sidebar entry and section appear/disappear together.
   const linearConnected = useLinearProviderConnected()
   const activeSkillRuntime = useActiveProjectSkillRuntime()
@@ -108,7 +105,7 @@ export function useSettingsStoreModel() {
     sourceKinds: GLOBAL_AGENT_SKILL_SOURCE_KINDS
   })
   const computerUseSkill = useInstalledAgentSkill(COMPUTER_USE_SKILL_NAME, {
-    enabled: showDesktopOnlySettings,
+    enabled: true,
     discoveryTarget: activeSkillRuntime.discoveryTarget,
     sourceKinds: GLOBAL_AGENT_SKILL_SOURCE_KINDS
   })
@@ -150,18 +147,16 @@ export function useSettingsStoreModel() {
     defaultScope.kind === 'environment' ? defaultScope.environmentId : null
   // Why: keyed on ids so status-only catalog updates keep the scope (and its loads) stable.
   const savedEnvironmentIdsKey = runtimeEnvironments.map((environment) => environment.id).join('\n')
-  // Why: the web client's only host is its server, so it never offers a choice.
   const settingsHostScope = useMemo(
     () =>
       resolveSettingsHostScope({
-        choice: isWebClient ? null : settingsHostChoice,
+        choice: settingsHostChoice,
         defaultEnvironmentId: defaultRuntimeEnvironmentId,
         savedEnvironmentIds: savedEnvironmentIdsKey ? savedEnvironmentIdsKey.split('\n') : [],
         catalogHydrated: runtimeEnvironmentCatalogHydrated
       }),
     [
       defaultRuntimeEnvironmentId,
-      isWebClient,
       runtimeEnvironmentCatalogHydrated,
       savedEnvironmentIdsKey,
       settingsHostChoice
@@ -198,8 +193,6 @@ export function useSettingsStoreModel() {
     systemPrefersDark,
     isWindows,
     isMac,
-    isWebClient,
-    showDesktopOnlySettings,
     linearConnected,
     orchestrationSkill,
     linearSkill,

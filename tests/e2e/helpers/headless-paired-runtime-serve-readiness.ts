@@ -6,13 +6,11 @@ type ServeReady = {
   pairing?: {
     available?: unknown
     url?: unknown
-    webClientUrl?: unknown
   }
 }
 
 const STARTUP_DIAGNOSTIC_LIMIT = 8_000
 const PAIRING_URL_PATTERN = /orca:\/\/[^\s"\\]+/g
-const WEB_CLIENT_PAIRING_PATTERN = /([#&]pairing=)[^&\s"\\]+/g
 
 export class HeadlessPairedRuntimeStartupDiagnosticBuffer {
   private completed = ''
@@ -85,10 +83,7 @@ export function parseHeadlessPairedRuntimePairingOffer(
   ) {
     return null
   }
-  return {
-    pairingUrl: pairing.url,
-    ...(typeof pairing.webClientUrl === 'string' ? { webClientUrl: pairing.webClientUrl } : {})
-  }
+  return { pairingUrl: pairing.url }
 }
 
 /** True for the `orca_server_ready` line, whether or not it carries a pairing offer. */
@@ -103,7 +98,6 @@ export function isHeadlessPairedRuntimeServeReadyLine(line: string): boolean {
 function redactPairingMaterial(value: string): string {
   return value
     .replace(PAIRING_URL_PATTERN, 'orca://[redacted]')
-    .replace(WEB_CLIENT_PAIRING_PATTERN, '$1[redacted]')
 }
 
 export async function readPairingOffer(

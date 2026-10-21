@@ -17,23 +17,12 @@ export function renderServersSettingsSection(context: SettingsRenderContext): Re
       <SettingsSection
         id="servers"
         title={translate('auto.components.settings.Settings.bd0181eeca', 'Remote Orca Servers')}
-        description={
-          model.isWebClient
-            ? translate(
-                'auto.components.settings.Settings.7686cb5c36',
-                'Connect this browser to a saved Orca server.'
-              )
-            : translate(
-                'auto.components.settings.Settings.remoteServersDescription',
-                'Run Orca on another machine and work on it from here.'
-              )
-        }
+        description={translate(
+          'auto.components.settings.Settings.remoteServersDescription',
+          'Run Orca on another machine and work on it from here.'
+        )}
         searchEntries={navigation.getSectionSearchEntries('servers')}
-        headerAction={
-          mounted ? (
-            <RuntimeServersHeaderActions canGeneratePairingUrl={!model.isWebClient} />
-          ) : undefined
-        }
+        headerAction={mounted ? <RuntimeServersHeaderActions canGeneratePairingUrl /> : undefined}
         // Why unframed: the server list and cards are the page's own surfaces; a band around them nests cards.
         bodyClassName="rounded-none border-0 bg-transparent px-0 py-0 shadow-none"
       >
@@ -41,8 +30,8 @@ export function renderServersSettingsSection(context: SettingsRenderContext): Re
           <RuntimeEnvironmentsPane
             settings={model.settings}
             setActiveRuntimeEnvironmentPreference={model.setActiveRuntimeEnvironmentPreference}
-            canGeneratePairingUrl={!model.isWebClient}
-            allowLocalRuntime={!model.isWebClient}
+            canGeneratePairingUrl
+            allowLocalRuntime
             addServerIntentSignal={model.remoteServerAddIntentSignal}
           />
         ) : null}
@@ -54,7 +43,7 @@ export function renderServersSettingsSection(context: SettingsRenderContext): Re
 export function renderSshSettingsSection(context: SettingsRenderContext): React.JSX.Element | null {
   const { model, navigation, view } = context
   const mounted = view.isSectionMounted('ssh')
-  return model.showDesktopOnlySettings ? (
+  return (
     <SshHostsHeaderSlotProvider>
       <SettingsSection
         id="ssh"
@@ -71,14 +60,14 @@ export function renderSshSettingsSection(context: SettingsRenderContext): React.
         {mounted ? <SshPane addTargetIntentSignal={model.sshHostAddIntentSignal} /> : null}
       </SettingsSection>
     </SshHostsHeaderSlotProvider>
-  ) : null
+  )
 }
 
 export function renderDeveloperPermissionsSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings && model.isMac ? (
+  return model.isMac ? (
     <SettingsSection
       id="developer-permissions"
       title={translate('auto.components.settings.Settings.65660d4548', 'macOS Permissions')}

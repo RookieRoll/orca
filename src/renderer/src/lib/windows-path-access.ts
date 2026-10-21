@@ -1,7 +1,6 @@
 import { toRuntimeExecutionHostId } from '../../../shared/execution-host'
 import { windowsPathAccess, type WindowsPathAccess } from '../../../shared/windows-path-access'
 import type { PublicKnownRuntimeEnvironment } from '../../../shared/runtime-environments'
-import { isWebClientLocation } from './web-client-location'
 
 type WslEnvironmentSource = readonly Pick<PublicKnownRuntimeEnvironment, 'id' | 'orcadDeployment'>[]
 
@@ -12,9 +11,9 @@ export function registerWindowsPathAccessEnvironments(read: () => WslEnvironment
   readKnownEnvironments = read
 }
 
-/** The desktop's own OS; a web client has no Windows shell to hand paths to. */
+/** The operating system this renderer runs on. */
 function getDesktopPlatform(): NodeJS.Platform | null {
-  if (isWebClientLocation() || typeof navigator === 'undefined') {
+  if (typeof navigator === 'undefined') {
     return null
   }
   return navigator.userAgent.includes('Windows') ? 'win32' : null

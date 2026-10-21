@@ -19,7 +19,6 @@ import { useStructuredPromptResponseHold } from './use-structured-prompt-respons
 import { NativeChatStructuredQuestionCard } from './NativeChatStructuredQuestionCard'
 import { selectNativeChatViewState, structuredChatHistoryPhase } from './native-chat-view-state'
 import { useNativeChatRootInputRouting } from './use-native-chat-root-input-routing'
-import { useNativeChatFontSize } from './use-native-chat-font-size'
 import { useNativeChatFind } from './use-native-chat-find'
 import { NativeChatFindBar } from './NativeChatFindBar'
 import { LinkActionPopover } from '@/components/link-actions/LinkActionPopover'
@@ -156,7 +155,6 @@ export function NativeChatStructuredSession(
   const readFailedFinally = readFailure?.final === true
   const viewState = selectNativeChatViewState(session, { readRetries: !readFailedFinally })
   const paneActive = props.isVisible && props.isFocusedGroup
-  useNativeChatFontSize(viewState.kind === 'ready' && paneActive, rootRef)
   const find = useNativeChatFind(paneActive, rootRef, composerRef, submits.messageListRef)
   const appearanceStyle = useNativeChatStoreAppearanceStyle()
   const imageRuntimeContext = useNativeChatImageRuntimeContext(props.tabId)

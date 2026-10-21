@@ -1138,12 +1138,7 @@ jobs:
           done
           exit "$status"
 
-      - name: Project web client from renderer build
-        id: web-client
-        background: true
-        run: pnpm run build:web-from-renderer
-
-      - wait: [linux-native, linux-package-tools, web-client]
+      - wait: [linux-native, linux-package-tools]
 
       - name: Package unpacked app
         env:

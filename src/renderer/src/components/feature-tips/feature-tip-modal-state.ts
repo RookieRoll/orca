@@ -14,7 +14,6 @@ export function getFeatureTipForModal(args: {
   featureInteractions: FeatureInteractionState
   inNativeChatUpgradeTipAudience: boolean | null
   settings: FeatureTipSettings | null | undefined
-  webClient: boolean
 }): FeatureTip | null {
   const modalTipId = isFeatureTipId(args.modalData.tipId) ? args.modalData.tipId : null
   const inNativeChatUpgradeTipAudience = args.inNativeChatUpgradeTipAudience === true

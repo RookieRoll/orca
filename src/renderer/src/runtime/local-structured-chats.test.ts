@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ held: false, isWebClient: false }))
+const mocks = vi.hoisted(() => ({ held: false }))
 
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.isWebClient }))
 vi.mock('@/store', () => ({ useAppStore: { getState: () => ({}) } }))
 vi.mock('./local-structured-session-tabs-sync/inventory-refresh', () => ({
   restoreLocalStructuredSessionTabsOnce: vi.fn(async () => undefined)
@@ -18,7 +17,6 @@ const SETTING_ON = { experimentalNativeChat: true }
 
 beforeEach(() => {
   mocks.held = false
-  mocks.isWebClient = false
   resetLocalStructuredChatsForTests()
   vi.stubGlobal('window', {
     api: {
@@ -57,13 +55,4 @@ describe("startup's restore of this machine's structured chats", () => {
     expect(step).toHaveBeenCalledOnce()
   })
 
-  it('never restores in the browser client', async () => {
-    mocks.isWebClient = true
-    mocks.held = true
-    const step = vi.fn(async () => undefined)
-
-    await restoreLocalStructuredChatsAtStartup(SETTING_ON, step)
-
-    expect(step).not.toHaveBeenCalled()
-  })
 })

@@ -150,7 +150,7 @@ describe('NativeChatImageAttachmentPreview', () => {
     expect(thumbnail.getAttribute('data-native-chat-copy-image-src')).toBe('blob:on-disk-1')
   })
 
-  it('offers nothing to copy until the file is readable or in the web client', () => {
+  it('offers nothing to copy until the file is readable', () => {
     mocks.useLocalImageSrc.mockReturnValue(undefined)
     renderPreview({ id: 'a1', path: '/tmp/example.png', previewUrl: 'data:thumbnail' })
     expect(
@@ -167,13 +167,6 @@ describe('NativeChatImageAttachmentPreview', () => {
         .hasAttribute('data-native-chat-copy-image-src')
     ).toBe(true)
 
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
-    renderPreview({ id: 'a3', path: '/tmp/shot.png' })
-    expect(
-      screen
-        .getByRole('button', { name: 'Image #1: View image: shot.png' })
-        .hasAttribute('data-native-chat-copy-image-src')
-    ).toBe(false)
   })
 
   it('stays open through a click on the chat context menu, but not elsewhere outside', async () => {

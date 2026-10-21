@@ -297,7 +297,6 @@ describe('getOpenFilesForExternalFileChange', () => {
     ).toEqual([])
 
     vi.stubGlobal('navigator', { userAgent: 'Windows' })
-    vi.stubGlobal('__ORCA_WEB_CLIENT__', true)
     expect(
       getOpenFilesForExternalFileChange([terminalLinkTab], {
         worktreeId: 'wt-wsl',

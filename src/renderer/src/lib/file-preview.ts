@@ -1,7 +1,6 @@
 import { toast } from 'sonner'
 import { absolutePathToFileUri } from '@/components/editor/markdown-internal-links'
 import { getClientCreationActionPolicy } from '@/lib/client-creation-action-policy'
-import { webClientDocPreviewRefusal } from '@/lib/doc-preview-web-client'
 import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { basename, getRelativePathInsideRoot } from '@/lib/path'
@@ -74,7 +73,7 @@ export function getWorkspaceFilePreviewPlan(
     }
   }
   if (connectionId !== null) {
-    return webClientDocPreviewRefusal() ?? { status: 'doc-preview' }
+    return { status: 'doc-preview' }
   }
   // Why: the doc preview needs no browser at all, so a paired runtime without the
   // screencast capability still previews documents.
@@ -90,7 +89,7 @@ export function getWorkspaceFilePreviewPlan(
         reason: 'outside-worktree'
       }
     }
-    return webClientDocPreviewRefusal() ?? { status: 'doc-preview' }
+    return { status: 'doc-preview' }
   }
   const availability = getClientCreationActionPolicy(state, worktreeId)['managed-browser']
   if (availability.state !== 'enabled') {
@@ -234,11 +233,6 @@ export function convertBrowserPageToWorkspaceDoc(
   docLocation: BrowserPageDocLocation,
   options?: { leg?: BrowserPageConversionLeg }
 ): 'activated-existing' | 'opened-in-owning-worktree' | 'converted' | 'failed' {
-  const webRefusal = webClientDocPreviewRefusal()
-  if (webRefusal) {
-    toast.error(webRefusal.message)
-    return 'failed'
-  }
   const state = useAppStore.getState()
   // Why a history leg skips reuse: Back and Forward both mean "this tab, as it was" — activating
   // another tab showing the document would leave this one a web page with live provenance, so

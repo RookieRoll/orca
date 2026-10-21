@@ -23,25 +23,12 @@ function makeClipboardEvent(text: string | null): ClipboardEvent {
 }
 
 describe('shouldUseClipboardEventPaste', () => {
-  it('requires the fallback for web clients without navigator.clipboard.readText', () => {
-    expect(
-      shouldUseClipboardEventPaste({ isWebClient: true, clipboardReadTextAvailable: false })
-    ).toBe(true)
+  it('uses the native clipboard event when asynchronous clipboard reads are unavailable', () => {
+    expect(shouldUseClipboardEventPaste({ clipboardReadTextAvailable: false })).toBe(true)
   })
 
-  it('keeps async clipboard reads for secure-context web clients', () => {
-    expect(
-      shouldUseClipboardEventPaste({ isWebClient: true, clipboardReadTextAvailable: true })
-    ).toBe(false)
-  })
-
-  it('never applies to the Electron renderer, which reads the clipboard over IPC', () => {
-    expect(
-      shouldUseClipboardEventPaste({ isWebClient: false, clipboardReadTextAvailable: false })
-    ).toBe(false)
-    expect(
-      shouldUseClipboardEventPaste({ isWebClient: false, clipboardReadTextAvailable: true })
-    ).toBe(false)
+  it('keeps asynchronous clipboard reads when available', () => {
+    expect(shouldUseClipboardEventPaste({ clipboardReadTextAvailable: true })).toBe(false)
   })
 })
 

@@ -11,7 +11,6 @@ import {
 } from '../../../../shared/execution-host'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
 import { SettingsRow } from './SettingsFormControls'
@@ -42,7 +41,6 @@ export function SessionHistorySettingsPane({
   updateSettings: (updates: Partial<GlobalSettings>) => Promise<void>
 }): React.JSX.Element {
   const policy = resolveAiVaultSearchSettings(settings)
-  const isWebClient = isWebClientLocation()
   const closeSettingsPage = useAppStore((state) => state.closeSettingsPage)
   const showAiVaultSearch = useAppStore((state) => state.showAiVaultSearch)
   const markFeatureTipsSeen = useAppStore((state) => state.markFeatureTipsSeen)
@@ -53,7 +51,7 @@ export function SessionHistorySettingsPane({
   const { environments, detailsByEnvironmentId } = useRuntimeEnvironmentCatalog()
   const localRead = useSessionSearchStatus({
     executionHostId: LOCAL_EXECUTION_HOST_ID,
-    active: policy.enabled && !isWebClient,
+    active: policy.enabled,
     refresh
   })
   const mounted = useRef(true)
@@ -64,7 +62,7 @@ export function SessionHistorySettingsPane({
     }
   }, [])
 
-  const servers = isWebClient ? [] : environments
+  const servers = environments
   const localEntry: SessionSearchComputerEntry = {
     id: LOCAL_EXECUTION_HOST_ID,
     name: getLocalExecutionHostLabel(),
@@ -180,15 +178,10 @@ export function SessionHistorySettingsPane({
           {translate('sessionHistory.settings.indexComputers', 'Search inside sessions')}
         </Label>
         <p className="select-text text-xs text-muted-foreground">
-          {isWebClient
-            ? translate(
-                'sessionHistory.settings.webUnsupported',
-                'Turn on session search from the Orca desktop app on that computer.'
-              )
-            : translate(
-                'sessionHistory.settings.computersConsent',
-                'Each computer keeps a searchable copy of its own agent conversations and tool output. Nothing leaves that computer.'
-              )}
+          {translate(
+            'sessionHistory.settings.computersConsent',
+            'Each computer keeps a searchable copy of its own agent conversations and tool output. Nothing leaves that computer.'
+          )}
         </p>
       </div>
       {/* Nothing left to switch on means nothing to offer: each row already speaks for itself. */}
@@ -211,9 +204,9 @@ export function SessionHistorySettingsPane({
             kind="local"
             name={localEntry.name}
             checked={policy.enabled}
-            disabled={busy || isWebClient}
+            disabled={busy}
             onToggle={() => void toggleEnabled()}
-            {...(isWebClient || localStatusText === undefined
+            {...(localStatusText === undefined
               ? {}
               : { status: localStatusText, details: sessionSearchStatusDetails(localStatus) })}
           />
@@ -231,32 +224,29 @@ export function SessionHistorySettingsPane({
           )
         }))}
       />
-      {isWebClient ? null : (
-        <SettingsRow
-          className="border-t border-border"
-          label={translate('sessionHistory.settings.openInSidebar', 'Open in the sidebar')}
-          description={translate(
-            'sessionHistory.settings.openInSidebarCopy',
-            'Type what you remember, or ask an agent: “find the session where we fixed the login timeout.”'
-          )}
-          control={
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                showAiVaultSearch()
-                closeSettingsPage()
-              }}
-            >
-              {translate('sessionHistory.settings.open', 'Open')}
-            </Button>
-          }
-        />
-      )}
+      <SettingsRow
+        className="border-t border-border"
+        label={translate('sessionHistory.settings.openInSidebar', 'Open in the sidebar')}
+        description={translate(
+          'sessionHistory.settings.openInSidebarCopy',
+          'Type what you remember, or ask an agent: “find the session where we fixed the login timeout.”'
+        )}
+        control={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              showAiVaultSearch()
+              closeSettingsPage()
+            }}
+          >
+            {translate('sessionHistory.settings.open', 'Open')}
+          </Button>
+        }
+      />
       <SessionSearchAdvancedSection
         enabled={policy.enabled}
-        disabled={isWebClient}
         turnSearchOff={turnSearchOffBeforeDelete}
         onError={setError}
         onCleared={() => setRefresh((value) => value + 1)}

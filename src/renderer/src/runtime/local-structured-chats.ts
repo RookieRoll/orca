@@ -1,7 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
 import { isNativeChatEnabled } from '../../../shared/structured-native-chat-launch-route'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { useAppStore } from '@/store'
 import { restoreLocalStructuredSessionTabsOnce } from './local-structured-session-tabs-sync/inventory-refresh'
 
@@ -9,7 +8,7 @@ import { restoreLocalStructuredSessionTabsOnce } from './local-structured-sessio
 // here), as main derives it from the host's records. Building the host alone is not holding one:
 // session history and phone launches build it too. The chat setting picks what new launches open
 // as, so the chats that exist show whatever it says; a machine that holds none pays for no chat
-// mirror. The browser client has no runtime of its own.
+// mirror.
 
 let held = false
 let pushes = 0
@@ -35,7 +34,7 @@ function subscribe(listener: () => void): () => void {
   listeners.add(listener)
   // Why optional: a window without the desktop bridge has no runtime to hold chats.
   const app = typeof window === 'undefined' ? undefined : window.api?.app
-  if (!stopListening && app && !isWebClientLocation()) {
+  if (!stopListening && app) {
     stopListening = app.onStructuredAgentSessionsHeldChanged(onHeldChanged)
     void readLocalStructuredAgentSessionsHeld()
   }
@@ -46,9 +45,6 @@ function subscribe(listener: () => void): () => void {
 
 /** Asks this machine's runtime whether it holds a structured chat. */
 export async function readLocalStructuredAgentSessionsHeld(): Promise<boolean> {
-  if (isWebClientLocation()) {
-    return false
-  }
   const pushesBefore = pushes
   try {
     const answer = (await window.api?.app?.holdsStructuredAgentSessions()) === true
@@ -74,7 +70,7 @@ export function useLocalStructuredAgentSessionsHeld(): boolean {
 type StructuredChatSettings = Pick<GlobalSettings, 'experimentalNativeChat'> | null
 
 function chatsInUse(settings: StructuredChatSettings | undefined, holds: boolean): boolean {
-  return !isWebClientLocation() && (isNativeChatEnabled(settings) || holds)
+  return isNativeChatEnabled(settings) || holds
 }
 
 /** Structured chats can exist on this machine: the setting launches them, or the runtime holds some. */
@@ -88,15 +84,12 @@ export function useLocalStructuredChatsInUse(): boolean {
 export async function localStructuredChatsInUse(
   settings: StructuredChatSettings | undefined
 ): Promise<boolean> {
-  if (isWebClientLocation()) {
-    return false
-  }
   return chatsInUse(settings, await readLocalStructuredAgentSessionsHeld())
 }
 
 /**
  * Startup's restore of this machine's chats. Existing chats come back whatever the chat setting
- * says; a machine that holds none, or the browser client, runs no session-tab census for them.
+ * says; a machine that holds none runs no session-tab census for them.
  */
 export async function restoreLocalStructuredChatsAtStartup(
   settings: StructuredChatSettings | undefined,

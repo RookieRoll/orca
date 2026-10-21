@@ -1,6 +1,5 @@
 import { useAppStore } from '../../store'
 import { translate } from '@/i18n/i18n'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { cn } from '@/lib/utils'
 import { MACHINE_NAME_MAX_LENGTH } from '../../../../shared/machine-name'
 import { DebouncedSettingsTextInput } from './DebouncedSettingsTextInput'
@@ -25,12 +24,6 @@ export function MachineNameField({
   const updateSettings = useAppStore((s) => s.updateSettings)
   const publishedMachineName = usePublishedMachineName(machineName)
   const descriptionId = `${id}-description`
-
-  // Why: a browser client has no machine of its own to name, and its settings mirror cannot
-  // persist one. The host's name is edited on the host.
-  if (isWebClientLocation()) {
-    return null
-  }
 
   return (
     <div className={cn('space-y-2', className)}>

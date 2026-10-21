@@ -22,7 +22,6 @@ describe('Windows terminal capability host ownership', () => {
     {
       name: 'local Windows desktop while the platform probe loads',
       isWindowsRenderer: true,
-      isWebClient: false,
       target: { kind: 'local' } as const,
       hostPlatform: null,
       expected: true
@@ -30,31 +29,13 @@ describe('Windows terminal capability host ownership', () => {
     {
       name: 'Windows desktop attached to remote Linux',
       isWindowsRenderer: true,
-      isWebClient: false,
       target: { kind: 'environment', environmentId: 'linux' } as const,
       hostPlatform: 'linux' as const,
       expected: false
     },
     {
-      name: 'Windows browser paired to a Linux server',
-      isWindowsRenderer: true,
-      isWebClient: true,
-      target: { kind: 'local' } as const,
-      hostPlatform: 'linux' as const,
-      expected: false
-    },
-    {
-      name: 'non-Windows browser paired to a Windows server',
-      isWindowsRenderer: false,
-      isWebClient: true,
-      target: { kind: 'local' } as const,
-      hostPlatform: 'win32' as const,
-      expected: true
-    },
-    {
       name: 'non-Windows desktop attached to remote Windows',
       isWindowsRenderer: false,
-      isWebClient: false,
       target: { kind: 'environment', environmentId: 'windows' } as const,
       hostPlatform: 'win32' as const,
       expected: true

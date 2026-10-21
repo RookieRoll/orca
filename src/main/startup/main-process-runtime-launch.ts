@@ -17,7 +17,7 @@ import { OffscreenBrowserBackend } from '../browser/offscreen-browser-backend'
 import { browserManager } from '../browser/browser-manager'
 import { getDesktopRelayStatus } from './main-process-relay-status'
 import { startDesktopRelayService } from './main-process-relay-startup'
-import { getServeOptions, getBundledWebClientRoot, printServeReady } from './main-process-serve'
+import { getServeOptions, printServeReady } from './main-process-serve'
 import {
   bindTerminalRuntimeStartupServices,
   handleCodexHomePtySpawned,
@@ -99,8 +99,7 @@ function installRuntimeRpc(
           preferPinnedWsPort: true,
           requirePinnedWsPort: true
         }
-      : {}),
-    webClientRoot: getBundledWebClientRoot()
+      : {})
   })
   state.runtimeRpc = runtimeRpc
   runtimeRpc.setMobileDesktopRelayHosts(createRuntimeEnvironmentMobileRelayHosts())

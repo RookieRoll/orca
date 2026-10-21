@@ -50,12 +50,6 @@ export function installBrowserClientPageRenderer(
     subscribe?: RendererRequestSubscriber
   } = {}
 ): BrowserClientPageRendererInstallation | null {
-  if (
-    typeof window !== 'undefined' &&
-    (window as unknown as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ === true
-  ) {
-    return null
-  }
   const subscribe =
     options.subscribe ??
     (typeof window === 'undefined'

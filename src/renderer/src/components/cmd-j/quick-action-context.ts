@@ -33,7 +33,6 @@ export type CmdJQuickActionContext = {
   activeWorktree: Worktree | null
   isLoading: boolean
   sshStatus: SshConnectionStatus | null
-  runtimeMode: 'local-desktop' | 'paired-web'
   managedBrowserCreationEnabled?: boolean
   activeGroupId: string | null
   openNewBrowserTab: (groupId: string) => Promise<void>
@@ -169,11 +168,6 @@ export function buildCmdJQuickActionContext(args: {
   )
   const isLoading =
     args.state.repos.length > 0 && Object.keys(args.state.worktreesByRepo).length === 0
-  const runtimeMode =
-    (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ &&
-    args.state.settings?.activeRuntimeEnvironmentId?.trim()
-      ? 'paired-web'
-      : 'local-desktop'
   const managedBrowserCreationEnabled =
     getClientCreationActionPolicy(args.state, activeWorktreeId)['managed-browser'].state ===
     'enabled'
@@ -188,7 +182,6 @@ export function buildCmdJQuickActionContext(args: {
     activeWorktree,
     isLoading,
     sshStatus: getActiveWorktreeSshStatus(args.state, activeWorktree),
-    runtimeMode,
     managedBrowserCreationEnabled,
     activeGroupId,
     openNewBrowserTab: args.openNewBrowserTab,

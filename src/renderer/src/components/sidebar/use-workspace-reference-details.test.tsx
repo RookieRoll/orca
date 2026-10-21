@@ -34,8 +34,6 @@ vi.mock('@/store/github/visible-hosted-review-refresh-targets', async (original)
   getVisibleHostedReviewRefreshTargets: () => [],
   visibleHostedReviewRefreshInputsChanged: () => true
 }))
-const mocks = vi.hoisted(() => ({ web: false }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.web }))
 const read = vi.fn<(...args: unknown[]) => Promise<ReturnType<typeof referenceReview> | null>>()
 const workspace = {
   ...referenceWorkspace,
@@ -51,7 +49,6 @@ function mount(open = false, enabled = true) {
 beforeEach(() => {
   vi.clearAllMocks()
   _clearHostedReviewRequestGenerationsForTest()
-  mocks.web = false
   Object.defineProperty(window, 'api', {
     configurable: true,
     value: { hostedReview: { forBranch: read } }
@@ -99,7 +96,7 @@ it('automatically reads every attached review without a mounted reference hook',
   renderHook(() => useVisibleHostedReviewRefresh({ enabled: true }))
   await waitFor(() => expect(read).toHaveBeenCalledTimes(2))
 })
-it.each(['not-visible', 'hidden', 'sleeping', 'archived', 'bare', 'unready', 'web-unselected'])(
+it.each(['not-visible', 'hidden', 'sleeping', 'archived', 'bare', 'unready'])(
   'does not poll %s workspaces',
   async (condition) => {
     if (condition === 'not-visible') {
@@ -120,7 +117,6 @@ it.each(['not-visible', 'hidden', 'sleeping', 'archived', 'bare', 'unready', 'we
         }
       })
     }
-    mocks.web = condition === 'web-unselected'
     mount(false, condition !== 'unready')
     await act(async () => {
       await Promise.resolve()

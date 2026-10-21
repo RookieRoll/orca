@@ -24,8 +24,6 @@ const REQUIRED_FILES = [
   'preload/index.js',
   'renderer/index.html',
   'renderer/.vite/manifest.json',
-  'renderer/.orca-web-client-files.json',
-  'web/web-index.html',
   'package.json'
 ]
 const NATIVE_FILE = /\.(?:node|exe|dll|dylib|so(?:\.\d+)*|a)$/i
@@ -90,6 +88,9 @@ export function javascriptInventory(directory, prefix = '', { excludeHostOutput 
     .sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0))
     .flatMap((entry) => {
       const name = prefix ? `${prefix}/${entry.name}` : entry.name
+      if (prefix === '' && entry.name === 'web' && entry.isDirectory()) {
+        return []
+      }
       const hostOutput = ['relay', 'orcad-template', 'orcad-prebuilds'].includes(name.split('/')[0])
       if (excludeHostOutput && hostOutput) {
         return []
@@ -121,7 +122,7 @@ export function packReleaseJavascript({ root = process.cwd(), artifactDir, confi
   verifyRequiredFiles(files)
   mkdirSync(artifactDir, { recursive: true })
   const archive = join(artifactDir, ARCHIVE_NAME)
-  command(getTarProgram(), ['-czf', archive, '-C', root, 'out'], root)
+  command(getTarProgram(), ['--exclude=out/web', '-czf', archive, '-C', root, 'out'], root)
   const manifest = {
     schema: 1,
     configuration,

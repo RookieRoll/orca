@@ -263,9 +263,6 @@ function printReadyLine(line) {
   if (payload.pairing?.endpoint) {
     console.log(`Pairing endpoint: ${payload.pairing.endpoint}`)
   }
-  if (payload.pairing?.webClientUrl) {
-    console.log(`Web client URL: ${payload.pairing.webClientUrl}`)
-  }
   if (payload.pairing?.url) {
     sawPairingUrl = true
     console.log(`Pairing URL: ${payload.pairing.url}`)

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createBrowserUuid } from '@/lib/browser-uuid'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { ipcOrRuntimeTargetForHostId } from '@/runtime/runtime-client-target'
 import {
   generateRuntimeJiraIssueSummary,
@@ -41,7 +40,7 @@ export function useTaskPageJiraSummaryGeneration<T extends SummaryGenerationMode
   } = model
   const ownerHostId = jiraTaskSourceContext?.hostId ?? accountBackedTaskSourceHostId
   const target = useMemo(() => ipcOrRuntimeTargetForHostId(ownerHostId), [ownerHostId])
-  const newJiraIssueSummaryAvailable = !isWebClientLocation()
+  const newJiraIssueSummaryAvailable = true
   const [newJiraIssueSummaryGenerating, setNewJiraIssueSummaryGenerating] = useState(false)
   const jiraSourceKey = jiraTaskSourceContext
     ? getTaskSourceCacheScope(jiraTaskSourceContext)

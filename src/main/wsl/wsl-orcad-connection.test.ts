@@ -58,7 +58,6 @@ function readiness(port: number, deviceToken = 'device-token'): ServeReadiness {
       }),
       endpoint,
       deviceId: 'device-1',
-      webClientUrl: null,
       scope: 'runtime',
       qr: null
     }

@@ -47,10 +47,7 @@ afterEach(() => {
 })
 
 export type SettingsPersistenceModel = SettingsInteractionModel &
-  Pick<
-    SettingsStoreModel,
-    'showDesktopOnlySettings' | 'sourceControlAiPromptDiscardSignal' | 'updateSettings'
-  >
+  Pick<SettingsStoreModel, 'sourceControlAiPromptDiscardSignal' | 'updateSettings'>
 
 export function settingsModel(): SettingsPersistenceModel {
   const state = useAppStore.getState()
@@ -58,7 +55,6 @@ export function settingsModel(): SettingsPersistenceModel {
     settings: state.settings,
     updateSettings: state.updateSettings,
     updateSettingsOrThrow: state.updateSettingsOrThrow,
-    showDesktopOnlySettings: true,
     sourceControlAiPromptDiscardSignal: 0,
     closeSettingsPage: vi.fn(),
     confirm: vi.fn(async () => false),

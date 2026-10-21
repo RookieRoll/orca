@@ -44,12 +44,10 @@ const linkContext = { worktreeId: 'wt-1', worktreePath: '/repo', runtimeEnvironm
 function Chat({
   acceptsText = true,
   rewind,
-  onFind,
   actions
 }: {
   acceptsText?: boolean
   rewind?: NativeChatRewindSurface
-  onFind?: () => void
   actions?: Partial<NativeChatContextMenuActions>
 }): React.JSX.Element {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -68,8 +66,7 @@ function Chat({
     actions: { ...emptyNativeChatContextMenuActions, ...actions, onPaste: vi.fn() },
     showTerminalPaneActions: actions !== undefined,
     fileLinkContext: linkContext,
-    rewind,
-    onFind
+    rewind
   })
   return (
     <div ref={rootRef} onContextMenuCapture={onContextMenuCapture}>
@@ -109,7 +106,7 @@ afterEach(() => {
 
 describe('native chat right-click targets', () => {
   it('offers a web link the rows its click popover offers, and copies its address', async () => {
-    render(<Chat onFind={vi.fn()} />)
+    render(<Chat />)
     await rightClick('docs link')
 
     fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }))
@@ -128,7 +125,7 @@ describe('native chat right-click targets', () => {
   })
 
   it('opens and copies a file link at the path the chat resolves it to', async () => {
-    render(<Chat onFind={vi.fn()} />)
+    render(<Chat />)
     await rightClick('app file')
 
     fireEvent.click(screen.getByRole('menuitem', { name: 'Open file' }))
@@ -145,7 +142,7 @@ describe('native chat right-click targets', () => {
   })
 
   it('quotes a reply selection into the composer, only where the composer takes text', async () => {
-    const view = render(<Chat onFind={vi.fn()} />)
+    const view = render(<Chat />)
     window.getSelection()?.selectAllChildren(screen.getByText('Agent reply words'))
     await rightClick('Agent reply words')
 
@@ -153,7 +150,7 @@ describe('native chat right-click targets', () => {
     expect(mocks.appendText).toHaveBeenCalledWith('> Agent reply words\n\n')
 
     view.unmount()
-    render(<Chat acceptsText={false} onFind={vi.fn()} />)
+    render(<Chat acceptsText={false} />)
     window.getSelection()?.selectAllChildren(screen.getByText('Agent reply words'))
     await rightClick('Agent reply words')
     expect(menuItemNames()).not.toContain('Add to chat')
@@ -182,19 +179,10 @@ describe('native chat right-click targets', () => {
 
   it('offers no target rows on an empty part of the transcript', async () => {
     const rewind = { disabledReason: null, request: vi.fn() }
-    render(<Chat rewind={rewind} onFind={vi.fn()} />)
+    render(<Chat rewind={rewind} />)
     await rightClick('Empty area')
 
-    expect(menuItemNames()).toEqual([expect.stringMatching(/^Find in chat/)])
-  })
-
-  it('opens find from the menu', async () => {
-    const onFind = vi.fn()
-    render(<Chat onFind={onFind} />)
-    await rightClick('Empty area')
-
-    fireEvent.click(screen.getByRole('menuitem', { name: /Find in chat/ }))
-    expect(onFind).toHaveBeenCalledOnce()
+    expect(menuItemNames()).toEqual([])
   })
 
   it("runs the terminal pane's Copy Context and Clear Pane Title for a chat in a terminal pane", async () => {

@@ -128,7 +128,7 @@ export function renderDesktopCapabilitySettingsSections(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <>
       <SettingsSection
         id="computer-use"
@@ -141,7 +141,6 @@ export function renderDesktopCapabilitySettingsSections(
       >
         {view.isSectionMounted('computer-use') ? <ComputerUsePane /> : null}
       </SettingsSection>
-
     </>
-  ) : null
+  )
 }

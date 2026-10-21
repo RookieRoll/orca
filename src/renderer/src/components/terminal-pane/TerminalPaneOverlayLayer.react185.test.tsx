@@ -93,7 +93,6 @@ beforeEach(() => {
   terminalPaneProps = null
   markUnverifiedPtyLoss.mockReset()
   capturedResizeCallback = null
-  ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
   vi.stubGlobal('ResizeObserver', CapturingResizeObserver)
 
   container = document.createElement('div')
@@ -116,7 +115,6 @@ afterEach(() => {
   container?.remove()
   bodyEl?.remove()
   vi.unstubAllGlobals()
-  delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
 })
 
 describe('TerminalPaneOverlayLayer fallback measure<->fit loop (React #185)', () => {

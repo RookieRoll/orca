@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type {
   BrowserClientPageRendererOutcome,
   BrowserClientPageRendererRequest
@@ -17,20 +17,8 @@ type RequestCallback = (
 ) => BrowserClientPageRendererOutcome | Promise<BrowserClientPageRendererOutcome>
 
 describe('browser client page renderer installation', () => {
-  afterEach(() => {
-    delete (window as unknown as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
-  })
-
   it('stays inert when the preload surface is unavailable', () => {
     expect(installBrowserClientPageRenderer({ subscribe: undefined })).toBeNull()
-  })
-
-  it('stays inert in the paired web client', () => {
-    ;(window as unknown as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
-    const subscribe = vi.fn()
-
-    expect(installBrowserClientPageRenderer({ subscribe })).toBeNull()
-    expect(subscribe).not.toHaveBeenCalled()
   })
 
   it('routes mount, rekey, and idempotent retirement through one subscriber', async () => {

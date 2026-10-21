@@ -20,15 +20,14 @@ type RuntimePairingGeneratorFormProps = {
   selectedAddress: string
   refreshingNetworkInterfaces: boolean
   isGeneratingPairing: boolean
-  webClientUrl: string | null
   runtimePairingUrl: string | null
-  copiedTarget: 'web' | 'pairing' | null
+  copiedTarget: 'pairing' | null
   generatedAddress: string | null
   onIntentChange: (intent: RuntimePairingIntent) => void
   onSelectedAddressChange: (address: string) => void
   onRefreshNetworkInterfaces: () => void
   onGenerate: () => void
-  onCopy: (target: 'web' | 'pairing', value: string) => void
+  onCopy: (value: string) => void
 }
 
 export function RuntimePairingGeneratorForm({
@@ -38,7 +37,6 @@ export function RuntimePairingGeneratorForm({
   selectedAddress,
   refreshingNetworkInterfaces,
   isGeneratingPairing,
-  webClientUrl,
   runtimePairingUrl,
   copiedTarget,
   generatedAddress,
@@ -317,33 +315,6 @@ export function RuntimePairingGeneratorForm({
         </div>
       </div>
 
-      {generatedIsCurrent && webClientUrl ? (
-        <GeneratedUrlRow
-          label={translate(
-            'auto.components.settings.RuntimePairingUrlGenerator.browserLinkLabel',
-            'Browser link'
-          )}
-          description={translate(
-            'auto.components.settings.RuntimePairingUrlGenerator.1ca2e5194d',
-            'Use this URL from a browser that can reach the selected address.'
-          )}
-          value={webClientUrl}
-          copied={copiedTarget === 'web'}
-          onCopy={() => onCopy('web', webClientUrl)}
-        />
-      ) : generatedIsCurrent && runtimePairingUrl ? (
-        <UnavailableUrlRow
-          label={translate(
-            'auto.components.settings.RuntimePairingUrlGenerator.browserLinkLabel',
-            'Browser link'
-          )}
-          description={translate(
-            'auto.components.settings.RuntimePairingUrlGenerator.f7cafdc9f3',
-            'Browser link unavailable in this build. The pairing URL still works for Orca clients.'
-          )}
-        />
-      ) : null}
-
       {generatedIsCurrent && runtimePairingUrl ? (
         <GeneratedUrlRow
           label={translate(
@@ -356,7 +327,7 @@ export function RuntimePairingGeneratorForm({
           )}
           value={runtimePairingUrl}
           copied={copiedTarget === 'pairing'}
-          onCopy={() => onCopy('pairing', runtimePairingUrl)}
+          onCopy={() => onCopy(runtimePairingUrl)}
         />
       ) : null}
     </>

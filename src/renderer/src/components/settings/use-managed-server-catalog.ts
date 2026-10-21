@@ -8,11 +8,10 @@ import {
 import type { SshTarget } from '../../../../shared/ssh-types'
 import type { ManagedOrcadPreloadApi } from '../../../../preload/api/managed-orcad-api'
 import { useMountedRef } from '@/hooks/useMountedRef'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import { managedServerOutcomeLabel } from './managed-server-copy'
 
 export type ManagedServerCatalog = {
-  /** Absent in the web client, which can't reach SSH hosts. */
+  /** The Electron preload API used to manage remote servers. */
   api: ManagedOrcadPreloadApi | undefined
   targets: SshTarget[]
   /** SSH hosts that don't already run, or move to, a managed server. */
@@ -24,9 +23,9 @@ export type ManagedServerCatalog = {
   resume: (row: OrcadManagedPendingMigrationRow) => Promise<void>
 }
 
-/** The managed-server API, or undefined where it can't work: the web client's fallback API stubs it. */
+/** The managed-server API exposed by the Electron preload. */
 export function getManagedOrcadApi(): ManagedOrcadPreloadApi | undefined {
-  return isWebClientLocation() ? undefined : window.api.runtimeEnvironments.managedOrcad
+  return window.api.runtimeEnvironments.managedOrcad
 }
 
 export function useManagedServerCatalog(

@@ -14,7 +14,6 @@ const mocks = vi.hoisted(() => {
   const statusByHost: Record<string, unknown> = {}
   const details: Record<string, unknown> = {}
   return {
-    web: false,
     visible: true,
     status: vi.fn(),
     statusByHost,
@@ -47,7 +46,6 @@ vi.mock('@/store', () => ({
       markFeatureTipsSeen: mocks.markFeatureTipsSeen
     })
 }))
-vi.mock('@/lib/web-client-location', () => ({ isWebClientLocation: () => mocks.web }))
 vi.mock('@/hooks/use-window-stream-visibility', () => ({
   useWindowStreamVisible: () => mocks.visible
 }))
@@ -127,7 +125,6 @@ const current: AiVaultSearchStatus = {
 const off: AiVaultSearchStatus = unavailableSessionSearchStatus()
 beforeEach(() => {
   vi.useFakeTimers()
-  mocks.web = false
   mocks.visible = true
   mocks.environments = []
   mocks.details = {}
@@ -306,18 +303,6 @@ it('does not execute a confirmation after navigating away', async () => {
   expect(mocks.clear).not.toHaveBeenCalled()
 })
 
-it('leaves paired-client controls unsupported without local calls', async () => {
-  mocks.web = true
-  pane(true)
-  expect(screen.getByRole('switch')).toBeDisabled()
-  await openAdvanced()
-  expect(screen.getByRole('button', { name: 'Clear' })).toBeDisabled()
-  await act(async () => {
-    await vi.advanceTimersByTimeAsync(60_000)
-  })
-  expect(mocks.status).not.toHaveBeenCalled()
-})
-
 it('keeps the last index status visible while a save is in flight', async () => {
   let finishSave: () => void = () => undefined
   const save = vi.fn().mockReturnValue(
@@ -351,19 +336,6 @@ it('lists one row per paired Orca server under this computer, and says where SSH
   expect(mocks.status).toHaveBeenCalledWith('local')
   expect(screen.getByText('This computer')).toBeInTheDocument()
   expect(screen.getByText('Orca remote servers')).toBeInTheDocument()
-})
-
-it('offers only this computer to a paired client, with no server rows', async () => {
-  mocks.web = true
-  mocks.environments = [{ id: 'env-1', name: 'build-box' }]
-  pane(true)
-  await act(async () => {})
-  expect(screen.getAllByRole('switch')).toHaveLength(1)
-  expect(screen.getByRole('switch')).toBeDisabled()
-  expect(screen.queryByRole('status')).not.toBeInTheDocument()
-  expect(enableAllButton()).not.toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: 'Open' })).not.toBeInTheDocument()
-  expect(mocks.status).not.toHaveBeenCalled()
 })
 
 /** Local on, one server on, one off, one offline, one too old. */

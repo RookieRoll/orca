@@ -17,7 +17,6 @@ import {
   getAgentAwakeLidNote,
   getAgentAwakeTitle
 } from './agent-awake-copy'
-import { getCodexTerminalServerIsolationTitle } from './codex-terminal-server-isolation-copy'
 import { AgentAwakeSetting } from './AgentAwakeSetting'
 import { AgentRuntimeSetting } from './AgentRuntimeSetting'
 import type * as AgentRuntimeSettingModule from './AgentRuntimeSetting'
@@ -274,44 +273,6 @@ describe('AgentsPane', () => {
     )
     expect(markup).toContain('role="radiogroup"')
     expect(markup).toContain('>Agent<')
-  })
-
-  it('hides desktop-only awake modes in paired web clients', () => {
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
-    try {
-      expect(renderPane(getDefaultSettings('/tmp'))).not.toContain('Keep computer awake')
-      expect(
-        matchesSettingsSearch('awake', getAgentsPaneSearchEntries({ includeAgentAwake: false }))
-      ).toBe(false)
-    } finally {
-      delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
-    }
-  })
-
-  it('keeps the host-only folder trust row out of paired web clients and their search', () => {
-    Reflect.set(globalThis, '__ORCA_WEB_CLIENT__', true)
-    try {
-      expect(renderPane(getDefaultSettings('/tmp'))).not.toContain(getAgentWorkspaceTrustTitle())
-      expect(
-        matchesSettingsSearch(
-          'trust',
-          getAgentsPaneSearchEntries({ includeAgentWorkspaceTrust: false })
-        )
-      ).toBe(false)
-    } finally {
-      Reflect.deleteProperty(globalThis, '__ORCA_WEB_CLIENT__')
-    }
-  })
-
-  it('keeps the host-only Codex server row out of paired web clients', () => {
-    Reflect.set(globalThis, '__ORCA_WEB_CLIENT__', true)
-    try {
-      expect(renderPane(getDefaultSettings('/tmp'))).not.toContain(
-        getCodexTerminalServerIsolationTitle()
-      )
-    } finally {
-      Reflect.deleteProperty(globalThis, '__ORCA_WEB_CLIENT__')
-    }
   })
 
   it('renders the agent runtime control on Windows-class hosts', () => {

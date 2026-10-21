@@ -65,7 +65,7 @@ export function renderBrowserSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, actions, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="browser"
       title={translate('auto.components.settings.Settings.c46215ea03', 'Browser')}
@@ -83,14 +83,14 @@ export function renderBrowserSettingsSection(
         />
       ) : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderMobileEmulatorSettingsSection(
   context: SettingsRenderContext
 ): React.JSX.Element | null {
   const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
+  return (
     <SettingsSection
       id="mobile-emulator"
       title={translate('auto.components.settings.Settings.f75daf1002', 'Mobile Emulator')}
@@ -107,7 +107,7 @@ export function renderMobileEmulatorSettingsSection(
         />
       ) : null}
     </SettingsSection>
-  ) : null
+  )
 }
 
 export function renderFloatingWorkspaceSettingsSection(

@@ -23,7 +23,6 @@ import { OrchestrationSkillPromptDialog } from './OrchestrationSkillPromptDialog
 import { translate } from '@/i18n/i18n'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import { resolveNestedWorkerMaxDepth } from '../../../../shared/nested-worker-depth'
-import { isPairedWebClientWindow } from '@/lib/desktop-window-chrome'
 import { NumberField } from './SettingsFormControls'
 import {
   getNestedWorkerDepthDescription,
@@ -52,10 +51,7 @@ export function OrchestrationPane({
   updateSettings
 }: OrchestrationPaneProps): React.JSX.Element {
   const searchQuery = useAppStore((s) => s.settingsSearchQuery)
-  const showNestedWorkerDepth = !isPairedWebClientWindow()
-  const searchEntries = getOrchestrationPaneSearchEntries({
-    includeNestedWorkerDepth: showNestedWorkerDepth
-  })
+  const searchEntries = getOrchestrationPaneSearchEntries()
   const showOrchestration = matchesSettingsSearch(searchQuery, searchEntries)
   const [skillPromptOpen, setSkillPromptOpen] = useState(false)
   const activeSkillRuntime = useActiveProjectSkillRuntime()
@@ -156,18 +152,16 @@ export function OrchestrationPane({
         }
       />
 
-      {showNestedWorkerDepth ? (
-        <NumberField
-          label={getNestedWorkerDepthTitle()}
-          description={getNestedWorkerDepthDescription()}
-          value={resolveNestedWorkerMaxDepth(settings)}
-          min={1}
-          integer
-          onChange={(nestedWorkerMaxDepth) => {
-            void updateSettings({ nestedWorkerMaxDepth })
-          }}
-        />
-      ) : null}
+      <NumberField
+        label={getNestedWorkerDepthTitle()}
+        description={getNestedWorkerDepthDescription()}
+        value={resolveNestedWorkerMaxDepth(settings)}
+        min={1}
+        integer
+        onChange={(nestedWorkerMaxDepth) => {
+          void updateSettings({ nestedWorkerMaxDepth })
+        }}
+      />
 
       <OrchestrationSkillPromptDialog
         command={orchestrationInstallCommand}

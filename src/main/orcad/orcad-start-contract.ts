@@ -15,8 +15,6 @@ export type OrcadOptions = {
   projectRoot?: string
   /** Literal IP to bind. Defaults to loopback; see orcad-bind-address.ts. */
   bind?: string
-  /** The browser client's directory; the slot carries none, so `orca serve` passes the app's. */
-  webClientRoot?: string
 }
 
 export type OrcadHandle = {

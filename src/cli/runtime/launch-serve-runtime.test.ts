@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events'
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -95,12 +95,9 @@ describe('orca serve host selection', () => {
     }
   })
 
-  // #30100: the slot carries no browser client, so orcad must be handed the app's.
-  it("serves on orcad by default, handing it the app's browser client", async () => {
-    const appRoot = await mkdtemp(join(tmpdir(), 'orca-serve-orcad-web-'))
+  it('serves on orcad by default without a standalone web client bundle', async () => {
+    const appRoot = await mkdtemp(join(tmpdir(), 'orca-serve-orcad-'))
     try {
-      await mkdir(join(appRoot, 'out', 'web'), { recursive: true })
-      await writeFile(join(appRoot, 'out', 'web', 'web-index.html'), '<html></html>')
       process.env.ORCA_SERVE_SUPERVISOR_APP_ROOT = appRoot
       const selection = { kind: 'orcad', runtime: '/node', entry: '/slot/orcad.js', version: '1' }
       resolveLocalServeRuntimeMock.mockResolvedValue(selection)
@@ -111,8 +108,7 @@ describe('orca serve host selection', () => {
         selection,
         { json: true },
         expect.any(String),
-        expect.not.objectContaining({ ELECTRON_RUN_AS_NODE: expect.anything() }),
-        join(appRoot, 'out', 'web')
+        expect.not.objectContaining({ ELECTRON_RUN_AS_NODE: expect.anything() })
       )
       expect(spawnMock).not.toHaveBeenCalled()
       expect(stderr.join('')).toContain('[serve] running on orcad 1')

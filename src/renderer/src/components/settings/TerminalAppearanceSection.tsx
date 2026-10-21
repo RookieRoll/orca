@@ -30,7 +30,6 @@ import { TerminalPaneAppearanceSection } from './TerminalPaneAppearanceSection'
 import { AppearanceAdvancedDisclosure } from './AppearanceAdvancedDisclosure'
 import { GhosttyImportModal } from './GhosttyImportModal'
 import type { UseGhosttyImportReturn } from './useGhosttyImport'
-import { isWebClientLocation } from '@/lib/web-client-location'
 import ghosttyIcon from '../../../../../resources/ghostty.svg'
 import { translate } from '@/i18n/i18n'
 
@@ -77,7 +76,7 @@ export function TerminalAppearanceSection({
   const isSearching = normalizeSettingsSearchQuery(searchQuery).length > 0
   const [themeSearch, setThemeSearch] = useState('')
   const [previewFontFamily, setPreviewFontFamily] = useState<string | null>(null)
-  const showDesktopThemeImports = !isWebClientLocation()
+  const showDesktopThemeImports = true
   const darkThemeSearchEntries = getTerminalDarkThemeSearchEntries()
   const lightThemeSearchEntries = getTerminalLightThemeSearchEntries()
   const terminalTypographyEntries = getTerminalTypographySearchEntries()

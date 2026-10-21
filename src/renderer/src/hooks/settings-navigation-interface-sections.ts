@@ -17,13 +17,11 @@ import type { SettingsNavigationBuildOptions } from './settings-navigation-build
 export function buildInterfaceSettingsSections({
   isMac,
   isWindows,
-  isWebClient,
   nativeChatEnabled,
   hostQueuesMessages,
   managedBrowserCreationEnabled,
   mobileEmulatorCreationEnabled
 }: SettingsNavigationBuildOptions): SettingsNavSection[] {
-  const showDesktopOnlySettings = !isWebClient
   return [
     {
       id: 'appearance',
@@ -34,9 +32,9 @@ export function buildInterfaceSettingsSections({
       ),
       icon: Palette,
       searchEntries: getAppearancePaneSearchEntries({
-        showDesktopThemeImports: showDesktopOnlySettings,
-        showSystemTray: showDesktopOnlySettings && isWindows,
-        showMenuBarIcon: showDesktopOnlySettings && isMac
+        showDesktopThemeImports: true,
+        showSystemTray: isWindows,
+        showMenuBarIcon: isMac
       }),
       group: 'interface'
     },
@@ -56,13 +54,9 @@ export function buildInterfaceSettingsSections({
               ...getChatBehaviorSearchEntries().filter(
                 (entry) => hostQueuesMessages || entry.targetSectionId !== 'chat-queue-follow-ups'
               ),
-              ...(showDesktopOnlySettings
-                ? [
-                    getChatProvidersSearchEntry(),
-                    getChatNamingSearchEntry(),
-                    getChatInlineVisualsSearchEntry()
-                  ]
-                : [])
+              getChatProvidersSearchEntry(),
+              getChatNamingSearchEntry(),
+              getChatInlineVisualsSearchEntry()
             ],
             group: 'interface'
           }
@@ -79,24 +73,17 @@ export function buildInterfaceSettingsSections({
       searchEntries: getInputPaneSearchEntries(),
       group: 'interface'
     },
-    ...(showDesktopOnlySettings
-      ? [
-          {
-            id: 'notifications',
-            title: translate(
-              'auto.hooks.useSettingsNavigationMetadata.2eece16ad1',
-              'Notifications'
-            ),
-            description: translate(
-              'auto.hooks.useSettingsNavigationMetadata.7682607591',
-              'Native desktop notifications for agent and terminal events.'
-            ),
-            icon: Bell,
-            searchEntries: getNotificationsPaneSearchEntries(),
-            group: 'interface'
-          }
-        ]
-      : []),
+    {
+      id: 'notifications',
+      title: translate('auto.hooks.useSettingsNavigationMetadata.2eece16ad1', 'Notifications'),
+      description: translate(
+        'auto.hooks.useSettingsNavigationMetadata.7682607591',
+        'Native desktop notifications for agent and terminal events.'
+      ),
+      icon: Bell,
+      searchEntries: getNotificationsPaneSearchEntries(),
+      group: 'interface'
+    },
     {
       id: 'shortcuts',
       title: translate('auto.hooks.useSettingsNavigationMetadata.94295ebfb3', 'Shortcuts'),

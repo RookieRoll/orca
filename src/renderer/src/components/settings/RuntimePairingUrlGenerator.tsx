@@ -33,9 +33,6 @@ export function RuntimePairingUrlGenerator({
   const [runtimePairingUrl, setRuntimePairingUrl] = useState<string | null>(
     runtimePairingLinkCache.runtimePairingUrl
   )
-  const [webClientUrl, setWebClientUrl] = useState<string | null>(
-    runtimePairingLinkCache.webClientUrl
-  )
   const [runtimePairingDeviceId, setRuntimePairingDeviceId] = useState<string | null>(
     runtimePairingLinkCache.runtimePairingDeviceId
   )
@@ -43,7 +40,7 @@ export function RuntimePairingUrlGenerator({
   const [isLoadingAccessGrants, setIsLoadingAccessGrants] = useState(false)
   const [refreshingNetworkInterfaces, setRefreshingNetworkInterfaces] = useState(false)
   const [revokingGrantId, setRevokingGrantId] = useState<string | null>(null)
-  const [copiedTarget, setCopiedTarget] = useState<'web' | 'pairing' | null>(null)
+  const [copiedTarget, setCopiedTarget] = useState<'pairing' | null>(null)
   const [isGeneratingPairing, setIsGeneratingPairing] = useState(false)
   const networkInterfaceLoadIdRef = useRef(0)
   const accessGrantLoadIdRef = useRef(0)
@@ -171,7 +168,6 @@ export function RuntimePairingUrlGenerator({
     clearGeneratedRuntimePairingLink()
     if (mountedRef.current) {
       setRuntimePairingUrl(null)
-      setWebClientUrl(null)
       setRuntimePairingDeviceId(null)
       setGeneratedAddress(null)
     }
@@ -211,27 +207,20 @@ export function RuntimePairingUrlGenerator({
       cacheGeneratedRuntimePairingLink({
         address,
         pairingUrl: result.pairingUrl,
-        webClientUrl: result.webClientUrl,
         deviceId: result.deviceId
       })
       if (mountedRef.current) {
         setRuntimePairingUrl(result.pairingUrl)
-        setWebClientUrl(result.webClientUrl)
         setRuntimePairingDeviceId(result.deviceId)
         setGeneratedAddress(address)
       }
       await loadRuntimeAccessGrants()
       if (mountedRef.current) {
         toast.success(
-          result.webClientUrl
-            ? translate(
-                'auto.components.settings.RuntimePairingUrlGenerator.6dd594a507',
-                'Generated web client URL.'
-              )
-            : translate(
-                'auto.components.settings.RuntimePairingUrlGenerator.11d5248e62',
-                'Generated pairing URL.'
-              )
+          translate(
+            'auto.components.settings.RuntimePairingUrlGenerator.11d5248e62',
+            'Generated pairing URL.'
+          )
         )
       }
     } catch (error) {
@@ -302,28 +291,23 @@ export function RuntimePairingUrlGenerator({
     }
   }
 
-  const copyGeneratedUrl = async (target: 'web' | 'pairing', value: string): Promise<void> => {
+  const copyGeneratedUrl = async (value: string): Promise<void> => {
     try {
       await window.api.ui.writeClipboardText(value)
       if (mountedRef.current) {
         clearCopiedTargetResetTimer()
-        setCopiedTarget(target)
+        setCopiedTarget('pairing')
         copiedTargetResetTimerRef.current = window.setTimeout(() => {
           copiedTargetResetTimerRef.current = null
           if (mountedRef.current) {
-            setCopiedTarget((current) => (current === target ? null : current))
+            setCopiedTarget((current) => (current === 'pairing' ? null : current))
           }
         }, 1400)
         toast.success(
-          target === 'web'
-            ? translate(
-                'auto.components.settings.RuntimePairingUrlGenerator.13704d635e',
-                'Copied web client URL.'
-              )
-            : translate(
-                'auto.components.settings.RuntimePairingUrlGenerator.df0aa45a86',
-                'Copied pairing URL.'
-              )
+          translate(
+            'auto.components.settings.RuntimePairingUrlGenerator.df0aa45a86',
+            'Copied pairing URL.'
+          )
         )
       }
     } catch (error) {
@@ -397,7 +381,6 @@ export function RuntimePairingUrlGenerator({
           selectedAddress={selectedAddress}
           refreshingNetworkInterfaces={refreshingNetworkInterfaces}
           isGeneratingPairing={isGeneratingPairing}
-          webClientUrl={webClientUrl}
           runtimePairingUrl={runtimePairingUrl}
           copiedTarget={copiedTarget}
           generatedAddress={generatedAddress}
@@ -405,7 +388,7 @@ export function RuntimePairingUrlGenerator({
           onSelectedAddressChange={updateSelectedAddress}
           onRefreshNetworkInterfaces={() => void loadNetworkInterfaces({ showToastOnError: true })}
           onGenerate={() => void generateRuntimePairingUrl()}
-          onCopy={(target, value) => void copyGeneratedUrl(target, value)}
+          onCopy={(target, value) => void copyGeneratedUrl(value)}
         />
       ) : null}
 

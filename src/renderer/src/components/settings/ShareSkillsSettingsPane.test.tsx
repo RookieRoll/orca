@@ -16,17 +16,12 @@ const mocks = vi.hoisted(() => ({
       string,
       unknown
     > | null,
-    isWebClient: false,
     settings: { showSkillsButton: false, agentSkillSharingEnabled: false }
   }
 }))
 
 vi.mock('@/i18n/i18n', () => ({
   translate: (_key: string, fallback: string) => fallback
-}))
-
-vi.mock('@/lib/web-client-location', () => ({
-  isWebClientLocation: () => mocks.state.isWebClient
 }))
 
 vi.mock('@/store', () => ({
@@ -49,7 +44,6 @@ describe('ShareSkillsSettingsPane', () => {
     mocks.openSkillsPage.mockReset()
     mocks.updateSettings.mockReset()
     mocks.state.orcaProfileAuthStatus = { configured: true, state: 'connected' }
-    mocks.state.isWebClient = false
     Object.defineProperty(window, 'api', {
       configurable: true,
       value: {
@@ -115,24 +109,5 @@ describe('ShareSkillsSettingsPane', () => {
       })
     )
     expect(mocks.updateSettings).toHaveBeenCalledWith({ agentSkillSharingEnabled: true })
-  })
-
-  it('does not offer desktop publishing from the web client', () => {
-    mocks.state.isWebClient = true
-    mocks.state.orcaProfileAuthStatus = { configured: true, state: 'local' }
-    render(
-      <TooltipProvider>
-        <ShareSkillsSettingsPane />
-      </TooltipProvider>
-    )
-
-    expect(screen.getByText(/available in the Orca desktop app/)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Open Skills/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Sign in to Orca' })).not.toBeInTheDocument()
-    expect(
-      screen.getByRole('switch', {
-        name: 'Allow agents and the Orca CLI to publish skill links'
-      })
-    ).toBeDisabled()
   })
 })

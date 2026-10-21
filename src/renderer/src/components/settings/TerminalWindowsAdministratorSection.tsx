@@ -17,7 +17,6 @@ import { getTerminalWindowsAdministratorSearchEntry } from './terminal-windows-s
 import { MANAGE_SESSIONS_SECTION_ID } from './TerminalTccAttributionNotice'
 import { useAppStore } from '../../store'
 import { translate } from '@/i18n/i18n'
-import { isWebClientLocation } from '@/lib/web-client-location'
 
 export function TerminalWindowsAdministratorSection(): React.JSX.Element {
   const [administrator, setAdministrator] = useState<boolean | null | undefined>()
@@ -37,7 +36,7 @@ export function TerminalWindowsAdministratorSection(): React.JSX.Element {
     ]).then(([status, identity]) => {
       if (active) {
         setAdministrator(status)
-        setRestartAvailable(identity !== null && !identity.isDev && !isWebClientLocation())
+        setRestartAvailable(identity !== null && !identity.isDev)
       }
     })
     return () => {
