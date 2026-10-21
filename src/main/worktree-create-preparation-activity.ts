@@ -1,11 +1,7 @@
 import type { PreparedCheckoutOrigin } from '../shared/worktree/create-types'
-import { beginPreparationWork, type PreparationWork } from './worktree-create-concurrency'
 
-/** What a create's event reports about the prepared checkout it used: who asked for it, and the
- *  disk work of its build and tip refreshes, and their timing. Recording only; never gates the pool. */
+/** Local timing details for the prepared checkout used by a create. */
 export type PreparationActivity = {
-  /** Counts the latest build or refresh as disk work competing with creates. */
-  readonly work: PreparationWork
   /** An explicit prefetch asked for this checkout too. */
   requestedByPrefetch(): void
   /** Covers `ready`, the checkout's latest build or tip refresh, until it settles. */
@@ -16,8 +12,6 @@ export type PreparationActivity = {
 }
 
 export function createPreparationActivity(kind: 'explicit' | 'automatic'): PreparationActivity {
-  let work = beginPreparationWork()
-  let workSettled = false
   // Build: from the first build's start (including any wait for the base fetch it is built on)
   // to its first ready; a later tip refresh does not restart it.
   const buildStartedAt = performance.now()
@@ -28,21 +22,12 @@ export function createPreparationActivity(kind: 'explicit' | 'automatic'): Prepa
   let prefetchRequested = false
 
   return {
-    get work() {
-      return work
-    },
     requestedByPrefetch() {
       prefetchRequested = true
     },
     track(ready) {
-      // A refresh queued after the previous work settled is new disk work.
-      if (workSettled) {
-        work = beginPreparationWork()
-        workSettled = false
-      }
       latest = ready
       latestReadyAt = undefined
-      const current = work
       const settle = (succeeded: boolean): void => {
         const now = performance.now()
         if (succeeded) {
@@ -55,8 +40,6 @@ export function createPreparationActivity(kind: 'explicit' | 'automatic'): Prepa
         if (succeeded) {
           latestReadyAt = now
         }
-        workSettled = true
-        current.end()
       }
       void ready.then(
         () => settle(true),

@@ -9,19 +9,10 @@ function mainAgentState(server: AgentHookServer): string | undefined {
   return server.getStatusSnapshot()[0]?.mainAgent?.state
 }
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
 
-vi.mock('../telemetry/client', () => ({ track: trackMock }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: getCohortAtEmitMock }))
 
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {

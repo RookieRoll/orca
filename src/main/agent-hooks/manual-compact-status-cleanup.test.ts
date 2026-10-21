@@ -3,9 +3,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import { AgentHookServer } from './server'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: vi.fn(() => ({})) }))
-
 const PANE_KEY = makePaneKey('manual-compact', '11111111-1111-4111-8111-111111111111')
 
 function compactEvent(hookEventName: string, state: 'working' | 'done') {

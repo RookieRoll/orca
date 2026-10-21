@@ -73,7 +73,6 @@ export default React.memo(function AddRepoDialog({
     setNestedSelectedPaths,
     setNestedGroupName,
     setNestedScanInProgress,
-    getNestedRepoRuntimeKind,
     showNestedRepoReview,
     setActiveNestedScanId,
     handleStopNestedScan,
@@ -81,16 +80,13 @@ export default React.memo(function AddRepoDialog({
     handleImportNestedRepos,
     handleOpenNestedRootFolder,
     resetNestedImportFlow,
-    trackNestedBackAction
   } = useAddRepoNestedReviewController({
-    reviewRuntimeEnvironmentId: selectedRuntimeEnvironmentId,
     cancelNestedRepoScan,
     closeModal: closeForFolderHandoff,
     fetchWorktrees,
     importNestedRepos,
     onGitRepoReady: completeGitRepoAdd,
     setIsAdding,
-    activeRuntimeEnvironmentId: selectedRuntimeEnvironmentId,
     setStep
   })
   const {
@@ -111,7 +107,7 @@ export default React.memo(function AddRepoDialog({
     setStep,
     // Why: useRemoteRepo closes only for the non-git → confirm-dialog handoff.
     closeForFolderHandoff,
-    (repoId, executionHostId) => completeGitRepoAdd(repoId, 'ssh_remote_path', executionHostId),
+    (repoId, executionHostId) => completeGitRepoAdd(repoId, executionHostId),
     selectedRuntimeEnvironmentId
   )
   const {
@@ -128,7 +124,7 @@ export default React.memo(function AddRepoDialog({
   } = useCreateRepo(
     fetchWorktrees,
     closeForFolderHandoff,
-    (repoId, executionHostId) => completeGitRepoAdd(repoId, 'create_project', executionHostId),
+    (repoId, executionHostId) => completeGitRepoAdd(repoId, executionHostId),
     {
       hostId: hostSelection.selectedHostId,
       runtimeEnvironmentId: selectedRuntimeEnvironmentId
@@ -200,7 +196,6 @@ export default React.memo(function AddRepoDialog({
     // Why: closes only after a folder add, which activates the folder workspace.
     closeModal: closeForFolderHandoff,
     fetchWorktrees,
-    getNestedRepoRuntimeKind,
     scanNestedRepos,
     setActiveNestedScanId,
     setNestedScanInProgress,
@@ -270,23 +265,17 @@ export default React.memo(function AddRepoDialog({
   })
 
   const handleBack = useCallback(() => {
-    if (step === 'nested') {
-      trackNestedBackAction()
-    }
     resetState()
-  }, [resetState, step, trackNestedBackAction])
+  }, [resetState])
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open) {
-        if (step === 'nested' && !isAdding) {
-          trackNestedBackAction()
-        }
         closeModal()
         resetState()
       }
     },
-    [closeModal, isAdding, resetState, step, trackNestedBackAction]
+    [closeModal, resetState]
   )
 
   return (

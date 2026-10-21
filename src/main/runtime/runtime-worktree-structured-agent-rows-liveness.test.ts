@@ -14,11 +14,6 @@ import { attachRuntimeWorktreeAgentRows } from './runtime-worktree-agent-rows'
 import { createStructuredAgentSessionLogger } from '../native-chat/agent-session-wire/structured-agent-session-logger'
 import { codexProviderHandle } from '../../shared/agent-session-provider-handle-encoding'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: vi.fn(() => ({ nth_repo_added: 2 }))
-}))
-
 /**
  * The whole chain `worktree ps` walks: journal -> status feed -> agent-status store -> agent rows
  * -> worktree status.

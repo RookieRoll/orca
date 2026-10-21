@@ -1,4 +1,4 @@
-import type { TerminalPaneSplitSource } from '../../../../shared/feature-education-telemetry'
+import type { TerminalPaneSplitSource } from '../../../../shared/terminal-pane-split-source'
 import type { ManagedPane, PaneManager } from '@/lib/pane-manager/pane-manager'
 import { splitWebRuntimeTerminal } from '@/runtime/web-runtime-terminal-actions'
 import type { PtyTransport } from './pty-transport-types'
@@ -82,8 +82,5 @@ function splitLocally(args: SplitArgs, cwd: () => SplitCwd): void {
     return
   }
   const createdPane = manager.splitPane(args.pane.id, args.direction, cwd())
-  recordCreatedTerminalPaneSplit(createdPane, {
-    source: args.source,
-    direction: args.direction
-  })
+  recordCreatedTerminalPaneSplit(createdPane)
 }

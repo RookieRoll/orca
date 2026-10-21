@@ -23,11 +23,6 @@ import { collectRuntimeWorktreeAgentSources } from './runtime-worktree-agent-sou
 import { createStructuredAgentSessionLogger } from '../native-chat/agent-session-wire/structured-agent-session-logger'
 import { codexProviderHandle } from '../../shared/agent-session-provider-handle-encoding'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: vi.fn(() => ({ nth_repo_added: 2 }))
-}))
-
 // A request that failed reads as failed on every surface the host feeds: the journal's verdict
 // travels the real feed, the status-store ingest and `worktree ps`, never just the projection.
 const SESSION = 'verdict-session'

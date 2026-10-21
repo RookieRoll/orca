@@ -31,7 +31,6 @@ const dependencyExports: [string, string[]][] = [
   ['../quit-teardown-start-gate', ['quitTeardownStartGate']],
   ['../dock/unread-badge', ['setUnreadDockBadgeCount']],
   ['../tray/system-tray', ['destroySystemTray']],
-  ['../telemetry/client', ['shutdownTelemetry']],
   ['../observability', ['shutdownObservability']],
   ['../updater', ['isQuittingForUpdate']],
   ['../updater-lifecycle-diagnostics', ['recordUpdaterLifecycle']],

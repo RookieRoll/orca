@@ -29,10 +29,7 @@ const SPAWN_TIMEOUT_MS = 10_000
 // files print banners or set colored prompts. Strip them before parsing.
 const ANSI_RE = /\x1b\[[0-9;?]*[A-Za-z]/g // eslint-disable-line no-control-regex
 
-// Why: the discriminator lets telemetry classify *why* hydration failed, not
-// just whether it did. Five resolve sites in this file each tag the result
-// with the right reason. The shared alias keeps the enum in lockstep with the
-// telemetry schema (compile-time guard in telemetry-events.ts).
+// Why: callers use the failure reason to distinguish recoverable PATH probe outcomes.
 export type HydrationResult =
   | { ok: true; segments: string[]; failureReason: 'none' }
   | {
@@ -360,7 +357,7 @@ function uniquePathSegments(segments: string[], pathKey: (segment: string) => st
 /**
  * Promote shell-discovered PATH segments to the front of process.env.PATH,
  * preserving shell ordering and avoiding duplicates. Returns the segments that
- * were newly added so callers can log/telemetry on nontrivial hydrations.
+ * were newly added so callers can log nontrivial hydrations.
  */
 export function mergePathSegments(segments: string[]): string[] {
   if (segments.length === 0) {

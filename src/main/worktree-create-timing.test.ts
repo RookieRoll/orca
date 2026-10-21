@@ -1,10 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createWorktreeCreateTimingRecorder } from './worktree-create-timing'
-import {
-  _resetWorktreeCreateConcurrencyForTests,
-  beginPreparationWork,
-  beginWorktreeCreate
-} from './worktree-create-concurrency'
 
 describe('createWorktreeCreateTimingRecorder', () => {
   it('records ordered phase timings and total duration', async () => {
@@ -25,16 +20,13 @@ describe('createWorktreeCreateTimingRecorder', () => {
     })
   })
 
-  it('carries the execution host and worktree count only once recorded', () => {
+  it('carries the execution host only once recorded', () => {
     const recorder = createWorktreeCreateTimingRecorder(() => 0)
     expect(recorder.finish()).not.toHaveProperty('executionHost')
-    expect(recorder.finish()).not.toHaveProperty('worktreeCount')
 
     recorder.recordExecutionHost('local')
     recorder.recordExecutionHost('wsl')
-    recorder.recordWorktreeCount(0)
-
-    expect(recorder.finish()).toMatchObject({ executionHost: 'wsl', worktreeCount: 0 })
+    expect(recorder.finish()).toMatchObject({ executionHost: 'wsl' })
   })
 
   describe('failedPhase', () => {
@@ -156,29 +148,4 @@ describe('createWorktreeCreateTimingRecorder', () => {
     })
   })
 
-  describe('concurrency window', () => {
-    afterEach(() => {
-      _resetWorktreeCreateConcurrencyForTests()
-    })
-
-    it('closes at finish, so work the create starts afterwards is not counted', () => {
-      const inFlight = beginWorktreeCreate()
-      const recorder = createWorktreeCreateTimingRecorder(() => 0, inFlight)
-      const during = beginPreparationWork()
-      during.end()
-      recorder.finish()
-      beginPreparationWork()
-      beginPreparationWork()
-      expect(inFlight.end().preparations).toBe(1)
-    })
-
-    it('leaves out the prepared checkout the create adopted', () => {
-      const adopted = beginPreparationWork()
-      const inFlight = beginWorktreeCreate()
-      const recorder = createWorktreeCreateTimingRecorder(() => 0, inFlight)
-      recorder.recordAdoptedPreparation(adopted)
-      recorder.finish()
-      expect(inFlight.end().preparations).toBe(0)
-    })
-  })
 })

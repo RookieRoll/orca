@@ -12,9 +12,6 @@ import type { AgentSubagentSnapshot } from '../../shared/agent-status-types'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import { AgentHookServer } from './server'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: vi.fn(() => ({})) }))
-
 const PANE_KEY = makePaneKey('manual-compact', '11111111-1111-4111-8111-111111111111')
 const COMPACT_PROMPT_ID = '22222222-2222-4222-8222-222222222222'
 const TURN_PROMPT_ID = '33333333-3333-4333-8333-333333333333'

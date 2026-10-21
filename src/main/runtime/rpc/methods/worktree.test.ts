@@ -95,7 +95,6 @@ describe('worktree RPC methods', () => {
         compareBaseRef: undefined,
         setupDecision: 'skip',
         displayName: 'Feature title',
-        telemetrySource: 'sidebar',
         workspaceStatus: 'in-review',
         manualOrder: 123_456,
         linkedIssue: 123,
@@ -125,7 +124,6 @@ describe('worktree RPC methods', () => {
       linkedGiteaPR: undefined,
       comment: undefined,
       displayName: 'Feature title',
-      telemetrySource: 'sidebar',
       workspaceStatus: 'in-review',
       manualOrder: 123_456,
       sparseCheckout: { directories: ['src'], presetId: 'preset-1' },
@@ -656,7 +654,6 @@ describe('worktree RPC methods', () => {
       makeRequest('worktree.create', {
         repo: 'repo-1',
         name: 'feature',
-        telemetrySource: 'future_surface'
       })
     )
 
@@ -665,7 +662,6 @@ describe('worktree RPC methods', () => {
       expect.objectContaining({
         repoSelector: 'repo-1',
         name: 'feature',
-        telemetrySource: undefined
       })
     )
   })

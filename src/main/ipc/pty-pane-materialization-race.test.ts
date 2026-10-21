@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   wslUncDirectoryExistsAsyncMock,
-  trackMock,
   getCodexPaneAccountMock
 } from './pty-ipc-mock-registry'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
@@ -31,12 +30,6 @@ vi.mock('../pi/titlebar-extension-service', () =>
 vi.mock('../pwsh', () => import('./pty-ipc-mock-registry').then((m) => m.pwshModuleMock()))
 vi.mock('../wsl', async (importOriginal) =>
   (await import('./pty-ipc-mock-registry')).wslModuleMock(await importOriginal())
-)
-vi.mock('../telemetry/client', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.telemetryClientModuleMock())
-)
-vi.mock('../telemetry/classify-error', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.classifyErrorModuleMock())
 )
 vi.mock('../cli/linux-terminal-orca-cli-shim', () =>
   import('./pty-ipc-mock-registry').then((m) => m.linuxCliShimModuleMock())
@@ -565,7 +558,6 @@ describe('registerPtyHandlers', () => {
       runtime.createPreAllocatedTerminalHandle.mockClear()
       runtime.registerPreAllocatedHandleForPty.mockClear()
       runtime.noteTerminalSpawnCommand.mockClear()
-      trackMock.mockClear()
       store.persistPtyBinding.mockClear()
       mainWindow.webContents.send.mockClear()
 
@@ -596,11 +588,6 @@ describe('registerPtyHandlers', () => {
           ORCA_TAB_ID: tabId,
           ORCA_WORKTREE_ID: worktreeId
         },
-        telemetry: {
-          agent_kind: 'codex',
-          launch_source: 'new_workspace_composer',
-          request_kind: 'new'
-        }
       }
       const firstMount = handlers.get('pty:spawn')!(null, mountArgs)
       await vi.waitFor(() => expect(providerSpawn).toHaveBeenCalledTimes(2))
@@ -626,7 +613,6 @@ describe('registerPtyHandlers', () => {
       expect(prepareClaudeAuth).not.toHaveBeenCalled()
       expect(runtime.registerPreAllocatedHandleForPty).not.toHaveBeenCalled()
       expect(runtime.noteTerminalSpawnCommand).not.toHaveBeenCalled()
-      expect(trackMock).not.toHaveBeenCalledWith('agent_started', expect.anything())
       expect(runtime.onPtyExit).not.toHaveBeenCalled()
       expect(getPtyIdForPaneKey(paneKey)).toBe('pty-live-owner')
 

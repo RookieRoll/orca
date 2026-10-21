@@ -1,4 +1,4 @@
-import { agentStartedTelemetry } from '../agent-launch/agent-started-telemetry'
+import { buildAgentLaunchContext } from '../agent-launch/build-agent-launch-context'
 import type { AgentLaunchPreferences } from '../../shared/agent-session-host-authority'
 import type { Repo } from '../../shared/repo-types'
 import type { TuiAgent } from '../../shared/tui-agent'
@@ -98,7 +98,7 @@ export async function buildWorktreeStartupForDraft(
     isRemote: repoIsRemote(repo),
     ...(environment.agentArgs !== undefined ? { agentArgs: environment.agentArgs } : {})
   })
-  const telemetry = agentStartedTelemetry(agent, environment.launchSource)
+  const telemetry = buildAgentLaunchContext(agent, environment.launchSource)
   const draftPlan = buildAgentDraftLaunchPlan({ ...launchArgs, draft: content })
   if (draftPlan) {
     return {
@@ -206,7 +206,7 @@ export function buildWorktreeStartupForAgent(
         ? { startupCommandDelivery: startupPlan.startupCommandDelivery }
         : {}),
       ...(startupPlan.env ? { env: startupPlan.env } : {}),
-      telemetry: agentStartedTelemetry(agent, environment.launchSource)
+      telemetry: buildAgentLaunchContext(agent, environment.launchSource)
     },
     launchRuntime,
     ...(startupPlan.followupPrompt

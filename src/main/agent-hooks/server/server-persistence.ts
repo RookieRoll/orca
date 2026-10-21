@@ -237,10 +237,6 @@ export abstract class AgentHookServerPersistence extends AgentHookServerHydratio
     this.statusPersistFailing = true
   }
 
-  _resetPromptSentDedupeForTests(): void {
-    this.promptSentDedupeByPaneKey.clear()
-  }
-
   _resetConnectionTimestampWatermarksForTests(): void {
     this.connectionTimestampWatermarkById.clear()
   }

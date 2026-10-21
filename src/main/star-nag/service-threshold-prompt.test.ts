@@ -18,8 +18,6 @@ const mocks = vi.hoisted(() => ({
   },
   checkOrcaStarredMock: vi.fn(),
   starOrcaMock: vi.fn(),
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(() => ({ nth_repo_added: 3 })),
   ipcMainHandleMock: vi.fn()
 }))
 
@@ -36,15 +34,7 @@ vi.mock('../github/client', () => ({
   starOrca: mocks.starOrcaMock
 }))
 
-vi.mock('../telemetry/client', () => ({
-  track: mocks.trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: mocks.getCohortAtEmitMock
-}))
-
-const { browserWindowMock, checkOrcaStarredMock, trackMock } = mocks
+const { browserWindowMock, checkOrcaStarredMock } = mocks
 const getIpcHandler = createIpcHandlerLookup(mocks.ipcMainHandleMock)
 
 describe('StarNagService', () => {
@@ -79,10 +69,6 @@ describe('StarNagService', () => {
     emitAgentStarted(80)
     await flushAsyncWork()
     expect(window.webContents.send).toHaveBeenCalledTimes(1)
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', threshold: 70, agents_since_baseline: 70 })
-    )
   })
 
   it.each([undefined, null])('initializes a missing baseline (%s) only once', async (baseline) => {
@@ -147,15 +133,6 @@ describe('StarNagService', () => {
       mode: 'web',
       surface: 'card'
     })
-    expect(trackMock).toHaveBeenCalledWith('star_nag_outcome', {
-      outcome: 'shown',
-      source: 'threshold',
-      mode: 'web',
-      threshold: STAR_NAG_INITIAL_THRESHOLD,
-      agents_since_baseline: 35,
-      agents_since_baseline_bucket: '35-69',
-      nth_repo_added: 3
-    })
     expect(consoleInfoMock).toHaveBeenCalledWith({
       event: 'star_nag_shown',
       app_version: '1.2.3',
@@ -187,7 +164,6 @@ describe('StarNagService', () => {
     await flushAsyncWork()
 
     expect(consoleInfoMock).not.toHaveBeenCalled()
-    expect(trackMock).not.toHaveBeenCalled()
 
     const window = createWindow()
     browserWindowMock.getAllWindows.mockReturnValue([window])
@@ -246,7 +222,6 @@ describe('StarNagService', () => {
 
     expect(checkOrcaStarredMock).not.toHaveBeenCalled()
     expect(window.webContents.send).not.toHaveBeenCalled()
-    expect(trackMock).not.toHaveBeenCalled()
     expect(store.updateUI).not.toHaveBeenCalled()
 
     ui.starNagDeferredUntil = Date.now() - 1

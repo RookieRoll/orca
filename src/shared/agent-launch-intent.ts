@@ -87,9 +87,8 @@ export type AgentLaunchIntent = {
    */
   cwd?: string
   /**
-   * Which surface the user acted on, for the `agent_started` telemetry triple. Never read as
-   * behaviour — the host derives the other two members of that triple and this one is the only part
-   * it cannot know.
+   * Which surface the user acted on. The host derives the agent and request kind and validates this
+   * value at the boundary.
    */
   launchSource?: string
   /** The `tabId:leafId` a terminal launch creates its pane under, for a caller that places its own

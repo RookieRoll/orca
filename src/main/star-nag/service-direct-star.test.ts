@@ -17,8 +17,6 @@ const mocks = vi.hoisted(() => ({
   },
   checkOrcaStarredMock: vi.fn(),
   starOrcaMock: vi.fn(),
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(() => ({ nth_repo_added: 3 })),
   ipcMainHandleMock: vi.fn()
 }))
 
@@ -35,15 +33,7 @@ vi.mock('../github/client', () => ({
   starOrca: mocks.starOrcaMock
 }))
 
-vi.mock('../telemetry/client', () => ({
-  track: mocks.trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: mocks.getCohortAtEmitMock
-}))
-
-const { browserWindowMock, getCohortAtEmitMock, starOrcaMock, trackMock } = mocks
+const { browserWindowMock, starOrcaMock } = mocks
 const getIpcHandler = createIpcHandlerLookup(mocks.ipcMainHandleMock)
 
 describe('StarNagService', () => {
@@ -58,7 +48,7 @@ describe('StarNagService', () => {
     consoleInfoMock.mockRestore()
   })
 
-  it('emits direct-star attempted and succeeded outcomes plus app_starred_orca', async () => {
+  it('completes direct-star after a successful GitHub request', async () => {
     const window = createWindow()
     browserWindowMock.getAllWindows.mockReturnValue([window])
     const { service, ui } = createHarness()
@@ -69,62 +59,9 @@ describe('StarNagService', () => {
 
     expect(ok).toBe(true)
     expect(ui.starNagCompleted).toBe(true)
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'star_clicked', mode: 'gh' })
-    )
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'direct_star_succeeded', mode: 'gh' })
-    )
-    expect(trackMock).toHaveBeenCalledWith('app_starred_orca', {
-      source: 'star_nag',
-      nth_repo_added: 3
-    })
   })
 
-  it('uses the source moment for confirmed direct-star success telemetry', async () => {
-    const window = createWindow()
-    browserWindowMock.getAllWindows.mockReturnValue([window])
-    const { service } = createHarness()
-
-    service.registerIpcHandlers()
-    await getIpcHandler('star-nag:onboardingCompleted')()
-    await getIpcHandler('star-nag:starOrca')()
-
-    expect(trackMock).toHaveBeenCalledWith('app_starred_orca', {
-      source: 'onboarding_completed',
-      nth_repo_added: 3
-    })
-  })
-
-  it('uses fresh cohort context for canonical app_starred_orca success telemetry', async () => {
-    const window = createWindow()
-    browserWindowMock.getAllWindows.mockReturnValue([window])
-    getCohortAtEmitMock
-      .mockReturnValueOnce({ nth_repo_added: 2 })
-      .mockReturnValueOnce({ nth_repo_added: 4 })
-    const { service } = createHarness()
-
-    service.registerIpcHandlers()
-    getIpcHandler('star-nag:forceShow')()
-    await getIpcHandler('star-nag:starOrca')()
-
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', nth_repo_added: 2 })
-    )
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'direct_star_succeeded', nth_repo_added: 2 })
-    )
-    expect(trackMock).toHaveBeenCalledWith('app_starred_orca', {
-      source: 'star_nag',
-      nth_repo_added: 4
-    })
-  })
-
-  it('records success and completion when direct star resolves after dismissal cleared the visible session', async () => {
+  it('completes direct star when it resolves after dismissal cleared the visible session', async () => {
     const window = createWindow()
     browserWindowMock.getAllWindows.mockReturnValue([window])
     const deferredStar = createDeferred<boolean>()
@@ -139,18 +76,10 @@ describe('StarNagService', () => {
     deferredStar.resolve(true)
     await expect(starPromise).resolves.toBe(true)
 
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'direct_star_succeeded', mode: 'gh' })
-    )
-    expect(trackMock).toHaveBeenCalledWith('app_starred_orca', {
-      source: 'star_nag',
-      nth_repo_added: 3
-    })
     expect(ui.starNagCompleted).toBe(true)
   })
 
-  it('records failed direct star after dismissal without clearing the cooldown or re-showing', async () => {
+  it('preserves the cooldown after direct star fails following dismissal', async () => {
     const window = createWindow()
     browserWindowMock.getAllWindows.mockReturnValue([window])
     const deferredStar = createDeferred<boolean>()
@@ -165,10 +94,6 @@ describe('StarNagService', () => {
     deferredStar.resolve(false)
     await expect(starPromise).resolves.toBe(false)
 
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'direct_star_failed', mode: 'gh' })
-    )
     expect(ui.starNagCompleted).toBeUndefined()
     expect(ui.starNagDeferredUntil).toBeGreaterThan(Date.now())
     expect(window.webContents.send).toHaveBeenCalledTimes(1)
@@ -191,7 +116,7 @@ describe('StarNagService', () => {
     expect(ui.starNagCompleted).toBe(true)
   })
 
-  it('records failed direct star before web fallback and guards duplicate in-flight attempts', async () => {
+  it('guards duplicate in-flight attempts before web fallback', async () => {
     const window = createWindow()
     browserWindowMock.getAllWindows.mockReturnValue([window])
     const deferredStar = createDeferred<boolean>()
@@ -208,22 +133,10 @@ describe('StarNagService', () => {
     await expect(first).resolves.toBe(false)
     await expect(second).resolves.toBe(false)
 
-    const starAttempts = trackMock.mock.calls.filter(
-      ([name, payload]) =>
-        name === 'star_nag_outcome' && (payload as { outcome?: string }).outcome === 'star_clicked'
-    )
-    expect(starAttempts).toHaveLength(1)
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'direct_star_failed', mode: 'gh' })
-    )
+    expect(starOrcaMock).toHaveBeenCalledTimes(1)
 
     getIpcHandler('star-nag:openWeb')()
 
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'opened_repo', mode: 'web' })
-    )
     expect(ui.starNagCompleted).toBeUndefined()
     expect(ui.starNagDeferredUntil).toBeGreaterThan(Date.now())
   })

@@ -41,7 +41,6 @@ const dependencies: Record<string, Record<string, unknown>> = {
   '../worktree-background-removal': { stopBackgroundWorktreeRemovals: idle() },
   '../dock/unread-badge': { setUnreadDockBadgeCount: idle() },
   '../tray/system-tray': { destroySystemTray: idle() },
-  '../telemetry/client': { shutdownTelemetry: settled() },
   '../observability': { shutdownObservability: settled() },
   '../updater': { isQuittingForUpdate: vi.fn(() => false) },
   '../updater-lifecycle-diagnostics': { recordUpdaterLifecycle: idle() },

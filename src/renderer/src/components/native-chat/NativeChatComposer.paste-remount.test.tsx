@@ -57,12 +57,6 @@ vi.mock('../../../../shared/remote-runtime-pty-id', async (importOriginal) => ({
   ...(await importOriginal<typeof RemoteRuntimePtyIdModule>()),
   isRemoteRuntimePtyId: () => false
 }))
-vi.mock('@/lib/native-chat-telemetry', () => ({
-  emitNativeChatMessageSent: vi.fn(),
-  emitNativeChatPickerItemAccepted: vi.fn(),
-  emitNativeChatPickerOpened: vi.fn(),
-  emitNativeChatSendClassified: vi.fn()
-}))
 vi.mock('./NativeChatComposerField', async (importOriginal) => {
   const original = await importOriginal<{
     NativeChatComposerField: typeof NativeChatComposerFieldComponent

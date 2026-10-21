@@ -9,7 +9,6 @@ const mocks = vi.hoisted(() => ({
   addRepoPath: vi.fn(),
   closeModal: vi.fn(),
   fetchWorktrees: vi.fn(),
-  getNestedRepoRuntimeKind: vi.fn(),
   scanNestedRepos: vi.fn(),
   setActiveNestedScanId: vi.fn(),
   setNestedScanInProgress: vi.fn(),
@@ -17,7 +16,6 @@ const mocks = vi.hoisted(() => ({
   onGitRepoReady: vi.fn(),
   setAddProjectBusyLabel: vi.fn(),
   markOnboardingProjectAdded: vi.fn(),
-  track: vi.fn()
 }))
 
 vi.mock('react', async (importOriginal) => {
@@ -45,9 +43,6 @@ vi.mock('@/lib/onboarding-project-checklist', () => ({
   markOnboardingProjectAdded: mocks.markOnboardingProjectAdded
 }))
 
-vi.mock('@/lib/telemetry', () => ({
-  track: mocks.track
-}))
 
 function makeRepo(overrides: Partial<Repo> = {}): Repo {
   return {
@@ -79,7 +74,6 @@ describe('useAddRepoServerPathFlow', () => {
       activeRuntimeEnvironmentId: 'box1-environment-id',
       closeModal: mocks.closeModal,
       fetchWorktrees: mocks.fetchWorktrees,
-      getNestedRepoRuntimeKind: mocks.getNestedRepoRuntimeKind,
       scanNestedRepos: mocks.scanNestedRepos,
       setActiveNestedScanId: mocks.setActiveNestedScanId,
       setNestedScanInProgress: mocks.setNestedScanInProgress,
@@ -101,7 +95,6 @@ describe('useAddRepoServerPathFlow', () => {
 
   it('routes the nested Git pre-scan and add through the selected runtime', async () => {
     const repo = makeRepo({ id: 'server-git', kind: 'git' })
-    mocks.getNestedRepoRuntimeKind.mockReturnValue('runtime')
     mocks.scanNestedRepos.mockResolvedValue({
       selectedPath: '/server/docs',
       selectedPathKind: 'git_repo',
@@ -115,7 +108,6 @@ describe('useAddRepoServerPathFlow', () => {
       activeRuntimeEnvironmentId: 'box1-environment-id',
       closeModal: mocks.closeModal,
       fetchWorktrees: mocks.fetchWorktrees,
-      getNestedRepoRuntimeKind: mocks.getNestedRepoRuntimeKind,
       scanNestedRepos: mocks.scanNestedRepos,
       setActiveNestedScanId: mocks.setActiveNestedScanId,
       setNestedScanInProgress: mocks.setNestedScanInProgress,

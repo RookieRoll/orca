@@ -18,8 +18,6 @@ const mocks = vi.hoisted(() => ({
   },
   checkOrcaStarredMock: vi.fn(),
   starOrcaMock: vi.fn(),
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(() => ({ nth_repo_added: 3 })),
   ipcMainHandleMock: vi.fn()
 }))
 
@@ -36,15 +34,7 @@ vi.mock('../github/client', () => ({
   starOrca: mocks.starOrcaMock
 }))
 
-vi.mock('../telemetry/client', () => ({
-  track: mocks.trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: mocks.getCohortAtEmitMock
-}))
-
-const { browserWindowMock, checkOrcaStarredMock, trackMock } = mocks
+const { browserWindowMock, checkOrcaStarredMock } = mocks
 const getIpcHandler = createIpcHandlerLookup(mocks.ipcMainHandleMock)
 
 describe('StarNagService', () => {
@@ -83,10 +73,6 @@ describe('StarNagService', () => {
       surface: 'card'
     })
     expect(ui.starNagAgentValueMomentAppVersion).toBe('1.2.3')
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', source: 'agent_value_moment' })
-    )
   })
 
   it('keeps cooldown-suppressed agent value moments consumed after an update', async () => {
@@ -158,10 +144,6 @@ describe('StarNagService', () => {
       mode: 'gh',
       surface: 'toast'
     })
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', source: 'onboarding_completed' })
-    )
   })
 
   it('lets onboarding completed supersede an already visible threshold card', async () => {
@@ -182,10 +164,6 @@ describe('StarNagService', () => {
       mode: 'gh',
       surface: 'toast'
     })
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', source: 'onboarding_completed' })
-    )
     expect(ui.starNagCompleted).toBeUndefined()
   })
 
@@ -234,10 +212,6 @@ describe('StarNagService', () => {
       mode: 'web',
       surface: 'toast'
     })
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', source: 'onboarding_completed', mode: 'web' })
-    )
     expect(ui.starNagCompleted).toBeUndefined()
   })
 
@@ -260,10 +234,6 @@ describe('StarNagService', () => {
       mode: 'web',
       surface: 'toast'
     })
-    expect(trackMock).toHaveBeenCalledWith(
-      'star_nag_outcome',
-      expect.objectContaining({ outcome: 'shown', source: 'onboarding_completed', mode: 'web' })
-    )
     expect(ui.starNagCompleted).toBeUndefined()
   })
 })

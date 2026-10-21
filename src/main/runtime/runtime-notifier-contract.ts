@@ -9,7 +9,7 @@ import type {
   AgentLaunchTabViewerRule,
   AgentLaunchTabPublishRequest
 } from '../../shared/agent-launch-tab-publication'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
+import type { TerminalPaneSplitSource } from '../../shared/terminal-pane-split-source'
 import type { TerminalRevealIdentity } from '../../shared/terminal-reveal-identity'
 import type { TerminalPaneRevealTarget } from '../../shared/terminal-pane-reveal'
 import type { TuiAgent } from '../../shared/tui-agent'

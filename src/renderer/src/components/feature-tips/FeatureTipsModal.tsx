@@ -11,12 +11,6 @@ import { CliSetupTipDialog } from './CliSetupTipDialog'
 import { CmdJPaletteTipDialog } from './CmdJPaletteTipDialog'
 import { installCliFromFeatureTip } from './feature-tip-cli-install-action'
 import { getFeatureTipForModal } from './feature-tip-modal-state'
-import {
-  getOrcaCliFeatureTipTelemetrySource,
-  trackCmdJPaletteFeatureTipAcknowledged,
-  trackOrcaCliFeatureTipSetupClicked,
-  trackOrcaCliFeatureTipSetupResult
-} from './feature-tip-telemetry'
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { translate } from '@/i18n/i18n'
 import { NativeChatUpgradeTipDialog } from './NativeChatUpgradeTipDialog'
@@ -150,9 +144,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
       case 'learn-cmd-j-palette': {
         // Why: passive education tip — acknowledging just dismisses; the rebind
         // path lives in Settings and is reachable from the palette itself.
-        trackCmdJPaletteFeatureTipAcknowledged(
-          getOrcaCliFeatureTipTelemetrySource(modalData.source)
-        )
         closeModal()
         break
       }
@@ -179,13 +170,10 @@ export default function FeatureTipsModal(): JSX.Element | null {
           mountedRef.current &&
           activeModalRef.current === 'feature-tips' &&
           setupRequestIdRef.current === setupRequestId
-        const telemetrySource = getOrcaCliFeatureTipTelemetrySource(modalData.source)
-        trackOrcaCliFeatureTipSetupClicked(telemetrySource)
         setPrimaryBusy(true)
         try {
           const result = await installCliFromFeatureTip(() => window.api.cli.install())
           if (result.kind === 'installed') {
-            trackOrcaCliFeatureTipSetupResult(telemetrySource, 'installed')
             if (!canApplySetupResult()) {
               return
             }
@@ -200,7 +188,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
             return
           }
 
-          trackOrcaCliFeatureTipSetupResult(telemetrySource, 'needs_attention')
           if (!canApplySetupResult()) {
             return
           }
@@ -226,7 +213,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
             import.meta.env.DEV &&
             message.includes('Development mode uses a generated launcher for validation only')
           ) {
-            trackOrcaCliFeatureTipSetupResult(telemetrySource, 'dev_preview')
             if (!canApplySetupResult()) {
               return
             }
@@ -241,7 +227,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
             return
           }
 
-          trackOrcaCliFeatureTipSetupResult(telemetrySource, 'failed')
           if (canApplySetupResult()) {
             toast.error(message)
           }

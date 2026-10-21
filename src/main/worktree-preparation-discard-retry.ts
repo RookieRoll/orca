@@ -2,7 +2,6 @@ import type { AddWorktreeOptions } from './git/worktree'
 import { discardPreparedWorktree } from './git/worktree-create-preparation'
 import { WorktreePreparationLockOwnershipError } from './git/worktree-preparation-lock'
 import { isOrphanedWorktreeError } from './ipc/worktree-logic'
-import { trackPreparationWork } from './worktree-create-concurrency'
 import type { PreparationEntry } from './worktree-create-preparation-pool'
 
 // Stale cleanup only reclaims preparations whose owner pid is dead, so a discard that fails inside
@@ -86,8 +85,8 @@ export function discardPreparationWithRetry(
 ): Promise<void> {
   // Claim the record so an overlapping retry pass cannot run the same discard twice.
   pendingDiscards.delete(pendingKey(target))
-  // Counted as preparation work: removing a full tree competes with creates for the disk.
-  const discard = trackPreparationWork(runDiscard(target, attempts))
+  // Keep the discard settleable by the reset helper while Git is still running.
+  const discard = runDiscard(target, attempts)
   trackPreparationDiscard(discard)
   return discard
 }

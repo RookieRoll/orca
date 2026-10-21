@@ -19,7 +19,7 @@ import type {
 } from '../../shared/pty-renderer-delivery-health'
 import type { TerminalViewAttributes } from '../../shared/terminal-view-attributes'
 import type { PtyMainDeliveryDiagnostics } from '../../shared/pty-delivery-diagnostics'
-import type { AgentKind, LaunchSource, RequestKind } from '../../shared/telemetry-events'
+import type { AgentLaunchContext } from '../../shared/agent-launch-context'
 import type { PreloadApi } from '../api-types'
 import type { TerminalPanePlacement } from '../../shared/terminal-pane-placement'
 import type { AgentPaneLaunchRequest } from '../../shared/agent-pane-launch-request'
@@ -59,8 +59,7 @@ export const ptySessionControlApi = {
     spawnIntent?: SpawnIntent
     // The agent launch this pane's spawn starts; main admits and plans it.
     agentLaunch?: AgentPaneLaunchRequest
-    // Why: loose typing on purpose — renderer owns launch metadata, main owns whether the launch happened and validates (telemetry-plan.md §Agent launch semantics).
-    telemetry?: { agent_kind: AgentKind; launch_source: LaunchSource; request_kind: RequestKind }
+    telemetry?: AgentLaunchContext
   }): Promise<{
     id: string
     /** Which lifetime of `id` this reply named; absent when the execution host predates the field. */

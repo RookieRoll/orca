@@ -167,7 +167,6 @@ export function bindSettlePaneSerializer(session: ConnectPanePtySession): void {
         createPasteReadinessTimeoutNotice({
           worktreeId: session.deps.worktreeId,
           tabId: session.deps.tabId,
-          agent: 'codex',
           submitted: false
         }).onTimeout()
         return

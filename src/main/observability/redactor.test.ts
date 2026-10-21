@@ -1,6 +1,6 @@
 // Fixture-based test suite for the redactor. Each provider-key shape is
 // exercised in three locations (attribute value, span event message,
-// exit-status `cause`) — that's the contract telemetry-error-tracking.md
+// exit-status `cause`) — that's the contract for local diagnostic bundles
 // §The redactor "Test strategy" calls for. We also cover the four other
 // rule families (labeled kv, URL userinfo, .env-line, attribute blocklist)
 // plus the server-side mode that drops install_id.
@@ -243,7 +243,7 @@ describe('redactor — server mode adds install_id keys', () => {
     const client = redactAttributes(before, 'client')
     const server = redactAttributes(before, 'server')
 
-    // Client mode keeps these (they are valid in product telemetry).
+    // Client mode keeps these before the server-side identity scrub.
     expect(client).toHaveProperty('install_id')
     expect(client).toHaveProperty('installId')
     expect(client).toHaveProperty('distinct_id')

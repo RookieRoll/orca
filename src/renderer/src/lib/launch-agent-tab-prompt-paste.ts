@@ -26,7 +26,6 @@ export function pasteAgentLaunchPromptOnceReady(args: {
   const timeoutNotice = createPasteReadinessTimeoutNotice({
     worktreeId,
     tabId,
-    agent,
     submitted: submit
   })
   return deliverLaunchPromptToAgentTab({

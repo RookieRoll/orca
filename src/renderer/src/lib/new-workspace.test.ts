@@ -5,7 +5,6 @@ const {
   mockSendRuntimePtyInputVerified,
   mockPasteDraftToAgentPtyWhenReady,
   mockShowAutomationPromptNotSentToast,
-  mockTrack,
   store,
   storeListeners,
   startupLeafId
@@ -14,7 +13,6 @@ const {
   mockSendRuntimePtyInputVerified: vi.fn(),
   mockPasteDraftToAgentPtyWhenReady: vi.fn(),
   mockShowAutomationPromptNotSentToast: vi.fn(),
-  mockTrack: vi.fn(),
   storeListeners: new Set<(state: unknown, previousState: unknown) => void>(),
   startupLeafId: '11111111-1111-4111-8111-111111111111',
   store: {
@@ -85,10 +83,6 @@ vi.mock('@/lib/agent-paste-draft', () => ({
 
 vi.mock('@/lib/browser-uuid', () => ({
   createBrowserUuid: () => 'launch-token-1'
-}))
-
-vi.mock('@/lib/telemetry', () => ({
-  track: mockTrack
 }))
 
 vi.mock('@/lib/agent-background-session-timeout-toast', () => ({
@@ -288,7 +282,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     resetAgentStartupDelayedDeliveryForTests()
   })
 
-  it('sends a follow-up prompt through the terminal runtime without renderer telemetry', async () => {
+  it('sends a follow-up prompt through the terminal runtime', async () => {
     await ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
@@ -305,10 +299,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       'fix the spinner\r',
       'launch'
     )
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
   })
 
-  it('does not track when follow-up prompt delivery is rejected by the terminal runtime', async () => {
+  it('handles follow-up prompt delivery rejected by the terminal runtime', async () => {
     mockSendRuntimePtyInputVerified.mockResolvedValue(false)
 
     await ensureAgentStartupInTerminal({
@@ -321,8 +314,11 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
         launchConfig: { agentArgs: '', agentEnv: {} }
       }
     })
-
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
+    expect(mockSendRuntimePtyInputVerified).toHaveBeenCalledWith(
+      'pty-1',
+      'fix the spinner\r',
+      'launch'
+    )
   })
 
   it('surfaces the not-sent toast when a follow-up prompt is dropped', async () => {
@@ -384,7 +380,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     expect(mockShowAutomationPromptNotSentToast).toHaveBeenCalledWith('claude')
   })
 
-  it('does not track when follow-up prompt delivery rejects', async () => {
+  it('handles rejected follow-up prompt delivery', async () => {
     mockSendRuntimePtyInputVerified.mockRejectedValue(new Error('runtime timeout'))
 
     await expect(
@@ -400,10 +396,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       })
     ).resolves.toBeUndefined()
 
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
   })
 
-  it('does not track draft prompt delivery as a sent prompt', async () => {
+  it('pastes draft prompts without submitting them', async () => {
     await ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
@@ -423,7 +418,6 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       forcePaste: true,
       onTimeout: expect.any(Function)
     })
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
   })
 
   it('pastes drafts into the activation primary tab when active tab state differs', async () => {

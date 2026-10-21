@@ -12,7 +12,7 @@ const buildStartup = (settings: Parameters<typeof buildOnboardingFolderAgentStar
   buildOnboardingFolderAgentStartup(settings, HOST)
 
 describe('buildOnboardingFolderAgentStartup', () => {
-  it('queues the persisted default agent with onboarding telemetry', () => {
+  it('queues the persisted default agent with its launch context', () => {
     const startup = buildStartup({
       ...getDefaultSettings('/tmp/orca-workspaces'),
       defaultTuiAgent: 'codex'

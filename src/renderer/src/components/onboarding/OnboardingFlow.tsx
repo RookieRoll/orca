@@ -138,26 +138,23 @@ export default function OnboardingFlow({
       ? translate('components.onboarding.flow.actions.addFirstProject', 'Add your first project')
       : translate('components.onboarding.flow.actions.continue', 'Continue'))
   const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
-  const skipConfirmAdvancedViaRef = useRef<'button' | 'keyboard'>('button')
   const { next: flowNext, dismissOnboarding: flowDismissOnboarding } = flow
 
   const requestSkipConfirmation = useCallback(
-    (advancedVia: 'button' | 'keyboard') => {
+    () => {
       // Why: click-off / Escape dismissal stays available on every step,
       // including the final notifications step, so the modal never feels stuck.
       if (busyLabel || skipConfirmOpen) {
         return
       }
-      skipConfirmAdvancedViaRef.current = advancedVia
       setSkipConfirmOpen(true)
     },
     [busyLabel, skipConfirmOpen]
   )
 
   const confirmSkipOnboarding = useCallback(() => {
-    const advancedVia = skipConfirmAdvancedViaRef.current
     setSkipConfirmOpen(false)
-    void flowDismissOnboarding(advancedVia)
+    void flowDismissOnboarding()
   }, [flowDismissOnboarding])
 
   // Why: depend on stable callbacks + step id only so the listener doesn't
@@ -175,7 +172,7 @@ export default function OnboardingFlow({
         return
       }
       event.preventDefault()
-      void flowNext('keyboard')
+      void flowNext()
     }
     window.addEventListener('keydown', onKeyDown, { capture: true })
     return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
@@ -187,7 +184,7 @@ export default function OnboardingFlow({
         return
       }
       event.preventDefault()
-      requestSkipConfirmation('keyboard')
+      requestSkipConfirmation()
     }
     window.addEventListener('keydown', onKeyDown, { capture: true })
     return () => window.removeEventListener('keydown', onKeyDown, { capture: true })
@@ -202,7 +199,7 @@ export default function OnboardingFlow({
           if (!shouldRequestOnboardingSkipConfirmation(event)) {
             return
           }
-          requestSkipConfirmation('button')
+          requestSkipConfirmation()
         }}
       >
         <div

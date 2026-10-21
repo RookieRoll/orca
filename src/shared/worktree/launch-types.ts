@@ -1,5 +1,5 @@
 import type { StartupCommandDelivery } from '../codex-startup-delivery'
-import type { AgentKind, LaunchSource, RequestKind } from '../telemetry-events'
+import type { AgentLaunchContext } from '../agent-launch-context'
 import type { SleepingAgentLaunchConfig } from '../agent-session-resume'
 import type { SetupRunnerShell } from '../setup-runner-command'
 import type { OrcaDefaultTabTemplate } from '../orca-yaml-hook-types'
@@ -21,7 +21,7 @@ export type WorktreeStartupLaunch = {
   launchAgent?: TuiAgent
   viewMode?: 'terminal' | 'chat'
   startupCommandDelivery?: StartupCommandDelivery
-  telemetry?: { agent_kind: AgentKind; launch_source: LaunchSource; request_kind: RequestKind }
+  telemetry?: AgentLaunchContext
 }
 
 export type WorktreeDefaultTabsLaunch = {

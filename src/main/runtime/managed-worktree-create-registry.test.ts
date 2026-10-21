@@ -11,15 +11,11 @@ vi.mock('electron', () => ({
 }))
 
 const mocks = vi.hoisted(() => ({
-  track: vi.fn<(name: string, props: Record<string, unknown>) => void>(),
-  probe: vi.fn(),
   createLocal: vi.fn(),
   createFolder: vi.fn(),
   startTerminals: vi.fn()
 }))
 
-vi.mock('../telemetry/client', () => ({ track: mocks.track, isTelemetryEnabled: () => true }))
-vi.mock('../git/create-event-repo-probe', () => ({ probeCreateEventRepoFacts: mocks.probe }))
 vi.mock('./runtime-local-worktree-create', () => ({
   createRuntimeLocalManagedWorktree: mocks.createLocal
 }))
@@ -103,8 +99,6 @@ function creationsOf(runtime: OrcaRuntimeService): Record<string, unknown> {
 
 describe('runtime creation registry', () => {
   beforeEach(() => {
-    mocks.track.mockReset()
-    mocks.probe.mockReset().mockResolvedValue({})
     mocks.startTerminals.mockReset().mockResolvedValue({})
   })
 

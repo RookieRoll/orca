@@ -5,7 +5,7 @@ import * as teamsPlan from '../runtime/terminal/launch/agent-teams-launch-plan'
 import { SessionNotFoundError } from '../daemon/daemon-errors'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
-import { classifyErrorMock, statSyncMock, trackMock } from './pty-ipc-mock-registry'
+import { statSyncMock } from './pty-ipc-mock-registry'
 import {
   providerFacts,
   recordOf,
@@ -85,12 +85,6 @@ vi.mock('../pwsh', () => import('./pty-ipc-mock-registry').then((m) => m.pwshMod
 vi.mock('../wsl', async (importOriginal) =>
   (await import('./pty-ipc-mock-registry')).wslModuleMock(await importOriginal())
 )
-vi.mock('../telemetry/client', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.telemetryClientModuleMock())
-)
-vi.mock('../telemetry/classify-error', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.classifyErrorModuleMock())
-)
 vi.mock('../cli/linux-terminal-orca-cli-shim', () =>
   import('./pty-ipc-mock-registry').then((m) => m.linuxCliShimModuleMock())
 )
@@ -160,7 +154,7 @@ const WINDOW_LANE_CASES: WindowLaneCase[] = [
 
 // Pins main's current launch behaviour as the convergence parity baseline (rows 1, 2, 5, 6 and 8, main
 // half): each table request, fed to pty:spawn, reaches the provider with these facts (the pane's
-// measured size, never hidden), one agent_started, and a pane binding.
+// measured size, never hidden) and a pane binding.
 // C2 (row 1), C5a-e and C6 check the merged spawn pipeline against it.
 describe('window lane: pty:spawn request -> provider', () => {
   const suite = setupPtyIpcSuite()
@@ -177,7 +171,6 @@ describe('window lane: pty:spawn request -> provider', () => {
       expect(await providerFacts(lanes.provider)).toEqual(
         expectedWindowProvider(request, provider, agentEnv)
       )
-      expect(trackMock.mock.calls).toEqual([['agent_started', request.telemetry]])
       expect(lanes.persistPtyBinding.mock.calls).toEqual([
         [
           {
@@ -259,7 +252,7 @@ async function runHostCall(lanes: ParityLanes, c: HostLaunchCase): Promise<unkno
 
 // Pins main's current launch behaviour as the convergence parity baseline (rows 3, 4, 7, 8, 10):
 // each host producer's call reaches the provider through the real runtime controller with these
-// facts, telemetry, placement and phone tab. C1, C2 and C5a-e check the host path against it.
+// facts, placement and phone tab. C1, C2 and C5a-e check the host path against it.
 describe('host lane: producer call -> runtime controller -> provider', () => {
   const suite = setupPtyIpcSuite()
   beforeEach(() => stubOpenCodeV2())
@@ -274,7 +267,6 @@ describe('host lane: producer call -> runtime controller -> provider', () => {
     // The host stamps its own pane identity (the window lane's stale-key case is below).
     const spawned = recordOf(lanes.provider.mock.calls.at(-1)?.[0])
     expect(recordOf(spawned.env).ORCA_PANE_KEY).toBe(spawned.paneKey)
-    expect(trackMock.mock.calls).toEqual(c.telemetry ? [['agent_started', c.telemetry]] : [])
     expect(lanes.persistPtyBinding.mock.calls[0]?.[0]).toMatchObject({
       placement: { kind: 'new-tab' }
     })
@@ -307,7 +299,6 @@ describe('launch facts outside the tables', () => {
       }
       if (lane === 'ipc-reentry' || lane === 'ipc-reentry-refused') {
         const refused = lane === 'ipc-reentry-refused'
-        classifyErrorMock.mockReturnValue({ error_class: 'unknown' })
         await lanes.store.admitTerminalPane({
           type: 'createTerminalTab',
           workspace: pane.worktreeId,
@@ -556,44 +547,11 @@ describe('launch facts outside the tables', () => {
     }
   })
 
-  // C5a (one agent_error place): main today reports a failed window-lane spawn.
-  it.each([
-    {
-      lane: 'telemetry kind wins over the claude sniff',
-      request: { command: 'claude', telemetry: { agent_kind: 'opencode' } },
-      calls: [['agent_error', { agent_kind: 'opencode', error_class: 'binary_not_found' }]]
-    },
-    {
-      lane: 'local claude without telemetry',
-      request: { command: 'claude' },
-      calls: [['agent_error', { agent_kind: 'claude-code', error_class: 'binary_not_found' }]]
-    }
-  ])('a failed window spawn, $lane, emits agent_error', async (c) => {
-    setMainPlatform('darwin')
-    classifyErrorMock.mockReturnValue({ error_class: 'binary_not_found' })
-    const spawnError = new Error('spawn boom')
-    const lanes = startParityLanes(suite, { workspace: POSIX_REPO, spawnError })
-    const launch = lanes.spawnWindow({
-      cols: 80,
-      rows: 24,
-      cwd: POSIX_PATH,
-      worktreeId: launchWorkspaceId(POSIX_REPO),
-      ...c.request
-    })
-    await expect(launch).rejects.toThrow('spawn boom')
-    expect(trackMock.mock.calls.filter(([event]) => event === 'agent_error')).toEqual(c.calls)
-  })
-
-  // C5a (one execute) keeps this on both lanes; C5a-2 flips only the host's agent_error.
-  const FAILED_START_AGENT_ERROR: Record<'window' | 'host', unknown[]> = {
-    window: [['agent_error', { agent_kind: 'claude-code', error_class: 'binary_not_found' }]],
-    host: [['agent_error', { agent_kind: 'claude-code', error_class: 'binary_not_found' }]]
-  }
+  // C5a keeps failed starts on both lanes and verifies their claimed resources are released.
   it.each(['window', 'host'] as const)(
     '%s lane: a start the provider fails undoes everything it claimed',
     async (lane) => {
       setMainPlatform('darwin')
-      classifyErrorMock.mockReturnValue({ error_class: 'binary_not_found' })
       const lanes = startParityLanes(suite, { workspace: POSIX_REPO })
       let hiddenWhileSpawning = false
       lanes.provider.mockImplementationOnce(async (options: { sessionId?: string }) => {
@@ -629,7 +587,6 @@ describe('launch facts outside the tables', () => {
 
       await expect(launch).rejects.toThrow('spawn boom')
       const sessionId = String(recordOf(lanes.provider.mock.calls.at(-1)?.[0]).sessionId)
-      expect(trackMock.mock.calls).toEqual(FAILED_START_AGENT_ERROR[lane])
       expect(hiddenWhileSpawning).toBe(true)
       expect(isHiddenRendererPty(sessionId)).toBe(false)
       const claim =
@@ -647,10 +604,9 @@ describe('launch facts outside the tables', () => {
     }
   )
 
-  // C5a-2: requests that join one claimed start share its failure; only the request that started it counts it.
-  it('host lane: concurrent resumes of one Claude session count one failed start once', async () => {
+  // C5a-2: requests that join one claimed start share its failure.
+  it('host lane: concurrent resumes share one failed provider start', async () => {
     setMainPlatform('darwin')
-    classifyErrorMock.mockReturnValue({ error_class: 'binary_not_found' })
     const lanes = startParityLanes(suite, { workspace: POSIX_REPO })
     lanes.provider.mockImplementation(async () => {
       await new Promise((resolve) => setTimeout(resolve, 100))
@@ -670,14 +626,10 @@ describe('launch facts outside the tables', () => {
 
     expect(results.map((r) => r.status)).toEqual(['rejected', 'rejected'])
     expect(lanes.provider).toHaveBeenCalledOnce()
-    expect(trackMock.mock.calls.filter(([event]) => event === 'agent_error')).toEqual([
-      ['agent_error', { agent_kind: 'claude-code', error_class: 'binary_not_found' }]
-    ])
   })
 
-  it('host lane: a Claude resume its claim refuses counts one failed start', async () => {
+  it('host lane: a Claude resume whose claim is refused does not spawn', async () => {
     setMainPlatform('darwin')
-    classifyErrorMock.mockReturnValue({ error_class: 'unknown' })
     const lanes = startParityLanes(suite, { workspace: POSIX_REPO })
     vi.spyOn(agentSessionOwners, 'ensure').mockRejectedValueOnce(
       new Error('agent_session_conflict')
@@ -692,7 +644,6 @@ describe('launch facts outside the tables', () => {
       })
     ).rejects.toThrow('agent_session_conflict')
     expect(lanes.provider).not.toHaveBeenCalled()
-    expect(trackMock.mock.calls.filter(([event]) => event === 'agent_error')).toHaveLength(1)
   })
 
   // C5e (presentation merge): a worker asks the window to reveal its titled tab without activating it.

@@ -18,7 +18,6 @@ import {
   SELF_WRITE_REMOTE_TTL_MS
 } from './editor-self-write-registry'
 import { getDiskBaselineSignature } from '../../../../shared/disk-baseline-signature'
-import { trackExternalChangeConflictAction } from './editor-external-change-telemetry'
 import { editorTabFileAccess } from '@/lib/local-file-access'
 import { isEditorLargePasteInFlight } from './editor-large-paste-in-flight'
 import {
@@ -216,7 +215,6 @@ export function createEditorSaveQueue(store: AppStoreApi): EditorSaveQueue {
         // Why: the write made disk match the buffer, so clear any now-stale changed-on-disk conflict.
         const savedFile = nextState.openFiles.find((openFile) => openFile.id === file.id)
         if (savedFile?.externalMutation === 'changed') {
-          trackExternalChangeConflictAction(savedFile, 'save_overwrite')
           nextState.setExternalMutation(file.id, null)
         }
 

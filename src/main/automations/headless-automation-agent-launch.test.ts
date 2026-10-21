@@ -195,7 +195,6 @@ describe('headless automation agent launch', () => {
       startupPrompt: 'fix the flaky test',
       startupExtraAgentArgs: '--model opus',
       createdWithAgent: 'claude',
-      telemetrySource: 'unknown'
     })
     expect(args).not.toHaveProperty('awaitTerminalProvisioning')
     expect(args).not.toHaveProperty('observeSetupCompletion')

@@ -26,8 +26,6 @@ vi.mock('electron', () => ({
   webContents: { fromId: webContentsFromId }
 }))
 vi.mock('../browser/browser-screencast-stream', () => ({ startBrowserScreencast }))
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-
 /** A real legacy E2EE channel, as every directly connected phone uses. */
 function connectLegacyChannel() {
   const serverKeys = generateKeyPair()

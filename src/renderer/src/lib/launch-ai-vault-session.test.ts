@@ -42,10 +42,6 @@ vi.mock('@/components/tab-bar/reconcile-order', () => ({
   ) => [...terminalIds, ...editorIds, ...browserIds]
 }))
 
-vi.mock('@/lib/telemetry', () => ({
-  tuiAgentToAgentKind: (agent: string) => agent
-}))
-
 vi.mock('@/lib/worktree-runtime-owner', () => ({
   runtimeEnvironmentIdWithLegacyFallbackUnlessTwin:
     runtimeMocks.runtimeEnvironmentIdWithLegacyFallbackUnlessTwin

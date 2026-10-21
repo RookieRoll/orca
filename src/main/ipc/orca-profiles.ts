@@ -25,7 +25,6 @@ import type {
 import {
   createLocalOrcaProfile,
   getOrcaProfileListState,
-  seedNewOrcaProfileTelemetryConsent,
   setActiveOrcaProfile
 } from '../orca-profiles/profile-index-store'
 import { getProfileUserDataPath } from '../orca-profiles/profile-storage-paths'
@@ -182,9 +181,7 @@ export function registerOrcaProfileHandlers(
   ipcMain.handle(
     'orcaProfiles:createLocal',
     (_event, args?: CreateLocalOrcaProfileArgs): CreateLocalOrcaProfileResult => {
-      const result = createLocalOrcaProfile(args)
-      seedNewOrcaProfileTelemetryConsent(result.profile.id, store.getSettings().telemetry)
-      return result
+      return createLocalOrcaProfile(args)
     }
   )
 
@@ -295,7 +292,6 @@ export function registerOrcaProfileHandlers(
         createCloudLinkedProfileArgsFromUnknown(rawArgs)
       )
       if (result.status === 'created') {
-        seedNewOrcaProfileTelemetryConsent(result.profile.id, store.getSettings().telemetry)
         options.onAuthMutation?.()
       }
       return result

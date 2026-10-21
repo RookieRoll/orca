@@ -5,7 +5,7 @@ import type {
   HistoryRecoveryContext,
   PendingDaemonSpawnOperation
 } from './daemon-pty-runtime-state'
-import { reportDaemonPtyCwdVerdict } from './daemon-adoption-telemetry-event'
+import { recordDaemonPtyCwdEvidence } from './daemon-folder-access-evidence'
 import { STABLE_PANE_ATTACH_ONLY_DAEMON_PROTOCOL_VERSION } from './daemon-protocol-version'
 import { TerminalKilledError } from './daemon-pty-lifecycle-errors'
 import { DaemonPtySpawnResult } from './daemon-pty-spawn-result'
@@ -263,10 +263,9 @@ export abstract class DaemonPtySessionSpawn extends DaemonPtySpawnResult {
     const result = await this.createOrAttachSpawn(context, context.historySeedSegments)
     if (result.isNew && !attachOnly) {
       // Not awaited: the app-side read behind it can sit on an unanswered macOS folder prompt.
-      void reportDaemonPtyCwdVerdict({
+      void recordDaemonPtyCwdEvidence({
         cwd: effectiveCwd,
         cwdReadableByDaemon: result.cwdReadableByDaemon,
-        pidPath: this.pidPath,
         daemonIdentity: this.client.getDaemonIdentity()
       })
     }

@@ -92,7 +92,6 @@ describe('worktree remote runtime mutations', () => {
         nestWorkspaces: false,
         refreshLocalBaseRefOnWorktreeCreate: true,
         localBaseRefSuggestionDismissed: false,
-        telemetrySource: 'sidebar',
         displayName: 'Feature title',
         linkedIssue: 123,
         linkedPR: 456,
@@ -279,7 +278,6 @@ describe('worktree remote runtime mutations', () => {
           repo: 'repo1',
           name: 'agent-startup',
           setupDecision: 'skip',
-          telemetrySource: 'sidebar',
           displayName: 'Launch agent',
           createdWithAgent: 'codex',
           startupCommand: "codex 'summarize repo'",
@@ -382,7 +380,6 @@ describe('worktree remote runtime mutations', () => {
         repoId: 'repo1',
         name: 'local-agent-startup',
         setupDecision: 'skip',
-        telemetrySource: 'sidebar',
         displayName: 'Launch local agent',
         createdWithAgent: 'claude',
         startup: {

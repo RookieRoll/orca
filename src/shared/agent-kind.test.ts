@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import { agentKindToTuiAgent, tuiAgentToAgentKind } from './agent-kind'
-import { AGENT_KIND_VALUES, agentKindSchema } from './telemetry-events'
+import { AGENT_KIND_VALUES, agentKindSchema } from './agent-launch-context'
 import { TUI_AGENT_CONFIG } from './tui-agent-config'
 import type { TuiAgent } from './tui-agent'
 
 describe('tuiAgentToAgentKind', () => {
-  it('maps every shipped TuiAgent to a concrete telemetry kind', () => {
+  it('maps every shipped TuiAgent to a concrete agent kind', () => {
     const agents = Object.keys(TUI_AGENT_CONFIG) as TuiAgent[]
 
     for (const agent of agents) {
@@ -17,7 +17,7 @@ describe('tuiAgentToAgentKind', () => {
     }
   })
 
-  it('keeps concrete telemetry kinds in exact sync with shipped TuiAgents', () => {
+  it('keeps concrete agent kinds in exact sync with shipped TuiAgents', () => {
     const agents = Object.keys(TUI_AGENT_CONFIG) as TuiAgent[]
     const mappedKinds = agents.map((agent) => tuiAgentToAgentKind(agent)).sort()
     const concreteSchemaKinds = AGENT_KIND_VALUES.filter((kind) => kind !== 'other').sort()
@@ -32,7 +32,7 @@ describe('tuiAgentToAgentKind', () => {
 })
 
 describe('agentKindToTuiAgent', () => {
-  it('round-trips every shipped TuiAgent through its telemetry kind', () => {
+  it('round-trips every shipped TuiAgent through its agent kind', () => {
     const agents = Object.keys(TUI_AGENT_CONFIG) as TuiAgent[]
     for (const agent of agents) {
       expect(agentKindToTuiAgent(tuiAgentToAgentKind(agent))).toBe(agent)

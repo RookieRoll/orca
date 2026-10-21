@@ -99,7 +99,7 @@ export type CrashReportCopyDiagnosticsArgs = {
   notes?: string
 }
 
-// User notes need a prose budget, separate from 240-character telemetry values.
+// User notes need a prose budget, separate from short diagnostic labels.
 export const MAX_USER_NOTES_LENGTH = 8_000
 // Bound redaction work while allowing redacted input to contract into the output budget.
 const MAX_USER_NOTES_SANITIZE_LENGTH = MAX_USER_NOTES_LENGTH * 2

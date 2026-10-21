@@ -4,7 +4,6 @@ import type { PtyManagementFolderAccessMismatch } from '../../../../preload/api-
 import { isMacTccFolderClass } from '../../../../shared/daemon-adoption-telemetry'
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { translate } from '@/i18n/i18n'
-import { track } from '@/lib/telemetry'
 import { useMacFolderAccessFixStore } from '@/store/mac-folder-access-fix'
 import { Button } from '../ui/button'
 import {
@@ -260,12 +259,10 @@ function FolderAccessFix({
   const { cwdClass, daemonScope } = mismatch
 
   const onOpenSettings = useCallback((): void => {
-    track('daemon_folder_access_notice', { action: 'settings_opened', cwd_class: cwdClass })
     void window.api?.developerPermissions?.openSettings(FILES_AND_FOLDERS_PANE)
-  }, [cwdClass])
+  }, [])
 
   const onReset = useCallback(async (): Promise<void> => {
-    track('daemon_folder_access_notice', { action: 'reset_clicked', cwd_class: cwdClass })
     setResetState('busy')
     try {
       const result = await window.api.pty.management.resetFolderAccess()
@@ -285,10 +282,9 @@ function FolderAccessFix({
         setResetState('failed')
       }
     }
-  }, [applyVerdict, cwdClass, mountedRef])
+  }, [applyVerdict, mountedRef])
 
   const onRestart = useCallback(async (): Promise<void> => {
-    track('daemon_folder_access_notice', { action: 'restart_clicked', cwd_class: cwdClass })
     setRestartState('busy')
     try {
       const { success } = await window.api.pty.management.restart()
@@ -306,7 +302,7 @@ function FolderAccessFix({
         setRestartState('failed')
       }
     }
-  }, [cwdClass, daemonScope, mountedRef, retireNotice])
+  }, [daemonScope, mountedRef, retireNotice])
 
   const folder = macFolderAccessFolderName(cwdClass)
   const busy = restartState === 'busy' || resetState === 'busy'

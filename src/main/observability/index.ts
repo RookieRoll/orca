@@ -1,32 +1,13 @@
-// Composition root for the error-tracking lane (telemetry-error-tracking.md
-// §Architecture). Wires the local NDJSON sink into the active tracer, and
+// Composition root for local diagnostics. Wires the NDJSON sink into the active tracer, and
 // exposes a single init/shutdown pair the main process calls from
 // `src/main/index.ts`.
 //
-// Architectural rule (load-bearing): nothing in `src/main/telemetry/`
-// imports from this directory and vice versa — the two lanes never share a
-// code path. Cross-contamination is the failure mode this entire lane is
-// counter-designed against. An import-restricted-paths lint rule will
-// enforce this; even before the rule lands, the rule is a code-review
-// invariant.
+// Consent boundary:
 //
-// Consent boundaries (telemetry-error-tracking.md §Consent boundaries):
-//
-//   DO_NOT_TRACK=1            → disable bundle button. KEEP local file.
-//                                Local file writes never leave the machine,
-//                                so they are not "tracking" in the DNT sense.
-//   ORCA_TELEMETRY_DISABLED=1 → identical to DO_NOT_TRACK for this lane.
-//   ORCA_DIAGNOSTICS_DISABLED=1 → ALSO disable local file writes. The escape
-//                                hatch for users on devices where even local
-//                                debug logs are policy-forbidden.
+//   ORCA_DIAGNOSTICS_DISABLED=1 → disable local files and bundles.
 //   CI detection              → disable everything in this lane.
 //
-// The CI gate matches the same env-var list the product-telemetry consent
-// resolver uses (CI / GITHUB_ACTIONS / GITLAB_CI / CIRCLECI / TRAVIS /
-// BUILDKITE / JENKINS_URL / TEAMCITY_VERSION). Duplicating the list — rather
-// than importing it from `src/main/telemetry/consent.ts` — preserves the
-// import isolation rule above. The cost of one duplicated array vs.
-// punching a hole in the architecture is trivially worth it.
+// Keep CI suppression local to diagnostics.
 
 import {
   createLocalFileSink,
@@ -62,8 +43,6 @@ export type ObservabilityConsent = {
   readonly bundleEnabled: boolean
   /** Reason any of the lanes are disabled, for debug surfaces. */
   readonly disabledReason?:
-    | 'do_not_track'
-    | 'orca_telemetry_disabled'
     | 'orca_diagnostics_disabled'
     | 'ci'
 }
@@ -83,10 +62,6 @@ function inCI(): boolean {
 /** Resolve the per-launch consent state for this lane. Pure — reads only
  *  process.env, so callers can re-evaluate any time without holding state. */
 export function resolveObservabilityConsent(): ObservabilityConsent {
-  // CI and DNT/disabled have different effects on which sub-lanes are gated.
-  // Keep the ordering aligned with §Consent boundaries above.
-  const dnt = envOn('DO_NOT_TRACK')
-  const orcaDisabled = envOn('ORCA_TELEMETRY_DISABLED')
   const diagnosticsDisabled = envOn('ORCA_DIAGNOSTICS_DISABLED')
   const ci = inCI()
 
@@ -104,16 +79,6 @@ export function resolveObservabilityConsent(): ObservabilityConsent {
       disabledReason: 'orca_diagnostics_disabled'
     }
   }
-  if (dnt || orcaDisabled) {
-    // Local file remains active — DNT is a *network* signal, and the local
-    // file never leaves the machine.
-    return {
-      localFileEnabled: true,
-      bundleEnabled: false,
-      disabledReason: dnt ? 'do_not_track' : 'orca_telemetry_disabled'
-    }
-  }
-
   return {
     localFileEnabled: true,
     bundleEnabled: true
@@ -227,9 +192,8 @@ export function getDiagnosticsStatus(): DiagnosticsStatus {
 
 /** Collect a bundle from the live trace folder. The `appVersion` /
  *  `platform` / `arch` / `osRelease` / `orcaChannel` inputs come from main
- *  and are baked into the bundle header. NEVER pass `install_id` here —
- *  the bundle's identity is the per-bundle ID, not the
- *  PostHog-lane install_id (Issue 8 in the security review). */
+ *  and are baked into the bundle header. Never attach an install identity; the bundle uses a
+ *  per-bundle ID. */
 export function collectDiagnosticBundle(
   meta: Pick<
     CollectBundleOptions,

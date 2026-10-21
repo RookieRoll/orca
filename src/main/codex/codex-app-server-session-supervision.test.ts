@@ -9,7 +9,7 @@ import {
 } from '../provider-process/provider-process-supervisor'
 import type { CodexAppServerSpawn } from './codex-app-server-process-tree-kill'
 import { CodexAppServerTimeoutError, runCodexAppServerSession } from './codex-app-server-session'
-import { classifyCodexTrustGrantError } from './codex-trust-grant-telemetry'
+import { classifyCodexTrustGrantError } from './codex-trust-grant-classification'
 import { PROVIDER_SPAWN_FAILURE_MARKER } from '../provider-process/provider-spawn-failure-report'
 import { alive, createSupervisedProbeRig, waitFor } from './supervised-probe-owner.test-fixture'
 

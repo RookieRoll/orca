@@ -11,13 +11,9 @@ import { splitTerminalPaneWithInheritedCwd } from './terminal-pane-split-with-in
 import { useAppStore } from '@/store'
 
 export function recordContextMenuCreatedTerminalPaneSplit(
-  createdPane: unknown,
-  args: {
-    source: 'contextual_tour' | 'context_menu'
-    direction: 'vertical' | 'horizontal'
-  }
+  createdPane: unknown
 ): boolean {
-  return recordCreatedTerminalPaneSplit(createdPane, args)
+  return recordCreatedTerminalPaneSplit(createdPane)
 }
 
 type UseTerminalPaneSplitActionsDeps = {

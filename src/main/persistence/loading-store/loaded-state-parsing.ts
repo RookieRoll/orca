@@ -79,7 +79,7 @@ export class LoadedStateParsingOperations {
   }
 
   private loadInternal(serialized?: string, parsedInput?: Record<string, unknown>): PersistedState {
-    // Capture "has run Orca before?" for telemetry cohort; the telemetry field is new, so field inference misclassifies old users as fresh.
+    // Persisted-file presence seeds legacy tab-switch keybindings on first load.
     const fileExistedOnLoad = serialized !== undefined || parsedInput !== undefined
     logStartupMilestone('persistence-load-start', {
       fileExists: fileExistedOnLoad
@@ -269,7 +269,6 @@ export class LoadedStateParsingOperations {
 
     const migrated = {
       ...this.cohorts.migrateTabSwitchKeybindings(
-        this.cohorts.migrateTelemetry(result, fileExistedOnLoad),
         fileExistedOnLoad
       ),
       nativeChatUpgradeTipAudience:

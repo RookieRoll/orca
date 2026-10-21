@@ -3,7 +3,7 @@ import type {
   AgentProcessVerdict
 } from '../../../shared/agent-process-presence'
 import type { createServer } from 'node:http'
-import { randomBytes, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 
 import {
   createHookListenerState,
@@ -13,7 +13,6 @@ import {
 import {
   createHookTransportInterferenceTracker,
   describeHookTransportInterference,
-  type HookTransportInterferenceReport
 } from '../../../shared/agent-hook-transport-interference'
 import {
   AgentStatusObservationSequencer,
@@ -34,7 +33,6 @@ import type {
   AgentHookProviderSessionIdentity,
   AgentHookStatusChangeEntry,
   AgentHookStatusFreshnessObservation,
-  AgentPromptSentDedupeEntry,
   EnrichedAgentHookEventPayload,
   NormalizedLocalHook,
   PaneKeyAliasEntry,
@@ -133,12 +131,9 @@ export abstract class AgentHookServerState {
     nextListingOrder: this.nextStatusListingOrder,
     isCanonicalPaneKey: (paneKey) => this.canonicalSubjectsByPane.has(paneKey)
   })
-  protected onTransportInterference: ((report: HookTransportInterferenceReport) => void) | null =
-    null
   protected transportInterference = createHookTransportInterferenceTracker(
-    (report: HookTransportInterferenceReport) => {
+    (report) => {
       console.warn(describeHookTransportInterference(report))
-      this.onTransportInterference?.(report)
     }
   )
   // Why: hydrated rows give UI continuity but aren't evidence of live agent work in this runtime.
@@ -167,9 +162,7 @@ export abstract class AgentHookServerState {
   protected lastStatusPersistStartedAt = Number.NEGATIVE_INFINITY
   protected lastPersistedAuthorityFingerprint: string | null = null
   protected assistantMessageRetryTimers = new Map<string, ReturnType<typeof setTimeout>>()
-  protected promptSentDedupeByPaneKey = new Map<string, AgentPromptSentDedupeEntry>()
   protected activeHookTurnCompletedAtByPaneKey = new Map<string, number>()
-  protected promptSentHashSalt = randomBytes(16).toString('hex')
   protected closedAgentStatusTabIds = new Set<string>()
   protected closedAgentStatusPaneKeys = new Set<string>()
   protected restartedStatusLaunchTokenHashByPaneKey = new Map<
@@ -232,11 +225,6 @@ export abstract class AgentHookServerState {
     now?: number,
     observedAt?: number
   ): EnrichedAgentHookEventPayload
-  protected abstract hashPromptForTelemetryDedupe(prompt: string): string
-  protected abstract maybeTrackAgentPromptSent(
-    payload: AgentHookEventPayload,
-    previousStatus: EnrichedAgentHookEventPayload | undefined
-  ): void
   protected abstract stampObservation(
     payload: AgentHookEventPayload,
     origin: AgentStatusObservationOrigin,
@@ -331,6 +319,5 @@ export abstract class AgentHookServerState {
   protected abstract primeStatusPersistBaseline(onDiskJson: string): void
 
   abstract _getStateForTests(): HookListenerState
-  abstract _resetPromptSentDedupeForTests(): void
   abstract _resetConnectionTimestampWatermarksForTests(): void
 }

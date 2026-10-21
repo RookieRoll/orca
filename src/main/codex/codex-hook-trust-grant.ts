@@ -6,11 +6,10 @@ import {
 } from './codex-app-server-client'
 import {
   classifyCodexTrustGrantError,
-  emitCodexTrustGrantTelemetry,
   type CodexTrustGrantErrorClass,
   type CodexTrustGrantFallbackReason,
   type CodexTrustGrantVerifyClass
-} from './codex-trust-grant-telemetry'
+} from './codex-trust-grant-classification'
 import {
   codexAppServerCapabilityCache,
   getCodexAppServerHostKey,
@@ -91,14 +90,6 @@ function fallback(
     `[codex-trust-grant] falling back to self-computed trust (reason=${reason}, host=${plan.host.kind})`,
     detail ?? ''
   )
-  emitCodexTrustGrantTelemetry({
-    outcome: reason === 'verify-failed' ? 'verify_failed' : 'fallback',
-    hostKind: plan.host.kind,
-    lane: 'managed',
-    reason,
-    ...(errorClass !== undefined ? { errorClass } : {}),
-    ...(verifyClass !== undefined ? { verifyClass } : {})
-  })
   return { lane: 'fallback', reason, ...(errorClass !== undefined ? { errorClass } : {}) }
 }
 
@@ -110,7 +101,7 @@ type GrantAttempt = {
   startedAtMs: number
 }
 
-/** Post-session verification, ledger persistence and telemetry. Never throws for
+/** Post-session verification and ledger persistence. Never throws for
  *  a verify failure — every rejection is a fallback. */
 function completeGrant(
   attempt: GrantAttempt,
@@ -165,11 +156,6 @@ function completeGrant(
     `[codex-trust-grant] granted ${grantedEntries.length} managed hook entries via codex app-server ` +
       `(host=${plan.host.kind}, wrote=${result.wroteTrust}, ${Date.now() - attempt.startedAtMs}ms)`
   )
-  emitCodexTrustGrantTelemetry({
-    outcome: 'granted',
-    hostKind: plan.host.kind,
-    lane: 'managed'
-  })
   return { lane: 'rpc', entries: grantedEntries }
 }
 

@@ -21,7 +21,7 @@ import {
 } from './agent-launch-typed-line-shell'
 import { resolveTerminalStartupCwd } from '../../shared/terminal-startup-cwd'
 import { resolveAgentStartupPlanInputs } from '../../shared/agent-startup-plan-inputs'
-import { agentStartedTelemetry } from '../agent-launch/agent-started-telemetry'
+import { buildAgentLaunchContext } from '../agent-launch/build-agent-launch-context'
 import { terminalShellOverrideRefusal } from './terminal-shell-override-host-support'
 import {
   resolveLocalProjectRuntimeForWorktreeId,
@@ -241,7 +241,7 @@ async function buildRuntimeAgentTerminalStartupOptions(
     launchAgent: agent,
     startupCommandDelivery: startupPlan.startupCommandDelivery,
     // A bare command the user typed stays out of launch accounting, as before.
-    ...(opts.startupAgent ? { telemetry: agentStartedTelemetry(agent, opts.launchSource) } : {})
+    ...(opts.startupAgent ? { telemetry: buildAgentLaunchContext(agent, opts.launchSource) } : {})
   }
 }
 

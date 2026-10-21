@@ -354,7 +354,7 @@ describe('runtime create timing', () => {
         'copy_worktreeinclude'
       ])
     )
-    expect(finished).toMatchObject({ executionHost: 'local', worktreeCount: 3 })
+    expect(finished).toMatchObject({ executionHost: 'local' })
   })
 
   it('records a sparse create as a miss without consulting the prepared checkout', async () => {

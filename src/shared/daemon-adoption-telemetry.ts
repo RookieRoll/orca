@@ -1,7 +1,4 @@
-// Enums for the `daemon_adopted` and `daemon_pty_cwd_denied` telemetry events (#17696).
-// Both exist to measure how often a macOS app runs on a daemon left behind by an earlier app
-// bundle, and how often such a daemon actually spawns a terminal whose cwd it cannot read.
-// Enum-only: no paths, versions, or exact counts ever reach the wire.
+// Classifies daemon attribution and terminal cwd access for local diagnostics and remediation.
 
 /** How the adopted daemon's recorded app version compares to the running app. */
 export const DAEMON_ADOPTED_APP_VERSION_MATCH = ['same', 'different', 'unknown'] as const

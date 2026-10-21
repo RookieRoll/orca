@@ -6,13 +6,7 @@ import { AgentHookServer, _internals } from './server'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import type { AgentStatusObservation } from '../../shared/agent-status-observation'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
 
-vi.mock('../telemetry/client', () => ({ track: trackMock }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: getCohortAtEmitMock }))
 
 const LEAF = '11111111-1111-4111-8111-111111111111'
 const PANE = makePaneKey('tab-1', LEAF)
@@ -41,7 +35,6 @@ describe('agent status observation provenance', () => {
 
   beforeEach(() => {
     _internals.resetCachesForTests()
-    getCohortAtEmitMock.mockReturnValue({})
   })
 
   afterEach(() => {

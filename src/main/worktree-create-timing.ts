@@ -5,7 +5,6 @@ import type {
   WorktreeCreateTimingPhase
 } from '../shared/worktree/create-types'
 import type { WorktreeCreatePhase } from '../shared/worktree/create-timing-vocabulary'
-import type { PreparationWork, WorktreeCreateInFlightHandle } from './worktree-create-concurrency'
 import { wslDistroForCommand } from './git/command-runner/git-command-resolution'
 
 type TimingClock = () => number
@@ -16,14 +15,9 @@ export type WorktreeCreateTimingRecorder = {
   time<T>(phase: WorktreeCreatePhase, operation: () => Promise<T>): Promise<T>
   timeSync<T>(phase: WorktreeCreatePhase, operation: () => T): T
   recordPreparedCheckout(outcome: PreparedCheckoutOutcome): void
-  /** The prepared checkout this create claimed, so its build is not counted as competing work. */
-  recordAdoptedPreparation(work: PreparationWork): void
   recordExecutionHost(host: WorktreeCreateExecutionHost): void
-  recordWorktreeCount(count: number): void
   /** The outermost phase this error (or one in its cause chain) propagated out of; undefined when none did. */
   failedPhase(error: unknown): WorktreeCreatePhase | undefined
-  /** Also closes the concurrency window, so work this create starts afterwards (its own re-arm)
-   *  is not counted against it. */
   finish(): WorktreeCreateTiming
 }
 
@@ -59,13 +53,11 @@ function createPhase(
 
 export function createWorktreeCreateTimingRecorder(
   clock: TimingClock = defaultClock,
-  inFlight?: WorktreeCreateInFlightHandle
 ): WorktreeCreateTimingRecorder {
   const startedAt = clock()
   const phases: WorktreeCreateTimingPhase[] = []
   let preparedCheckout: PreparedCheckoutOutcome | undefined
   let executionHost: WorktreeCreateExecutionHost | undefined
-  let worktreeCount: number | undefined
   // Keyed by the thrown value, so a caught failure or a concurrent sibling cannot be misattributed.
   const phaseByError = new WeakMap<object, WorktreeCreatePhase>()
 
@@ -105,14 +97,8 @@ export function createWorktreeCreateTimingRecorder(
     recordPreparedCheckout(outcome: PreparedCheckoutOutcome): void {
       preparedCheckout = outcome
     },
-    recordAdoptedPreparation(work: PreparationWork): void {
-      inFlight?.adoptPreparation(work)
-    },
     recordExecutionHost(host: WorktreeCreateExecutionHost): void {
       executionHost = host
-    },
-    recordWorktreeCount(count: number): void {
-      worktreeCount = count
     },
     failedPhase(error: unknown) {
       // Bounded so a cyclic cause chain cannot loop.
@@ -130,13 +116,11 @@ export function createWorktreeCreateTimingRecorder(
       return undefined
     },
     finish() {
-      inFlight?.end()
       return {
         totalDurationMs: clampDuration(clock() - startedAt),
         phases: [...phases],
         ...(preparedCheckout ? { preparedCheckout } : {}),
         ...(executionHost ? { executionHost } : {}),
-        ...(worktreeCount !== undefined ? { worktreeCount } : {})
       }
     }
   }

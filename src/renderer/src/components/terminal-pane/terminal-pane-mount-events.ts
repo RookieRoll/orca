@@ -6,7 +6,6 @@ import {
   type SetTerminalPaneTitleDetail
 } from '@/constants/terminal'
 import { resolveLeafIdForManager } from '@/lib/pane-manager/pane-key-resolution'
-import { consumePendingWebRuntimeSplitMirrorTelemetry } from '@/runtime/web-runtime-terminal-actions'
 import { scheduleRuntimeGraphSync } from '@/runtime/sync-runtime-graph'
 import { closeTerminalTab } from '../terminal/terminal-tab-actions'
 import { useAppStore } from '@/store'
@@ -62,20 +61,10 @@ export function installTerminalPaneMountEvents(args: {
         const createdPane = splitPaneWithOneShotStartup(ptyDeps, { command: detail.command }, () =>
           mgr.splitPane(sourcePaneId, detail.direction, splitOptions)
         )
-        recordRuntimeCreatedTerminalPaneSplit(createdPane, {
-          source: detail.telemetrySource ?? 'command',
-          direction: detail.direction
-        })
+        recordRuntimeCreatedTerminalPaneSplit(createdPane)
       } else {
         const createdPane = mgr.splitPane(sourcePaneId, detail.direction, splitOptions)
-        const telemetrySuppressed = createdPane
-          ? consumePendingWebRuntimeSplitMirrorTelemetry(detail.sourcePtyId, detail.direction)
-          : false
-        recordRuntimeCreatedTerminalPaneSplit(createdPane, {
-          source: detail.telemetrySource ?? 'command',
-          direction: detail.direction,
-          telemetrySuppressed
-        })
+        recordRuntimeCreatedTerminalPaneSplit(createdPane)
       }
     }
   )

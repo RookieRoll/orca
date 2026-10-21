@@ -218,7 +218,7 @@ export async function createRuntimeLocalGitWorktree(args: {
           args.localWorktreeGitOptions
         )
       : preparedPushTarget
-  const { created, worktrees, listingComplete } = await args.timing.time(
+  const { created } = await args.timing.time(
     'list_created_worktree',
     () =>
       resolveCreatedWorktree(
@@ -228,9 +228,6 @@ export async function createRuntimeLocalGitWorktree(args: {
         args.localWorktreeGitOptions
       )
   )
-  if (listingComplete) {
-    args.timing.recordWorktreeCount(worktrees.length)
-  }
   return {
     sparseDirectories,
     ...(configuredPushTarget ? { configuredPushTarget } : {}),

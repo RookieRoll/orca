@@ -1414,11 +1414,10 @@
           "fd7b3891af": "You opened the local review file ({{value0}}). You can discard it when finished."
         },
         "PrivacyDiagnosticsRows": {
-          "5a7cbe069a": "DO_NOT_TRACK=1 is set — creating local diagnostic files is disabled.",
-          "63d03261d1": "ORCA_TELEMETRY_DISABLED=1 is set — creating local diagnostic files is disabled."
+          "e27c8d45bf": "Diagnostics are disabled by an environment variable."
         },
         "PrivacyPane": {
-          "afec8b03be": "ci"
+          "77410e0566": "Privacy policy"
         },
         "ProjectWindowsRuntimeSetting": {
           "activeTaskPlural": "{{count}} active tasks",
@@ -1924,6 +1923,11 @@
             "search": {
               "b730ff7049": "experimental"
             }
+          }
+        },
+        "privacy": {
+          "search": {
+            "6d258d2ed6": "Diagnostics"
           }
         },
         "providerAccountScope": {

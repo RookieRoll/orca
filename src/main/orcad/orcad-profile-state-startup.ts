@@ -3,7 +3,8 @@ import type { ProfileStateStoreFactoryResult } from '../persistence/profile-stat
 import { ensureActiveOrcaProfile, initOrcaProfilePaths } from '../orca-profiles/profile-index-store'
 import { initSshHostKeyStoreFile } from '../ssh/ssh-host-key-store'
 import { initOrcadHeldFenceTokenFile } from '../ssh/orcad-held-fence-tokens'
-import { emitOrcadProfileStateAuthoritySelected } from './orcad-profile-state-telemetry'
+import type { OrcadProfileStateAuthoritySelection } from './orcad-profile-state-types'
+import { logOrcadProfileStateAuthorityDiagnostic } from './orcad-profile-state-diagnostics'
 
 export type OrcadProfileStateProfile = {
   dataFile: string
@@ -13,13 +14,7 @@ export type OrcadProfileStateProfile = {
 
 export type OrcadProfileStateStartup = {
   store: ProfileStateStoreFactoryResult['store']
-  authority: {
-    backend: ProfileStateStoreFactoryResult['backend']
-    classification: ProfileStateStoreFactoryResult['classification']
-    authority_mode: 'sqlite-established'
-    runtime: 'orcad'
-    migrated: boolean
-  }
+  authority: OrcadProfileStateAuthoritySelection
 }
 
 /** Build the headless Store and publish its authority selection at one Node-only seam. */
@@ -48,7 +43,7 @@ export async function createOrcadProfileStateStartup(
   try {
     initSshHostKeyStoreFile(profile.dataFile)
     initOrcadHeldFenceTokenFile(profile.dataFile)
-    emitOrcadProfileStateAuthoritySelected(authority)
+    logOrcadProfileStateAuthorityDiagnostic(authority)
     return { store: result.store, authority }
   } catch (error) {
     try {

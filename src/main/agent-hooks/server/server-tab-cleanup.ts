@@ -49,11 +49,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
         paneKeysToClear.add(paneKey)
       }
     }
-    for (const paneKey of this.promptSentDedupeByPaneKey.keys()) {
-      if (paneCacheKeyMatchesTab(paneKey, tabId)) {
-        paneKeysToClear.add(paneKey)
-      }
-    }
     for (const commitment of this.hydratedAuthorityCommitments) {
       if (paneCacheKeyMatchesTab(commitment.paneKey, tabId)) {
         paneKeysToClear.add(commitment.paneKey)
@@ -82,7 +77,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
       this.activeHookTurnCompletedAtByPaneKey.delete(paneKey)
       this.runtimeObservedStatusPaneKeys.delete(paneKey)
       this.currentAuthorityObservations.delete(paneKey)
-      this.promptSentDedupeByPaneKey.delete(paneKey)
       this.restartedStatusLaunchTokenHashByPaneKey.delete(paneKey)
       this.evidenceObservedAtByPaneKey.delete(paneKey)
       this.programStatusFacets.delete(paneKey)
@@ -142,7 +136,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
     clearPaneCacheState(this.state, resolvedPaneKey)
     this.activeHookTurnCompletedAtByPaneKey.delete(resolvedPaneKey)
     this.currentAuthorityObservations.delete(resolvedPaneKey)
-    this.promptSentDedupeByPaneKey.delete(resolvedPaneKey)
     this.restartedStatusLaunchTokenHashByPaneKey.delete(resolvedPaneKey)
     // Why: the pane itself is gone, so its observation clock describes nothing a later pane owns.
     this.evidenceObservedAtByPaneKey.delete(resolvedPaneKey)
@@ -158,7 +151,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
         clearPaneCacheState(this.state, legacyPaneKey)
         this.activeHookTurnCompletedAtByPaneKey.delete(legacyPaneKey)
         this.currentAuthorityObservations.delete(legacyPaneKey)
-        this.promptSentDedupeByPaneKey.delete(legacyPaneKey)
         this.restartedStatusLaunchTokenHashByPaneKey.delete(legacyPaneKey)
         this.evidenceObservedAtByPaneKey.delete(legacyPaneKey)
         this.programStatusFacets.delete(legacyPaneKey)

@@ -2,6 +2,7 @@ import { ORCA_SIDEBAR_INPUTS_IS_MAIN } from '../../../../../../shared/sidebar-in
 import type { CreateWorktreeArgs } from '../../../../../../shared/worktree/create-types'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import type { WorkspaceKey } from '../../../../../../shared/folder-workspace-types'
+import type { WorkspaceSource } from '../../../../../../shared/workspace-source'
 import type { TaskSourceContext } from '../../../../../../shared/task-source-context'
 import type { WorkspaceLinkedItem } from '../../../../../../shared/worktree/types'
 
@@ -31,6 +32,7 @@ export type CreateWorktreeCallOptions = {
 /** Everything `createWorktree` received, packed once so both transports read from the same record.
  *  The per-attempt fields live on `WorktreeCreateAttempt` instead. */
 export type WorktreeCreateRequest = Omit<CreateWorktreeArgs, 'parentWorkspace' | 'manualOrder'> & {
+  telemetrySource?: WorkspaceSource
   options?: CreateWorktreeCallOptions
 }
 
@@ -61,7 +63,6 @@ function sharedCreateFields(
     ...((request.displayNameKind ?? options?.displayNameKind)
       ? { displayNameKind: request.displayNameKind ?? options?.displayNameKind }
       : {}),
-    ...(request.telemetrySource ? { telemetrySource: request.telemetrySource } : {}),
     ...(request.linkedIssue !== undefined ? { linkedIssue: request.linkedIssue } : {}),
     ...(request.linkedPR !== undefined ? { linkedPR: request.linkedPR } : {}),
     ...(request.pushTarget ? { pushTarget: request.pushTarget } : {}),

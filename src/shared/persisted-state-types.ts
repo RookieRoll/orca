@@ -7,7 +7,6 @@ import type {
 } from './ssh-types'
 import type { Automation, AutomationRun } from './automations-types'
 import type { MigrationUnsupportedPtyEntry } from './agent-status-types'
-import type { FeatureInteractionTelemetryBucketState } from './feature-interactions'
 import type { CodexResetCreditAttemptLedger } from './codex-reset-credit-attempt-ledger'
 import type { NativeChatUpgradeTipAudience } from './native-chat-upgrade-tip-audience'
 import type { DiffComment } from './diff-comment-types'
@@ -125,8 +124,6 @@ export type PersistedState = {
   /** Catalogs staged on an orcad and not yet committed or aborted. */
   orcadMigrationStagedCatalogs?: OrcadMigrationStagedCatalog[]
   onboarding: OnboardingState
-  /** Main-owned telemetry de-dupe marker; never exposed through PersistedUIState. */
-  featureInteractionTelemetryBuckets?: FeatureInteractionTelemetryBucketState
   /** Main-owned reset mutation journal. Never expose this through renderer settings APIs. */
   codexResetCreditAttemptLedger?: CodexResetCreditAttemptLedger
   /** Main-owned, decided once on the first load of the upgrade; never derived from live settings. */

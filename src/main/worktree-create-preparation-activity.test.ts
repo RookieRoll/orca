@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPreparationActivity } from './worktree-create-preparation-activity'
-import {
-  _resetWorktreeCreateConcurrencyForTests,
-  beginWorktreeCreate
-} from './worktree-create-concurrency'
 
 let now = 0
 
@@ -13,7 +9,6 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  _resetWorktreeCreateConcurrencyForTests()
   vi.restoreAllMocks()
 })
 
@@ -33,7 +28,6 @@ describe('createPreparationActivity', () => {
     const refresh = Promise.withResolvers<void>()
     const chained = build.promise.then(() => refresh.promise)
     activity.track(chained)
-    const observer = beginWorktreeCreate()
 
     now = 3_000
     build.resolve()
@@ -44,7 +38,6 @@ describe('createPreparationActivity', () => {
 
     // Build is the build alone; idle runs from the refreshed checkout's ready.
     expect(activity.timesAt(9_000)).toEqual({ buildMs: 2_000, idleMs: 4_000 })
-    expect(observer.end().preparations).toBe(1)
   })
 
   it('keeps the build time of the first build when a later refresh runs as new work', async () => {
@@ -54,7 +47,6 @@ describe('createPreparationActivity', () => {
     now = 41_000
     build.resolve()
     await build.promise
-    const observer = beginWorktreeCreate()
 
     now = 101_000
     const refresh = Promise.withResolvers<void>()
@@ -65,7 +57,6 @@ describe('createPreparationActivity', () => {
 
     // A 40 s build stays 40 s; idle runs from the refresh's ready, not the build's.
     expect(activity.timesAt(113_000)).toEqual({ buildMs: 40_000, idleMs: 10_000 })
-    expect(observer.end().preparations).toBe(1)
   })
 
   it('reports no idle time while a refresh is still running at the claim', async () => {

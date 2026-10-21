@@ -89,14 +89,14 @@ export function renderPrivacySettingsSection(context: SettingsRenderContext): Re
   return (
     <SettingsSection
       id="privacy"
-      title={translate('auto.components.settings.Settings.d7e3f62d70', 'Privacy & Telemetry')}
+      title={translate('auto.components.settings.Settings.privacyTitle', 'Privacy')}
       description={translate(
-        'auto.components.settings.Settings.c1b43dc4e2',
-        'Anonymous usage data and telemetry controls.'
+        'auto.components.settings.Settings.localDiagnosticsDescription',
+        'Local diagnostics settings.'
       )}
       searchEntries={navigation.getSectionSearchEntries('privacy')}
     >
-      {view.isSectionMounted('privacy') ? <PrivacyPane settings={model.settings} /> : null}
+      {view.isSectionMounted('privacy') ? <PrivacyPane /> : null}
     </SettingsSection>
   )
 }

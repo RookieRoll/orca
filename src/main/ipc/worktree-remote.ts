@@ -1563,9 +1563,6 @@ async function performLocalWorktreeCreate(
   } = await timing.time('list_created_worktree', async () =>
     resolveCreatedWorktree(repo.path, worktreePath, branchName, localWorktreeGitOptions)
   )
-  if (listingComplete) {
-    timing.recordWorktreeCount(gitWorktrees.length)
-  }
 
   const worktreeId = `${repo.id}::${created.path}`
   const now = Date.now()

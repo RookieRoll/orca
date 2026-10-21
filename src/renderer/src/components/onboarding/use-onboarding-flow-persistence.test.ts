@@ -6,30 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getDefaultOnboardingState } from '../../../../shared/onboarding-defaults'
 import type { OnboardingState } from '../../../../shared/onboarding-state-types'
 
-const trackMock = vi.hoisted(() => vi.fn())
-
-vi.mock('@/lib/telemetry', () => ({
-  track: trackMock
-}))
-
 import {
   buildCompletedOnboardingNotificationSettings,
-  buildOnboardingDismissedPayload,
   onboardingChatPermissionSetting,
-  useCloseWith,
-  type DismissedExtras,
-  trackOnboardingDismissed
+  useCloseWith
 } from './use-onboarding-flow-persistence'
-import type { StepNumber } from './use-onboarding-flow-types'
 
-type CloseWithCallback = (
-  outcome: 'completed' | 'dismissed',
-  lastStepReached: StepNumber,
-  completedPath?: 'add_project_modal',
-  dismissedExtras?: DismissedExtras
-) => Promise<boolean>
-
-const probeStartTime = Date.now()
+type CloseWithCallback = (outcome: 'completed' | 'dismissed') => Promise<boolean>
 
 function makeOnboardingState(): OnboardingState {
   return {
@@ -50,7 +33,6 @@ function setApi(api: {
 function CloseWithProbe(props: { onReady: (closeWith: CloseWithCallback) => void }): null {
   const closeWith = useCloseWith({
     onOnboardingChange: vi.fn(),
-    startTimeRef: { current: probeStartTime },
     setError: vi.fn()
   })
   useEffect(() => props.onReady(closeWith), [closeWith, props])
@@ -74,7 +56,6 @@ describe('onboarding flow persistence', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    trackMock.mockClear()
     setApi({
       onboarding: { update: vi.fn().mockResolvedValue(makeOnboardingState()) },
       starNag: { onboardingCompleted: vi.fn().mockResolvedValue(undefined) }
@@ -89,32 +70,6 @@ describe('onboarding flow persistence', () => {
     root = null
     container = null
     vi.useRealTimers()
-  })
-
-  it('builds dismissed telemetry with the triggering advance path', () => {
-    expect(
-      buildOnboardingDismissedPayload(3, {
-        durationMs: 250,
-        advancedVia: 'keyboard'
-      })
-    ).toEqual({
-      last_step: 3,
-      duration_ms: 250,
-      advanced_via: 'keyboard'
-    })
-  })
-
-  it('tracks dismissed onboarding telemetry with the triggering advance path', () => {
-    trackOnboardingDismissed(3, {
-      durationMs: 250,
-      advancedVia: 'keyboard'
-    })
-
-    expect(trackMock).toHaveBeenCalledWith('onboarding_dismissed', {
-      last_step: 3,
-      duration_ms: 250,
-      advanced_via: 'keyboard'
-    })
   })
 
   it('preserves explicit focus notification suppression when completing onboarding', () => {
@@ -159,7 +114,7 @@ describe('onboarding flow persistence', () => {
     }))
 
     await act(async () => {
-      await closeWith?.('completed', 5)
+      await closeWith?.('completed')
     })
 
     const api = (

@@ -19,8 +19,6 @@ const mocks = vi.hoisted(() => ({
   },
   checkOrcaStarredMock: vi.fn(),
   starOrcaMock: vi.fn(),
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(() => ({ nth_repo_added: 3 })),
   ipcMainHandleMock: vi.fn()
 }))
 
@@ -35,14 +33,6 @@ vi.mock('electron', () => ({
 vi.mock('../github/client', () => ({
   checkOrcaStarred: mocks.checkOrcaStarredMock,
   starOrca: mocks.starOrcaMock
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: mocks.trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: mocks.getCohortAtEmitMock
 }))
 
 const { browserWindowMock, checkOrcaStarredMock } = mocks

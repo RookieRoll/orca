@@ -37,10 +37,6 @@ import {
 } from './worktree-create-preparation'
 import { startPreparation } from './worktree-create-preparation-pool'
 import { createWorktreeCreateTimingRecorder } from './worktree-create-timing'
-import {
-  _resetWorktreeCreateConcurrencyForTests,
-  beginWorktreeCreate
-} from './worktree-create-concurrency'
 
 const request = {
   repoPath: '/repo',
@@ -76,7 +72,6 @@ beforeEach(() => {
 
 afterEach(async () => {
   await _resetWorktreeCreatePreparationsForTests()
-  _resetWorktreeCreateConcurrencyForTests()
   vi.restoreAllMocks()
 })
 
@@ -303,26 +298,4 @@ describe('prepared checkout create timing', () => {
     expect(await create).toMatchObject({ status: 'hit', buildMs: 5_000, idleMs: 0 })
   })
 
-  it('counts a building prepared checkout against other creates but not the one that used it', async () => {
-    const checkoutStarted = Promise.withResolvers<void>()
-    const checkout = Promise.withResolvers<void>()
-    mocks.prepare.mockImplementation(() => {
-      checkoutStarted.resolve()
-      return checkout.promise
-    })
-    const bystander = beginWorktreeCreate()
-    const preparation = prepare()
-    await checkoutStarted.promise
-    const inFlight = beginWorktreeCreate()
-    const timing = createWorktreeCreateTimingRecorder(undefined, inFlight)
-
-    const create = consumePreparedWorktreeCreate({ ...request, timing })
-    await settleClaim()
-    checkout.resolve()
-    await preparation
-
-    expect(await create).toMatchObject({ status: 'hit', origin: 'prefetch' })
-    expect(inFlight.end().preparations).toBe(0)
-    expect(bystander.end().preparations).toBe(1)
-  })
 })

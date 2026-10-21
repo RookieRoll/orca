@@ -37,8 +37,6 @@ export function AgentCapabilitiesSetupAction(props: {
     DEFAULT_ONBOARDING_FEATURE_SETUP_SELECTION
   )
   const [featureSetupCommand, setFeatureSetupCommand] = useState<string | null>(null)
-  const [featureSetupCommandSelection, setFeatureSetupCommandSelection] =
-    useState<OnboardingFeatureSetupSelection | null>(null)
   const [featureSetupRuntime, setFeatureSetupRuntime] =
     useState<OnboardingFeatureSetupRuntimeContext | null>(null)
   const [setupBusyLabel, setSetupBusyLabel] = useState<string | null>(null)
@@ -115,7 +113,6 @@ export function AgentCapabilitiesSetupAction(props: {
         )
       }
       if (result.skillInstallCommand) {
-        setFeatureSetupCommandSelection(featureSetup)
         setFeatureSetupRuntime(activeSkillRuntime)
         setFeatureSetupCommand(result.skillInstallCommand)
       }
@@ -136,7 +133,6 @@ export function AgentCapabilitiesSetupAction(props: {
         featureSetup={featureSetup}
         onFeatureSetupChange={handleFeatureSetupChange}
         featureSetupCommand={featureSetupCommand}
-        featureSetupCommandSelection={featureSetupCommandSelection}
         featureSetupRuntime={featureSetupRuntime}
         setupBusyLabel={setupBusyLabel}
         onStartFeatureSetup={() => void handleStartFeatureSetup()}
@@ -209,7 +205,6 @@ function AgentCapabilitySetupControls(props: {
   featureSetup: OnboardingFeatureSetupSelection
   onFeatureSetupChange: (value: OnboardingFeatureSetupSelection) => void
   featureSetupCommand: string | null
-  featureSetupCommandSelection: OnboardingFeatureSetupSelection | null
   featureSetupRuntime: OnboardingFeatureSetupRuntimeContext | null
   setupBusyLabel: string | null
   onStartFeatureSetup: () => void
@@ -262,7 +257,6 @@ function AgentCapabilitySetupControls(props: {
         <FeatureSetupInlineTerminal
           command={props.featureSetupCommand}
           runtimeContext={props.featureSetupRuntime ?? undefined}
-          selection={props.featureSetupCommandSelection ?? props.featureSetup}
         />
       ) : null}
     </>

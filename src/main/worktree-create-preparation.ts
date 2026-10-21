@@ -82,7 +82,7 @@ type ConsumePreparedWorktreeArgs = {
   options?: AddWorktreeOptions
   timing?: Pick<
     WorktreeCreateTimingRecorder,
-    'time' | 'recordPreparedCheckout' | 'recordAdoptedPreparation'
+    'time' | 'recordPreparedCheckout'
   >
 }
 
@@ -158,7 +158,6 @@ async function claimPreparedWorktree(
     return reserved
   }
   const { entry, reservation } = reserved
-  args.timing?.recordAdoptedPreparation(entry.activity.work)
   const claimedAt = performance.now()
   try {
     await timePhase(args, 'prepared_checkout_wait', () => entry.ready)

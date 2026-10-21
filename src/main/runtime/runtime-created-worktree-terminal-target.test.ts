@@ -8,7 +8,7 @@ import type { RemoteTrackingBase } from './runtime-remote-fetch-controller'
 import type { OrcaRuntimeWithNotifySshStateChanged } from './workspaces/workspace-host-notifications'
 import type { RuntimeManagedWorktreeCreateArgs } from './runtime-managed-worktree-create-types'
 import type { PreparationRearmHolder } from '../worktree-create-preparation'
-import type { RuntimeWorkspaceCreateEvents } from '../workspace-create-telemetry'
+import type { WorktreeCreateTimingRecorder } from '../worktree-create-timing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ExecutionHostId } from '../../shared/execution-host'
 import type { Repo } from '../../shared/repo-types'
@@ -506,9 +506,9 @@ describe('managed creation runtime entry', () => {
         this: unknown,
         request: RuntimeManagedWorktreeCreateArgs,
         rearm: PreparationRearmHolder,
-        events: RuntimeWorkspaceCreateEvents
+        timing: WorktreeCreateTimingRecorder
       ) {
-        calls.push({ receiver: this, args: [request, rearm, events] })
+        calls.push({ receiver: this, args: [request, rearm, timing] })
         order.push('private entry')
         rearm.fire = () => order.push('rearm')
         throw failure
@@ -519,7 +519,7 @@ describe('managed creation runtime entry', () => {
     expect(calls).toEqual([
       {
         receiver: runtime,
-        args: [request, { fire: expect.any(Function) }, { begin: expect.any(Function) }]
+        args: [request, { fire: expect.any(Function) }, expect.objectContaining({ time: expect.any(Function) })]
       }
     ])
     expect(order).toEqual(['private entry', 'rearm'])

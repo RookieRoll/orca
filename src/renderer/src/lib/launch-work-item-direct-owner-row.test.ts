@@ -20,8 +20,6 @@ vi.mock('@/lib/ensure-hooks-confirmed', () => ({
 vi.mock('@/lib/connection-context', () => ({ getConnectionId: () => null }))
 vi.mock('@/runtime/runtime-hooks-client', () => ({ checkRuntimeHooks: mocks.checkRuntimeHooks }))
 vi.mock('@/runtime/runtime-rpc-client', () => ({ callRuntimeRpc: mocks.callRuntimeRpc }))
-vi.mock('@/lib/telemetry', () => ({ track: vi.fn(), tuiAgentToAgentKind: (a: string) => a }))
-
 import { launchWorkItemDirect } from './launch-work-item-direct'
 
 // Why: preflight, the PR start point and `git worktree add` must agree on one host per launch.

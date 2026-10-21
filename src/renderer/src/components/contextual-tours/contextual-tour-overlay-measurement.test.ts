@@ -28,7 +28,6 @@ describe('contextual tour overlay measurement', () => {
       activeStepIndex: 0,
       sidebarOpen: true,
       keybindings: undefined,
-      previousTelemetryTotalSteps: 0
     })
 
     expect(result.kind).toBe('render')
@@ -53,7 +52,6 @@ describe('contextual tour overlay measurement', () => {
       activeStepIndex: 1,
       sidebarOpen: true,
       keybindings: undefined,
-      previousTelemetryTotalSteps: 0
     })
 
     expect(result.kind).toBe('render')
@@ -89,7 +87,6 @@ describe('contextual tour overlay measurement', () => {
       activeStepIndex: 1,
       sidebarOpen: true,
       keybindings: undefined,
-      previousTelemetryTotalSteps: 0
     })
 
     expect(result.kind).toBe('render')

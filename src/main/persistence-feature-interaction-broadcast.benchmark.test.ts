@@ -1,7 +1,6 @@
 import {
   closeTestStores,
-  createSqliteTestStore,
-  readPersistedStateJson
+  createSqliteTestStore
 } from './persistence-test-harness'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -9,7 +8,6 @@ import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { normalizeFeatureInteractions } from '../shared/feature-interactions'
-import type { PersistedState } from '../shared/persisted-state-types'
 
 vi.mock('electron', () => ({
   app: { getPath: () => tmpdir() },
@@ -19,9 +17,6 @@ vi.mock('electron', () => ({
     decryptString: (value: Buffer) => value.toString('utf8')
   }
 }))
-
-vi.mock('./telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('./telemetry/cohort-classifier', () => ({ getCohortAtEmit: () => ({}) }))
 
 import { Store } from './persistence'
 
@@ -86,12 +81,6 @@ describe('feature interaction UI broadcast benchmark', () => {
         'agent-orchestration'
       ]?.interactionCount
     ).toBe(INTERACTIONS)
-    // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: The preceding Store save produced the PersistedState snapshot read by this test.
-    const persisted = JSON.parse(readPersistedStateJson(dataFile)) as PersistedState
-    expect(persisted.featureInteractionTelemetryBuckets?.['agent-orchestration']).toBe(
-      'count_200_499'
-    )
-
     console.log(
       `[bench] ${INTERACTIONS} orchestration interactions: ` +
         `full-state broadcasts ${legacyBroadcasts} -> ${optimizedBroadcasts}; ` +

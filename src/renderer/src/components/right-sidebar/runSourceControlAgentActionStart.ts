@@ -4,7 +4,7 @@ import { newAgentLaunchRequestId } from '@/lib/agent-launch-request-id'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { Repo } from '../../../../shared/repo-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { LaunchSource } from '../../../../shared/telemetry-events'
+import type { LaunchSource } from '../../../../shared/agent-launch-context'
 import type {
   SourceControlActionRecipe,
   SourceControlLaunchActionId

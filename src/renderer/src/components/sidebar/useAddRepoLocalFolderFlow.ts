@@ -1,18 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { track } from '@/lib/telemetry'
 import { isGitRepoKind } from '../../../../shared/repo-kind'
-import {
-  buildNestedRepoScanTelemetry,
-  createNestedRepoTelemetryAttemptId,
-  type NestedRepoTelemetryRuntimeKind
-} from '../../../../shared/nested-repo-telemetry'
-import type { AddRepoExistingWorkspaceSource } from '../../../../shared/telemetry-events'
+import { createNestedRepoScanId } from './add-repo-dialog-types'
 import type { NestedRepoScanResult } from '../../../../shared/project-group-types'
 import type { Repo } from '../../../../shared/repo-types'
 import type { WorktreeFetchOptions } from '@/store/slices/worktree-helpers'
 import type { RepoSlice } from '@/store/repos/repo-state'
-import { createNestedRepoScanId } from './add-repo-dialog-types'
 import { translate } from '@/i18n/i18n'
 import { worktreeRefreshOptions } from './add-repo-runtime-owner'
 import type { ExecutionHostId } from '../../../../shared/execution-host'
@@ -21,8 +14,6 @@ type ShowNestedRepoReview = (args: {
   scan: NestedRepoScanResult
   selectedPath: string
   connectionId: string | null
-  attemptId: string
-  runtimeKind: NestedRepoTelemetryRuntimeKind
   inProgress: boolean
   scanId: string | null
   runtimeEnvironmentId?: string | null
@@ -61,7 +52,6 @@ export function useAddRepoLocalFolderFlow({
   showNestedRepoReview: ShowNestedRepoReview
   onGitRepoReady: (
     repoId: string,
-    source: AddRepoExistingWorkspaceSource,
     executionHostId?: ExecutionHostId
   ) => Promise<void>
   setIsAdding: (isAdding: boolean) => void
@@ -86,7 +76,6 @@ export function useAddRepoLocalFolderFlow({
   const addLocalPathForGeneration = useCallback(
     async (
       path: string,
-      source: AddRepoExistingWorkspaceSource,
       gen: number,
       mode: LocalPathAddMode = 'single'
     ): Promise<LocalPathAddResult> => {
@@ -102,7 +91,6 @@ export function useAddRepoLocalFolderFlow({
       }
       setAddProjectBusyLabel('Scanning for repositories...')
       try {
-        const attemptId = createNestedRepoTelemetryAttemptId()
         const scanId = createNestedRepoScanId()
         setActiveNestedScanId(scanId, activeRuntimeEnvironmentId ?? null)
         setNestedScanInProgress(true)
@@ -122,8 +110,6 @@ export function useAddRepoLocalFolderFlow({
               scan: progressScan,
               selectedPath: path,
               connectionId: null,
-              attemptId,
-              runtimeKind: 'local',
               inProgress: true,
               scanId,
               runtimeEnvironmentId: activeRuntimeEnvironmentId
@@ -134,15 +120,6 @@ export function useAddRepoLocalFolderFlow({
           return { status: 'cancelled' }
         }
         clearNestedScanState()
-        track(
-          'add_repo_nested_scan_result',
-          buildNestedRepoScanTelemetry({
-            attemptId,
-            surface: 'sidebar',
-            runtimeKind: 'local',
-            scan
-          })
-        )
         if (scan?.selectedPathKind === 'non_git_folder' && mode === 'batch') {
           return { status: 'skipped' }
         }
@@ -152,8 +129,6 @@ export function useAddRepoLocalFolderFlow({
             scan,
             selectedPath: path,
             connectionId: null,
-            attemptId,
-            runtimeKind: 'local',
             inProgress: false,
             scanId,
             runtimeEnvironmentId: activeRuntimeEnvironmentId
@@ -180,7 +155,7 @@ export function useAddRepoLocalFolderFlow({
           if (mode === 'batch') {
             return { status: 'completed', repo }
           }
-          await onGitRepoReady(repo.id, source, ownerOptions.executionHostId)
+          await onGitRepoReady(repo.id, ownerOptions.executionHostId)
         } else {
           // Why: folder repos skip the Git default-checkout handoff and activate
           // their synthetic root workspace in the folder add flow.
@@ -211,13 +186,12 @@ export function useAddRepoLocalFolderFlow({
   const handleAddLocalPath = useCallback(
     async (
       path: string,
-      source: AddRepoExistingWorkspaceSource,
       mode: LocalPathAddMode = 'single'
     ): Promise<LocalPathAddResult> => {
       const gen = ++localAddGenRef.current
       setIsAdding(true)
       try {
-        return await addLocalPathForGeneration(path, source, gen, mode)
+        return await addLocalPathForGeneration(path, gen, mode)
       } finally {
         if (gen === localAddGenRef.current) {
           clearNestedScanState()
@@ -230,14 +204,13 @@ export function useAddRepoLocalFolderFlow({
   )
 
   const handleAddLocalPaths = useCallback(
-    async (paths: string[], source: AddRepoExistingWorkspaceSource, gen: number): Promise<void> => {
+    async (paths: string[], gen: number): Promise<void> => {
       const gitRepoIds: string[] = []
       const shouldDeferGitRepoReady = paths.length > 1
       let skippedCount = 0
       for (const path of paths) {
         const result = await addLocalPathForGeneration(
           path,
-          source,
           gen,
           shouldDeferGitRepoReady ? 'batch' : 'single'
         )
@@ -272,7 +245,6 @@ export function useAddRepoLocalFolderFlow({
       if (shouldDeferGitRepoReady && gitRepoIds.length > 0) {
         await onGitRepoReady(
           gitRepoIds[0],
-          source,
           worktreeRefreshOptions(activeRuntimeEnvironmentId ?? null).executionHostId
         )
       }
@@ -288,7 +260,7 @@ export function useAddRepoLocalFolderFlow({
       return
     }
     droppedLocalPathHandledRef.current = droppedLocalPath
-    void handleAddLocalPath(droppedLocalPath, 'local_folder_picker')
+    void handleAddLocalPath(droppedLocalPath)
   }, [droppedLocalPath, handleAddLocalPath, isOpen])
 
   const handleBrowse = useCallback(async (): Promise<void> => {
@@ -300,7 +272,7 @@ export function useAddRepoLocalFolderFlow({
       if (paths.length === 0 || gen !== localAddGenRef.current) {
         return
       }
-      await handleAddLocalPaths(paths, 'local_folder_picker', gen)
+      await handleAddLocalPaths(paths, gen)
     } finally {
       if (gen === localAddGenRef.current) {
         clearNestedScanState()

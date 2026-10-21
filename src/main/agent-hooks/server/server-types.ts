@@ -7,7 +7,6 @@ import type {
   AgentStatusState
 } from '../../../shared/agent-status-types'
 import type { AgentStatusObservation } from '../../../shared/agent-status-observation'
-import type { AgentKind } from '../../../shared/telemetry-events'
 import type { LegacyPaneKeyAliasEntry } from '../../../shared/persisted-state-types'
 
 // Why: server-side enrichment — receivedAt = latest event arrival, stateStartedAt = when the current state first appeared; extra fields ride the shared map untouched (it only writes/clears).
@@ -139,12 +138,6 @@ export type LastStatusFile = {
   authorityCommitments?: Record<string, PersistedAgentHookAuthorityCommitment>
   /** Proven agent exits whose rows were reconciled away; absent from older files. */
   agentExits?: PersistedAgentExitEvidence[]
-}
-
-export type AgentPromptSentDedupeEntry = {
-  agentKind: AgentKind
-  promptHash: string
-  promptInteractionKey?: string
 }
 
 export type NormalizedLocalHook = {

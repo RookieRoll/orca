@@ -23,7 +23,6 @@ import { settleTeardownWithinDeadline, settleWithinMs } from '../quit-teardown-d
 import { quitTeardownStartGate } from '../quit-teardown-start-gate'
 import { setUnreadDockBadgeCount } from '../dock/unread-badge'
 import { destroySystemTray } from '../tray/system-tray'
-import { shutdownTelemetry } from '../telemetry/client'
 import { shutdownObservability } from '../observability'
 import { isQuittingForUpdate } from '../updater'
 import { recordUpdaterLifecycle } from '../updater-lifecycle-diagnostics'
@@ -272,7 +271,6 @@ function installWillQuitHandler(): void {
       rpcStopAndClear
     ]).then(() => state.runtime?.closeNotificationDismissals())
     // Why: allSettled (not all) keeps fail-open — a daemon-disconnect rejection still quits instead of hanging.
-    // Why: telemetry flush folds in before app.quit() (bounded 2s); catch defensively so a flush failure can't cancel the quit chain.
     // Why: normal quits keep the detached daemon for warm reattach, but a dead dev parent leaves the temp/dev profile ownerless.
     const daemonTeardown = isDevParentShutdownRequested() ? shutdownDaemon() : disconnectDaemon()
     // Why: a wedged transport (half-open post-sleep socket) can leave one
@@ -305,10 +303,9 @@ function installWillQuitHandler(): void {
           console.warn('[shutdown] Quit teardown deadline reached', { pendingTeardowns })
         }
       })
-      .then(() => shutdownTelemetry())
       .then(() => shutdownObservability())
       .catch(() => {
-        /* swallow — telemetry must never prevent app.quit() */
+        /* swallow — diagnostics must never prevent app.quit() */
       })
       .then(() => {
         daemonDisconnectDone = true

@@ -260,9 +260,6 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
       this.clearAssistantMessageRetry(effectivePayload.paneKey)
     }
     onAccepted?.()
-    if (!identity.inheritedFromActivePane) {
-      this.maybeTrackAgentPromptSent(effectivePayload, previous)
-    }
     // Why carried forward only within one host: main's OSC parse resolves the handle, so a later
     // hook must not erase its terminal join; a connection change must not inherit another host's.
     // Why drop the settled list: it vouches for this replay's transition only, not for the stored row.

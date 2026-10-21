@@ -12,13 +12,7 @@ import { AgentHookServer, _internals } from './server'
 import { buildBody, PANE } from './server.test-fixtures'
 import { hookAt, loadCapture } from './claude-cancel-capture.test-fixture'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
 
-vi.mock('../telemetry/client', () => ({ track: trackMock }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: getCohortAtEmitMock }))
 
 const records = loadCapture('claude-permission-approve-deny-hooks')
 const prompt = hookAt(records, 0).payload
@@ -33,9 +27,6 @@ const running: { stop: () => void }[] = []
 
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {

@@ -13,11 +13,6 @@ import type { AgentSessionStatusSummary } from '../../shared/agent-session-wire'
 import type { RuntimeWorktreePsSummary } from '../../shared/runtime-types'
 import { AgentHookServer, _internals } from '../agent-hooks/server'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: vi.fn(() => ({ nth_repo_added: 2 }))
-}))
-
 /**
  * A structured session has no PTY and no hook script, so the host publishes its projection into
  * the agent-status store itself. This walks that store into `worktree ps` rows: before it, the CLI

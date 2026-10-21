@@ -1,5 +1,4 @@
-// Convenience wrappers around the tracer for the span boundaries listed in
-// telemetry-error-tracking.md §"Span boundaries worth capturing":
+// Convenience wrappers around the tracer for useful local diagnostic spans:
 //
 //   - IPC boundaries (renderer → main preload calls)
 //   - Agent session lifecycle (start, turn, stop, recover)

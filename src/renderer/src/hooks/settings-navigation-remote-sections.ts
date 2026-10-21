@@ -71,13 +71,10 @@ export function buildRemoteSettingsSections(
       : []),
     {
       id: 'privacy',
-      title: translate(
-        'auto.hooks.useSettingsNavigationMetadata.3618579df6',
-        'Privacy & Telemetry'
-      ),
+      title: translate('auto.hooks.useSettingsNavigationMetadata.privacyTitle', 'Privacy'),
       description: translate(
-        'auto.hooks.useSettingsNavigationMetadata.8400cfe1c1',
-        'Anonymous usage data and telemetry controls.'
+        'auto.hooks.useSettingsNavigationMetadata.localDiagnosticsDescription',
+        'Local diagnostics settings.'
       ),
       icon: Lock,
       searchEntries: getPrivacyPaneSearchEntries(),

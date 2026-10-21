@@ -10,10 +10,7 @@ import { translate } from '@/i18n/i18n'
 
 type AgentStepProps = {
   selectedAgent: TuiAgent | null
-  // `fromCollapsedSection` tells the controller whether the click happened
-  // under the `<details>` disclosure so `onboarding_agent_picked` can carry
-  // it without re-deriving from props at the emit site.
-  onSelect: (agent: TuiAgent, fromCollapsedSection: boolean) => void
+  onSelect: (agent: TuiAgent) => void
   detectedSet: Set<TuiAgent>
   isDetecting: boolean
   yoloPermissions?: boolean
@@ -116,7 +113,7 @@ export function AgentStep({
                   key={agent.id}
                   agent={agent}
                   selected={selectedAgent === agent.id}
-                  onClick={() => onSelect(agent.id, false)}
+                  onClick={() => onSelect(agent.id)}
                 />
               ))}
             </div>
@@ -132,7 +129,7 @@ export function AgentStep({
                         key={agent.id}
                         agent={agent}
                         selected={selectedAgent === agent.id}
-                        onClick={() => onSelect(agent.id, true)}
+                        onClick={() => onSelect(agent.id)}
                       />
                     ))}
                   </div>

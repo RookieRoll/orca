@@ -17,9 +17,9 @@ import type { PreparationRearmHolder } from '../../worktree-create-preparation'
 import { prepareRuntimeLocalWorktreeSetup } from '../runtime-local-worktree-setup'
 import { invalidateAuthorizedRootsCacheForRepo } from '../../ipc/registered-worktree-roots-scoped-invalidation'
 import { startRuntimeLocalWorktreeTerminals } from '../runtime-local-worktree-terminal-startup'
-import { trackRuntimeWorkspaceCreate } from '../../workspace-create-telemetry'
+import { createWorktreeCreateTimingRecorder } from '../../worktree-create-timing'
+import type { WorktreeCreateTimingRecorder } from '../../worktree-create-timing'
 import { assertOpenCodeModelLaunchPreferencesAbsent } from '../../opencode/opencode-model-startup-plan'
-import type { RuntimeWorkspaceCreateEvents } from '../../workspace-create-telemetry'
 import { createdWorkspaceActivationCallbacks } from './workspace-create-activation'
 import { assertWslMoveRepoWritable } from '../../persistence/moving-wsl-projects/wsl-move-scope-guard'
 import { resolveManagedWorktreeCreateStartup } from './managed-worktree-create-startup'
@@ -44,9 +44,8 @@ export abstract class OrcaRuntimeWithCreateManagedWorktree extends OrcaRuntimeWi
     // Re-arm a consumed checkout after terminal startup, including failed creates.
     const rearm: PreparationRearmHolder = { fire: () => {} }
     try {
-      return await trackRuntimeWorkspaceCreate(args, (events) =>
-        this.performManagedWorktreeCreate(args, rearm, events)
-      )
+      const timing = createWorktreeCreateTimingRecorder()
+      return await this.performManagedWorktreeCreate(args, rearm, timing)
     } finally {
       rearm.fire()
     }
@@ -55,7 +54,7 @@ export abstract class OrcaRuntimeWithCreateManagedWorktree extends OrcaRuntimeWi
   private async performManagedWorktreeCreate(
     args: RuntimeManagedWorktreeCreateArgs,
     rearm: PreparationRearmHolder,
-    events: RuntimeWorkspaceCreateEvents
+    timing: WorktreeCreateTimingRecorder
   ): Promise<CreateWorktreeResult> {
     if (!this.store) {
       throw new Error('runtime_unavailable')
@@ -70,7 +69,7 @@ export abstract class OrcaRuntimeWithCreateManagedWorktree extends OrcaRuntimeWi
     // Listed from here: a create refused before its project resolved has nothing to show.
     const creation = this.workspaceCreations?.open({ creationId: args.creationId, repoId: repo.id })
     try {
-      return await this.createInResolvedProject(args, repo, creation, rearm, events)
+      return await this.createInResolvedProject(args, repo, creation, rearm, timing)
     } finally {
       creation?.close()
     }
@@ -81,7 +80,7 @@ export abstract class OrcaRuntimeWithCreateManagedWorktree extends OrcaRuntimeWi
     repo: Repo,
     creation: WorkspaceCreationHandle | undefined,
     rearm: PreparationRearmHolder,
-    events: RuntimeWorkspaceCreateEvents
+    timing: WorktreeCreateTimingRecorder
   ): Promise<CreateWorktreeResult> {
     const store = this.requireStore()
     const onWorkspaceCreated = (worktreeId: string): void => {
@@ -138,9 +137,7 @@ export abstract class OrcaRuntimeWithCreateManagedWorktree extends OrcaRuntimeWi
     if (createRoute.kind === 'runtime') {
       throw new ExecutionHostNotDispatchableError(createRoute.hostId)
     }
-    const timing = events.begin(repo.path)
     if (createRoute.kind === 'ssh') {
-      // Tagged before the refusal so the failed-create event keeps naming its host.
       timing.recordExecutionHost('ssh')
       throw new SshHostNotServedError(createRoute.connectionId)
     }

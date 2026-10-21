@@ -3,7 +3,7 @@ import type {
   RuntimeFileOpenPosition
 } from '../../shared/runtime-file-contracts'
 import { ipcRenderer } from 'electron'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
+import type { TerminalPaneSplitSource } from '../../shared/terminal-pane-split-source'
 import type { TerminalTabCreateReply } from '../../shared/terminal-reveal-identity'
 import type {
   AgentLaunchTabPublishReply,

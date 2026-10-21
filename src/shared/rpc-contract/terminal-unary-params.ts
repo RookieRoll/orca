@@ -8,7 +8,7 @@ import {
   isSupportedWindowsShellOverride,
   listSupportedWindowsShellOverrides
 } from '../windows-terminal-shell'
-import { TERMINAL_PANE_SPLIT_SOURCES } from '../feature-education-telemetry'
+import { TERMINAL_PANE_SPLIT_SOURCES } from '../terminal-pane-split-source'
 import { OptionalExecutionHostId } from './worktree-params'
 
 // Why refused at the boundary rather than at spawn: only the host knows the allowlist, and a

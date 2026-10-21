@@ -17,9 +17,6 @@ import {
 } from './structured-agent-session-runtime'
 import { scriptedCodexTransport } from './scripted-codex-transport.test-fixture'
 
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: vi.fn() }))
-
 describe('foreground commands in the background-task channel', () => {
   let root: string
   let server: AgentHookServer

@@ -1,14 +1,10 @@
 // Mapping from the renderer's `TuiAgent` union (every agent Orca knows how
-// to launch) to the closed `agentKindSchema` enum on telemetry events. Every
-// shipped agent maps to a concrete telemetry value so dashboards can
-// distinguish launch interest instead of collapsing the long tail to `other`.
+// to launch) to the closed agent-kind enum. Every
+// shipped agent maps to a concrete launch kind instead of collapsing the long tail to `other`.
 //
-// Lives in `src/shared/` (not the renderer) because main-side telemetry
-// emission (`agent_started` from the `pty:spawn` IPC handler) needs the
-// same mapping. Centralizing here means a new TuiAgent member is one edit,
-// not a sweep across renderer + main.
+// Lives in `src/shared/` so main and renderer launch paths use the same mapping.
 
-import type { AgentKind } from './telemetry-events'
+import type { AgentKind } from './agent-launch-context'
 import type { TuiAgent } from './tui-agent'
 
 type ConcreteAgentKind = Exclude<AgentKind, 'other'>
@@ -69,7 +65,7 @@ export function tuiAgentToAgentKind(agent: TuiAgent): AgentKind {
   return TUI_AGENT_KIND_BY_AGENT[agent] ?? 'other'
 }
 
-// Why: the worktree-initial-terminal launch path only carries the telemetry
+// Why: the worktree-initial-terminal launch path only carries the launch context
 // `agent_kind`, not the TuiAgent. Reverse the map so that path can stamp the
 // tab's launch agent without threading TuiAgent through every startup builder.
 const AGENT_BY_TUI_AGENT_KIND: Partial<Record<AgentKind, TuiAgent>> = Object.fromEntries(

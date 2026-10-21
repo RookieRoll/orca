@@ -36,7 +36,7 @@ import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig
 } from '../../shared/agent-session-resume'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
+import type { TerminalPaneSplitSource } from '../../shared/terminal-pane-split-source'
 import type {
   RuntimeMobileSessionTabMove,
   RuntimeTerminalCreateRequestPayload,

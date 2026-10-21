@@ -33,8 +33,6 @@ export const clearAgentHookPaneStateMock: Mock = vi.fn()
 export const registerPaneKeyAliasMock: Mock = vi.fn()
 export const piBuildPtyEnvMock: Mock = vi.fn()
 export const piClearPtyMock: Mock = vi.fn()
-export const trackMock: Mock = vi.fn()
-export const classifyErrorMock: Mock = vi.fn()
 export const registerPtyMock: Mock = vi.fn()
 export const unregisterPtyMock: Mock = vi.fn()
 export const setMigrationUnsupportedPtyMock: Mock = vi.fn()
@@ -153,14 +151,6 @@ export const pwshModuleMock = () => ({
 export const wslModuleMock = (original: typeof Wsl) => ({
   ...original,
   wslUncDirectoryExistsAsync: (...args: unknown[]) => wslUncDirectoryExistsAsyncMock(...args)
-})
-
-export const telemetryClientModuleMock = () => ({
-  track: trackMock
-})
-
-export const classifyErrorModuleMock = () => ({
-  classifyError: classifyErrorMock
 })
 
 // Why: the real ensure writes to process.resourcesPath (absent under vitest); env assembly only needs the returned dir path.

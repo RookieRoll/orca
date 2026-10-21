@@ -13,7 +13,6 @@ const contentProbe = vi.hoisted(() => ({
   storeNotifications: vi.fn(),
   subscriptions: vi.fn(),
   unsubscriptions: vi.fn(),
-  telemetryOpenStates: vi.fn(),
   refreshEnabledStates: vi.fn()
 }))
 
@@ -52,11 +51,6 @@ vi.mock('./use-setup-guide-progress', async () => {
     }
   }
 })
-
-vi.mock('./use-setup-guide-telemetry', () => ({
-  useSetupGuideOpenCloseTelemetry: ({ isOpen }: { isOpen: boolean }) =>
-    contentProbe.telemetryOpenStates(isOpen)
-}))
 
 vi.mock('../feature-wall/FeatureWallSetupChecklist', () => ({
   FeatureWallSetupChecklist: () => <div data-setup-guide-content="true" />
@@ -114,7 +108,6 @@ describe('SetupGuideModal mount gating', () => {
     contentProbe.storeNotifications.mockClear()
     contentProbe.subscriptions.mockClear()
     contentProbe.unsubscriptions.mockClear()
-    contentProbe.telemetryOpenStates.mockClear()
     contentProbe.refreshEnabledStates.mockClear()
     useAppStore.setState(initialAppState, true)
     useAppStore.setState({ activeModal: 'none', activeWorktreeId: null })
@@ -151,7 +144,6 @@ describe('SetupGuideModal mount gating', () => {
 
     expect(testContainer.querySelector('[data-setup-guide-dialog="true"]')).toBeNull()
     expect(activeContentSubscriptions()).toBe(1)
-    expect(contentProbe.telemetryOpenStates).toHaveBeenLastCalledWith(false)
     // Why: dropping progress inputs mid-fade would flip completed rows back to "not done yet".
     expect(contentProbe.refreshEnabledStates).toHaveBeenLastCalledWith(true)
 

@@ -58,7 +58,7 @@ import type { KeybindingsApi, SettingsApi } from './api/settings-api'
 import type { ShellApi } from './api/shell-api'
 import type { SshApi } from './api/ssh-api'
 import type { LegacyRelayBridgeApi } from './api/legacy-relay-bridge-api'
-import type { DiagnosticsApi, MemoryApi, StatsApi, TelemetryApi } from './api/telemetry-api'
+import type { ProcessInspectionApi } from './api/process-inspection-api'
 import type { UiCommandEventApi } from './api/ui-command-event-api'
 import type { UiWindowApi } from './api/ui-window-api'
 import type { UpdaterApi } from './api/updater-api'
@@ -94,11 +94,9 @@ export type PreloadApi = {
   linear: LinearApi
   jira: JiraApi
   starNag: StarNagApi
-  telemetryTrack: TelemetryApi['telemetryTrack']
-  telemetrySetOptIn: TelemetryApi['telemetrySetOptIn']
-  diagnostics: DiagnosticsApi
-  telemetryGetConsentState: TelemetryApi['telemetryGetConsentState']
-  telemetryAcknowledgeBanner: TelemetryApi['telemetryAcknowledgeBanner']
+  diagnostics: ProcessInspectionApi['diagnostics']
+  stats: ProcessInspectionApi['stats']
+  memory: ProcessInspectionApi['memory']
   settings: SettingsApi
   agentAwake: AgentAwakeApi
   localhostWorktreeLabels: LocalhostWorktreeLabelsApi
@@ -218,8 +216,9 @@ export type {
   DiagnosticsBundlePayload,
   DiagnosticsStatusPayload,
   MemoryApi,
+  ProcessInspectionApi,
   StatsApi
-} from './api/telemetry-api'
+} from './api/process-inspection-api'
 
 declare global {
   // oxlint-disable-next-line typescript-eslint/consistent-type-definitions -- declaration merging requires interface

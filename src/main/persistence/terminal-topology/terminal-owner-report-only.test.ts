@@ -13,7 +13,6 @@ import { buildProfileStateCutoverFixture } from '../profile-state-cutover-fixtur
 import { ProfileStateSqliteAuthority } from '../profile-state/profile-state-sqlite-authority'
 import type * as OwnerInvariants from '../../../shared/workspace-layout/terminal-owner-invariants'
 
-vi.mock('../../telemetry/client', () => ({ track: vi.fn() }))
 vi.mock('../../ssh/config/ssh-config-parser', () => ({
   loadUserSshConfig: () => ({ hosts: [] }),
   sshConfigHostsToTargets: () => []
@@ -103,11 +102,6 @@ function seededProfile(): string {
   }
   return JSON.stringify({
     ...state,
-    // A fixed install id: load mints a random one when it is missing.
-    settings: {
-      ...state.settings,
-      telemetry: { existedBeforeTelemetryRelease: true, optedIn: null, installId: 'install-1' }
-    },
     workspaceSession: local,
     workspaceSessionsByHostId: { [SSH_HOST]: ssh }
   })

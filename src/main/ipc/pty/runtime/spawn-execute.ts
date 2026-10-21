@@ -38,7 +38,6 @@ export async function executeRuntimePtySpawn(ctx: RuntimePtySpawnState): Promise
         }
       )
     : undefined
-  let awaitingAnotherStart = false
   try {
     if (args.preAllocatedHandle) {
       ctx.deps.trustedTerminalHandleEnv.add(args.preAllocatedHandle)
@@ -150,11 +149,7 @@ export async function executeRuntimePtySpawn(ctx: RuntimePtySpawnState): Promise
           }
           return await isProviderAgentSessionOwnerLive(ownerProvider, owner)
         },
-        onJoin: () => {
-          awaitingAnotherStart = true
-        }
       })
-      awaitingAnotherStart = false
       ctx.result = providerResult ?? {
         id: ensured.owner.ptyId,
         isReattach: true,
@@ -226,8 +221,6 @@ export async function executeRuntimePtySpawn(ctx: RuntimePtySpawnState): Promise
     throw failPtySpawnExecute(ctx, err, {
       sessionId: ctx.sessionId,
       ownsNewSession: ctx.isNewDaemonSession,
-      telemetry: args.telemetry,
-      joinedAnotherStart: awaitingAnotherStart
     })
   } finally {
     if (args.preAllocatedHandle) {

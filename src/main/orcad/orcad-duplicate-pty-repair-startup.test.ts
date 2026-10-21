@@ -44,7 +44,6 @@ vi.mock('../../shared/layout-owner-switch', () => ({
     return state.layoutOwnerIsMain
   }
 }))
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
 // Why: startup reconciles the user-global agent configs; keep it off this machine's real home.
 vi.mock('../codex/codex-hook-reconcile', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),

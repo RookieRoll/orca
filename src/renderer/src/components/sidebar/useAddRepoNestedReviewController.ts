@@ -1,5 +1,4 @@
 import type { Dispatch, SetStateAction } from 'react'
-import type { AddRepoExistingWorkspaceSource } from '../../../../shared/telemetry-events'
 import type { ProjectGroupImportResult } from '../../../../shared/project-group-types'
 import type { WorktreeFetchOptions } from '@/store/slices/worktree-helpers'
 import { useAddRepoNestedImportFlow } from './useAddRepoNestedImportFlow'
@@ -8,18 +7,14 @@ import type { AddRepoDialogStep } from './add-repo-dialog-types'
 import type { ExecutionHostId } from '../../../../shared/execution-host'
 
 export function useAddRepoNestedReviewController({
-  activeRuntimeEnvironmentId,
   cancelNestedRepoScan,
   closeModal,
   fetchWorktrees,
   importNestedRepos,
   onGitRepoReady,
   setIsAdding,
-  setStep,
-  reviewRuntimeEnvironmentId
+  setStep
 }: {
-  activeRuntimeEnvironmentId: string | null | undefined
-  reviewRuntimeEnvironmentId: string | null | undefined
   cancelNestedRepoScan: (
     scanId: string,
     options: { runtimeEnvironmentId: string | null }
@@ -37,7 +32,6 @@ export function useAddRepoNestedReviewController({
   }) => Promise<ProjectGroupImportResult | null>
   onGitRepoReady: (
     repoId: string,
-    source: AddRepoExistingWorkspaceSource,
     executionHostId?: ExecutionHostId
   ) => Promise<void>
   setIsAdding: (isAdding: boolean) => void
@@ -48,29 +42,23 @@ export function useAddRepoNestedReviewController({
     | 'handleImportNestedRepos'
     | 'handleOpenNestedRootFolder'
     | 'resetNestedImportFlow'
-    | 'trackNestedBackAction'
   > {
   const review = useAddRepoNestedReviewState({
-    activeRuntimeEnvironmentId: reviewRuntimeEnvironmentId,
     cancelNestedRepoScan,
     setStep
   })
   const imports = useAddRepoNestedImportFlow({
-    activeRuntimeEnvironmentId,
     closeModal,
     fetchWorktrees,
     importNestedRepos,
     onGitRepoReady,
     setIsAdding,
-    nestedAttemptId: review.nestedAttemptId,
     nestedScan: review.nestedScan,
     nestedSelectedPaths: review.nestedSelectedPaths,
-    nestedRuntimeKind: review.nestedRuntimeKind,
     nestedConnectionId: review.nestedConnectionId,
     nestedGroupName: review.nestedGroupName,
     nestedImportScanId: review.nestedImportScanId,
-    nestedRuntimeEnvironmentId: review.nestedRuntimeEnvironmentId,
-    getNestedRepoRuntimeKind: review.getNestedRepoRuntimeKind
+    nestedRuntimeEnvironmentId: review.nestedRuntimeEnvironmentId
   })
   return { ...review, ...imports }
 }

@@ -1,6 +1,5 @@
 import { normalizePersistedMobileClientTabSelections } from '../../runtime/client-session-tab-selection-persistence'
 import type { SshRemotePtyLease } from '../../../shared/ssh-types'
-import { normalizeFeatureInteractionTelemetryBuckets } from '../../../shared/feature-interactions'
 import { normalizeFolderWorkspaceDiffComments } from '../../folder-workspace-diff-comments'
 import { normalizeFolderWorkspaces } from '../../../shared/folder-workspaces'
 import { normalizeOrcadMigrationEvictedReceipts } from '../../../shared/orcad-migration/orcad-migration-evicted-receipts'
@@ -31,23 +30,22 @@ import { normalizeRetiredNameRegistryMap } from './retired-name-registry-normali
 import { hydrateWorktreeMetaAliasProjection } from './worktree-meta-alias-projection'
 
 export function normalizeLoadedProfileState(
-  parsed: PersistedState,
+  parsed: PersistedState & { featureInteractionTelemetryBuckets?: unknown },
   terminal: PreparedLoadedTerminalSettings,
   profile: PreparedLoadedProfileSettings,
   markNeedsSave: () => void
 ): PersistedState {
   const { defaults, migratedExternalVisibility, osc52ClipboardNoticePending } = terminal
   const { normalizedOnboarding, normalizedProjectGroups, loadedCompactWorktreeCards } = profile
+  const { featureInteractionTelemetryBuckets: _retiredTelemetryBuckets, ...persisted } = parsed
+  void _retiredTelemetryBuckets
   const projectCatalog = normalizeLoadedProjectCatalog(parsed, markNeedsSave)
   // Ordered: the host partitions drop the global fields this slice already owns.
   const workspaceSession = normalizeLoadedLocalSession(parsed, defaults, markNeedsSave)
 
   return {
     ...defaults,
-    ...parsed,
-    featureInteractionTelemetryBuckets: normalizeFeatureInteractionTelemetryBuckets(
-      parsed.featureInteractionTelemetryBuckets
-    ),
+    ...persisted,
     projectGroups: normalizedProjectGroups,
     repos: migratedExternalVisibility.repos,
     // Why: persisted catalog rows are untrusted JSON; consumers call string methods on fields the type says are strings.

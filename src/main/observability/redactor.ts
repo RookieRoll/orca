@@ -1,7 +1,5 @@
-// Secrets scrubber for the error-tracking lane (see telemetry-error-tracking.md
-// §The redactor). Runs at three locations — sink-write, bundle-collection, and
-// server-ingest; the server pass is defense-in-depth since the client runs on an
-// attacker-controllable binary, and it additionally drops PostHog identity keys.
+// Secrets scrubber for local diagnostic files and bundles. Runs at sink-write,
+// bundle-collection, and server-ingest boundaries.
 //
 // The five rule families run in order; the string passes are idempotent, which
 // is what makes the three-location placement safe.
@@ -66,7 +64,7 @@ const CLIENT_ATTR_BLOCKLIST = new Set([
   'headers.authorization'
 ])
 
-// Identity keys: valid in telemetry but stripped from bundles to prevent re-identifying PostHog history (see telemetry-error-tracking.md).
+// Remove identifiers that could link a diagnostic bundle to an install history.
 const SERVER_ATTR_BLOCKLIST_EXTRA = new Set([
   'install_id',
   'installid',

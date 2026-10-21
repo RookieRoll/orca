@@ -1,5 +1,4 @@
 import { AGENT_STATUS_HYDRATE_MAX_AGE_MS } from '../../../shared/agent-status-freshness'
-import { AGENT_KIND_VALUES, type AgentKind } from '../../../shared/telemetry-events'
 
 // Why: co-located with the endpoint file in userData/agent-hooks/ so hook-server cross-restart artifacts stay together.
 export const LAST_STATUS_FILE_NAME = 'last-status.json'
@@ -13,7 +12,6 @@ export const LAST_STATUS_FILE_VERSION = 2
 // Why: recovery-cache writes are capped at one per window so the rate can't follow the hook event rate
 // (#26720); quit-time flushStatusPersistSync() still captures the final state.
 export const STATUS_PERSIST_MIN_INTERVAL_MS = 5_000
-export const AGENT_PROMPT_SENT_AGENT_KINDS = new Set<AgentKind>(AGENT_KIND_VALUES)
 
 // Why: bound file growth from PTYs that never re-attach; 7 days is the "still relevant?" horizon beyond which entries shouldn't resurrect on hydrate.
 export const HYDRATE_MAX_AGE_MS = AGENT_STATUS_HYDRATE_MAX_AGE_MS

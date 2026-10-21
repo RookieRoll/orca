@@ -6,7 +6,7 @@ import type { AgentStatusState, AgentType } from '../../../shared/agent-status-t
 import { tabHasLivePty } from '../../../shared/tab-has-live-pty'
 import type { WorktreeStatus } from './worktree-status'
 import { tuiAgentToAgentKind } from '../../../shared/agent-kind'
-import type { AgentKind } from '../../../shared/telemetry-events'
+import type { AgentKind } from '../../../shared/agent-launch-context'
 
 // Re-export from shared so existing renderer imports work; main process now shares the detection logic.
 export {
@@ -160,7 +160,7 @@ export function agentTypeToIconAgent(
   return isTuiAgent(agentType) && Object.hasOwn(ICONABLE_AGENT_TYPES, agentType) ? agentType : null
 }
 
-// Why: shared resolver so all send paths stamp identical agent_kind on agent_prompt_sent telemetry.
+// Why: normalize provider aliases the same way across agent status consumers.
 export function agentKindForAgentType(agentType: AgentType | null | undefined): AgentKind {
   const tuiAgent = agentTypeToIconAgent(agentType)
   return isTuiAgent(tuiAgent) ? tuiAgentToAgentKind(tuiAgent) : 'other'

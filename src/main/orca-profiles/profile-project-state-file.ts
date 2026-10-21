@@ -121,12 +121,14 @@ function parseProfileState(rawJson: string | undefined): TransferProfileState {
 }
 
 export function normalizeProfileProjectState(
-  parsed: Partial<PersistedState>
+  parsed: Partial<PersistedState> & { featureInteractionTelemetryBuckets?: unknown }
 ): TransferProfileState {
   const defaults = getDefaultPersistedState(homedir())
+  const { featureInteractionTelemetryBuckets: _retiredTelemetryBuckets, ...persisted } = parsed
+  void _retiredTelemetryBuckets
   return rebuildRepoBackedProjectState({
     ...defaults,
-    ...parsed,
+    ...persisted,
     repos: arrayOrEmpty<Repo>(parsed.repos),
     // Why normalize: another profile's file is untrusted JSON, and a null repoId/path here would be
     // carried straight into the importing app's state.
@@ -171,9 +173,6 @@ export function normalizeProfileProjectState(
     onboarding: isRecord(parsed.onboarding)
       ? { ...defaults.onboarding, ...parsed.onboarding }
       : defaults.onboarding,
-    featureInteractionTelemetryBuckets: isRecord(parsed.featureInteractionTelemetryBuckets)
-      ? parsed.featureInteractionTelemetryBuckets
-      : defaults.featureInteractionTelemetryBuckets
   })
 }
 

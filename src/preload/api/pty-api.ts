@@ -17,7 +17,7 @@ import type {
   PtyRendererDeliveryHealthReply,
   PtyRendererDeliveryStateReport
 } from '../../shared/pty-renderer-delivery-health'
-import type { AgentKind, LaunchSource, RequestKind } from '../../shared/telemetry-events'
+import type { AgentLaunchContext } from '../../shared/agent-launch-context'
 import type { TerminalSideEffectBatch } from '../../shared/terminal-side-effect-facts'
 import type { TerminalViewAttributes } from '../../shared/terminal-view-attributes'
 import type { TuiAgent } from '../../shared/tui-agent'
@@ -64,8 +64,7 @@ export type PtyApi = {
     spawnIntent?: SpawnIntent
     // The agent launch this pane's spawn starts; main admits and plans it.
     agentLaunch?: AgentPaneLaunchRequest
-    // Why: main fires `agent_started` only on spawn success, so launch metadata rides this field (telemetry-plan.md §Agent launch semantics).
-    telemetry?: { agent_kind: AgentKind; launch_source: LaunchSource; request_kind: RequestKind }
+    telemetry?: AgentLaunchContext
   }) => Promise<{
     id: string
     /** Which lifetime of `id` this reply named; absent when the execution host predates the field. */

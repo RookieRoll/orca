@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { toast } from 'sonner'
 import { callRuntimeRpc } from '@/runtime/runtime-rpc-client'
-import type { AddRepoExistingWorkspaceSource } from '../../../../shared/telemetry-events'
 import type { Repo } from '../../../../shared/repo-types'
 import { getCloneDestinationAutoFill } from './clone-defaults'
 import type { AddRepoDialogStep } from './add-repo-dialog-types'
@@ -33,7 +32,6 @@ export function useAddRepoCloneFlow({
   ) => Promise<unknown>
   onGitRepoReady: (
     repoId: string,
-    source: AddRepoExistingWorkspaceSource,
     executionHostId?: ExecutionHostId
   ) => Promise<void>
 }): {
@@ -167,7 +165,7 @@ export function useAddRepoCloneFlow({
       if (!isCurrent()) {
         return
       }
-      await onGitRepoReady(ownedRepo.id, 'clone_url', ownerOptions.executionHostId)
+      await onGitRepoReady(ownedRepo.id, ownerOptions.executionHostId)
     } catch (err) {
       if (!isCurrent()) {
         return

@@ -162,7 +162,7 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
   }
 
   const openMilestones = (): void => {
-    openModal('setup-guide', { telemetrySource: 'help_menu' })
+    openModal('setup-guide')
   }
 
   return (

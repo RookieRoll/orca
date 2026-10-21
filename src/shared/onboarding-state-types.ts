@@ -1,6 +1,3 @@
-// Subset of onboarding Ghostty DiscoveryState statuses that emit telemetry; UI-only 'idle'/'detecting' don't.
-export type DiscoveryStatusEmitted = 'found' | 'absent' | 'imported'
-
 export type OnboardingOutcome = 'completed' | 'dismissed'
 
 export type OnboardingChecklistState = {
@@ -9,15 +6,13 @@ export type OnboardingChecklistState = {
   ranFirstAgent: boolean
   ranSecondAgentOnSameTask: boolean
   triedCmdJ: boolean
-  // Persisted field, also a telemetry enum member in ./telemetry-onboarding-foundation-schemas;
-  // renaming it would orphan saved state. Rule exemption: config/oxlint-anti-slop.json.
+  // Persisted field; renaming it would orphan saved state.
   shapedSidebar: boolean
   reviewedDiff: boolean
   openedPr: boolean
   addedFolder: boolean
   openedFile: boolean
   ranAgentOnFile: boolean
-  // Why: UI state flag (panel visibility), not an activation event; telemetry checklist enum omits it.
   dismissed: boolean
 }
 

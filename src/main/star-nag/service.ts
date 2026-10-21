@@ -3,14 +3,8 @@ import { STAR_NAG_INITIAL_THRESHOLD } from '../../shared/constants'
 import { checkOrcaStarred } from '../github/client'
 import type { Store } from '../persistence'
 import type { StatsCollector } from '../stats/collector'
-import { track } from '../telemetry/client'
-import type {
-  StarNagOutcome,
-  StarNagPromptMode,
-  StarNagPromptSource
-} from '../../shared/star-nag-telemetry'
-import { type StarNagPromptSession, trackStarNagSessionOutcome } from './prompt-session-telemetry'
-import { createStarNagPromptContext } from './prompt-context'
+import type { StarNagPromptMode, StarNagPromptSource } from '../../shared/star-nag-contract'
+import type { StarNagPromptSession } from './star-nag-session'
 import { logStarNagConsoleEvent } from './console-events'
 import { StarNagAgentValueMoment, type AgentValueMomentPreparation } from './agent-value-moment'
 import { deferAfterStarNagWebHandoff } from './web-handoff'
@@ -57,7 +51,6 @@ export class StarNagService {
       isPromptVisible: () => this.promptVisible,
       isCooldownActive: (deferredUntil) => this.isCooldownActive(deferredUntil),
       markCompleted: () => this.markCompleted(),
-      trackAlreadyStarredSuppressed: () => this.trackAlreadyStarredSuppressed('agent_value_moment'),
       broadcastShow: (mode) => this.broadcastShow('agent_value_moment', mode)
     })
   }
@@ -127,7 +120,6 @@ export class StarNagService {
         return this.broadcastShow(source, 'web', surface)
       }
       if (starred) {
-        this.trackAlreadyStarredSuppressed(source)
         // Already starred somewhere — lock in the permanent suppression so we
         // stop recomputing thresholds on every spawn.
         this.markCompleted()
@@ -180,11 +172,9 @@ export class StarNagService {
       this.promptSession = null
       return false
     }
-    const context = createStarNagPromptContext(this.store, this.stats, source, mode)
     win.webContents.send('star-nag:show', { mode, surface })
     this.promptVisible = true
-    this.promptSession = context
-    this.trackOutcome('shown')
+    this.promptSession = { source, mode }
     logStarNagConsoleEvent(this.store, this.stats, 'star_nag_shown', source)
     return true
   }
@@ -195,24 +185,6 @@ export class StarNagService {
         win.webContents.send('star-nag:hide')
       }
     }
-  }
-
-  private trackOutcome(
-    outcome: StarNagOutcome,
-    options: { mode?: StarNagPromptMode; nextThreshold?: number; cooldownDays?: number } = {}
-  ): void {
-    const session = this.promptSession
-    if (!session) {
-      return
-    }
-    trackStarNagSessionOutcome(session, outcome, options)
-  }
-
-  private trackAlreadyStarredSuppressed(source: StarNagPromptSource): void {
-    track('star_nag_outcome', {
-      ...createStarNagPromptContext(this.store, this.stats, source, 'gh'),
-      outcome: 'already_starred_suppressed'
-    })
   }
 
   // ── Public actions (invoked from IPC) ─────────────────────────────
@@ -259,7 +231,7 @@ export class StarNagService {
     this.defer('dismissed')
   }
 
-  private defer(outcome: Extract<StarNagOutcome, 'dismissed' | 'later'>): void {
+  private defer(outcome: 'dismissed' | 'later'): void {
     const session = this.promptSession
     if (!session) {
       this.promptVisible = false
@@ -268,7 +240,6 @@ export class StarNagService {
     const ui = this.store.getUI()
     const threshold = ui.starNagNextThreshold ?? STAR_NAG_INITIAL_THRESHOLD
     const nextThreshold = threshold * 2
-    this.trackOutcome(outcome, { nextThreshold, cooldownDays: STAR_NAG_COOLDOWN_DAYS })
     logStarNagConsoleEvent(
       this.store,
       this.stats,
@@ -286,17 +257,14 @@ export class StarNagService {
   }
 
   private disable(): void {
-    this.trackOutcome('disabled')
     this.markCompleted()
   }
 
   private openWeb(): void {
     const session = this.promptSession
-    if (!session || session.openedRepoTracked) {
+    if (!session) {
       return
     }
-    session.openedRepoTracked = true
-    trackStarNagSessionOutcome(session, 'opened_repo', { mode: 'web' })
     // Why: opening GitHub is only a handoff, not verified star success. Keep the
     // ask quiet for the normal cooldown, but do not set starNagCompleted.
     deferAfterStarNagWebHandoff(this.store, this.stats, STAR_NAG_COOLDOWN_MS)

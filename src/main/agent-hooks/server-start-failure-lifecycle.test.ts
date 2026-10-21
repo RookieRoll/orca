@@ -4,20 +4,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type * as NodeHttp from 'node:http'
 
-const { createServerMock, getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  createServerMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
+const { createServerMock } = vi.hoisted(() => ({ createServerMock: vi.fn() }))
 
 vi.mock('node:http', async (importOriginal) => {
   const actual = await importOriginal<typeof NodeHttp>()
   createServerMock.mockImplementation(actual.createServer)
   return { ...actual, createServer: createServerMock }
 })
-
-vi.mock('../telemetry/client', () => ({ track: trackMock }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: getCohortAtEmitMock }))
 
 import { AgentHookServer, _internals } from './server'
 import { RelayAgentHookServer } from '../../wsl-guest/agent-hook-server'
@@ -28,9 +21,6 @@ const PANE = makePaneKey('tab-lifecycle', '11111111-1111-4111-8111-111111111111'
 beforeEach(() => {
   _internals.resetCachesForTests()
   createServerMock.mockClear()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {

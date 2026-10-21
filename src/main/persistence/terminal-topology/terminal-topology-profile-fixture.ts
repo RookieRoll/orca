@@ -14,11 +14,6 @@ export function emptyTerminalSessionProfile(): string {
   const state = buildProfileStateCutoverFixture()
   return JSON.stringify({
     ...state,
-    // A fixed install id: load mints a random one when it is missing.
-    settings: {
-      ...state.settings,
-      telemetry: { existedBeforeTelemetryRelease: true, optedIn: null, installId: 'install-1' }
-    },
     workspaceSession: getDefaultWorkspaceSession(),
     workspaceSessionsByHostId: {}
   })

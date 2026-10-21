@@ -14,7 +14,7 @@ import type {
 } from '../../../../shared/agent-session-host-authority'
 import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
 import type { ProjectExecutionRuntimeResolution } from '../../../../shared/project-execution-runtime'
-import type { EventProps } from '../../../../shared/telemetry-events'
+import type { AgentLaunchContext } from '../../../../shared/agent-launch-context'
 import type { TerminalInputKind } from '../../../../shared/terminal-input-kind'
 import type { TerminalOscColorQueryReplyColors } from '../../../../shared/terminal-osc-color-reply'
 import type { TuiAgent } from '../../../../shared/tui-agent'
@@ -313,7 +313,7 @@ export type IpcPtyTransportOptions = {
   projectRuntime?: ProjectExecutionRuntimeResolution
   terminalKittyKeyboardProtocol?: boolean
   terminalColorQueryReplies?: TerminalOscColorQueryReplyColors
-  telemetry?: EventProps<'agent_started'>
+  telemetry?: AgentLaunchContext
   onPtyExit?: (ptyId: string, exitCode?: number) => void
   onTitleChange?: (title: string, rawTitle: string) => void
   onPtySpawn?: (ptyId: string) => void
