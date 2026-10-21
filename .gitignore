@@ -185,3 +185,6 @@ ci-shards/
 /.build/windows-native-benchmark/
 
 .local/static-analysis-research/
+/graphify-out
+/config/.cache
+/src/graphify-out/
