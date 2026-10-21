@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import {
-  ORCAD_MOBILE_WEB_MANIFEST,
   ORCAD_NODE_RUNTIME_MARKER_FILENAME,
   ORCAD_SERVER_TARGET_FILENAME,
   ORCAD_TEMPLATE_MANIFEST_FILENAME,
@@ -35,15 +34,8 @@ function targetFileContents(target, filename) {
 export async function writeOrcadTemplateTestFixture(resourcesDir, { compat = false } = {}) {
   const templateDir = join(resourcesDir, 'orcad-template')
   const commonSha256 = {}
-  for (const filename of orcadTemplateCommonFilenames(['out/mobile-web/index.html'])) {
-    commonSha256[filename] = await write(
-      join(templateDir, ...filename.split('/')),
-      Buffer.from(
-        filename === ORCAD_MOBILE_WEB_MANIFEST
-          ? JSON.stringify({ assets: [{ path: 'index.html' }] })
-          : `common:${filename}`
-      )
-    )
+  for (const filename of orcadTemplateCommonFilenames()) {
+    commonSha256[filename] = await write(join(templateDir, ...filename.split('/')), `common:${filename}`)
   }
   const targets = {}
   for (const target of [...ORCAD_TEMPLATE_TARGETS, ...(compat ? COMPAT_SERVER_TARGETS : [])]) {

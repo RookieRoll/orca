@@ -4,7 +4,6 @@ import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { writeMobileWebBundleFixtureTree } from './mobile-web-bundle-fixture-tree.mjs'
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..')
 
@@ -85,6 +84,7 @@ describe('electron-builder config', () => {
     expect(packs('out/main/index.js')).toBe(true)
     expect(packs('out/web/web-index.html')).toBe(false)
     expect(packs('out/web/assets/shared.js')).toBe(false)
+    expect(packs('out/mobile-web/stale.js')).toBe(false)
     expect(packs('out/renderer/web-index.html')).toBe(true)
     expect(packs('out/renderer/.orca-web-client-files.json')).toBe(true)
   })
@@ -414,8 +414,8 @@ describe('electron-builder config', () => {
   })
 
   // Why: opening a packed file reads a one-time /tmp extract; once a /tmp sweep removes it, the
-  // web client answers an empty 500 and phone bundle reads fail until restart (#27976).
-  it('unpacks the web and mobile bundles a host serves by opening their files', () => {
+  // web client answers an empty 500 until restart (#27976).
+  it('unpacks the web client a host serves by opening its files', () => {
     const matcher = new FileMatcher(
       '/app',
       '/dest',
@@ -426,9 +426,7 @@ describe('electron-builder config', () => {
     for (const webPath of [
       'out/renderer/web-index.html',
       'out/renderer/assets/index-abc123.js',
-      'out/renderer/.orca-web-client-files.json',
-      'out/mobile-web/manifest.json',
-      'out/mobile-web/assets/index-abc123.js'
+      'out/renderer/.orca-web-client-files.json'
     ]) {
       expect(isUnpacked(join('/app', webPath), { isDirectory: () => false })).toBe(true)
     }
@@ -570,15 +568,10 @@ describe('arch-aware packaging guard', () => {
   const OTHER_ARCH = process.arch === 'arm64' ? 1 : 3
   const OTHER_ARCH_NAME = process.arch === 'arm64' ? 'x64' : 'arm64'
 
-  // beforePack also hash-verifies the mobile web bundle, which the unit-test job never builds.
-  // Point it at a real bundle built into a temp dir: these tests are about the native-variant
-  // guard, and the bundle guard has its own suite.
+  // These tests focus on the native-variant and dark-build guards.
   let scratch
-  let bundleDir
   beforeAll(async () => {
     scratch = await mkdtemp(join(tmpdir(), 'orca-electron-builder-guard-'))
-    bundleDir = join(scratch, 'mobile-web')
-    await writeMobileWebBundleFixtureTree({ outDir: bundleDir })
   })
   afterAll(async () => {
     await rm(scratch, { recursive: true, force: true })
@@ -587,7 +580,6 @@ describe('arch-aware packaging guard', () => {
   const packHost = (arch) =>
     electronBuilderConfig.beforePack(
       { electronPlatformName: process.platform, arch },
-      bundleDir,
       () => undefined
     )
 
@@ -617,7 +609,6 @@ describe('arch-aware packaging guard', () => {
       expect(() =>
         electronBuilderConfig.beforePack(
           { electronPlatformName: process.platform, arch: HOST_ARCH },
-          bundleDir,
           () => undefined,
           templateDir
         )
@@ -642,7 +633,10 @@ describe('arch-aware packaging guard', () => {
       (resource) => resource.to === join('node_modules', '@vscode', 'windows-process-tree')
     )
     const packWindows = () =>
-      electronBuilderConfig.beforePack({ electronPlatformName: 'win32', arch: 1 }, bundleDir)
+      electronBuilderConfig.beforePack(
+        { electronPlatformName: 'win32', arch: 1 },
+        () => undefined
+      )
     if (process.platform === 'win32' || windowsAddon) {
       expect(packWindows).not.toThrow()
     } else {

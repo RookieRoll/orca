@@ -14,7 +14,6 @@ describe('per-job path classification', () => {
       shell_contracts: false,
       test: true,
       orcad_browser: false,
-      mobile_web_app: false,
       'cross-version-wire': false,
       managed_hook_node18: false,
       package: false,

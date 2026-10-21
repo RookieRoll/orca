@@ -38,7 +38,6 @@ function fixture() {
     'renderer/.vite/manifest.json',
     'renderer/.orca-web-client-files.json',
     'web/web-index.html',
-    'mobile-web/manifest.json',
     'package.json',
     'renderer/wasm/viewer.wasm',
     'main/index.js.map'

@@ -7,7 +7,7 @@ import { readTrackedSources, runCountRatchet } from './ratchet-baseline.mjs'
 // which is how one worktree ends up with two ids (#30150). Counts per file may only go down.
 
 const BASELINE_PATH = 'config/worktree-id-composer-baseline.txt'
-const SCAN_ROOTS = ['src', 'mobile/src']
+const SCAN_ROOTS = ['src']
 const COMPOSER_FILE = 'src/shared/worktree/id.ts'
 const HEADER = [
   '# Hand-built worktree ids (`${repoId}::${path}`) per file, outside src/shared/worktree/id.ts.',

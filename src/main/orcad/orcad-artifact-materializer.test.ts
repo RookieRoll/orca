@@ -25,7 +25,6 @@ import {
 } from '../../shared/node-runtime-pin'
 import {
   ORCAD_BUILD_TARGET_FILENAME,
-  ORCAD_MOBILE_WEB_MANIFEST,
   ORCAD_NODE_RUNTIME_MARKER_FILENAME,
   ORCAD_SERVER_TARGET_FILENAME,
   ORCAD_TEMPLATE_MANIFEST_FILENAME,
@@ -52,7 +51,6 @@ import {
 } from './orcad-artifact-materializer'
 
 const TARGET = 'linux-x64-glibc' as const
-const PAGE_ASSETS = ['out/mobile-web/index.html']
 const fileReads = vi.hoisted(() => ({ count: 0 }))
 
 // Counts whole-file hash reads without changing read behavior.
@@ -106,9 +104,6 @@ function targetContents(target: NodeRuntimeTarget, filename: string): string {
 }
 
 function commonContents(filename: string): string {
-  if (filename === ORCAD_MOBILE_WEB_MANIFEST) {
-    return JSON.stringify({ assets: [{ path: 'index.html' }] })
-  }
   return filename === 'orcad.js' ? 'orcad-entry' : filename
 }
 
@@ -121,7 +116,7 @@ function createTemplate(target: NodeRuntimeTarget = TARGET): {
   const templateDir = join(root, 'template')
   const cacheRoot = join(root, 'cache')
   const commonSha256: Record<string, string> = {}
-  for (const filename of orcadTemplateCommonFilenames(PAGE_ASSETS)) {
+  for (const filename of orcadTemplateCommonFilenames()) {
     write(join(templateDir, filename), commonContents(filename))
     commonSha256[filename] = sha256(join(templateDir, filename))
   }
@@ -256,7 +251,7 @@ describe('assembleOrcadArtifact', () => {
     expect(readFileSync(join(artifactDir, ORCAD_NODE_RUNTIME_MARKER_FILENAME), 'utf8').trim()).toBe(
       NODE_RUNTIME_ASSETS[TARGET].executableSha256
     )
-    for (const filename of orcadArtifactFilenames(TARGET, PAGE_ASSETS)) {
+    for (const filename of orcadArtifactFilenames(TARGET)) {
       expect(readFileSync(join(artifactDir, filename)).byteLength).toBeGreaterThan(0)
     }
     // A Bun-era client's selector would exit 78 on this file without a Bun runtime (R5).
@@ -278,33 +273,6 @@ describe('assembleOrcadArtifact', () => {
 
     await expect(assembleOrcadArtifact({ ...fixture, target: TARGET })).rejects.toThrow(
       'node_modules/node-pty/build/Release/pty.node checksum mismatch'
-    )
-  })
-
-  it('copies the page phones load into the slot, verified like every other file', async () => {
-    const fixture = createTemplate()
-    const artifactDir = await assembleOrcadArtifact({ ...fixture, target: TARGET })
-    expect(readFileSync(join(artifactDir, 'out/mobile-web/index.html'), 'utf8')).toBe(
-      'out/mobile-web/index.html'
-    )
-    expect(existsSync(join(artifactDir, ORCAD_MOBILE_WEB_MANIFEST))).toBe(true)
-
-    const corrupted = createTemplate()
-    write(join(corrupted.templateDir, 'out/mobile-web/index.html'), 'corrupted')
-    await expect(assembleOrcadArtifact({ ...corrupted, target: TARGET })).rejects.toThrow(
-      'out/mobile-web/index.html checksum mismatch'
-    )
-  })
-
-  it('refuses a template page asset name that escapes the slot', async () => {
-    const fixture = createTemplate()
-    rewriteManifest(fixture.templateDir, (manifest) => {
-      manifest.commonSha256['out/mobile-web/../../escape.js'] = sha256(
-        join(fixture.templateDir, 'out/mobile-web/index.html')
-      )
-    })
-    await expect(assembleOrcadArtifact({ ...fixture, target: TARGET })).rejects.toThrow(
-      'unsafe page asset: out/mobile-web/../../escape.js'
     )
   })
 
@@ -430,7 +398,7 @@ describe('assembleOrcadArtifact verification record', () => {
     expect(await assembleOrcadArtifact({ ...fixture, target: TARGET, now: later })).toBe(slot)
     // Template pass plus the slot's own check, exactly as with no record at all.
     expect(fileReads.count - before).toBe(
-      (orcadArtifactFilenames(TARGET, PAGE_ASSETS).length + 1) * 2
+      (orcadArtifactFilenames(TARGET).length + 1) * 2
     )
     rmSync(recordPath(fixture.cacheRoot))
     await assembleOrcadArtifact({ ...fixture, target: TARGET, now: later })
@@ -463,7 +431,7 @@ describe('assembleOrcadArtifact verification record', () => {
     const fixture = createTemplate()
     const before = fileReads.count
     const slot = await assembleOrcadArtifact({ ...fixture, target: TARGET })
-    const sources = orcadArtifactFilenames(TARGET, PAGE_ASSETS).length + 1
+    const sources = orcadArtifactFilenames(TARGET).length + 1
     // One template pass plus the copied slot's own check, where three template passes ran before.
     expect(fileReads.count - before).toBe(sources * 2)
     expect(slot).toContain(fixture.cacheRoot)

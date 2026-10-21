@@ -30,8 +30,6 @@ import {
   BROWSER_UNAVAILABLE_ERROR_CODE,
   browserUnavailableMessage
 } from '../../shared/runtime-types'
-import { MOBILE_WEB_BUNDLE_CAPABILITY } from '../../shared/mobile-web-bundle/mobile-web-bundle-capability'
-import { loadBundledMobileWebBundle } from './bundled-mobile-web-bundle'
 import { runtimeTerminalDegradation } from './native-terminal-availability'
 import { isWindowsProcessStartTimeAvailable } from '../windows/windows-process-table'
 import type { RuntimeWorktreeLifecycleEvent } from './orca-runtime-core'
@@ -149,12 +147,6 @@ export abstract class OrcaRuntimeWithGetStatus extends OrcaRuntimeWithGetRuntime
       capabilities.push(DESKTOP_BROWSER_BRIDGE_RUNTIME_CAPABILITY)
     }
     capabilities.push(...darkSwitchRuntimeCapabilities())
-    // Why not a static capability: dev trees and `orca serve` installs may carry no
-    // out/mobile-web, and advertising a bundle this install cannot produce would promise a
-    // download that only ever answers mobile_web_bundle_unavailable.
-    if (loadBundledMobileWebBundle()) {
-      capabilities.push(MOBILE_WEB_BUNDLE_CAPABILITY)
-    }
     // Why the cause and not one fixed sentence: the operator can only act on the reason
     // that actually applies, and a host that says "set ORCA_BROWSER_EXECUTABLE" to someone
     // who already set it sends them to fix a thing that is not broken.

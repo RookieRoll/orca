@@ -58,7 +58,6 @@ it('retains both Linux architectures and the pinned libc qualification container
 
 it.each([
   ['changes', 'ubuntu-latest', 'blacksmith-2vcpu-ubuntu-2404'],
-  ['mobile_web_bundle', 'ubuntu-latest', 'blacksmith-8vcpu-ubuntu-2404'],
   ['desktop_template', 'ubuntu-latest', 'blacksmith-4vcpu-ubuntu-2404'],
   ['linux_glibc217_compat', 'ubuntu-22.04', 'blacksmith-8vcpu-ubuntu-2204']
 ])('sizes %s for its work without changing default callers', (name, hostedRunner, fastRunner) => {

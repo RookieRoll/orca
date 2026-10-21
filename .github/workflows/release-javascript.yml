@@ -66,9 +66,6 @@ jobs:
         with:
           native-runtime: node
 
-      - uses: ./.github/actions/install-mobile-dependencies
-        if: steps.source.outputs.supported == 'true'
-
       - name: Resolve release build identity
         id: identity
         if: steps.source.outputs.supported == 'true' && !inputs.dev_build

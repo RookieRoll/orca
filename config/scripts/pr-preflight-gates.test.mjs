@@ -20,7 +20,7 @@ it('shares one setup and overlaps the compiler only after type-aware checks fini
   const installs = steps.filter(
     (step) => step.uses === './.github/actions/install-node-dependencies'
   )
-  expect(installs).toHaveLength(2)
+  expect(installs).toHaveLength(1)
   for (const install of installs) {
     expect(install.with['native-runtime']).toBe('node')
     expect(install.with['node-version']).toBe('24')
@@ -237,10 +237,6 @@ it('pins every foreground and background step to its selected phase', () => {
     ['Check formatting', staticPhase],
     ['Reject low-evidence patterns', staticPhase],
     ['Enforce type-aware code-quality baseline', staticPhase],
-    [
-      './.github/actions/install-mobile-dependencies',
-      `${staticPhase} && needs.code_paths.outputs.mobile_dependencies == 'true'`
-    ],
     ['Verify locked audit tools', staticPhase],
     ['Enforce React Doctor on changed lines', staticPhase],
     ['Check Zustand selector fan-out budget', staticPhase],
@@ -260,7 +256,6 @@ it('pins every foreground and background step to its selected phase', () => {
     ['Enforce id-only store write ratchet', staticPhase],
     ['Enforce repo host-read ratchet', staticPhase],
     ['Check Node runtime pin', staticPhase],
-    ['Check root and mobile lock the same shared dependencies', staticPhase],
     ['Decide whether the orcad terminal smoke runs', staticPhase],
     ['Verify the generated RPC params catalog', staticPhase],
     ['Verify the generated ACP protocol schema', staticPhase],
@@ -290,39 +285,16 @@ it('pins every foreground and background step to its selected phase', () => {
 })
 
 it.each([
-  { changed: ['LICENSE'], static_analysis: false, typecheck: false, mobile_dependencies: false },
-  { changed: ['README.md'], static_analysis: true, typecheck: false, mobile_dependencies: false },
-  {
-    changed: ['mobile/src/App.tsx'],
-    static_analysis: true,
-    typecheck: false,
-    mobile_dependencies: true
-  },
-  {
-    changed: ['cloud/package.json'],
-    static_analysis: false,
-    typecheck: false,
-    mobile_dependencies: false
-  },
-  {
-    changed: ['src/main/index.ts'],
-    static_analysis: true,
-    typecheck: true,
-    mobile_dependencies: false
-  },
-  {
-    changed: ['mobile/src/App.tsx', 'src/main/index.ts'],
-    static_analysis: true,
-    typecheck: true,
-    mobile_dependencies: true
-  },
-  { changed: [], static_analysis: true, typecheck: true, mobile_dependencies: true }
+  { changed: ['LICENSE'], static_analysis: false, typecheck: false },
+  { changed: ['README.md'], static_analysis: true, typecheck: false },
+  { changed: ['cloud/package.json'], static_analysis: false, typecheck: false },
+  { changed: ['src/main/index.ts'], static_analysis: true, typecheck: true },
+  { changed: [], static_analysis: true, typecheck: true }
 ])('preserves exact phase selection for unrelated paths: $changed', ({ changed, ...expected }) => {
   const scope = classifyPrJobs(changed)
   expect({
     static_analysis: scope.static_analysis,
     typecheck: scope.typecheck,
-    mobile_dependencies: scope.mobile_dependencies
   }).toEqual(expected)
   const needs = {
     code_paths: {

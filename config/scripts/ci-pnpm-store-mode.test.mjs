@@ -95,7 +95,7 @@ describe('automatic pnpm store mode', () => {
     ['unknown request', { inputs: { 'cache-pnpm-store-lookup-only': 'other' } }],
     [
       'mixed lockfiles',
-      { inputs: { 'cache-dependency-path': 'pnpm-lock.yaml\nmobile/pnpm-lock.yaml' } }
+      { inputs: { 'cache-dependency-path': 'pnpm-lock.yaml\ntools/pnpm-lock.yaml' } }
     ],
     ['custom lockfile', { inputs: { 'cache-dependency-path': 'cloud/pnpm-lock.yaml' } }],
     ['Node 25', { inputs: { 'node-version': '25' } }],

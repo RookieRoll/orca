@@ -52,7 +52,7 @@ function routedOutputs(files, reused, options) {
     }
   }
   return Object.fromEntries(
-    ['test', 'static_analysis', 'typecheck', 'mobile_ci_tools', ...routes.map(([job]) => job)].map(
+    ['test', 'static_analysis', 'typecheck', ...routes.map(([job]) => job)].map(
       (name) => [name, String(evaluate(workflow.jobs.code_paths.outputs[name], context))]
     )
   )
@@ -148,8 +148,6 @@ describe.each(routes)('%s preflight admission', (jobName, changedFile) => {
 
 it.each([
   { files: ['README.md'] },
-  { files: ['mobile/src/App.tsx'] },
-  { files: ['mobile/package.json'] },
   { files: ['cloud/apps/relay/src/index.ts'] }
 ])('does not add preflight consumers to a no-unit diff: $files', ({ files }) => {
   const outputs = routedOutputs(files, 'false')
@@ -157,16 +155,6 @@ it.each([
   for (const [name] of routes) {
     expect(outputs[name], name).toBe('false')
   }
-})
-
-it('keeps the mobile-only bundle job in the first wave', () => {
-  const mobile = workflow.jobs.mobile_web_app
-  expect(mobile.needs).toEqual(['code_paths'])
-  expect(mobile.if).toBe("needs.code_paths.outputs.mobile_web_app == 'true'")
-  expect(classifyPrJobs(['mobile/src/App.tsx'])).toMatchObject({
-    test: false,
-    mobile_web_app: true
-  })
 })
 
 it('preserves relay continuation, setup guards and cancellation', () => {
@@ -218,36 +206,7 @@ it('guards both browser steps after setup or discovery failure and for default c
   expect(evaluate(browser.if, context)).toBe(false)
 })
 
-describe('Mobile CI tool preflight routing', () => {
-  const verified = { allowMobileCiTools: true }
-
-  it.each([
-    { files: ['config/scripts/run-mobile-ci-tests.mjs', 'config/mobile-ci.vitest.config.mjs'] },
-    { files: ['config/scripts/mobile-release-check-scope.test.mjs'] },
-    { files: ['config/scripts/mobile-test-change-scope.test.mjs'] }
-  ])('keeps affected controls required without starting root shards for $files', ({ files }) => {
-    const outputs = routedOutputs(files, 'false', verified)
-    expect(outputs.mobile_ci_tools).toBe('true')
-    expect(outputs.test).toBe('true')
-    const context = { needs: { code_paths: { outputs } } }
-    expect(evaluate(workflow.jobs.preflight.if, context)).toBe(true)
-    expect(evaluate(workflow.jobs.test.with.run_shards, context)).toBe(false)
-    expect(evaluate(unit.jobs.test.if, { inputs: { run_shards: false } })).toBe(false)
-    const required = workflow.jobs.verify.steps.find(
-      (step) => step.name === 'Require successful checks'
-    )
-    expect(evaluate(required.env.PREFLIGHT_SHOULD_RUN, context)).toBe(true)
-  })
-
-  // Static analysis only, for the whole-tree formatting check.
-  it('keeps workflow-only changes off the root unit and typecheck route', () => {
-    const outputs = routedOutputs(['.github/workflows/mobile.yml'], 'false', verified)
-    expect(outputs.mobile_ci_tools).toBe('false')
-    expect(outputs.test).toBe('false')
-    expect(outputs.static_analysis).toBe('true')
-    expect(outputs.typecheck).toBe('false')
-  })
-
+describe('unit-test workflow defaults', () => {
   it('keeps root shard execution enabled for callers that do not opt out', () => {
     expect(unit.on.workflow_call.inputs.run_shards.default).toBe(true)
     expect(evaluate(unit.jobs.test.if, { inputs: { run_shards: true } })).toBe(true)
@@ -263,49 +222,22 @@ describe('Mobile CI tool preflight routing', () => {
     expect(unit.jobs.relay_integration.needs).toBeUndefined()
   })
 
-  it('requires complete modification evidence and an exact path scope', () => {
-    const tool = 'config/scripts/run-mobile-ci-tests.mjs'
-    expect(classifyPrJobs([tool]).test).toBe(true)
-    expect(classifyPrJobs([tool]).mobile_ci_tools).toBe(false)
-    for (const files of [
-      [],
-      [tool, 'src/main/runtime/orca-runtime.ts'],
-      [tool, 'pnpm-lock.yaml'],
-      [tool, 'package.json'],
-      [tool, 'config/vitest.config.ts'],
-      [tool, 'config/scripts/pr-code-change-scope.mjs'],
-      [tool, 'config/scripts/pr-package-test-paths.mjs'],
-      [tool, 'config/scripts/new-mobile-tool.mjs'],
-      [tool, 'README.md'],
-      [tool, 'mobile/vitest.config.ts']
-    ]) {
-      const selected = classifyPrJobs(files, verified)
-      expect(selected.mobile_ci_tools).toBe(false)
-      expect(selected.test).toBe(true)
-    }
-  })
-
-  it('reuses only identical successful checks for the focused preflight gate', () => {
-    const files = ['config/scripts/run-mobile-ci-tests.mjs']
-    expect(routedOutputs(files, 'true', verified).mobile_ci_tools).toBe('false')
-    expect(routedOutputs(files, 'false', verified).mobile_ci_tools).toBe('true')
-  })
 })
 
-const mobileCiScopeDirectories = []
+const scopeDirectories = []
 afterEach(() => {
-  for (const directory of mobileCiScopeDirectories.splice(0)) {
+  for (const directory of scopeDirectories.splice(0)) {
     rmSync(directory, { recursive: true, force: true })
   }
 })
 
-function createMobileCiScopeRepository(
+function createPrScopeRepository(
   withTool = true,
-  toolPath = 'config/scripts/run-mobile-ci-tests.mjs',
+  toolPath = 'src/main/daemon/daemon-init-dependency-mocks.ts',
   companionPaths = []
 ) {
   const directory = mkdtempSync(join(tmpdir(), 'orca-mobile-ci-scope-'))
-  mobileCiScopeDirectories.push(directory)
+  scopeDirectories.push(directory)
   const root = resolve(import.meta.dirname, '../..')
   for (const file of [
     'package.json',
@@ -377,60 +309,10 @@ function createMobileCiScopeRepository(
   return { directory, tool, git, commit, detect }
 }
 
-describe.skipIf(process.platform === 'win32')('Mobile CI complete Git change evidence', () => {
-  it('admits an actual modification through the workflow detector', () => {
-    const repo = createMobileCiScopeRepository()
-    writeFileSync(repo.tool, 'export const revision = 2\n')
-    repo.commit()
-    const { result, output } = repo.detect()
-    expect(result.code, result.stderr).toBe(0)
-    expect(readFileSync(output, 'utf8')).toContain('mobile_ci_tools=true\n')
-    expect(readFileSync(output, 'utf8')).toContain('test=true\n')
-  })
-
-  it.each(['addition', 'deletion', 'rename', 'type change'])(
-    'retains full root units for an actual %s',
-    (change) => {
-      const repo = createMobileCiScopeRepository(change !== 'addition')
-      if (change === 'addition') {
-        writeFileSync(repo.tool, 'export const revision = 1\n')
-      } else if (change === 'deletion') {
-        rmSync(repo.tool)
-      } else if (change === 'rename') {
-        repo.git(
-          'mv',
-          'config/scripts/run-mobile-ci-tests.mjs',
-          'config/mobile-ci.vitest.config.mjs'
-        )
-      } else {
-        rmSync(repo.tool)
-        symlinkSync('pr-code-change-scope.mjs', repo.tool)
-      }
-      repo.commit()
-      const { result, output } = repo.detect()
-      expect(result.code, result.stderr).toBe(0)
-      expect(readFileSync(output, 'utf8')).toContain('mobile_ci_tools=false\n')
-      expect(readFileSync(output, 'utf8')).toContain('test=true\n')
-    }
-  )
-
-  it('does not emit a passing classification when the Git evidence is unavailable', () => {
-    const repo = createMobileCiScopeRepository()
-    writeFileSync(repo.tool, 'export const revision = 2\n')
-    repo.commit()
-    expect(repo.detect().result.code).toBe(0)
-    rmSync(join(repo.directory, 'github-output'))
-    rmSync(join(repo.directory, '.git'), { recursive: true, force: true })
-    const { result } = repo.detect()
-    expect(result.code).not.toBe(0)
-    expect(result.stderr).toContain('not a git repository')
-  })
-})
-
 describe.skipIf(process.platform === 'win32')('Daemon mock complete Git change evidence', () => {
   const helper = 'src/main/daemon/daemon-init-dependency-mocks.ts'
   it('keeps real unit and type contracts while omitting unrelated packages for a modification', () => {
-    const repo = createMobileCiScopeRepository(true, helper)
+    const repo = createPrScopeRepository(true, helper)
     writeFileSync(repo.tool, 'export const revision = 2\n')
     repo.commit()
     const { result, output } = repo.detect()
@@ -447,7 +329,7 @@ describe.skipIf(process.platform === 'win32')('Daemon mock complete Git change e
       'config/scripts/process-host-build-dist.test.mjs',
       'src/main/codex/codex-app-server-connection.test.ts'
     ]
-    const repo = createMobileCiScopeRepository(true, helper, companions)
+    const repo = createPrScopeRepository(true, helper, companions)
     for (const file of [helper, ...companions]) {
       writeFileSync(join(repo.directory, file), 'export const revision = 2\n')
     }
@@ -471,7 +353,7 @@ describe.skipIf(process.platform === 'win32')('Daemon mock complete Git change e
   it.each(['addition', 'deletion', 'rename', 'type change'])(
     'keeps platform packages for an actual %s',
     (change) => {
-      const repo = createMobileCiScopeRepository(change !== 'addition', helper)
+      const repo = createPrScopeRepository(change !== 'addition', helper)
       if (change === 'addition') {
         writeFileSync(repo.tool, 'export const revision = 1\n')
       } else if (change === 'deletion') {

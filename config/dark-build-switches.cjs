@@ -2,7 +2,7 @@ const { existsSync } = require('node:fs')
 const { join } = require('node:path')
 
 // Dark build switches: a build compiles a switch's path in only when its variable is 'main'. Such a
-// main build leaves the switch's marker in out/main, the phone page bundle (out/mobile-web), out/orcad
+// main build leaves the switch's marker in out/main, out/orcad
 // and a --dark-test-template orcad template; packaging refuses any of them, and packaging and a
 // release orcad template also refuse the variable itself.
 const DARK_BUILD_SWITCHES = [

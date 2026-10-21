@@ -9,7 +9,7 @@ import { collectModuleSpecifiers } from './static-module-specifiers.mjs'
 // it, or carry the COMPAT tag, are the seams that retirement edits. Both lists may only shrink.
 
 const LEGACY_FOLDER = 'src/main/ssh/legacy-relay'
-const SCAN_ROOTS = ['src', 'tests', 'config', 'mobile/src']
+const SCAN_ROOTS = ['src', 'tests', 'config']
 const COMPAT_TAG = 'COMPAT(legacy-relay-bridge)'
 // The gate names the tag it counts; it is not a seam.
 const SELF = 'config/scripts/check-legacy-relay-fence-ratchet.'

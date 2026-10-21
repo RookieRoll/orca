@@ -9,7 +9,7 @@ name: WSL orcad E2E
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
-    # This lane drives host RPC, not UI; pr.yml owns mobile bundle/render checks.
+    # This lane drives host RPC, not UI.
     paths:
       - 'src/main/wsl/**'
       - 'src/main/runtime/**'
@@ -67,7 +67,6 @@ jobs:
       - uses: ./.github/actions/install-node-dependencies
         with:
           native-runtime: node
-      - uses: ./.github/actions/build-mobile-web-bundle
       - name: Build the template
         run: |
           pnpm build:orcad-prebuilds

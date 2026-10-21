@@ -103,14 +103,8 @@ it('only skips the unchanged smoke after a successful diff and dependency analys
   expect(scope.run).toMatch(
     /&& \[ "\$scope" = false \]; then[\s\S]*run=false[\s\S]*else\s+echo 'run=true'/
   )
-  // orcad refuses to build without the page, so the page builds exactly when the smoke runs.
   const gated = "steps.orcad-smoke-scope.outputs.run == 'true'"
-  const page = steps.find(
-    (candidate) => candidate.uses === './.github/actions/build-mobile-web-bundle'
-  )
   const smoke = steps.find((candidate) => candidate.name === 'Boot orcad and round-trip a terminal')
-  expect(page.if).toBe(gated)
   expect(smoke.if).toBe(gated)
   expect(smoke.run).toBe('pnpm run smoke:orcad-terminal')
-  expect(steps.indexOf(page)).toBeLessThan(steps.indexOf(smoke))
 })

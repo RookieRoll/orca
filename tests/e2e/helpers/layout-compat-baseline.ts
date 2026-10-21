@@ -1,5 +1,5 @@
 /**
- * Mixed-version, two-client and phone baselines (layout rework P3). Each scenario reduces what the
+ * Mixed-version and two-client baselines (layout rework P3). Each scenario reduces what the
  * server and its clients report to a shape with stable labels in place of generated ids, and
  * compares it with the shape recorded on main in `layout-compat-baselines.json`. A change that
  * moves a scenario updates its recorded shape in the same PR, so every difference is reviewed.

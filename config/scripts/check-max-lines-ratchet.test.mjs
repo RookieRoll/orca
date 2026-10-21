@@ -7,7 +7,6 @@ import { resolveOxlintInvocation } from './oxlint-cli-invocation.mjs'
 
 import {
   collectCurrentSuppressions,
-  collectMobileBumps,
   defaultLimitForPath,
   hasMaxLinesDisable
 } from './check-max-lines-ratchet.mjs'
@@ -78,45 +77,6 @@ describe('defaultLimitForPath', () => {
   })
 })
 
-describe('collectMobileBumps', () => {
-  it.each(['mts', 'cts'])('only flags .%s overrides above their source or test budget', (ext) => {
-    const paths = [`module.${ext}`, `module.test.${ext}`, `module.spec.${ext}`]
-    const config = (extra) =>
-      JSON.stringify({
-        overrides: paths.map((file, index) => ({
-          files: [file],
-          rules: { 'max-lines': ['error', { max: (index === 0 ? 300 : 800) + extra }] }
-        }))
-      })
-    expect(collectMobileBumps(config(-1))).toEqual([])
-    expect(collectMobileBumps(config(0))).toEqual([])
-    expect(collectMobileBumps(config(1))).toEqual(paths.map((file) => `mobile-config ${file}`))
-  })
-  it('captures only overrides whose max exceeds the default for the glob', () => {
-    const cfg = JSON.stringify({
-      overrides: [
-        { files: ['app/h/*/tasks.tsx'], rules: { 'max-lines': ['error', { max: 14682 }] } }, // bump (>400)
-        {
-          files: ['src/terminal/TerminalWebView.tsx'],
-          rules: { 'max-lines': ['error', { max: 379 }] }
-        }, // stricter (<400), skip
-        { files: ['scripts/mock-server.ts'], rules: { 'max-lines': ['error', { max: 407 }] } } // bump (>300)
-      ]
-    })
-    expect(collectMobileBumps(cfg)).toEqual([
-      'mobile-config app/h/*/tasks.tsx',
-      'mobile-config scripts/mock-server.ts'
-    ])
-  })
-
-  it('ignores overrides without a max-lines rule', () => {
-    const cfg = JSON.stringify({
-      overrides: [{ files: ['a.tsx'], rules: { 'no-console': 'off' } }]
-    })
-    expect(collectMobileBumps(cfg)).toEqual([])
-  })
-})
-
 describe('max-lines repository coverage', () => {
   let scratch
   const repoRoot = resolve(import.meta.dirname, '../..')
@@ -161,9 +121,8 @@ describe('max-lines repository coverage', () => {
     )
   })
 
-  it.each(['.oxlintrc.json', 'mobile/.oxlintrc.json'])(
-    'enforces exact budgets with installed oxlint and %s',
-    (config) => {
+  it('enforces exact budgets with installed oxlint and .oxlintrc.json', () => {
+    const config = '.oxlintrc.json'
       rmSync(scratch, { recursive: true, force: true })
       scratch = mkdtempSync(join(dirname(join(repoRoot, config)), '.max-lines-test-'))
       const initialized = runProcessSync({

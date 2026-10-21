@@ -32,10 +32,6 @@ const {
   finalizePackagedWaylandClipboard
 } = require('./wayland-clipboard-resources.cjs')
 const { writeMacBuildCompatibility } = require('./scripts/mac-build-compatibility.cjs')
-const {
-  MOBILE_WEB_BUNDLE_DIR,
-  assertMobileWebBundleBuilt
-} = require('./scripts/verify-packaged-mobile-web-bundle.cjs')
 const { verifyPackagedPluginResources } = require('./scripts/verify-packaged-plugin-resources.cjs')
 const {
   assertPackagedServeSelectionEntry,
@@ -290,6 +286,8 @@ module.exports = {
     '!out/renderer/.vite{,/**/*}',
     // The installed browser serves its allowlisted assets from the unpacked renderer.
     '!out/web{,/**/*}',
+    // Why: stopped builds may leave this ignored bundle behind; never package it from stale output.
+    '!out/mobile-web{,/**/*}',
     // Why: out/electron-dev caches `pnpm dev`'s per-branch Electron.app copies (~270MB each).
     // CI never creates it, but packaging on a machine that has run dev would pack them all.
     '!out/electron-dev{,/**/*}',
@@ -340,7 +338,7 @@ module.exports = {
   // entries reached solely from the Electron main process stay packed, since
   // asar redirects their app.asar paths.
   // Why: `orca serve` runs the orcad selection entry under ELECTRON_RUN_AS_NODE too (#27307).
-  // Why out/renderer and out/mobile-web: their assets are opened by path, and opening a packed file
+  // Why out/renderer: its assets are opened by path, and opening a packed file
   // reads a /tmp extract Electron makes once and never remakes, so a /tmp sweep broke them (#27976).
   asarUnpack: [
     'out/package.json',
@@ -372,7 +370,6 @@ module.exports = {
     'out/main/orcad/orcad-local-serve-selection-entry.js',
     'out/main/chunks/**',
     'out/renderer/**',
-    'out/mobile-web/**',
     'resources/**',
     'node_modules/ws/**',
     'node_modules/tweetnacl/**',
@@ -384,21 +381,18 @@ module.exports = {
       verifyStaticAppImagePackage(file, arch)
     }
   },
-  // electron-builder calls this with the context alone. The second parameter is the bundle root,
-  // so a test can point the guard at a scratch bundle instead of needing the repo's out/ built.
+  // The optional template path lets packaging tests use a scratch artifact.
   beforePack: (
     context,
-    mobileWebBundleDir = MOBILE_WEB_BUNDLE_DIR,
     ensureWaylandClipboard = ensureBundledWaylandClipboard,
     orcadTemplateDir = join(__dirname, '..', orcadTemplateExtraResource.from)
   ) => {
     // The template is the server every SSH host gets, so a dark test template must never ship.
-    assertNotDarkBuild([join(__dirname, '..', 'out', 'main'), mobileWebBundleDir, orcadTemplateDir])
+    assertNotDarkBuild([join(__dirname, '..', 'out', 'main'), orcadTemplateDir])
     assertPackagedNativeVariantsInstalled(context.electronPlatformName, context.arch)
     assertBundledRipgrepInstalled()
     assertProcessHostOutputBuilt()
     assertOrcadTemplateBuilt()
-    assertMobileWebBundleBuilt(mobileWebBundleDir)
     if (context.electronPlatformName === 'linux') {
       ensureWaylandClipboard(context.arch)
     }

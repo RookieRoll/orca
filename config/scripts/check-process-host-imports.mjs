@@ -13,7 +13,7 @@ const PACKAGE_SOURCE = `${PACKAGE_DIRECTORY}/src/`
 const BASELINE_PATH = 'config/process-host-direct-import-baseline.txt'
 const SOURCE_PATTERNS = [
   '*.{ts,tsx,mts,cts,js,mjs,cjs}',
-  ...['src', 'config', 'tests', 'mobile/src', 'mobile/app', 'mobile/scripts'].map(
+  ...['src', 'config', 'tests'].map(
     (directory) => `${directory}/**/*.{ts,tsx,mts,cts,js,mjs,cjs}`
   )
 ]

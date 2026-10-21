@@ -24,7 +24,6 @@ describe('countHandBuiltWorktreeIds', () => {
 describe('isScannedPath', () => {
   it('scans production sources outside the composer module', () => {
     expect(isScannedPath('src/main/runtime/a.ts')).toBe(true)
-    expect(isScannedPath('mobile/src/session/a.tsx')).toBe(true)
     expect(isScannedPath('src/shared/worktree/id.ts')).toBe(false)
     expect(isScannedPath('src/main/a.test.ts')).toBe(false)
     expect(isScannedPath('src/main/runtime/__fixtures__/a.ts')).toBe(false)

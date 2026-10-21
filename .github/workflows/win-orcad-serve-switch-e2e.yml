@@ -59,10 +59,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: dist/orca-windows-setup.exe
-          key: serve-switch-installer-v2-${{ hashFiles('src/**', 'config/**', 'native/**', 'resources/**', 'mobile/**', 'patches/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml') }}
-
-      - uses: ./.github/actions/install-mobile-dependencies
-        if: steps.cache-installer.outputs.cache-hit != 'true'
+          key: serve-switch-installer-v2-${{ hashFiles('src/**', 'config/**', 'native/**', 'resources/**', 'patches/**', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml') }}
 
       - uses: ./.github/actions/prepare-windows-agent-hook
         if: steps.cache-installer.outputs.cache-hit != 'true'
@@ -98,7 +95,6 @@ jobs:
       - uses: ./.github/actions/prepare-windows-cli-launcher
         with:
           arches: x64
-      - uses: ./.github/actions/build-mobile-web-bundle
       - name: Build the win32-x64 orcad template
         shell: bash
         env:

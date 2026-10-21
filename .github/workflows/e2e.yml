@@ -161,10 +161,6 @@ jobs:
             echo 'available=false' >> "$GITHUB_OUTPUT"
           fi
 
-      # The orcad builds downstream refuse to run without the page; older refs predate the action.
-      - uses: ./.github/actions/build-mobile-web-bundle
-        if: hashFiles('.github/actions/build-mobile-web-bundle/action.yml') != ''
-
       # Foreground: a background JavaScript action reads the event payload while later steps rewrite it.
       - name: Upload E2E build output
         uses: actions/upload-artifact@v7
@@ -490,15 +486,6 @@ jobs:
           ORCA_E2E_ORCAD_SERVE: '1'
           ORCA_E2E_FORWARD_APP_LOGS: '1'
         run: xvfb-run --auto-servernum bash .github/scripts/e2e-with-window-manager.sh pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/orcad-serve-mode-switch.spec.ts --project=electron-headless --workers=1
-      # Only this job builds out/orcad, so the spec's orcad case runs here; the e2e shards run its Electron case.
-      - name: Phone Markdown on headless orcad serve
-        if: >-
-          !cancelled() &&
-          (inputs.test_files == '' || contains(inputs.test_files, 'tests/e2e/headless-serve-mobile-markdown.spec.ts'))
-        env:
-          SKIP_BUILD: '1'
-          ORCA_E2E_FORWARD_APP_LOGS: '1'
-        run: xvfb-run --auto-servernum bash .github/scripts/e2e-with-window-manager.sh pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/headless-serve-mobile-markdown.spec.ts --grep "headless orcad server" --project=electron-headless --workers=1
       # The layout oracle's headless scenarios run on both serve hosts, so they need this job's orcad.
       - name: Layout oracle on headless serve (orcad and Electron)
         if: >-
@@ -667,7 +654,6 @@ jobs:
       - uses: ./.github/actions/prepare-windows-cli-launcher
         with:
           arches: x64
-      - uses: ./.github/actions/build-mobile-web-bundle
       - name: Build the e2e app, CLI, orcad slot and template
         shell: bash
         env:

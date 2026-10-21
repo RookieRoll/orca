@@ -24,14 +24,6 @@ describe('CI dependency download caches', () => {
     expect(install.run).toContain(
       'diff --exit-code -- package.json pnpm-lock.yaml pnpm-workspace.yaml'
     )
-    const mobile = workflow('mobile').jobs.verify.steps.find((step) =>
-      step.uses?.includes('install-node-dependencies')
-    )
-    expect(mobile.with['cache-pnpm-store']).toBe('false')
-    expect(mobile.with['cache-dependency-path'].trim().split('\n')).toEqual([
-      'pnpm-lock.yaml',
-      'mobile/pnpm-lock.yaml'
-    ])
   })
 
   it('builds internal packages before native preparation after a script-free install', () => {
@@ -53,7 +45,7 @@ describe('CI dependency download caches', () => {
       (step) => step.name === 'Restore pnpm download store without saving'
     )
     expect(restore.if).toBe(
-      "github.event_name == 'pull_request' && inputs.cache-pnpm-store != 'false' && !((runner.os == 'Linux' || runner.os == 'macOS') && (runner.arch == 'X64' || runner.arch == 'ARM64') && inputs.cache-dependency-path == 'pnpm-lock.yaml') && (runner.os != 'Windows' || !(runner.arch == 'X64' && contains(inputs.cache-dependency-path, 'mobile/pnpm-lock.yaml')) && !((runner.arch == 'X64' || runner.arch == 'ARM64') && inputs.cache-dependency-path == 'pnpm-lock.yaml'))"
+      "github.event_name == 'pull_request' && inputs.cache-pnpm-store != 'false' && !((runner.os == 'Linux' || runner.os == 'macOS') && (runner.arch == 'X64' || runner.arch == 'ARM64') && inputs.cache-dependency-path == 'pnpm-lock.yaml') && (runner.os != 'Windows' || !((runner.arch == 'X64' || runner.arch == 'ARM64') && inputs.cache-dependency-path == 'pnpm-lock.yaml'))"
     )
     expect(resolve.if).toBe(
       `${restore.if} || (github.event_name != 'pull_request' && inputs.cache-pnpm-store != 'false' && steps.pnpm-store-mode.outputs.lookup-only == 'true')`
@@ -75,13 +67,6 @@ describe('CI dependency download caches', () => {
     expect(saves[0].if).toContain("github.ref == 'refs/heads/main'")
     expect(saves[0].if).toContain("github.event_name != 'pull_request'")
     expect(saves[0].with.path).toBe('${{ steps.verification-cache.outputs.path }}')
-    const windows = workflow('pr').jobs.package_windows.steps.find((step) =>
-      step.uses?.includes('install-node-dependencies')
-    )
-    expect(windows.with['cache-dependency-path'].trim().split('\n')).toEqual([
-      'pnpm-lock.yaml',
-      'mobile/pnpm-lock.yaml'
-    ])
   })
 
   it('keeps producer lookup optional and compatible with the existing store archive', () => {
@@ -104,7 +89,7 @@ describe('CI dependency download caches', () => {
   })
 
   it.each([
-    ['Windows x64 mixed PR', 'pull_request', 'Windows', 'X64', true, false, ''],
+    ['Windows x64 auxiliary lock PR', 'pull_request', 'Windows', 'X64', true, true, ''],
     ['Windows ARM64 mixed PR', 'pull_request', 'Windows', 'ARM64', true, true, ''],
     ['Windows x86 mixed PR', 'pull_request', 'Windows', 'X86', true, true, ''],
     ['Windows x64 root-only PR', 'pull_request', 'Windows', 'X64', false, false, ''],
@@ -233,7 +218,7 @@ describe('CI dependency download caches', () => {
             typeof mixed === 'string'
               ? mixed
               : mixed
-                ? 'pnpm-lock.yaml\nmobile/pnpm-lock.yaml'
+                ? 'pnpm-lock.yaml\ntools/pnpm-lock.yaml'
                 : 'pnpm-lock.yaml'
         },
         contains: (value, search) => value.toLowerCase().includes(search.toLowerCase())
@@ -395,15 +380,10 @@ describe('CI dependency download caches', () => {
     expect(unitInstall.with['cache-electron-package']).toBe(
       warmInstall.with['cache-electron-package']
     )
-    const preflightInstalls = pr.jobs.preflight.steps.filter((step) => step.uses === installer)
-    expect(preflightInstalls.map((step) => step.if)).toEqual([
-      "needs.code_paths.outputs.mobile_dependencies != 'true'",
-      "needs.code_paths.outputs.mobile_dependencies == 'true'"
-    ])
-    for (const step of preflightInstalls) {
-      expect(step.with['native-runtime']).toBe('node')
-      expect(step.with['node-version']).toBe('24')
-    }
+    const preflightInstall = pr.jobs.preflight.steps.find((step) => step.uses === installer)
+    expect(preflightInstall).toBeDefined()
+    expect(preflightInstall.with['native-runtime']).toBe('node')
+    expect(preflightInstall.with['node-version']).toBe('24')
     const populate = 'node config/scripts/install-electron-package-binary.mjs'
     const unitPopulate = units.steps.find((step) => step.run === populate)
     expect(unitPopulate.if).toBeUndefined()
@@ -424,11 +404,10 @@ describe('CI dependency download caches', () => {
       ...workflow('ci-cache-warmup-platforms').on.pull_request.paths,
       '.github/workflows/ci-cache-warmup.yml'
     ]) {
-      expect(classifyPrJobs([path], { allowMobileCiTools: true }), path).toMatchObject({
+      expect(classifyPrJobs([path]), path).toMatchObject({
         static_analysis: true,
         typecheck: true,
-        test: true,
-        mobile_ci_tools: false
+        test: true
       })
     }
   })

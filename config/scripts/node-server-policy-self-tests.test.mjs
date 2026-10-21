@@ -25,11 +25,10 @@ describe('modified Node-server policy self-tests', () => {
   it.each(policyTests)(
     'keeps %s in required root units without native qualification',
     async (file) => {
-      expect(classifyPrJobs([file], { allowMobileCiTools: true })).toMatchObject({
+      expect(classifyPrJobs([file])).toMatchObject({
         test: true,
         static_analysis: true,
-        typecheck: true,
-        mobile_ci_tools: false
+        typecheck: true
       })
       expect(inputs.has(file)).toBe(false)
       const scope = await classifyNodeServerChanges([file], async () => inputs, {

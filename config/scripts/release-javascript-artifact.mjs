@@ -26,7 +26,6 @@ const REQUIRED_FILES = [
   'renderer/.vite/manifest.json',
   'renderer/.orca-web-client-files.json',
   'web/web-index.html',
-  'mobile-web/manifest.json',
   'package.json'
 ]
 const NATIVE_FILE = /\.(?:node|exe|dll|dylib|so(?:\.\d+)*|a)$/i

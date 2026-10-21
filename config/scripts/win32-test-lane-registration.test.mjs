@@ -139,13 +139,6 @@ const GATED_FILE_FLOOR = 23
 const TEST_FILE_PATTERN = /\.(?:test|spec)\.(?:ts|tsx|mjs|cjs|js)$/
 
 /**
- * Mobile has its own vitest run and never touches the desktop Windows job:
- * `classifyPrJobs` reports `package_windows: false` for every `mobile/` path,
- * so a gated file there could not satisfy this guard even in principle.
- */
-const UNREACHABLE_BY_THE_WINDOWS_LANE = 'mobile/'
-
-/**
  * This file quotes every gate spelling as a fixture, so it matches its own
  * matcher. It is not gated -- it must run on ubuntu, since a guard about
  * Windows CI that only ran on Windows would be self-defeating. Exempt by exact
@@ -311,7 +304,7 @@ const { windowsJobNames, laneFiles } = readWindowsWorkflow()
 const scannedTestFiles = scanSourceTree(projectDir, {
   includeTests: true,
   extensions: TEST_FILE_PATTERN
-}).filter(({ relativePath }) => !relativePath.startsWith(UNREACHABLE_BY_THE_WINDOWS_LANE))
+})
 const gatedFiles = scannedTestFiles
   .filter(({ relativePath }) => !isScannerSelfPath(relativePath))
   .filter(({ relativePath, source }) => isWindows32GatedTestFile(relativePath, source))

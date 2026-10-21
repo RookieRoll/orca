@@ -237,9 +237,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            mobile/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       # Caches the Electron binary and electron-builder's tool downloads (nsis,
       # winCodeSign). Same key shape as release-cut's Windows leg.
@@ -265,11 +263,6 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 30
           command: pnpm install --frozen-lockfile
-
-      # Why here: electron-builder's beforePack requires out/mobile-web, and the bundle
-      # build resolves React Native and Expo from mobile/node_modules.
-      - uses: ./.github/actions/install-mobile-dependencies
-        if: inputs.javascript_source_sha == ''
 
       # Why the packaging check runs before the 20-minute build: it only needs
       # node_modules, and a stale config should cost seconds rather than a build.

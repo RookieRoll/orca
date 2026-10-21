@@ -26,8 +26,8 @@ describe('isDirectInvocation', () => {
   const toWin32FileUrl = (windowsPath) => new URL(`file:///${windowsPath.replaceAll('\\', '/')}`)
 
   it('matches a Windows entry path, which the file:// template form never does', () => {
-    const scriptPath = 'C:\\orca\\config\\scripts\\build-mobile-web-app-bundle.mjs'
-    const moduleUrl = 'file:///C:/orca/config/scripts/build-mobile-web-app-bundle.mjs'
+    const scriptPath = 'C:\\orca\\config\\scripts\\build-orcad-template.mjs'
+    const moduleUrl = 'file:///C:/orca/config/scripts/build-orcad-template.mjs'
     const keepAsIs = (path) => path
     expect(
       isDirectInvocation(moduleUrl, scriptPath, {

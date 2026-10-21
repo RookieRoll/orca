@@ -504,7 +504,6 @@ describe('the actual Bun build and profile-test dependency graph', () => {
 
   it.each([
     'config/scripts/ci-shard-timings.json',
-    'config/scripts/mobile-web-app-terminal-render.test.mjs',
     'src/renderer/src/components/terminal/pty-running-work-probe.ts',
     'src/renderer/src/runtime/runtime-terminal-inspection.ts',
     'src/main/ssh/ssh-relay-upload-stage-commands.test.ts',
@@ -572,11 +571,6 @@ it('keeps every platform job and runs them when detection is skipped or fails', 
   for (const jobName of ['linux_glibc_floor', 'linux_musl']) {
     const job = workflow.jobs[jobName]
     expect(job.needs).toBe('changes')
-    // The containers never install mobile/, and orcad refuses to build without the page.
-    expect(job.steps.some((step) => step.with?.name === 'orcad-mobile-web-bundle')).toBe(true)
-    expect(job.steps.some((step) => step.name === 'Wait for the qualified mobile bundle')).toBe(
-      true
-    )
     expect(job.if).not.toContain('needs.persistence')
     expect(job.if).toContain("needs.changes.outputs.qualification != 'false'")
     expect(job.if).toContain("needs.changes.outputs.should_run != 'false'")

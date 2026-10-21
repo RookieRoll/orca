@@ -1,5 +1,3 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { readTrackedSources, runEntryRatchet } from './ratchet-baseline.mjs'
@@ -7,14 +5,13 @@ import { readTrackedSources, runEntryRatchet } from './ratchet-baseline.mjs'
 // Ratchet gate for the oxlint `max-lines` rule.
 //
 // oxlint already fails any file that exceeds max-lines WITHOUT a suppression, so
-// the only way a file grows past the budget is by adding an `eslint/oxlint-disable
-// max-lines` comment or a per-file `max-lines` bump in mobile/.oxlintrc.json. This
-// check freezes the set of files currently allowed to do that (the baseline) and
+// the only way a file grows past the budget is by adding an
+// `eslint/oxlint-disable max-lines` comment. This check freezes the set of files allowed to do
+// that (the baseline) and
 // fails CI when a NEW bypass appears — the existing over-limit files are
 // grandfathered; new ones must split instead. The baseline may only shrink.
 
 const BASELINE_PATH = 'config/max-lines-baseline.txt'
-const MOBILE_CONFIG_PATH = 'mobile/.oxlintrc.json'
 // These two files legitimately contain the directive text as data (regex, fixtures),
 // so scanning them would self-flag. The ratchet does not police itself.
 const SELF_FILES = new Set([
@@ -55,25 +52,6 @@ export function hasMaxLinesDisable(sourceText) {
   return false
 }
 
-// Per-file `max-lines` bumps in mobile/.oxlintrc.json whose `max` exceeds the
-// default for that glob (a lower `max` is stricter, not a bypass).
-export function collectMobileBumps(configText) {
-  const cfg = JSON.parse(configText)
-  const bumps = []
-  for (const override of cfg.overrides ?? []) {
-    const rule = override.rules?.['max-lines']
-    if (!Array.isArray(rule) || typeof rule[1]?.max !== 'number') {
-      continue
-    }
-    for (const glob of override.files ?? []) {
-      if (rule[1].max > defaultLimitForPath(glob)) {
-        bumps.push(`mobile-config ${glob}`)
-      }
-    }
-  }
-  return bumps
-}
-
 // Collect every current suppression entry from the tracked tree.
 export function collectCurrentSuppressions(root = process.cwd()) {
   const sources = readTrackedSources(
@@ -84,11 +62,6 @@ export function collectCurrentSuppressions(root = process.cwd()) {
   const entries = [...sources]
     .filter(([, src]) => hasMaxLinesDisable(src))
     .map(([rel]) => `inline ${rel}`)
-
-  const mobileCfgPath = path.join(root, MOBILE_CONFIG_PATH)
-  if (fs.existsSync(mobileCfgPath)) {
-    entries.push(...collectMobileBumps(fs.readFileSync(mobileCfgPath, 'utf8')))
-  }
 
   return entries.sort()
 }
@@ -104,8 +77,7 @@ const RATCHET = {
   ],
   collect: collectCurrentSuppressions,
   fix: [
-    'An `inline` entry added an eslint/oxlint-disable max-lines comment; a `mobile-config` entry',
-    'added a per-file max-lines bump in mobile/.oxlintrc.json. Orca caps file size (300',
+    'An `inline` entry added an eslint/oxlint-disable max-lines comment. Orca caps file size (300',
     '.ts/.mts/.cts / 400 .tsx / 600 .mjs / 800 test — non-blank, non-comment lines).',
     'Fix it: SPLIT the file into focused modules — do NOT suppress the rule.'
   ]

@@ -100,14 +100,13 @@ jobs:
           pnpm exec playwright test --config tests/playwright.config.ts
           tests/e2e/layout-compat-old-desktop-on-new-server.spec.ts
           tests/e2e/layout-compat-new-desktop-on-old-server.spec.ts
-          tests/e2e/layout-compat-old-phone-on-new-server.spec.ts
           tests/e2e/layout-compat-serve-restart-keeps-at-at-terminals.spec.ts
           --project=electron-headless --workers=1 --retries=0 --reporter=list
       - name: Require every layout scenario to have run
         if: always()
         # A missing env skips the specs and passes; each run writes its observation first.
         run: |
-          for scenario in old-desktop-on-new-server old-cli-terminal-create new-desktop-on-old-server old-phone-on-new-server serve-restart-keeps-@@-terminals; do
+          for scenario in old-desktop-on-new-server old-cli-terminal-create new-desktop-on-old-server serve-restart-keeps-@@-terminals; do
             test -f "test-results/layout-compat/$scenario.linux.json" || { echo "::error::$scenario did not run"; exit 1; }
           done
       - uses: actions/upload-artifact@v7

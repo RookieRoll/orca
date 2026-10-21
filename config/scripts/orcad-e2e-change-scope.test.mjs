@@ -200,12 +200,7 @@ describe.each([
 
 describe('WSL host coverage without UI-only admissions', () => {
   const paths = workflows.wsl.on.pull_request.paths
-  const mobileFiles = [
-    'mobile/src/session/MobileSessionTabStrip.tsx',
-    'mobile/src/session/mobile-session-frame-styles.ts'
-  ]
   const uiFiles = [
-    ...mobileFiles,
     'src/renderer/src/components/native-chat/NativeChatToolRun.tsx',
     'src/renderer/src/lib/agent-session-continuation.ts'
   ]
@@ -213,11 +208,6 @@ describe('WSL host coverage without UI-only admissions', () => {
   it.each(uiFiles)('leaves UI-only changes to their own checks: %s', (file) => {
     expect(existsSync(new URL(`../../${file}`, import.meta.url)), file).toBe(true)
     expect(workflowIncludes(paths, [file])).toBe(false)
-  })
-
-  it('still builds and checks the mobile page for the tab-strip regression example', () => {
-    expect(workflowIncludes(paths, mobileFiles)).toBe(false)
-    expect(classifyPrJobs(mobileFiles).mobile_web_app).toBe(true)
   })
 
   it.each([

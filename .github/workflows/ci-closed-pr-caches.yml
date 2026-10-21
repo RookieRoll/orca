@@ -25,7 +25,6 @@ jobs:
               ['node-server', 'node-server-tests.yml'],
               ['ssh-windows-hosts', 'ssh-windows-hosts.yml'],
               ['ssh-hostile-hosts', 'ssh-hostile-hosts.yml'],
-              ['mobile', 'mobile.yml'],
               ['computer-e2e', 'computer-e2e.yml'],
               ['wsl-orcad-e2e', 'wsl-orcad-e2e.yml'],
               ['performance-contracts', 'performance-contracts.yml'],

@@ -88,7 +88,6 @@ describe('process-host import boundary', () => {
     ['src/main/consumer.test.ts', '../packages/process-host/src/run-process'],
     ['config/scripts/consumer.mjs', '../../src/packages/process-host/src/run-process'],
     ['tests/e2e/consumer.ts', '../../src/packages/process-host/src/run-process'],
-    ['mobile/src/consumer.ts', '../../src/packages/process-host/src/run-process'],
     ['src/main/consumer.ts', '@orca/process-host/src/run-process'],
     ['src/main/consumer.ts', '@orca/process-host/private-process-state']
   ])('rejects private package access in %s', (file, specifier) => {
@@ -191,7 +190,7 @@ describe('process-host import boundary', () => {
     })
   })
 
-  it('scans nested package, consumer, test, config, and mobile source without generated checkouts', () => {
+  it('scans nested package, consumer, test, and config source without generated checkouts', () => {
     const files = [
       `${PACKAGE_SOURCE}nested/runner.ts`,
       'src/main/consumer.ts',
@@ -199,9 +198,6 @@ describe('process-host import boundary', () => {
       'config/build-plugins/consumer.ts',
       'config/scripts/nested/build.mjs',
       'tests/e2e/consumer.ts',
-      'mobile/src/consumer.ts',
-      'mobile/app/consumer.tsx',
-      'mobile/scripts/consumer.mts'
     ]
     const ignored = [
       'tests/e2e/.cross-version-checkouts/src/runtime.ts',
