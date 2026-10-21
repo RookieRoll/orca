@@ -10930,20 +10930,6 @@
             "33031c1465": "텍스트 크기",
             "0fe0073f0c": "새 창 및 라이브 업데이트의 기본 터미널 글꼴 크기입니다.",
             "5930244899": "글꼴 크기",
-            "warp_import": {
-              "title": "Warp에서 가져오기",
-              "description": "Warp 테마를 Orca 터미널 테마로 가져옵니다.",
-              "keyword_warp": "warp",
-              "keyword_themes": "themes",
-              "keyword_yaml": "yaml",
-              "keyword_legacy_title": "Warp에서 테마 가져오기"
-            },
-            "yaml_import": {
-              "title": "YAML에서 가져오기",
-              "description": "테마 YAML 파일을 Orca 터미널 테마로 가져옵니다.",
-              "keyword_yaml": "yaml",
-              "keyword_custom": "custom"
-            },
             "ask_before_closing_running_terminals_title": "실행 중인 Terminals을 닫기 전에 확인",
             "ask_before_closing_running_terminals_description": "실행 중인 명령이나 agent가 있는 terminal을 닫기 전에 확인을 표시합니다.",
             "scrollSpeed": {
@@ -11151,43 +11137,6 @@
               }
             }
           }
-        },
-        "WarpThemeImportModal": {
-          "title": "Warp에서 가져오기",
-          "description": "Warp 테마를 Orca 터미널 테마로 가져옵니다.",
-          "yaml_title": "테마 YAML 가져오기",
-          "yaml_description": "YAML 파일(Warp 형식)을 Orca 터미널 테마로 가져옵니다.",
-          "yaml_no_themes_found": "선택한 파일에서 테마를 찾을 수 없습니다.",
-          "choose_file": "파일 선택",
-          "choose_folder": "폴더 선택",
-          "loading": "Warp 테마 로드 중...",
-          "found_theme_one": "테마 1개를 찾았습니다.",
-          "found_theme_other": "테마 {{value0}}개를 찾았습니다.",
-          "found_in_source": "{{value0}}에서",
-          "clear_all": "모두 지우기",
-          "select_all": "모두 선택",
-          "colors_only": "색상만",
-          "no_themes_found": "사용자 지정 Warp 테마를 찾을 수 없습니다.",
-          "builtin_themes_hint": "Warp의 사전 로드 테마는 Warp 앱의 일부라 디스크에서 읽을 수 없습니다. Orca에는 Dracula, Gruvbox, Solarized, Tokyo Night 등 대부분의 테마가 이미 포함되어 있습니다.",
-          "custom_theme_yaml_hint": "사용자 지정 및 커뮤니티 테마를 자동으로 가져오려면 Warp 테마 폴더에 YAML 파일로 저장되어 있어야 합니다. Warp의 공개 테마 저장소를 복제했다면 ‘폴더 선택’을 눌러 복제한 폴더에서 테마를 가져오세요.",
-          "choose_manually": "수동으로 가져올 테마 YAML 파일 또는 폴더를 선택하세요.",
-          "skipped_files": "건너뛴 파일",
-          "more_skipped_files": "건너뛴 파일 {{value0}}개 더 있음",
-          "cancel": "취소",
-          "import_theme_one": "테마 1개 가져오기",
-          "import_theme_other": "테마 {{value0}}개 가져오기",
-          "import_themes": "테마 가져오기"
-        },
-        "useWarpThemeImport": {
-          "unknown_error": "알 수 없는 오류",
-          "imported_one": "테마 1개를 가져왔습니다.",
-          "imported_other": "테마 {{value0}}개를 가져왔습니다.",
-          "import_failed": "테마를 가져오지 못했습니다.",
-          "over_limit_one": "이 테마를 가져오면 사용자 지정 터미널 테마 {{value0}}개 제한을 초과합니다. 새 테마 1개를 선택 해제하고 다시 시도하세요.",
-          "over_limit_other": "이 테마들을 가져오면 사용자 지정 터미널 테마 {{value0}}개 제한을 초과합니다. 새 테마 {{value1}}개를 선택 해제하고 다시 시도하세요."
-        },
-        "YamlThemeImportButton": {
-          "label": "YAML에서 가져오기"
         },
         "cli": {
           "source": {

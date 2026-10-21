@@ -262,7 +262,7 @@ describe('CLI and worker thread entry guard', () => {
 
   it('still reads changed code on the same chunk within one bundle scan', () => {
     const first = entryChunk('stt-worker', 'require("node:fs")')
-    const second = entryChunk('warp-theme-parser-worker', 'require("node:fs")')
+    const second = entryChunk('foreign-sqlite-reader-entry', 'require("node:fs")')
     const shared = entryChunk('shared', '')
     shared.isEntry = false
     let reads = 0
@@ -278,7 +278,7 @@ describe('CLI and worker thread entry guard', () => {
     }
 
     expect(() => runEntryWriteBundle(createPlainNodeEntryGuardPlugin(), bundle)).toThrow(
-      '[plain-node-entry-guard] "warp-theme-parser-worker" reaches chunk "shared.js"'
+      '[plain-node-entry-guard] "foreign-sqlite-reader-entry" reaches chunk "shared.js"'
     )
     expect(reads).toBe(2)
   })
@@ -361,8 +361,8 @@ describe('CLI and worker thread entry guard', () => {
   it('passes a clean worker entry', () => {
     const plugin = createPlainNodeEntryGuardPlugin()
     const bundle: Rollup.OutputBundle = {
-      'warp-theme-parser-worker.js': entryChunk(
-        'warp-theme-parser-worker',
+      'foreign-sqlite-reader-entry.js': entryChunk(
+        'foreign-sqlite-reader-entry',
         'require("node:worker_threads")'
       )
     }

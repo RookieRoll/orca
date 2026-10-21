@@ -33,7 +33,6 @@ vi.mock('../ssh/config/ssh-config-parser', () => ({
   sshConfigHostsToTargets: () => []
 }))
 vi.mock('../ghostty/index', () => ({ previewGhosttyImport: vi.fn() }))
-vi.mock('../warp-themes', () => ({ previewWarpThemeImport: vi.fn() }))
 vi.mock('../network/proxy-settings', () => ({
   applyElectronProxySettings: applyElectronProxySettingsMock
 }))

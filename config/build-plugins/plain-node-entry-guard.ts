@@ -59,7 +59,6 @@ const PLAIN_NODE_ENTRY_NAMES = [
 // require electron.
 const WORKER_THREAD_ENTRY_NAMES = [
   'stt-worker',
-  'warp-theme-parser-worker',
   'foreign-sqlite-reader-entry',
   'main-thread-hang-watchdog-entry',
   'port-scan-command-worker-entry',

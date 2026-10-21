@@ -2855,75 +2855,6 @@
   "auto.components.settings.VoicePane.b6536a1d12": {
     "ko": "추출 중"
   },
-  "auto.components.settings.WarpThemeImportModal.builtin_themes_hint": {
-    "ko": "Warp의 사전 로드 테마는 Warp 앱의 일부라 디스크에서 읽을 수 없습니다. Orca에는 Dracula, Gruvbox, Solarized, Tokyo Night 등 대부분의 테마가 이미 포함되어 있습니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.choose_file": {
-    "ko": "파일 선택"
-  },
-  "auto.components.settings.WarpThemeImportModal.choose_folder": {
-    "ko": "폴더 선택"
-  },
-  "auto.components.settings.WarpThemeImportModal.choose_manually": {
-    "ko": "수동으로 가져올 테마 YAML 파일 또는 폴더를 선택하세요."
-  },
-  "auto.components.settings.WarpThemeImportModal.clear_all": {
-    "ko": "모두 지우기"
-  },
-  "auto.components.settings.WarpThemeImportModal.colors_only": {
-    "ko": "색상만"
-  },
-  "auto.components.settings.WarpThemeImportModal.custom_theme_yaml_hint": {
-    "ko": "사용자 지정 및 커뮤니티 테마를 자동으로 가져오려면 Warp 테마 폴더에 YAML 파일로 저장되어 있어야 합니다. Warp의 공개 테마 저장소를 복제했다면 ‘폴더 선택’을 눌러 복제한 폴더에서 테마를 가져오세요."
-  },
-  "auto.components.settings.WarpThemeImportModal.description": {
-    "ko": "Warp 테마를 Orca 터미널 테마로 가져옵니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.found_in_source": {
-    "ko": "{{value0}}에서"
-  },
-  "auto.components.settings.WarpThemeImportModal.found_theme_one": {
-    "ko": "테마 1개를 찾았습니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.found_theme_other": {
-    "ko": "테마 {{value0}}개를 찾았습니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.import_theme_one": {
-    "ko": "테마 1개 가져오기"
-  },
-  "auto.components.settings.WarpThemeImportModal.import_theme_other": {
-    "ko": "테마 {{value0}}개 가져오기"
-  },
-  "auto.components.settings.WarpThemeImportModal.import_themes": {
-    "ko": "테마 가져오기"
-  },
-  "auto.components.settings.WarpThemeImportModal.loading": {
-    "ko": "Warp 테마 로드 중..."
-  },
-  "auto.components.settings.WarpThemeImportModal.more_skipped_files": {
-    "ko": "건너뛴 파일 {{value0}}개 더 있음"
-  },
-  "auto.components.settings.WarpThemeImportModal.no_themes_found": {
-    "ko": "사용자 지정 Warp 테마를 찾을 수 없습니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.select_all": {
-    "ko": "모두 선택"
-  },
-  "auto.components.settings.WarpThemeImportModal.skipped_files": {
-    "ko": "건너뛴 파일"
-  },
-  "auto.components.settings.WarpThemeImportModal.title": {
-    "ko": "Warp에서 테마 가져오기"
-  },
-  "auto.components.settings.WarpThemeImportModal.yaml_description": {
-    "ko": "YAML 파일(Warp 형식)을 Orca 터미널 테마로 가져옵니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.yaml_no_themes_found": {
-    "ko": "선택한 파일에서 테마를 찾을 수 없습니다."
-  },
-  "auto.components.settings.WarpThemeImportModal.yaml_title": {
-    "ko": "테마 YAML 가져오기"
-  },
   "auto.components.settings.WorkspaceDirectorySetting.1a2b3c4d5e": {
     "ko": "클라이언트 기본값"
   },
@@ -2953,9 +2884,6 @@
   },
   "auto.components.settings.WslCliRegistration.e49688f67f": {
     "ko": "WSL에 `{{value0}}`을(를) 등록하시겠습니까?"
-  },
-  "auto.components.settings.YamlThemeImportButton.label": {
-    "ko": "YAML에서 가져오기"
   },
   "auto.components.settings.accounts.search.042885c07c": {
     "ko": "오래됨"
@@ -3911,18 +3839,6 @@
   "auto.components.settings.terminal.search.fffdff40a7": {
     "ko": "버퍼"
   },
-  "auto.components.settings.terminal.search.warp_import.description": {
-    "ko": "Warp 테마를 Orca 터미널 테마로 가져옵니다."
-  },
-  "auto.components.settings.terminal.search.warp_import.title": {
-    "ko": "Warp에서 테마 가져오기"
-  },
-  "auto.components.settings.terminal.search.yaml_import.description": {
-    "ko": "테마 YAML 파일을 Orca 터미널 테마로 가져옵니다."
-  },
-  "auto.components.settings.terminal.search.yaml_import.title": {
-    "ko": "YAML에서 가져오기"
-  },
   "auto.components.settings.terminal.windows.search.28ff08ed35": {
     "ko": "Windows"
   },
@@ -4012,24 +3928,6 @@
   },
   "auto.components.settings.token.source.control.integration.cards.fcbe0469fd": {
     "ko": "공개 repos는 Git 원격에서 감지됩니다. 설정하세요"
-  },
-  "auto.components.settings.useWarpThemeImport.import_failed": {
-    "ko": "테마를 가져오지 못했습니다."
-  },
-  "auto.components.settings.useWarpThemeImport.imported_one": {
-    "ko": "테마 1개를 가져왔습니다."
-  },
-  "auto.components.settings.useWarpThemeImport.imported_other": {
-    "ko": "테마 {{value0}}개를 가져왔습니다."
-  },
-  "auto.components.settings.useWarpThemeImport.over_limit_one": {
-    "ko": "이 테마를 가져오면 사용자 지정 터미널 테마 {{value0}}개 제한을 초과합니다. 새 테마 1개를 선택 해제하고 다시 시도하세요."
-  },
-  "auto.components.settings.useWarpThemeImport.over_limit_other": {
-    "ko": "이 테마들을 가져오면 사용자 지정 터미널 테마 {{value0}}개 제한을 초과합니다. 새 테마 {{value1}}개를 선택 해제하고 다시 시도하세요."
-  },
-  "auto.components.settings.useWarpThemeImport.unknown_error": {
-    "ko": "알 수 없는 오류"
   },
   "auto.components.settings.voice.pane.search.04c25a6fb0": {
     "ko": "openai"

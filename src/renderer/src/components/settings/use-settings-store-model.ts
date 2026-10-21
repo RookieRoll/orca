@@ -23,7 +23,6 @@ import { useLinearProviderConnected } from '@/hooks/useLinearProviderConnected'
 import { useSkillFreshness } from '@/hooks/useSkillFreshness'
 import { getFallbackTerminalFonts, mergeFontSuggestions } from './SettingsConstants'
 import { useGhosttyImport } from './useGhosttyImport'
-import { useWarpThemeImport } from './useWarpThemeImport'
 import { getInitialMountedSectionIds } from './settings-load-performance'
 import {
   buildRepoIdToHostSelection,
@@ -123,7 +122,6 @@ export function useSettingsStoreModel() {
   const [prevScrollbackRows, setPrevScrollbackRows] = useState(settings?.terminalScrollbackRows)
   // Why: keep Ghostty import state at Settings level so the modal survives section remounts.
   const ghostty = useGhosttyImport(updateSettings, settings)
-  const warpThemes = useWarpThemeImport(updateSettings, settings)
   const [fontSuggestions, setFontSuggestions] = useState<string[]>(
     mergeFontSuggestions([], getFallbackTerminalFonts())
   )
@@ -220,7 +218,6 @@ export function useSettingsStoreModel() {
     prevScrollbackRows,
     setPrevScrollbackRows,
     ghostty,
-    warpThemes,
     fontSuggestions,
     setFontSuggestions,
     terminalFontSuggestions,

@@ -37,7 +37,7 @@
 
 | 原编号 | 功能 | 批次 | 状态 | 负责人 | 依赖任务 | 对应代码入口 | 检查证据 / 阻塞 |
 |---|---|---|---|---|---|---|---|
-| C17 | Warp 及主题文件导入 | B1 | 代码已改待验证 | c17_cleanup | B0 | `src/main/warp-themes/`、settings IPC/preload、设置 renderer、locale/build metadata（具体清单见 diff） | agent 报告：`git diff --check`、残余符号 rg、10个 JSON 解析检查通过；Vitest/typecheck/lint 尚未运行，依赖环境待确认。 |
+| C17 | Warp 及主题文件导入 | B1 | 完成 | c17_cleanup / cleanup_tracker(review) | B0 | `src/main/warp-themes/`、settings IPC/preload、设置 renderer、locale/build metadata（具体路径见提交） | 独立完整 diff 审查通过：删除链/worker 构建入口/locale 无残余 Warp-YAML importer 符号；Ghostty IPC/preload/UI、主题 picker、自定义颜色编辑保留；`terminal-custom-themes.ts` 和测试保留历史 `source: 'warp'` 兼容。`git diff --check`、残余符号检索、10个 JSON Node 解析通过（执行者报告）；6个定向 Vitest 文件118/118通过（Node 24，无 preload shim）。Changed-code quality gate通过、0 findings，但只覆盖新增行的4个文件，不代表所有删除行均经 lint。全量 Node TC 因12 GiB机器资源压力中止、结果未知；Web/CLI TC未运行，定向TC也未运行；此项为纯删除并经有界审查验收，类型检查覆盖限制如上，不得表述为全量TC通过。 |
 | D02 | Agent 安装与配置引导 | B2 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | F01 | Claude 多账号管理 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | F02 | Codex 多账号管理 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -187,10 +187,10 @@
 
 | 任务 ID | 工作项 | 状态 | 负责人 | 依赖 | 完成证据 |
 |---|---|---|---|---|---|
-| B0-01 | 核对 Windows 10+ x64 本机环境、工具链与依赖可用性；只记录实际发现，不假定安装或验证通过。 | 进行中 | validation_setup | — | 环境盘点结果待回报。 |
+| B0-01 | 核对 Windows 10+ x64 本机环境、工具链与依赖可用性；只记录实际发现，不假定安装或验证通过。 | 进行中 | validation_setup | — | 环境盘点结果待回报。验证前先实测资源；重型检查串行执行并设保守 CPU/内存预算，超预算即中止团队检查、记录断点，不触碰用户进程；具体阈值以本机实测为准。 |
 | B0-02 | 自动/人工核对来源清单删除集合为 136 项、编号无重复且完整；保留集合 216 项。 | 完成 | cleanup_tracker | — | 本表来源逐行提取 136 个删除编号；需后续变更时重新比对源清单。 |
 | B0-03 | 盘点代码入口、包依赖、构建脚本、测试与后台副作用，建立保留复用关系。 | 进行中 | cleanup_tracker | B0-01 | 已完成语音/宠物/反馈上传/遥测/更新首轮只读入口盘点，候选归属见文件归属表；其余域待盘点。 |
-| B0-04 | 生成完整生产源码结构图谱并登记输入状态。 | 进行中 | graphify_build | 当前分支 `cleanup/function-pruning`；基准 HEAD `e2196403c397b44964f6ec80b93a3cfee27aa0df`；输入包含未提交 C17 修改 | AST 分批处理，不使用 LLM；覆盖 src main/renderer/shared/cli/preload/packages/wsl-guest/types 及相关 config/native 源码，排除测试、fixtures 和生成资产。图谱反映执行时工作树，不等于提交 HEAD；`graphify-out/` 为用户缓存，禁止自动 stage。 |
+| B0-04 | 生成并审核完整生产源码结构图谱，登记输入状态与覆盖限制。 | 完成 | graphify_build / cleanup_tracker(review) | 本地成果路径：`graphify-out/production-code-structure/` | 图谱已生成并完成独立结构核验，仅保留在本地；所有 `graphify-out/**`（含报告、清单、源哈希快照、生成脚本和缓存）及 `src/graphify-out/**` 均禁止纳入推送，不作为动态行为或运行验证结论。`cleanup/function-pruning` 是经审核后允许推送的跟踪分支；`local/graphify-production-snapshot` 是仅本地备份，禁止推送。 |
 | B7-01 | 删除完成后清理 package.json/锁文件中的确认为专用且无保留用途依赖，并检查安装/打包脚本。 | 待执行 | 待分配 | B1–B6 | 依赖图与构建成功证据待补。 |
 | B7-02 | 检查 TypeScript 类型、IPC/preload/API 合同及失效调用点。 | 待执行 | 待分配 | B1–B6 | 类型检查和静态检索结果待补。 |
 | B7-03 | 清理被删功能专属快捷键、命令面板项、路由、菜单和设置入口。 | 待执行 | 待分配 | B1–B6 | 入口反向搜索证据待补。 |
@@ -215,7 +215,7 @@
 
 | 包 ID | 范围 | 状态 | 负责人 | 依赖 | 独立交付/完成证据 |
 |---|---|---|---|---|---|
-| B2-VOC | T01–T04 语音输入、模型、热键和本地/云转写清理 | 待执行 | 待分配 | B0；与 B4-MOBILE 的 runtime RPC 文件串行 | 移除语音专属入口及云音频上传；核查快捷键、IPC、speech worker、设置/UI 和回归。 |
+| B2-VOC | T01–T04 语音输入/模型/转写与快捷录音模式清理（整体交付） | 只读盘点中 | 待分配 | B0；与 B4-MOBILE 的 speech runtime RPC 文件串行 | 只读盘点已完成，实施尚未开始。由一个执行者整体完成 T01–T04，避免 UI/IPC/RPC/runtime 中间态不可用；纳入共享 mobile speech 专属链。删除语音专属录音/模型/转写和云音频上传，保留通用麦克风选择、浏览器媒体权限及被其他功能复用的音频基础设施。 |
 | B2-PET | T05–T06 桌面宠物及导入管理 | 待执行 | 待分配 | B0 | 移除专属 UI/API/后台行为；确认 Codex sprite defaults 是否被保留能力复用。 |
 | B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 待执行 | 待分配 | B0 | 移除上传 handler/network/菜单动作，保留本地崩溃资料导出；不得删除本地 crash diagnostics。 |
 | B2-TELEMETRY | U11 遥测采集/发送清理 | 待执行 | 待分配 | B0；B2-VOC/B2-PET/B2-UPLOAD 后清理残余调用 | 禁止默认及用户路径中的遥测网络发送；保留本地诊断、Agent状态/流程所需非遥测代码；公共 shared schema 由唯一执行者串行改。 |
@@ -224,7 +224,7 @@
 | B5-SHARE | P05–P07 私有 Skills 分发/版本/WSL目标清理 | 待执行 | 待分配 | B0；B4-WSL 完成后清理 WSL 目标残余 | 保留本地 Skills/MCP/插件能力；删除私有分发、安装源、版本回滚和 WSL 目标专属流程。 |
 | B5-ISOLATION | O08–O13 Cloud VM、recipe、资源管理及 Docker 隔离裁剪 | 待执行 | 待分配 | B0 | 去除远程/云/Docker 专属环境，保留 O02 本机隔离及普通本地进程执行；复核共享执行器。 |
 | B5-CROSS | B5 与 B2/B4 重叠的跨功能共享入口及配置收尾 | 待执行 | 待分配 | B5-PROFILE/B5-SHARE/B5-ISOLATION；依文件冲突串行 | 只清理由多个范围交叉形成的残余入口；每个共享文件事先指定唯一执行者，附保留依赖检索。 |
-| B4-MOBILE | M01–M15、R01–R09 移动端/中继/模拟器清理 | 待执行 | 待分配 | B0；与 B2-VOC 串行处理 speech runtime RPC | 移除移动客户端/中继和设备模拟器路径；保留本地 daemon、普通终端与本地 PTY。 |
+| B4-MOBILE | M01–M15、R01–R09 移动端/中继/模拟器清理 | 待执行 | 待分配 | B0；B2-VOC 完成后处理共用 speech runtime RPC 残余 | 移除移动客户端/中继和设备模拟器路径；保留本地 daemon、普通终端与本地 PTY。移动 speech 专属链随 B2-VOC 整体交付；B4 负责确认无移动端/中继 RPC 残余，不拆分修改共享 runtime 文件。 |
 | B7-COMMON | 公共依赖/构建/类型/IPC/快捷键/i18n/默认后台/测试清理 | 待执行 | 待分配 | B1–B6 所有代码包完成 | 独立清理确认无保留用途的死代码/依赖；锁文件只由指定者改；运行对应类型、构建、合同与回归证据。 |
 
 ### B5 跨功能边界单列
@@ -242,7 +242,7 @@
 
 | 任务组 | 候选文件归属 / 已检索入口 | 并行边界与保留要求 |
 |---|---|---|
-| B2-VOC（T01–T04） | `src/renderer/src/store/slices/dictation.ts`、`src/renderer/src/components/feature-tips/VoiceDictationTipDialog.tsx`、`VoiceDictationFeatureTipVisual.tsx`；具体录音/模型实现和 IPC 待调用链盘点 | 仅语音专属文件；不要改共享设置/telemetry schema，若共享入口需协调者单独分配。 |
+| B2-VOC（T01–T04） | `src/renderer/src/store/slices/dictation.ts`、`src/renderer/src/components/feature-tips/VoiceDictationTipDialog.tsx`、`VoiceDictationFeatureTipVisual.tsx`；具体录音/模型实现、IPC、RPC 与 mobile speech runtime 调用链由同一执行者继续核对 | 整体交付；移除语音专属录音/模型/转写与快捷录音模式。保留通用麦克风选择和 browser media permission；shared speech runtime RPC 文件由 B2-VOC 唯一执行者改完后交 B4 只读复核，避免并行修改。共享设置/telemetry schema需协调者另行点名。 |
 | B2-PET（T05–T06） | `src/preload/api/pet-bridge.ts`、`pet-api.ts`；`src/shared/pet-types.ts`；renderer pet UI 待盘点 | 专属入口/资源由一人处理；`src/shared/codex-pet-sprite-defaults.ts` 先核对是否普通 Codex 编码使用，不可按文件名直接删除。 |
 | B2-UPLOAD（U10） | `src/preload/api/feedback-bridge.ts`、`crash-reports-bridge.ts`、`crash-report-api.ts`；`src/shared/feedback-submit-contract.ts`；renderer feedback UI 与主进程 handler 待调用链盘点 | 专人负责移除发送/上传，保留用户触发本地导出；不得与 `src/main/crash-reporting/` 本地诊断维护者并行改同一文件。 |
 | B2-TELEMETRY（U11） | `src/main/telemetry/`、`src/preload/api/telemetry-api.ts`、`src/renderer/src/lib/telemetry.ts`、`src/renderer/src/components/TelemetryFirstLaunchSurface.tsx`；`src/shared/telemetry-*` 和 feature 专属埋点待引用盘点 | 与 crash 本地诊断严格分开；shared schema/通用埋点由协调者统一改或按文件点名，不能整组目录删除。 |

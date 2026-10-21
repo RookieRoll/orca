@@ -1684,12 +1684,6 @@
           "901985625d": "toggle",
           "b6536a1d12": "extracting"
         },
-        "WarpThemeImportModal": {
-          "found_theme_one": "Found 1 theme",
-          "found_theme_other": "Found {{value0}} themes",
-          "import_theme_one": "Import 1 Theme",
-          "import_theme_other": "Import {{value0}} Themes"
-        },
         "WslCliRegistration": {
           "41a1480d3e": "install",
           "7c3bb36706": "remove",
@@ -2019,12 +2013,6 @@
               }
             }
           }
-        },
-        "useWarpThemeImport": {
-          "imported_one": "Imported 1 theme",
-          "imported_other": "Imported {{value0}} themes",
-          "over_limit_one": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect 1 new theme and try again.",
-          "over_limit_other": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect {{value1}} new themes and try again."
         },
         "wslHosts": {
           "remove": "Remove"

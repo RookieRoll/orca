@@ -12,9 +12,7 @@ import {
 import {
   getTerminalDarkThemeSearchEntries,
   getTerminalLightThemeSearchEntries,
-  getTerminalThemeTargetSearchEntries,
-  getTerminalWarpImportSearchEntries,
-  getTerminalYamlImportSearchEntries
+  getTerminalThemeTargetSearchEntries
 } from './terminal-theme-search'
 import {
   getTerminalCursorSearchEntries,
@@ -48,9 +46,7 @@ export {
 export {
   getTerminalDarkThemeSearchEntries,
   getTerminalLightThemeSearchEntries,
-  getTerminalThemeTargetSearchEntries,
-  getTerminalWarpImportSearchEntries,
-  getTerminalYamlImportSearchEntries
+  getTerminalThemeTargetSearchEntries
 } from './terminal-theme-search'
 export {
   getTerminalAdvancedSearchEntries,
@@ -83,9 +79,7 @@ const getTerminalAppearanceSearchEntriesWithoutImports = createLocalizedCatalog(
 const getTerminalAppearanceSearchEntriesWithImports = createLocalizedCatalog(
   (): SettingsSearchEntry[] => [
     ...getTerminalAppearanceSearchEntriesWithoutImports(),
-    ...getTerminalGhosttyImportSearchEntries(),
-    ...getTerminalWarpImportSearchEntries(),
-    ...getTerminalYamlImportSearchEntries()
+    ...getTerminalGhosttyImportSearchEntries()
   ]
 )
 

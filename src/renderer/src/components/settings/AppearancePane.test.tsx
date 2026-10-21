@@ -118,24 +118,6 @@ function createGhosttyStub() {
   }
 }
 
-function createWarpThemesStub() {
-  return {
-    open: false,
-    preview: null,
-    loading: false,
-    desktopOnly: false,
-    applyError: null,
-    importSignal: 0,
-    selectedThemeIds: new Set<string>(),
-    handleClick: vi.fn(),
-    handlePreviewSource: vi.fn(),
-    handleToggleTheme: vi.fn(),
-    handleToggleAll: vi.fn(),
-    handleApply: vi.fn(),
-    handleOpenChange: vi.fn()
-  }
-}
-
 async function renderAppearancePane(
   settings: GlobalSettings,
   updateSettings: (updates: Partial<GlobalSettings>) => void = vi.fn(),
@@ -161,7 +143,6 @@ async function renderAppearancePane(
             onRequestFontSuggestions={options.onRequestFontSuggestions}
             systemPrefersDark={false}
             ghostty={createGhosttyStub() as never}
-            warpThemes={createWarpThemesStub() as never}
           />
         </TooltipProvider>
       </I18nextProvider>
@@ -190,7 +171,6 @@ async function rerenderAppearancePane(
             terminalFontSuggestions={[]}
             systemPrefersDark={false}
             ghostty={createGhosttyStub() as never}
-            warpThemes={createWarpThemesStub() as never}
           />
         </TooltipProvider>
       </I18nextProvider>

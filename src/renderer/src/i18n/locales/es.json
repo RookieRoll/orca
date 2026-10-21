@@ -10940,20 +10940,6 @@
             "33031c1465": "tamaño del texto",
             "0fe0073f0c": "Tamaño de fuente predeterminado del terminal para nuevos paneles y actualizaciones en vivo.",
             "5930244899": "Tamaño de fuente",
-            "warp_import": {
-              "title": "Importar desde Warp",
-              "description": "Importa temas de Warp como temas de terminal de Orca.",
-              "keyword_warp": "warp",
-              "keyword_themes": "temas",
-              "keyword_yaml": "yaml",
-              "keyword_legacy_title": "Importar temas desde Warp"
-            },
-            "yaml_import": {
-              "title": "Importar desde YAML",
-              "description": "Importa archivos YAML de temas como temas de terminal de Orca.",
-              "keyword_yaml": "yaml",
-              "keyword_custom": "personalizado"
-            },
             "ask_before_closing_running_terminals_title": "Preguntar antes de cerrar terminales en ejecución",
             "ask_before_closing_running_terminals_description": "Muestra una confirmación antes de cerrar un terminal que tiene un comando o agente en ejecución.",
             "scrollSpeed": {
@@ -11146,43 +11132,6 @@
         "agent-generated-tab-title-copy": {
           "19ad21615a": "Generar títulos de pestañas automáticamente",
           "b036c7a409": "Deriva nombres de pestañas breves y estables a partir del primer prompt conocido del agente. Los cambios de nombre manuales siempre tienen prioridad."
-        },
-        "WarpThemeImportModal": {
-          "title": "Importar desde Warp",
-          "description": "Importa temas de Warp como temas de terminal de Orca.",
-          "yaml_title": "Importar YAML de tema",
-          "yaml_description": "Importa archivos YAML de temas (formato Warp) como temas de terminal de Orca.",
-          "yaml_no_themes_found": "No se encontraron temas en los archivos seleccionados.",
-          "choose_file": "Elegir archivo",
-          "choose_folder": "Elegir carpeta",
-          "loading": "Cargando temas de Warp...",
-          "found_theme_one": "Se encontró 1 tema",
-          "found_theme_other": "Se encontraron {{value0}} temas",
-          "found_in_source": " en {{value0}}",
-          "clear_all": "Borrar selección",
-          "select_all": "Seleccionar todo",
-          "colors_only": "Solo colores",
-          "no_themes_found": "No se encontraron temas personalizados de Warp.",
-          "builtin_themes_hint": "Los temas preinstalados de Warp forman parte de la app de Warp y no se pueden leer desde el disco. Orca ya incluye la mayoría, como Dracula, Gruvbox, Solarized y Tokyo Night.",
-          "custom_theme_yaml_hint": "Los temas personalizados y de la comunidad deben existir como archivos YAML en una carpeta de temas de Warp para que la importación automática los encuentre. Si clonaste el repositorio público de temas de Warp, usa Elegir carpeta para importar esa copia.",
-          "choose_manually": "Elige un archivo YAML de tema o una carpeta para importarlo manualmente.",
-          "skipped_files": "Archivos omitidos",
-          "more_skipped_files": "{{value0}} archivos omitidos más.",
-          "cancel": "Cancelar",
-          "import_theme_one": "Importar 1 tema",
-          "import_theme_other": "Importar {{value0}} temas",
-          "import_themes": "Importar temas"
-        },
-        "useWarpThemeImport": {
-          "unknown_error": "Error desconocido",
-          "imported_one": "Se importó 1 tema",
-          "imported_other": "Se importaron {{value0}} temas",
-          "import_failed": "No se pudieron importar los temas",
-          "over_limit_one": "Importar estos temas superaría el límite de {{value0}} temas personalizados de terminal. Deselecciona 1 tema nuevo e inténtalo de nuevo.",
-          "over_limit_other": "Importar estos temas superaría el límite de {{value0}} temas personalizados de terminal. Deselecciona {{value1}} temas nuevos e inténtalo de nuevo."
-        },
-        "YamlThemeImportButton": {
-          "label": "Importar desde YAML"
         },
         "cli": {
           "source": {

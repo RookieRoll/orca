@@ -10930,20 +10930,6 @@
             "33031c1465": "文字大小",
             "0fe0073f0c": "新窗格和实时更新的默认终端字体大小。",
             "5930244899": "字体大小",
-            "warp_import": {
-              "title": "从 Warp 导入",
-              "description": "将 Warp 主题导入为 Orca 终端主题。",
-              "keyword_warp": "warp",
-              "keyword_themes": "themes",
-              "keyword_yaml": "yaml",
-              "keyword_legacy_title": "从 Warp 导入主题"
-            },
-            "yaml_import": {
-              "title": "从 YAML 导入",
-              "description": "将主题 YAML 文件导入为 Orca 终端主题。",
-              "keyword_yaml": "yaml",
-              "keyword_custom": "自定义"
-            },
             "ask_before_closing_running_terminals_title": "关闭运行中的终端前询问",
             "ask_before_closing_running_terminals_description": "在关闭有运行中命令或智能体的终端前显示确认。",
             "scrollSpeed": {
@@ -11151,43 +11137,6 @@
               }
             }
           }
-        },
-        "WarpThemeImportModal": {
-          "title": "从 Warp 导入",
-          "description": "将 Warp 主题导入为 Orca 终端主题。",
-          "yaml_title": "导入主题 YAML",
-          "yaml_description": "将主题 YAML 文件（Warp 格式）导入为 Orca 终端主题。",
-          "yaml_no_themes_found": "所选文件中未找到主题。",
-          "choose_file": "选择文件",
-          "choose_folder": "选择文件夹",
-          "loading": "正在加载 Warp 主题...",
-          "found_theme_one": "找到 1 个主题",
-          "found_theme_other": "找到 {{value0}} 个主题",
-          "found_in_source": " 位于 {{value0}}",
-          "clear_all": "全部清除",
-          "select_all": "全选",
-          "colors_only": "仅颜色",
-          "no_themes_found": "未找到自定义 Warp 主题。",
-          "builtin_themes_hint": "Warp 的预装主题是 Warp 应用的一部分，无法从磁盘读取。Orca 已包含其中大多数，如 Dracula、Gruvbox、Solarized 和 Tokyo Night。",
-          "custom_theme_yaml_hint": "自定义和社区主题必须以 YAML 文件形式存在于 Warp themes 文件夹中，自动导入才能发现它们。如果你克隆了 Warp 的公开主题仓库，请使用 Choose Folder 导入该仓库副本。",
-          "choose_manually": "选择主题 YAML 文件或文件夹以手动导入。",
-          "skipped_files": "已跳过文件",
-          "more_skipped_files": "还有 {{value0}} 个已跳过的文件。",
-          "cancel": "取消",
-          "import_theme_one": "导入 1 个主题",
-          "import_theme_other": "导入 {{value0}} 个主题",
-          "import_themes": "导入主题"
-        },
-        "useWarpThemeImport": {
-          "unknown_error": "未知错误",
-          "imported_one": "已导入 1 个主题",
-          "imported_other": "已导入 {{value0}} 个主题",
-          "import_failed": "导入主题失败",
-          "over_limit_one": "导入这些主题会超出 {{value0}} 个自定义终端主题的上限。请取消选择 1 个新主题后重试。",
-          "over_limit_other": "导入这些主题会超出 {{value0}} 个自定义终端主题的上限。请取消选择 {{value1}} 个新主题后重试。"
-        },
-        "YamlThemeImportButton": {
-          "label": "从 YAML 导入"
         },
         "cli": {
           "source": {

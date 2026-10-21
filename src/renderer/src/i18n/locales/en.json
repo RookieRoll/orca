@@ -7878,43 +7878,6 @@
           "273e7e81fe": "Configs",
           "1f744a72f4": "Config"
         },
-        "WarpThemeImportModal": {
-          "title": "Import from Warp",
-          "description": "Import Warp themes as Orca terminal themes.",
-          "yaml_title": "Import theme YAML",
-          "yaml_description": "Import theme YAML files (Warp format) as Orca terminal themes.",
-          "yaml_no_themes_found": "No themes found in the selected files.",
-          "choose_file": "Choose File",
-          "choose_folder": "Choose Folder",
-          "loading": "Loading Warp themes...",
-          "found_theme_one": "Found 1 theme",
-          "found_theme_other": "Found {{value0}} themes",
-          "found_in_source": " in {{value0}}",
-          "clear_all": "Clear all",
-          "select_all": "Select all",
-          "colors_only": "Colors only",
-          "no_themes_found": "No custom Warp themes found.",
-          "builtin_themes_hint": "Warp's preloaded themes are part of the Warp app and can't be read from disk. Orca already includes most of them, like Dracula, Gruvbox, Solarized, and Tokyo Night.",
-          "custom_theme_yaml_hint": "Custom and community themes need to exist as YAML files in a Warp themes folder before auto-import can find them. If you cloned Warp's public themes repo, use Choose Folder to import that checkout.",
-          "choose_manually": "Choose a theme YAML file or folder to import manually.",
-          "skipped_files": "Skipped files",
-          "more_skipped_files": "{{value0}} more skipped files.",
-          "cancel": "Cancel",
-          "import_theme_one": "Import 1 Theme",
-          "import_theme_other": "Import {{value0}} Themes",
-          "import_themes": "Import Themes"
-        },
-        "useWarpThemeImport": {
-          "unknown_error": "Unknown error",
-          "imported_one": "Imported 1 theme",
-          "imported_other": "Imported {{value0}} themes",
-          "import_failed": "Failed to import themes",
-          "over_limit_one": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect 1 new theme and try again.",
-          "over_limit_other": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect {{value1}} new themes and try again."
-        },
-        "YamlThemeImportButton": {
-          "label": "Import from YAML"
-        },
         "BranchPrefixFeedback": {
           "6c40c0908f": "Prefix cannot contain spaces or special characters like ~ ^ : ? * [ \\",
           "64d70b156a": "Branches will be named {{example}}",
@@ -11170,20 +11133,6 @@
             "fd752b3cac": "import",
             "73e9422f19": "One-time import of supported Ghostty terminal settings.",
             "a979df0083": "Import from Ghostty",
-            "warp_import": {
-              "title": "Import from Warp",
-              "description": "Import Warp themes as Orca terminal themes.",
-              "keyword_warp": "warp",
-              "keyword_themes": "themes",
-              "keyword_yaml": "yaml",
-              "keyword_legacy_title": "Import themes from Warp"
-            },
-            "yaml_import": {
-              "title": "Import from YAML",
-              "description": "Import theme YAML files as Orca terminal themes.",
-              "keyword_yaml": "yaml",
-              "keyword_custom": "custom"
-            },
             "4cec42dbf7": "intl",
             "b495dc6a9f": "jis",
             "d8d6f7a3c5": "macos",
