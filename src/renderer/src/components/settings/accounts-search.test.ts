@@ -40,13 +40,12 @@ describe('getAccountsPaneSearchEntries', () => {
 })
 
 describe('getAccountsMiniMaxSearchEntries', () => {
-  it('returns a single entry that targets the MiniMax session cookie flow', () => {
+  it('returns a single entry that targets MiniMax usage settings', () => {
     const entries = getAccountsMiniMaxSearchEntries()
     expect(entries).toHaveLength(1)
     const [entry] = entries
     expect(entry.title).toBe('MiniMax Usage')
-    expect(entry.description.toLowerCase()).toContain('cookie')
-    expect(entry.description.toLowerCase()).toContain('api key')
+    expect(entry.description).toBeUndefined()
   })
 
   it('exposes the keywords that drive the Settings search index', () => {
@@ -54,8 +53,10 @@ describe('getAccountsMiniMaxSearchEntries', () => {
     // Why: the Settings search needs at least one of these tokens to
     // surface the MiniMax section when the user types a related term.
     expect(entry.keywords).toEqual(
-      expect.arrayContaining(['minimax', 'cookie', 'session', 'rate limit', 'status bar'])
+      expect.arrayContaining(['minimax', 'endpoint', 'rate limit', 'status bar'])
     )
+    expect(entry.keywords).not.toContain('cookie')
+    expect(entry.keywords).not.toContain('api key')
   })
 
   it('is included in the rolled-up pane search entries', () => {
@@ -66,17 +67,16 @@ describe('getAccountsMiniMaxSearchEntries', () => {
 })
 
 describe('getAccountsOpencodeSearchEntries', () => {
-  it('tells search to paste the full Cookie header including the console session', () => {
-    const cookieEntry = getAccountsOpencodeSearchEntries().find(
-      (entry) => entry.title === 'OpenCode Go Session Cookie'
+  it('keeps the non-secret workspace override discoverable for usage lookup', () => {
+    const workspaceEntry = getAccountsOpencodeSearchEntries().find(
+      (entry) => entry.title === 'OpenCode Go Workspace ID'
     )
 
-    expect(cookieEntry).toBeDefined()
-    expect(cookieEntry?.description).toContain('__Host-console_session')
-    expect(cookieEntry?.description).toContain('Cookie header')
-    expect(cookieEntry?.description).not.toMatch(/Fe26\.2\*\*/)
-    expect(cookieEntry?.keywords).toEqual(
-      expect.arrayContaining(['opencode', 'cookie', 'session', 'console', 'rate limit'])
+    expect(workspaceEntry).toBeDefined()
+    expect(workspaceEntry?.description).toContain('workspace ID override')
+    expect(workspaceEntry?.keywords).toEqual(
+      expect.arrayContaining(['opencode', 'workspace', 'id', 'rate limit'])
     )
+    expect(getAccountsOpencodeSearchEntries()).toHaveLength(1)
   })
 })

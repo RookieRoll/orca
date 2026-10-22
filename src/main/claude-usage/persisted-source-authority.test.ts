@@ -90,10 +90,9 @@ it('uses a verified packed restart for exact append corrections', async () => {
     [],
     cached.sources,
     undefined,
-    [],
     cached.verifiedSources
   )
-  const cold = await scanClaudeUsageFiles([], [], undefined, [])
+  const cold = await scanClaudeUsageFiles([], [])
 
   expect(resumed.sessions).toEqual(cold.sessions)
   expect(resumed.dailyAggregates).toEqual(cold.dailyAggregates)
@@ -106,7 +105,7 @@ it('compresses large caches losslessly and resumes the same totals after restart
     row(index).replace('"request"', `"request-${index}"`)
   ).join('')
   await writeFile(transcript, rows)
-  const cold = await scanClaudeUsageFiles([], [], undefined, [])
+  const cold = await scanClaudeUsageFiles([], [])
   const mutableRef = ref()
   const pending = writeClaudeUsageSourceCache(mutableRef, cold.processedFiles)
   mutableRef.path = join(directory, 'different-cache.json')
@@ -126,10 +125,9 @@ it('compresses large caches losslessly and resumes the same totals after restart
     [],
     cached.sources,
     undefined,
-    [],
     cached.verifiedSources
   )
-  expect(resumed).toEqual(await scanClaudeUsageFiles([], [], undefined, []))
+  expect(resumed).toEqual(await scanClaudeUsageFiles([], []))
   // Older readers discard the optional resume cache; the separately stored report stays readable.
   expect(await readUsageSourceCache(ref())).toEqual([])
 })
@@ -141,7 +139,7 @@ it('keeps old plain caches readable and rejects compressed content with invalid 
       row(index).replace('"request"', `"request-${index}"`)
     ).join('')
   )
-  const cold = await scanClaudeUsageFiles([], [], undefined, [])
+  const cold = await scanClaudeUsageFiles([], [])
   await writeClaudeUsageSourceCache(ref(), cold.processedFiles)
   const decoded = await decodeClaudeUsageSourceText(await readFile(sourcePath))
   await writeFile(sourcePath, decoded)
@@ -164,7 +162,7 @@ it('protects tiny source rollups despite their absent resume checkpoint', async 
 
   const rejected = await readClaudeUsageSourceCache(ref())
   expect(rejected.sources).toEqual([])
-  const rebuilt = await scanClaudeUsageFiles([], rejected.sources, undefined, [])
+  const rebuilt = await scanClaudeUsageFiles([], rejected.sources)
   expect(rebuilt.sessions).toEqual(original.sessions)
 })
 
@@ -177,7 +175,7 @@ it('rejects same-stat direct scanner corruption without a raw-envelope proof', a
   checkpoint.ownedTokenMaxima[0][0]--
   const forged = { ...original, usageIntegrity: 'pretend-proof', schemaVersion: 7 }
 
-  const rebuilt = await scanClaudeUsageFiles([], [forged], undefined, [])
+  const rebuilt = await scanClaudeUsageFiles([], [forged])
 
   expect(rebuilt.sessions[0]?.totalInputTokens).toBe(100)
   expect(rebuilt.sessions[0]?.turnCount).toBe(1)

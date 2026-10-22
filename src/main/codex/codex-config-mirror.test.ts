@@ -32,7 +32,6 @@ vi.mock('node:os', async () => {
 import {
   prepareSystemConfigForFreshRuntimeMirror,
   resolveCodexConfigMirrorSourceDirectory,
-  syncSystemConfigIntoLegacySharedCodexHome,
   syncSystemConfigIntoManagedCodexHome
 } from './codex-config-mirror'
 import { escapeTomlString } from './config-toml-trust'
@@ -852,23 +851,6 @@ describe('syncSystemConfigIntoManagedCodexHome', () => {
     syncSystemConfigIntoManagedCodexHome()
 
     expect(existsSync(getRuntimeConfigPath())).toBe(false)
-  })
-})
-
-describe('syncSystemConfigIntoLegacySharedCodexHome', () => {
-  it('recovers an interrupted runtime config when the system source is missing', () => {
-    const runtimeConfigPath = getRuntimeConfigPath()
-    const heldConfigPath = `${runtimeConfigPath}.orca-guarded`
-    mkdirSync(join(userDataDir, 'codex-runtime-home', 'home'), { recursive: true })
-    writeFileSync(heldConfigPath, 'model = "retained"\n', 'utf-8')
-
-    syncSystemConfigIntoLegacySharedCodexHome({
-      runtimeHomePath: join(userDataDir, 'codex-runtime-home', 'home'),
-      systemHomePath: getSystemCodexHomePath()
-    })
-
-    expect(readFileSync(runtimeConfigPath, 'utf-8')).toBe('model = "retained"\n')
-    expect(existsSync(heldConfigPath)).toBe(false)
   })
 })
 

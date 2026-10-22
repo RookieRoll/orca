@@ -14,10 +14,6 @@ vi.mock('node:os', async () => ({
   homedir: homedirMock
 }))
 
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  claudeProfileHistoryDirs: () => []
-}))
-
 type ScanResult = Awaited<ReturnType<typeof scanClaudeUsageFiles>>
 
 let root: string
@@ -58,7 +54,7 @@ function padding(): string {
 
 async function scan(previous: ClaudeUsagePersistedFile[] = []): Promise<ScanResult> {
   const { scanClaudeUsageFiles } = await import('./scanner')
-  return scanClaudeUsageFiles([], previous, undefined, [])
+  return scanClaudeUsageFiles([], previous)
 }
 
 describe('Claude usage long-context subsets', () => {

@@ -7064,10 +7064,6 @@
           "remoteEmptyCodexAccounts": "No managed Codex accounts on {{value0}}. It uses its system default Codex login; add accounts on that server.",
           "codexSystemDefaultCustomProvider": "Custom provider — no usage tracked.",
           "codexSystemDefaultNeedsSignIn": "No Codex sign-in was found for {{value0}}.",
-          "codexConfigSyncMissingSource": "Codex is still using the settings it last synced because {{value0}} is missing. Restore that file to resume syncing.",
-          "codexConfigSyncBlankSource": "Codex is still using the settings it last synced because {{value0}} is empty. That is expected while a synced folder finishes downloading.",
-          "codexConfigSyncManagedHomeUnavailable": "Orca could not read this account’s Codex files just now, so settings may not be syncing. This usually clears on its own — antivirus or a backup tool briefly locks them.",
-          "codexConfigSyncUnreadableSource": "Codex is still using the settings it last synced because {{value0}} could not be read. Check that file's permissions.",
           "codexLoginLinkPending": "Codex opened this sign-in link in your browser. Copy it to finish signing in somewhere else — a private window, or another profile.",
           "codexLoginLinkCopied": "Copied",
           "codexLoginLinkCopy": "Copy link",
@@ -7081,7 +7077,7 @@
           "83b6a1f7c4": "MiniMax API key",
           "4f2c8a7e1b": "Paste your MiniMax API key",
           "a7b1e3c5d2": "Forget key",
-          "usageTracking": "Configure MiniMax usage tracking for your account.",
+          "usageTracking": "Review MiniMax usage status and endpoint settings.",
           "credentialsNotSet": "Credentials not set",
           "selectedEndpointStorage": "Stored locally and sent to the selected MiniMax endpoint for usage refreshes.",
           "endpointOverseas": "Overseas (platform.minimax.io)",
@@ -12706,7 +12702,7 @@
           "title": "GLM Coding Plan",
           "subtitle": "Track Z.AI or Zhipu (BigModel) GLM Coding Plan usage in the status bar. Save the plan API key here — no ZCode CLI setup needed.",
           "consoleLink": "Get API key",
-          "keyStored": "API key saved · {{value0}}",
+          "keyStored": "API key configured · {{value0}}",
           "keyStoredHelp": "Stored locally and sent only to the selected site for usage refreshes. It takes priority over the ZCode CLI sign-in.",
           "usingCli": "Using the ZCode CLI sign-in",
           "usingCliHelp": "Orca reads the selected Coding Plan from the ZCode CLI credential store on this computer. Save an API key below to link the plan here instead.",
@@ -12716,7 +12712,6 @@
           "siteTitle": "Plan site",
           "siteDescription": "Pick the console your Coding Plan belongs to: Z.AI for the international site, Zhipu BigModel for the mainland site.",
           "keyTitle": "API key",
-          "keyDescription": "Paste the API key from the selected console’s API Keys page. Stored locally, encrypted when the OS supports it, and sent only to that site for usage refreshes.",
           "saved": "Saved",
           "notSaved": "Not saved",
           "keyPlaceholder": "Paste your GLM Coding Plan API key",
@@ -12732,8 +12727,7 @@
           "siteUnavailable": "Host plan site unavailable",
           "keyStoredOnHostHelp": "Stored on {{host}} and sent from there only to the selected site for usage refreshes. It takes priority over the ZCode CLI sign-in.",
           "usingCliOnHostHelp": "Orca reads the selected Coding Plan from the ZCode CLI credential store on {{host}}. Save an API key below to link the plan there instead.",
-          "notConfiguredOnHostHelp": "Save the plan API key below, or sign in with the ZCode CLI on {{host}}.",
-          "keyOnHostDescription": "Paste the API key from the selected console’s API Keys page. Stored on {{host}} and sent from there only to that site for usage refreshes."
+          "notConfiguredOnHostHelp": "Save the plan API key below, or sign in with the ZCode CLI on {{host}}."
         },
         "deltaMove": {
           "action": "Move the new projects…",
@@ -12812,7 +12806,7 @@
           "descriptionShareComputer": "{{name}} no longer accepts this computer. On {{name}}, open Settings → Remote Orca Servers → Share this computer, create a link for another Orca, then paste it here."
         },
         "usageCredentialHost": {
-          "outdated": "Update Orca on {{host}} to save this key there.",
+          "outdated": "Update Orca on {{host}} to check its usage credential status.",
           "unreachable": "Could not reach {{host}}, so whether a key is saved there is unknown.",
           "storedOnHost": "Stored on {{host}}",
           "miniMaxStorage": "Stored on {{host}} and sent from there to the selected MiniMax endpoint for usage refreshes.",

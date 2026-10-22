@@ -16,7 +16,6 @@ import { buildRegistry, isStreamingMethod, type RpcContext } from '../core'
 const state: { path: string; watcher: SubscribeNativeChatTranscriptArgs | null } = vi.hoisted(
   () => ({ path: '', watcher: null })
 )
-vi.mock('../../../managed-data-accounts/service', () => ({ getManagedDataAccountService: vi.fn() }))
 vi.mock('../../../native-chat/transcript-watch', () => ({
   readNativeChatTranscriptTail: (args: {
     sessionId: string

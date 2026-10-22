@@ -13,8 +13,6 @@ import {
 import { readOpenCodeNativeChatTranscriptFull } from './transcript-opencode'
 import { subscribeOpenCodeNativeChatTranscript } from './transcript-opencode-subscribe'
 
-vi.mock('../managed-data-accounts/service', () => ({ getManagedDataAccountService: vi.fn() }))
-
 const fixtures: { db: Database.Database; root: string }[] = []
 afterEach(() => {
   for (const { db, root } of fixtures.splice(0)) {

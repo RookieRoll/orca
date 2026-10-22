@@ -45,7 +45,6 @@ export async function createPersistedUsageTestFixture(getPath: Mock<() => string
       worktrees,
       previous.sources,
       undefined,
-      [],
       previous.verifiedSources
     )
     await persistClaudeUsageSourceCache(ref, result.processedFiles, previous)

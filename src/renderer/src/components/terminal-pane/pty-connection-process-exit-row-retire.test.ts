@@ -30,7 +30,6 @@ const {
   scheduleRuntimeGraphSync,
   shouldSeedCacheTimerOnInitialTitle,
   toastInfo,
-  notifyCodexPaneBoundForStaleSweep
 } = vi.hoisted(() => ({
   coordinatorOptionsByPaneKey: new Map<string, AgentCompletionCoordinatorOptions>(),
   resetAndRefreshAllTerminalWebglAtlases: vi.fn(),
@@ -38,7 +37,6 @@ const {
   scheduleRuntimeGraphSync: vi.fn(),
   shouldSeedCacheTimerOnInitialTitle: vi.fn(() => false),
   toastInfo: vi.fn(),
-  notifyCodexPaneBoundForStaleSweep: vi.fn()
 }))
 
 let mockStoreState: StoreState
@@ -85,9 +83,6 @@ vi.mock('sonner', () => ({
   }
 }))
 
-vi.mock('@/lib/codex-stale-pane-sweep', () => ({
-  notifyCodexPaneBoundForStaleSweep
-}))
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof React>()

@@ -18,7 +18,6 @@ import {
   stripCodexDaemonOverride
 } from './codex-daemon-socket-path-guard'
 import {
-  syncSystemConfigIntoLegacySharedCodexHome,
   syncSystemConfigIntoManagedCodexHome
 } from './codex-config-mirror'
 import { getCodexConfigSyncStatus } from './config-sync-stall'
@@ -219,19 +218,6 @@ describe('syncSystemConfigIntoManagedCodexHome daemon guard', () => {
       state: 'stalled',
       reason: 'missing-source'
     })
-  })
-
-  it('keeps the guard in the legacy shared home when a system launch refreshes it', () => {
-    writeFileSync(join(systemHomePath, 'config.toml'), 'model = "gpt-5"\n')
-    const runtimeHomePath = longHome()
-    writeFileSync(
-      join(runtimeHomePath, 'config.toml'),
-      `model = "old"\n\n[features]\n${OVERRIDE_LINE}\n`
-    )
-    syncSystemConfigIntoLegacySharedCodexHome({ runtimeHomePath, systemHomePath })
-    expect(readFileSync(join(runtimeHomePath, 'config.toml'), 'utf-8')).toContain(OVERRIDE_LINE)
-    expect(readFileSync(join(runtimeHomePath, 'config.toml'), 'utf-8')).toContain('model = "gpt-5"')
-    expect(readFileSync(join(systemHomePath, 'config.toml'), 'utf-8')).toBe('model = "gpt-5"\n')
   })
 
   it('leaves a short home on the default daemon behavior', () => {

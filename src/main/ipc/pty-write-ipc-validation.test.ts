@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { spawnMock, recordCodexPaneAccountMock } from './pty-ipc-mock-registry'
+import { spawnMock } from './pty-ipc-mock-registry'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import {
   TERMINAL_INPUT_CHUNK_MAX_BYTES,
@@ -327,41 +327,6 @@ describe('registerPtyHandlers', () => {
     // BEFORE — publishing both would erase a negotiation the pane scanned live.
     expect(reply.snapshotKittyKeyboardFlags).toBeUndefined()
     expect(reply.snapshotSeq).toBeUndefined()
-  })
-  it('records the launch Codex account for a fresh spawn but not for a reattach', async () => {
-    const spawn = vi
-      .fn()
-      .mockResolvedValueOnce({ id: 'pty-fresh' })
-      .mockResolvedValueOnce({ id: 'pty-reattached', isReattach: true })
-    setLocalPtyProvider({
-      spawn,
-      write: vi.fn(),
-      resize: vi.fn(),
-      kill: vi.fn(),
-      shutdown: vi.fn(),
-      onData: vi.fn(() => vi.fn()),
-      onExit: vi.fn(() => vi.fn()),
-      listProcesses: vi.fn(async () => []),
-      getForegroundProcess: vi.fn(async () => null)
-    } as never)
-    const getSettings = vi.fn().mockReturnValue({ activeCodexManagedAccountId: 'account-a' })
-    registerPtyHandlers(mainWindow as never, undefined, undefined, getSettings as never)
-
-    const nativeCodexEnv = { CODEX_HOME: '', ORCA_CODEX_HOME: '' }
-    await handlers.get('pty:spawn')!(null, { cols: 80, rows: 24, env: nativeCodexEnv })
-    await handlers.get('pty:spawn')!(null, {
-      cols: 80,
-      rows: 24,
-      env: nativeCodexEnv,
-      sessionId: 'pty-reattached'
-    })
-
-    // Why: a reattached shell keeps the CODEX_HOME baked in at its original
-    // spawn, so re-recording it under the current selection would erase the only
-    // evidence that the pane is stale.
-    expect(recordCodexPaneAccountMock.mock.calls).toEqual([
-      ['pty-fresh', { selectionKey: 'host', accountId: 'account-a', homeRoute: 'real-home' }]
-    ])
   })
   it('refreshes the WSL hook relay for the distro a reattached pane already owns', async () => {
     // Why here and not only in the helper's unit test: nothing else catches pty.ts dropping the

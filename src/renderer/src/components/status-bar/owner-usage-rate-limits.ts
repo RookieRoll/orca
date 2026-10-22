@@ -92,9 +92,7 @@ function adoptRemoteRateLimits(remote: RateLimitState): RateLimitState {
     cursorAuthConfigured: partial.cursorAuthConfigured === true,
     zcodePlanApiKeyConfigured: partial.zcodePlanApiKeyConfigured === true,
     claudeTarget: partial.claudeTarget ?? { runtime: 'host', wslDistro: null },
-    codexTarget: partial.codexTarget ?? { runtime: 'host', wslDistro: null },
-    inactiveClaudeAccounts: partial.inactiveClaudeAccounts ?? [],
-    inactiveCodexAccounts: partial.inactiveCodexAccounts ?? []
+    codexTarget: partial.codexTarget ?? { runtime: 'host', wslDistro: null }
   }
 }
 

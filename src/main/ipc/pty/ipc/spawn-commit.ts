@@ -4,8 +4,7 @@ import { registerPty } from '../../../memory/pty-registry'
 import type { PtySpawnResult } from '../../../providers/pty-provider-contract'
 import { clearMigrationUnsupportedPtysForPaneKey } from '../../../agent-hooks/migration-unsupported-pty-state'
 import {
-  shouldSkipCodexHomeEnvForWindowsShell,
-  codexReattachedHomeRouteField
+  shouldSkipCodexHomeEnvForWindowsShell
 } from '../host-env/codex-home'
 import { rememberPaneKeyForPty } from '../pane/key-state'
 import { resolvePaneSpawnReservation } from '../pane/spawn-reservation'
@@ -220,11 +219,6 @@ async function commitReservedPtyIpcSpawn(ctx: PtyIpcSpawnState): Promise<PtySpaw
     codexHomePath: ctx.selectedCodexHomePath,
     startedAt: ctx.codexHomeLaunchStartedAt,
     startedSequence: ctx.codexHomeLaunchStartedSequence,
-    ...codexReattachedHomeRouteField(
-      ctx.reattachedCodexHomeRoutes,
-      ctx.result.id,
-      ctx.result.isReattach === true
-    ),
     ...(ctx.result.isReattach === true
       ? { reattached: true }
       : ctx.baseEnv

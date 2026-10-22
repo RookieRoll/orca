@@ -25,50 +25,8 @@ const credentialRoots: readonly (string | { root: string; only: RegExp })[] = [
 ]
 
 /**
- * Only noncredential profile surfaces may persist bytes, and each only with the primitives it
- * uses today; a new primitive in one of them is a review, not a silent pass.
+ * Runtime auth and usage readers must not persist credential state.
  */
-const fsAllowances: Record<string, readonly string[]> = {
-  'claude-accounts/claude-profile-history.ts': [
-    'mkdirSync',
-    'renameSync',
-    'rmdirSync',
-    'symlinkSync',
-    'unlinkSync'
-  ],
-  'claude-accounts/claude-profile-paths.ts': ['mkdirSync', 'writeFileAtomically'],
-  // The which-account file.
-  'claude-accounts/claude-profile-router.ts': ['mkdirSync', 'rmSync', 'writeFileAtomically'],
-  // Removing an account deletes its folder, links first.
-  'claude-accounts/claude-account-folder.ts': ['rmSync', 'rmdirSync', 'unlinkSync'],
-  'claude-accounts/claude-profile-prompt-history.ts': [
-    'appendFileSync',
-    'linkSync',
-    'openSync',
-    'renameSync',
-    'rmSync',
-    'symlinkSync',
-    'unlinkSync',
-    'writeFileSync',
-    'writeFileAtomically'
-  ],
-  'claude-accounts/claude-profile-provisioning.ts': [
-    'publishFileWithoutOverwrite',
-    'rmSync',
-    'writeFileSync'
-  ],
-  'claude-accounts/claude-profile-sharing.ts': [
-    'mkdirSync',
-    'rmdirSync',
-    'symlinkSync',
-    'unlinkSync',
-    'writeFileAtomically'
-  ],
-  // The BROWSER stand-in a hidden sign-in hands its link through; holds no login.
-  'claude-accounts/claude-sign-in-browser.ts': ['rm', 'writeFile'],
-  // The guest helper answers the host on stdout.
-  'claude-accounts/claude-profile-wsl-entry.ts': ['write']
-}
 const mutation =
   /^(?:write(?:File|Json|Sync|v|.*Credentials|.*Keychain)?$|write(?:File|Json)|appendFile|copyFile|cp(?:Sync)?$|rename(?:Sync)?$|unlink(?:Sync)?$|rm(?:dir)?(?:Sync)?$|truncate(?:Sync)?$|createWriteStream|symlink(?:Sync)?$|link(?:Sync)?$|chmod(?:Sync)?$|mkdir(?:Sync)?$|mkdtemp(?:Sync)?$|open(?:Sync)?$|delete.*Keychain|refreshClaudeOauth)/
 
@@ -87,8 +45,6 @@ const WRITE_CALL =
   /\b(?:write\w*|append\w*|copy\w*|cp(?:Sync)?|rename\w*|link\w*|symlink\w*|createWriteStream)\s*\(/g
 // The one runner that takes `security` argv from its callers; each caller must spell the verb.
 const SECURITY_RUNNER = 'main/macos-keychain/generic-password.ts'
-// Removing an account deletes the Keychain items Claude made for its folder; nothing adds one.
-const KEYCHAIN_DELETE_OWNER = 'main/claude-accounts/claude-account-folder.ts'
 
 /** Names bound, directly or through another such name, to the credentials file's path. */
 function credentialFileNames(text: string): Set<string> {
@@ -153,7 +109,7 @@ function credentialMutations(text: string, file = ''): string[] {
   // Argv (`['add-generic-password', …]`) and shell (`security add-generic-password`) forms.
   if (
     /add-generic-password/.test(text) ||
-    (file !== KEYCHAIN_DELETE_OWNER && /delete-generic-password/.test(text))
+    /delete-generic-password/.test(text)
   ) {
     found.push('keychain write')
   }
@@ -212,7 +168,7 @@ it('keeps every Claude credential writer removed, in every form and on every lau
   expect(violations).toEqual([])
 })
 
-it('confines filesystem persistence in accounts and usage to named profile surfaces', () => {
+it('keeps filesystem persistence out of Claude runtime auth and usage', () => {
   const main = join(src, 'main')
   const candidates = [
     ...files(__dirname),
@@ -220,7 +176,7 @@ it('confines filesystem persistence in accounts and usage to named profile surfa
   ]
   const violations = candidates.flatMap((file) => {
     const name = relative(main, file).replaceAll('\\', '/')
-    const allowed = new Set(fsAllowances[name] ?? [])
+    const allowed = new Set<string>()
     return persistencePrimitives(stripComments(readFileSync(file, 'utf8')))
       .filter((primitive) => !allowed.has(primitive))
       .map((primitive) => `${name}: ${primitive}`)
@@ -275,14 +231,9 @@ it.each([
   expect(credentialMutations(source)).toEqual([])
 })
 
-it('lets only account removal delete a Keychain item, and nothing add one', () => {
-  const remove = "execSecurityCommand(['delete-generic-password', '-s', service])"
-  expect(credentialMutations(remove, KEYCHAIN_DELETE_OWNER)).toEqual([])
-  expect(credentialMutations(remove, 'main/claude-accounts/service.ts')).not.toEqual([])
-  expect(
-    credentialMutations(
-      "execSecurityCommand(['add-generic-password', '-s', service])",
-      KEYCHAIN_DELETE_OWNER
-    )
-  ).not.toEqual([])
+it('rejects Keychain writes and deletes from every runtime auth caller', () => {
+  expect(credentialMutations("execSecurityCommand(['delete-generic-password', '-s', service])"))
+    .not.toEqual([])
+  expect(credentialMutations("execSecurityCommand(['add-generic-password', '-s', service])"))
+    .not.toEqual([])
 })

@@ -22,20 +22,13 @@ export function ZcodeCliSetupSection(): React.JSX.Element {
     'auto.components.settings.ZcodeCliSetupSection.title',
     'Use GLM with ZCode'
   )
-  const description = translate(
-    'auto.components.settings.ZcodeCliSetupSection.description',
-    'Sign in to use GLM as a coding agent. The quota API key above only monitors usage; ZCode owns its own sign-in and model selection.'
-  )
-
   return (
     <SearchableSetting
       title={title}
-      description={description}
       keywords={['zcode', 'glm', 'oauth', 'login', 'model', 'api key']}
       className="space-y-2"
     >
       <h4 className="text-xs font-medium">{title}</h4>
-      <p className="text-xs text-muted-foreground">{description}</p>
       <p className="text-xs text-muted-foreground">
         {translate(
           'auto.components.settings.ZcodeCliSetupSection.help',

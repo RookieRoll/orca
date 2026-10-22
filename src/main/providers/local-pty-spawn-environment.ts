@@ -1,5 +1,4 @@
 import { mergeGitConfigEnvProtocol } from '../../shared/git-credential-prompt-env'
-import { restoreManagedDataAccountEnvironment } from '../../shared/managed-data-account-environment'
 import {
   ORCA_IMAGE_PROTOCOL_ENV,
   ORCA_IMAGE_PROTOCOL_VALUE
@@ -25,7 +24,6 @@ export function buildLocalPtySpawnEnvironment(args: {
 }): Record<string, string> | Promise<Record<string, string>> {
   const { id, spawn, getOptions, plan } = args
   const inheritedEnv = stripInheritedBuildModeEnv(process.env)
-  restoreManagedDataAccountEnvironment(inheritedEnv)
   const spawnEnv: Record<string, string> = {
     ...mergeGitConfigEnvProtocol(inheritedEnv, spawn.env),
     TERM: 'xterm-256color',

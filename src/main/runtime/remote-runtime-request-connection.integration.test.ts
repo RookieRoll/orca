@@ -556,15 +556,15 @@ describe('remote runtime request connection integration', () => {
           clientEventListeners.add(listener)
           return () => clientEventListeners.delete(listener)
         },
-        getAccountsSnapshot: () => ({ claude: null, codex: null }),
+        getAccountsSnapshot: () => ({ rateLimits: {} }),
         refreshAccountsForMobile: async () => {
           for (const listener of accountsListeners) {
-            listener({ claude: null, codex: null })
+            listener({ rateLimits: {} })
           }
         },
         refreshAccountsForMobileSubscriber: async () => {
           for (const listener of accountsListeners) {
-            listener({ claude: null, codex: null })
+            listener({ rateLimits: {} })
           }
         },
         onAccountsChanged: (listener: (snapshot: unknown) => void) => {

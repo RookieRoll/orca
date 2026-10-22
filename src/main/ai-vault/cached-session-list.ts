@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { claudeProfileHistoryDirs } from '../claude-accounts/claude-profile-installed-router'
 import {
   clearAiVaultBackgroundRestartCircuit,
   resetAiVaultScannerBackgroundForTests,
@@ -81,7 +80,7 @@ export function configureAiVaultSessionSources(next: AiVaultSessionSources): voi
  */
 export async function localAiVaultScanRoots(): Promise<
   Required<Pick<AiVaultScanOptions, 'additionalCodexSessionsDirs' | 'wslHomeDirs'>> &
-    Pick<AiVaultScanOptions, 'executionHostId' | 'wslOpenCodeReaders' | 'claudeProfileProjectsDirs'>
+    Pick<AiVaultScanOptions, 'executionHostId' | 'wslOpenCodeReaders'>
 > {
   const [additionalCodexHomes, wslHomeDirs] = await Promise.all([
     filterPathsToRunningWslDistrosAsync(configuredAdditionalCodexHomePaths()),
@@ -90,8 +89,6 @@ export async function localAiVaultScanRoots(): Promise<
   return {
     additionalCodexSessionsDirs: additionalCodexHomes.map((homePath) => join(homePath, 'sessions')),
     wslHomeDirs,
-    // Why: the scan runs in a worker or child process, which has no account router.
-    claudeProfileProjectsDirs: claudeProfileHistoryDirs('projects'),
     wslOpenCodeReaders: await prepareOpenCodeWslReaders(wslHomeDirs),
     // Why: this scan is always host-local; callers addressing this host by a
     // runtime id get the result restamped at the RPC edge, never rescanned.

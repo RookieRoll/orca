@@ -14,7 +14,6 @@ import { finishPtyShutdown } from './provider/liveness'
 import type { GetSelectedCodexHomePath, PrepareClaudeAuth } from './host-env/types'
 import { installPtyInspectIpcHandlers } from './ipc/inspect'
 import { installPtyCodexSharedServerIpcHandler } from './ipc/codex-shared-server'
-import { installPtyClaudeOldTerminalIpcHandler } from './ipc/claude-old-terminal'
 import { installPtyClaudeDiffPanelNoticeIpcHandler } from './ipc/claude-diff-panel-notice'
 import { installPtyNewerDaemonHoldIpcHandlers } from './ipc/newer-daemon-hold'
 import {
@@ -63,7 +62,6 @@ import { getPtyIpc } from '../pty-host-bindings'
 import {
   noCodexResumeLaunch,
   prepareCodexResumeHome,
-  reconcileSharedRuntimeResumeHome,
   resolveCodexResumeLaunch,
   stripSequencedStartupResumeArgv
 } from './host-env/codex-resume'
@@ -245,7 +243,6 @@ export function registerPtyHandlers(
     prepareCodexResumeHome: prepareCodexResumeHomeBound,
     resolveCodexResumeLaunch,
     noCodexResumeLaunch,
-    reconcileSharedRuntimeResumeHome,
     stripSequencedStartupResumeArgv,
     assertWorkspaceAcceptsNewPty,
     resolvePtySpawnStartupCwd,
@@ -293,7 +290,6 @@ export function registerPtyHandlers(
     prepareCodexResumeHome: prepareCodexResumeHomeBound,
     noCodexResumeLaunch,
     resolveCodexResumeLaunch,
-    reconcileSharedRuntimeResumeHome,
     stripSequencedStartupResumeArgv,
     transitionSpawnHiddenRendererPtyDeliveryState:
       session.transitionSpawnHiddenRendererPtyDeliveryState,
@@ -306,7 +302,6 @@ export function registerPtyHandlers(
   installPtyResizeVisibilityIpc(session)
   installPtyInspectIpcHandlers({ getLocalPtyProviderStartupPromise })
   installPtyCodexSharedServerIpcHandler({ getLocalPtyProviderStartupPromise })
-  installPtyClaudeOldTerminalIpcHandler({ getLocalPtyProviderStartupPromise })
   installPtyClaudeDiffPanelNoticeIpcHandler({ getLocalPtyProviderStartupPromise })
   installPtyNewerDaemonHoldIpcHandlers()
   installPtyKillIpcHandler(killDeps)

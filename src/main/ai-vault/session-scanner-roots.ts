@@ -1,4 +1,3 @@
-import { claudeProfileHistoryDirs } from '../claude-accounts/claude-profile-installed-router'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { resolveAbsoluteDirOverride } from '../../shared/absolute-dir-override'
@@ -29,11 +28,12 @@ export type SessionHomeAgent = keyof typeof AGENT_SESSION_HOME_SEGMENTS
  * there; the default stays listed so history from before the variable was set is kept.
  */
 export function claudeProjectsHostDirs(): string[] {
+  return claudeConfigHostDirs().map((configDir) => join(configDir, 'projects'))
+}
+
+export function claudeConfigHostDirs(): string[] {
   const defaultHome = join(homedir(), '.claude')
-  return uniqueDirs([
-    join(resolveAbsoluteDirOverride(process.env.CLAUDE_CONFIG_DIR, defaultHome), 'projects'),
-    join(defaultHome, 'projects')
-  ])
+  return uniqueDirs([resolveAbsoluteDirOverride(process.env.CLAUDE_CONFIG_DIR, defaultHome), defaultHome])
 }
 
 /** This host's `CODEX_HOME` (or `~/.codex`) sessions root. */
@@ -49,13 +49,10 @@ export function codexHomeSessionsDir(): string {
 export function claudeProjectsRootDirs(args: {
   claudeProjectsDir?: string
   wslHomeDirs?: readonly string[]
-  /** Passed in by a scan worker, which has no account router of its own. */
-  claudeProfileProjectsDirs?: readonly string[]
 }): string[] {
   return uniqueDirs([
     ...(args.claudeProjectsDir ? [args.claudeProjectsDir] : claudeProjectsHostDirs()),
-    ...wslHomeSessionDirs('claude', args.wslHomeDirs ?? []),
-    ...(args.claudeProfileProjectsDirs ?? claudeProfileHistoryDirs('projects'))
+    ...wslHomeSessionDirs('claude', args.wslHomeDirs ?? [])
   ])
 }
 

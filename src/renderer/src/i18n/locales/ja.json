@@ -6776,10 +6776,6 @@
           "remoteEmptyCodexAccounts": "{{value0}} に管理対象の Codex アカウントはありません。システム既定の Codex ログインを使用します。アカウントの追加はそのサーバー上で行ってください。",
           "codexSystemDefaultCustomProvider": "カスタムプロバイダー — 使用量は追跡されません。",
           "codexSystemDefaultNeedsSignIn": "{{value0}} の Codex サインインが見つかりません。",
-          "codexConfigSyncMissingSource": "{{value0}} が見つからないため、Codex は最後に同期した設定を使い続けています。同期を再開するには、そのファイルを復元してください。",
-          "codexConfigSyncBlankSource": "{{value0}} が空のため、Codex は最後に同期した設定を使い続けています。同期フォルダーのダウンロードが完了するまでは正常な状態です。",
-          "codexConfigSyncManagedHomeUnavailable": "Orca は現在このアカウントの Codex ファイルを読み取れないため、設定が同期されていない可能性があります。ウイルス対策ソフトやバックアップツールによる一時的なロックが原因で、通常は自動的に解消されます。",
-          "codexConfigSyncUnreadableSource": "{{value0}} を読み取れなかったため、Codex は最後に同期した設定を使い続けています。そのファイルの権限を確認してください。",
           "d5267cce63": "）。認証 Cookie は引き続きワークスペースの検出をカバーします。認証だけでは使用するには不十分です。 OpenCode Go 認証は Web ベースであり、Windows および WSL ターミナル間で共有されます。",
           "62ab430f94": "ブラウザの DevTools → Network → __Host-console_session を含む任意の opencode.ai リクエストから完全な Cookie ヘッダーを貼り付けます (例:",
           "37b4b4a3f7": "認証=…; __ホストコンソール_セッション=…",
@@ -6797,7 +6793,7 @@
           "83b6a1f7c4": "MiniMax API キー",
           "4f2c8a7e1b": "MiniMax API キーを貼り付けます",
           "a7b1e3c5d2": "キーを忘れた場合",
-          "usageTracking": "アカウントの MiniMax 使用量追跡を構成します。",
+          "usageTracking": "MiniMax の使用状況とエンドポイント設定を確認します。",
           "credentialsNotSet": "認証情報が設定されていません",
           "selectedEndpointStorage": "ローカルに保存され、使用状況を更新するために選択した MiniMax エンドポイントに送信されます。",
           "endpointOverseas": "海外（platform.minimax.io）",
@@ -12251,7 +12247,7 @@
           "title": "GLMコーディングプラン",
           "subtitle": "Z.AI または Zhipu (BigModel) GLM コーディングプランの使用状況をステータスバーで追跡します。ここにプラン API キーを保存します。ZCode CLI セットアップは必要ありません。",
           "consoleLink": "APIキーを取得する",
-          "keyStored": "API キーが保存されました · {{value0}}",
+          "keyStored": "API キーを設定済み · {{value0}}",
           "keyStoredHelp": "ローカルに保存され、使用状況を更新するために選択したサイトにのみ送信されます。これは、ZCode CLI サインインよりも優先されます。",
           "usingCli": "ZCode CLI サインインの使用",
           "usingCliHelp": "Orca は、このコンピュータ上の ZCode CLI の認証情報ストアから選択したコーディングプランを読み取ります。代わりにここでプランをリンクするには、以下に API キーを保存してください。",
@@ -12261,7 +12257,6 @@
           "siteTitle": "企画サイト",
           "siteDescription": "コーディングプランが属するコンソールを選択します。国際サイトの場合は Z.AI、本土サイトの場合は Zhipu BigModel です。",
           "keyTitle": "APIキー",
-          "keyDescription": "選択したコンソールの API キーページから API キーを貼り付けます。ローカルに保存され、OS がサポートする場合は暗号化され、使用状況を更新するためにそのサイトにのみ送信されます。",
           "saved": "保存済み",
           "notSaved": "保存されていません",
           "keyPlaceholder": "GLM コーディングプラン API キーを貼り付けます",
@@ -12277,8 +12272,7 @@
           "siteUnavailable": "ホストプランサイトが利用できない",
           "keyStoredOnHostHelp": "{{host}} に保存され、使用量の更新時にそこから選択したサイトにのみ送信されます。ZCode CLI のサインインより優先されます。",
           "usingCliOnHostHelp": "Orca は {{host}} の ZCode CLI 認証情報ストアから選択した Coding Plan を読み取ります。そこでプランを紐付けるには、下で API キーを保存してください。",
-          "notConfiguredOnHostHelp": "下でプランの API キーを保存するか、{{host}} で ZCode CLI にサインインしてください。",
-          "keyOnHostDescription": "選択したコンソールの API Keys ページから API キーを貼り付けてください。{{host}} に保存され、使用量の更新時にそこからそのサイトにのみ送信されます。"
+          "notConfiguredOnHostHelp": "下でプランの API キーを保存するか、{{host}} で ZCode CLI にサインインしてください。"
         },
         "sshManagedHostRemove": {
           "description": "{{label}} では Orca が動作しています。[SSH ホスト上の Orca] で「停止…」を使ってホストから Orca を削除するか、ホストがもう存在しない場合は「登録を解除…」を使ってください。その後、この SSH ホストを削除できます。",
@@ -12517,7 +12511,7 @@
           "descriptionShareComputer": "{{name}} はこのコンピューターを受け付けなくなりました。{{name}} で「設定 → リモート Orca サーバー → このコンピューターを共有」を開き、別の Orca 用のリンクを作成してここに貼り付けてください。"
         },
         "usageCredentialHost": {
-          "outdated": "このキーを {{host}} に保存するには、そのホストの Orca を更新してください。",
+          "outdated": "使用状況の認証情報を確認するには、{{host}} の Orca を更新してください。",
           "unreachable": "{{host}} に接続できないため、キーが保存されているかどうかは不明です。",
           "storedOnHost": "{{host}} に保存済み",
           "miniMaxStorage": "{{host}} に保存され、使用量の更新時にそこから選択した MiniMax エンドポイントへ送信されます。",

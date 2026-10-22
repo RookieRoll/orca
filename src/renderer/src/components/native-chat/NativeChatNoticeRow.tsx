@@ -19,12 +19,6 @@ import { useNativeChatOrcaStopView } from './native-chat-orca-stop-context'
 import { NativeChatInterruptedContinueButton } from './NativeChatInterruptedContinue'
 import { nativeChatOrcaStopRowText } from './native-chat-orca-stop-words'
 import { ProviderFrameRow } from './NativeChatTranscriptChrome'
-import { Button } from '@/components/ui/button'
-import {
-  isClaudeSignInFailureKind,
-  nativeChatClaudeSignInLabel,
-  useNativeChatClaudeSignInView
-} from './native-chat-claude-sign-in'
 import { readWholeAgentSessionFailureFact } from '../../../../shared/agent-session-failure'
 import { agentSessionFailureSentence } from '../../../../shared/agent-session-failure-words'
 import { sayAgentSessionFailureTranslated } from './agent-session-failure-words-text'
@@ -60,7 +54,6 @@ export function NativeChatNoticeRow({
 }): React.JSX.Element {
   useTranslation()
   const orcaStopView = useNativeChatOrcaStopView()
-  const claudeSignIn = useNativeChatClaudeSignInView()
   const look = nativeChatNoticeLook(block)
   if (look.kind === 'divider') {
     const label =
@@ -208,17 +201,6 @@ export function NativeChatNoticeRow({
           />
         ) : null}
       </div>
-      {claudeSignIn && isClaudeSignInFailureKind(block.failure?.kind) ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="xs"
-          disabled={claudeSignIn.signingIn}
-          onClick={claudeSignIn.signIn}
-        >
-          {nativeChatClaudeSignInLabel(claudeSignIn)}
-        </Button>
-      ) : null}
       {block.providerFrame || detail ? (
         <ProviderFrameRow
           block={block}

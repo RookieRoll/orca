@@ -14,7 +14,6 @@ import type {
   AiVaultPrepareSessionResumeResult
 } from '../../shared/ai-vault-resume-preparation'
 import type { ClaudeStatusLineRateLimits } from '../../shared/claude-statusline-rate-limits'
-import { resolveTuiAgentLaunchEnv } from '../../shared/tui-agent-launch-defaults'
 import { createProviderAccountServices } from '../provider-account-services'
 import { createCodexRuntimeHomeLaunchPreparation } from '../codex/codex-runtime-home-launch-preparation'
 import { createCodexSessionResumeLaunchPreparation } from '../codex/codex-session-resume-launch-preparation'
@@ -35,7 +34,6 @@ export type OrcadAccountServices = {
   runtimeDeps: {
     prepareCodexStructuredLaunch: (input: StructuredLaunchInput) => Promise<string | null>
     resolveCodexStructuredLaunchHome: (input: StructuredLaunchInput) => string | null
-    prepareCodexCatalogProbeHome: (homePath: string) => void
     prepareAiVaultSessionResume: (
       args: AiVaultPrepareSessionResumeArgs
     ) => Promise<AiVaultPrepareSessionResumeResult>
@@ -64,8 +62,7 @@ export function createOrcadAccountServices(args: {
   }
   isWslHost?: () => boolean
 }): OrcadAccountServices | null {
-  // Why: the Windows desktop owns a WSL host's accounts and pushes them (accounts.setHostLaunchEnv),
-  // which a host with services of its own refuses.
+  // A WSL host has no desktop-owned provider account services.
   if ((args.isWslHost ?? isWslHostOrcadProcess)()) {
     return null
   }
@@ -104,11 +101,6 @@ export function createOrcadAccountServices(args: {
       resolveCodexStructuredLaunchHome: ({ launchEnv }) =>
         clientCodexHomes.readLaunchHome(launchEnv) ??
         codexRuntimeHome.resolveHostCodexHomePathForLaunchReadOnly(launchEnv),
-      prepareCodexCatalogProbeHome: (homePath) =>
-        codexRuntimeHome.prepareHostCodexHomeForReadOnlyAppServer(
-          homePath,
-          resolveTuiAgentLaunchEnv('codex', store.getSettings().agentDefaultEnv)
-        ),
       prepareAiVaultSessionResume: (resumeArgs) =>
         prepareCodexAiVaultSessionResume(resumeArgs, {
           runtimeHome: codexRuntimeHome,
@@ -119,8 +111,7 @@ export function createOrcadAccountServices(args: {
     listCodexSessionHomes: () => codexRuntimeHome.getHostCodexHomePathsForSessionDiscovery(),
     attachToRuntime: (runtime) => {
       runtime.setAccountServices({
-        claudeAccounts: services.claudeAccounts,
-        codexAccounts: services.codexAccounts,
+        claudeRuntimeAuth: services.claudeRuntimeAuth,
         rateLimits: services.rateLimits
       })
       runtime.setCommitMessageAgentEnvironmentResolvers({

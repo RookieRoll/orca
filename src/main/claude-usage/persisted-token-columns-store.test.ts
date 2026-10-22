@@ -13,8 +13,7 @@ vi.mock('../usage/usage-scan-worker-spawn', () => ({
   splitUsageCacheFileViaWorker: vi.fn()
 }))
 vi.mock('./transcript-file-discovery', () => ({
-  listClaudeTranscriptFiles: vi.fn(),
-  claudeProfileTranscriptDirs: vi.fn(() => [])
+  listClaudeTranscriptFiles: vi.fn()
 }))
 
 let fixture: PersistedUsageTestFixture

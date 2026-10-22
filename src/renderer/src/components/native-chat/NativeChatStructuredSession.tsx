@@ -58,11 +58,6 @@ import { useNativeChatHostPermissionGate } from './use-native-chat-host-permissi
 import { useNativeChatAvailabilityNotice } from './use-native-chat-availability-notice'
 import { useStructuredAgentSessionStartFailureFacts } from './use-structured-agent-session-start-failure-facts'
 import { pendingPromptsAllUnanswerableHere } from '../../../../shared/agent-session-approval-subject'
-import {
-  isClaudeSignInFailureKind,
-  NativeChatClaudeSignInContext,
-  useNativeChatClaudeSignIn
-} from './native-chat-claude-sign-in'
 
 export function NativeChatStructuredSession(
   props: Omit<NativeChatStructuredViewProps, 'mode'>
@@ -242,19 +237,12 @@ export function NativeChatStructuredSession(
     submissions: controller.submissions,
     deliveryNotices
   })
-  const claudeSignIn = useNativeChatClaudeSignIn({
-    agent: props.agent,
-    target: props.target,
-    failure: provisionalLaunch.failure,
-    failureRows: startFailures.filter((fact) => isClaudeSignInFailureKind(fact.kind)).length
-  })
   // While Install shows, it says what to do; a start failure's "send again" or Retry can't help.
   const notices = structuredSessionNotices({
     launch: install.slot.kind === 'install' ? { ...launch, lifecycle: null } : launch,
     agentLabel,
     sessionError,
     composerError: composerError ?? continuation.continueError,
-    claudeSignIn,
     availability,
     hostPermission: hostPermission.notice
   })
@@ -299,7 +287,6 @@ export function NativeChatStructuredSession(
         ) : (
           <NativeChatRewindContext.Provider value={controller.rewind.surface}>
             <NativeChatOrcaStopContext.Provider value={continuation.view}>
-              <NativeChatClaudeSignInContext.Provider value={claudeSignIn}>
                 <NativeChatMessageList
                   // A rewind or a /clear replaces the conversation; nothing the old one held carries over.
                   key={`${controller.epoch}:${controller.contextClear.clears}`}
@@ -324,7 +311,6 @@ export function NativeChatStructuredSession(
                   runtimeContext={imageRuntimeContext}
                   deliveryNotices={deliveryNotices}
                 />
-              </NativeChatClaudeSignInContext.Provider>
             </NativeChatOrcaStopContext.Provider>
           </NativeChatRewindContext.Provider>
         )}

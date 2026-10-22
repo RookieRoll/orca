@@ -35,7 +35,6 @@ export function FeatureWallBody(props: {
   reviewActiveStep: ReviewStep | null
   orchestrationSkill: InstalledAgentSkillState
   browserUseSkill: InstalledAgentSkillState
-  onUsageAccountStateChange: () => void | Promise<void>
   settings: GlobalSettings | null
   updateSettings: (updates: Partial<GlobalSettings>) => void
 }): JSX.Element {
@@ -51,7 +50,6 @@ export function FeatureWallBody(props: {
     reviewActiveStep,
     orchestrationSkill,
     browserUseSkill,
-    onUsageAccountStateChange
   } = props
   const isWorkspaces = selected.id === 'workspaces'
   const isTasks = selected.id === 'tasks'
@@ -126,7 +124,7 @@ export function FeatureWallBody(props: {
   ) : isAgentsStatuses && props.settings ? (
     <KeepAwakeCard settings={props.settings} updateSettings={props.updateSettings} />
   ) : isAgentsUsage ? (
-    <UsageAccountsCard onAccountStateChange={onUsageAccountStateChange} />
+    <UsageAccountsCard />
   ) : isAgentsOrchestration ? (
     <OrchestrationSetupCard
       compact

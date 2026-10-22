@@ -6,15 +6,13 @@ import {
 } from './codex-session-resume-home'
 import { prepareCodexSessionResume } from './codex-session-resume-preparation'
 import {
-  prepareCodexAccountRestartResume,
   prepareLegacySharedCodexSessionResume
 } from './codex-legacy-session-resume'
-import { ManagedCodexHomeTemporarilyUnavailableError } from '../codex-accounts/host-codex-managed-home-ownership'
 import { codexHookService } from './hook-service'
 import { reconcileCodexHooksForLaunch } from './codex-hook-reconcile'
 import { ensureCodexDaemonSocketGuard } from './codex-config-mirror'
 import { isAgentStatusHooksEnabledForAgent } from '../agent-hooks/managed-agent-hook-controls'
-import { getOrcaManagedCodexHomePath, getSystemCodexHomePath } from './codex-home-paths'
+import { getSystemCodexHomePath } from './codex-home-paths'
 import { normalizeRuntimePathForComparison } from '../../shared/cross-platform-path'
 import type { CodexRuntimeHomeService } from '../codex-accounts/runtime-home-service'
 import type { GlobalSettings } from '../../shared/global-settings-types'
@@ -25,7 +23,7 @@ export function createCodexSessionResumeLaunchPreparation(deps: {
   getSettings: () => GlobalSettings | undefined
 }) {
   /** Hook repair and the daemon-socket guard for a pane that pins `home` as its CODEX_HOME rather
-   *  than launching in the selected account's home, which the pane spawn prepares itself. */
+   *  than launching with the shell's inherited home, which spawn preparation handles. */
   async function prepareCodexPinnedLaunchHome(
     home: string,
     systemHomePath: string = getSystemCodexHomePath()
@@ -57,35 +55,26 @@ export function createCodexSessionResumeLaunchPreparation(deps: {
     providerSession: AgentProviderSessionMetadata
     target: CodexAccountSelectionTarget
     launchEnv?: NodeJS.ProcessEnv
-    useSelectedAccount?: boolean
   }): Promise<CodexSessionResumePreparation | null> {
     const runtimeHome = deps.getRuntimeHome()
     if (args.target.runtime === 'wsl' || !runtimeHome || !deps.getSettings()) {
       return null
     }
     const systemHomePath = getSystemCodexHomePath()
-    const trustedHomes = trustedCodexResumeHomes(runtimeHome, systemHomePath)
+    const trustedHomes = trustedCodexResumeHomes(runtimeHome, systemHomePath, args.launchEnv)
     // Why: resolved eagerly, once, before any ranking or provenance match. The
     // marker read used to be deferred into the ranking thunk so a
     // provenance-present resume never paid for it, but that optimisation let an
-    // unreadable selected home reach the PTY as "no selection": the provenance
-    // branch simply omits the account from `trustedHomes` and another account's
+    // unreadable home reach the PTY as an empty candidate and another home's
     // readable alias wins. A throw here refuses the whole resume instead
     // (#STA-4422).
-    const selectedAccountCodexHome = runtimeHome.resolveSelectedHostAccountCodexHomePathForResume()
     // Why: a `fresh` outcome must skip migration and hook repair entirely — there is
     // no verified origin home to prepare, so the PTY layer drops the resume argv (#10793).
     const preparation = await prepareCodexSessionResume({
       sessionId: args.providerSession.id,
       transcriptPath: args.providerSession.transcriptPath,
       trustedCodexHomes: trustedHomes,
-      // Why: the legacy id rescan's winning home becomes this pane's CODEX_HOME, i.e. its account;
-      // rank it by the current selection so settings insertion order can never decide the account.
-      getSelectedAccountCodexHome: () => selectedAccountCodexHome,
       systemCodexHomePath: systemHomePath,
-      // Why: the mirror winning is what triggers the migration into ~/.codex below, so it must
-      // outrank the path-sorted account homes or a system-default selection resumes as an account.
-      sharedRuntimeCodexHomePath: getOrcaManagedCodexHomePath(),
       resolveVerifiedResumeHome: async (sessionSource) => {
         let migrated = { useRealCodexHome: false }
         try {
@@ -103,38 +92,18 @@ export function createCodexSessionResumeLaunchPreparation(deps: {
             }
           )
         } catch (error) {
-          // A credential-read refusal must never fall back to the old account.
-          if (error instanceof ManagedCodexHomeTemporarilyUnavailableError) {
-            throw error
-          }
-          // Why: migration is a compatibility repair; its failure must not prevent the PTY from resuming from its trusted origin home.
+          // Why: session migration is a compatibility repair; failure must not prevent resuming from the trusted origin home.
           console.warn(
             '[codex-session-resume] Legacy rollout migration failed; using origin home:',
             error
           )
         }
-        const resumeHome = args.useSelectedAccount
-          ? await prepareCodexAccountRestartResume({
-              sourceHome: sessionSource.homePath,
-              transcriptPath: sessionSource.transcriptPath,
-              targetHome: selectedAccountCodexHome ?? systemHomePath,
-              systemCodexHomePath: systemHomePath
-            })
-          : migrated.useRealCodexHome
-            ? systemHomePath
-            : sessionSource.homePath
+        const resumeHome = migrated.useRealCodexHome ? systemHomePath : sessionSource.homePath
         await prepareCodexPinnedLaunchHome(resumeHome, systemHomePath)
         return resumeHome
       }
     })
-    return preparation.outcome === 'resume'
-      ? {
-          ...preparation,
-          reconcileSharedRuntimeAuth:
-            normalizeRuntimePathForComparison(preparation.codexHomePath) ===
-            normalizeRuntimePathForComparison(getOrcaManagedCodexHomePath())
-        }
-      : preparation
+    return preparation
   }
 
   return { prepareCodexSessionResumeForLaunch, prepareCodexPinnedLaunchHome }

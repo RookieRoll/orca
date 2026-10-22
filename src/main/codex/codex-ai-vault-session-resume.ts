@@ -16,7 +16,6 @@ import {
 type CodexAiVaultRuntimeHome = Pick<
   CodexRuntimeHomeService,
   | 'isHostSystemDefaultRealHomeSelected'
-  | 'resolveSelectedHostAccountCodexHomePathForResume'
   | 'getHostCodexHomePathsForSessionDiscovery'
 >
 
@@ -45,7 +44,7 @@ export function codexAiVaultSessionResumePreparation(
   }
 }
 
-/** Keeps window and serve AI Vault resumes behind the same refusing account-home gate. */
+/** Keeps window and serve AI Vault resumes on the same standard-home migration path. */
 export async function prepareCodexAiVaultSessionResume(
   args: AiVaultPrepareSessionResumeArgs,
   options: CodexAiVaultResumeOptions
@@ -53,8 +52,6 @@ export async function prepareCodexAiVaultSessionResume(
   const result = await prepareLegacySharedCodexSessionResume(args, {
     isHostSystemDefaultRealHomeSelected: () =>
       options.runtimeHome?.isHostSystemDefaultRealHomeSelected() === true,
-    getSelectedHostAccountCodexHomePath: () =>
-      options.runtimeHome?.resolveSelectedHostAccountCodexHomePathForResume() ?? null,
     systemCodexHomePath: options.systemCodexHomePath
   })
   // Why: a fork carries no provider session, so the pane spawn never readies the home a resume

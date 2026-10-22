@@ -38,7 +38,6 @@ export function createInitialStoreState(getState: () => StoreState): StoreState 
       experimentalTerminalAttention: true,
       terminalMainSideEffectAuthority: false
     },
-    codexRestartNoticeByPtyId: {},
     deferredSshReconnectTargets: [],
     deferredSshSessionIdsByTabId: {},
     removeDeferredSshReconnectTarget: vi.fn(),

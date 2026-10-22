@@ -97,8 +97,7 @@ describe('purgeWorktreeTerminalState with a surviving twin', () => {
     // A mixed-host split: the kept local tab also binds the purged copy's PTY.
     f.store.setState((s) => ({
       ptyIdsByTabId: { ...s.ptyIdsByTabId, [f.local.terminalTabId]: [f.local.ptyId, shared] },
-      suppressedPtyExitIds: { [shared]: true },
-      pendingPaneAccountRestarts: { [shared]: 'codex' }
+      suppressedPtyExitIds: { [shared]: true }
     }))
 
     f.store
@@ -108,7 +107,6 @@ describe('purgeWorktreeTerminalState with a surviving twin', () => {
     const s = f.store.getState()
     expect(s.ptyIdsByTabId[f.local.terminalTabId]).toEqual([f.local.ptyId, shared])
     expect(s.suppressedPtyExitIds).toEqual({ [shared]: true })
-    expect(s.pendingPaneAccountRestarts).toEqual({ [shared]: 'codex' })
   })
 
   it('collapses a split the purged copy emptied, handing selection to the survivor', () => {

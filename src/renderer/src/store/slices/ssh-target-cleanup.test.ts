@@ -67,11 +67,7 @@ describe('SSH target cleanup tab map', () => {
       ...createTestStore().getState(),
       tabsByWorktree,
       ptyIdsByTabId: Object.freeze({ split: [removedPtyId] }),
-      lastKnownRelayPtyIdByTabId: Object.freeze({ last: removedPtyId }),
-      pendingPaneAccountRestarts: Object.freeze({ [removedPtyId]: 'codex' as const }),
-      codexRestartNoticeByPtyId: Object.freeze({
-        [removedPtyId]: { previousAccountLabel: 'old', nextAccountLabel: 'new' }
-      })
+      lastKnownRelayPtyIdByTabId: Object.freeze({ last: removedPtyId })
     })
     const patch = buildRemovedSshTargetCleanupPatch(state, 'removed')!
     expect(patch.tabsByWorktree!['folder:split']).not.toBe(tabsByWorktree['folder:split'])
@@ -79,8 +75,6 @@ describe('SSH target cleanup tab map', () => {
     expect(patch.tabsByWorktree!['folder:empty']).toBe(tabsByWorktree['folder:empty'])
     expect(patch.ptyIdsByTabId).toEqual({ split: [], last: [] })
     expect(patch.lastKnownRelayPtyIdByTabId).toEqual({})
-    expect(patch.pendingPaneAccountRestarts).toEqual({})
-    expect(patch.codexRestartNoticeByPtyId).toEqual({})
   })
 
   it.each([false, true])('preserves own special keys with null prototype = %s', (nullPrototype) => {

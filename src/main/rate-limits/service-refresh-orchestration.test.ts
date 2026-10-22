@@ -20,8 +20,7 @@ import {
 } from './rate-limit-service-test-harness'
 
 vi.mock('./claude-fetcher', () => ({
-  fetchClaudeRateLimits: vi.fn(),
-  fetchManagedAccountUsage: vi.fn()
+  fetchClaudeRateLimits: vi.fn()
 }))
 
 vi.mock('./codex-fetcher', () => ({

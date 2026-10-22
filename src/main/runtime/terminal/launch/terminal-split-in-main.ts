@@ -106,10 +106,7 @@ export abstract class OrcaRuntimeWithSplitPaneInMain extends OrcaRuntimeWithSpli
       cwd: opts.cwd ?? workspace.path,
       command: opts.command,
       commandDelivery: 'provider',
-      env: this.buildTerminalWorkspaceEnv(workspace, {
-        ...(workspace.connectionId ? {} : this.accounts.hostLaunchEnvFor(null)),
-        ...opts.env
-      }),
+      env: this.buildTerminalWorkspaceEnv(workspace, opts.env),
       envToDelete: opts.envToDelete,
       connectionId: workspace.connectionId,
       worktreeId: workspace.id,

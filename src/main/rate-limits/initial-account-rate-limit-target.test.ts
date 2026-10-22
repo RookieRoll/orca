@@ -25,13 +25,6 @@ const providers = [
     selectionSettings: (selection: RuntimeSelection) => ({
       activeCodexManagedAccountIdsByRuntime: selection
     })
-  },
-  {
-    name: 'Claude',
-    getTarget: getInitialClaudeRateLimitTarget,
-    selectionSettings: (selection: RuntimeSelection) => ({
-      activeClaudeManagedAccountIdsByRuntime: selection
-    })
   }
 ] as const
 
@@ -160,4 +153,44 @@ describe.each(providers)('$name initial rate-limit target', ({ getTarget, select
 
     expect(getTarget(settings, scenario.platform ?? 'win32')).toEqual(scenario.expected)
   })
+})
+
+describe('Claude initial rate-limit target', () => {
+  const claudeScenarios: {
+    settings: Partial<GlobalSettings>
+    platform: NodeJS.Platform
+    expected: { runtime: 'host' } | { runtime: 'wsl'; wslDistro: string | null }
+  }[] = [
+    {
+      settings: { localAccountRuntime: 'wsl', localAccountWslDistro: ' Fedora ' },
+      platform: 'win32',
+      expected: { runtime: 'wsl', wslDistro: 'Fedora' }
+    },
+    {
+      settings: { localAccountRuntime: 'wsl', localAccountWslDistro: 'Ubuntu' },
+      platform: 'linux',
+      expected: { runtime: 'host' }
+    },
+    {
+      settings: { localAccountRuntime: 'host' },
+      platform: 'win32',
+      expected: { runtime: 'host' }
+    },
+    {
+      settings: {
+        localAccountRuntime: 'auto',
+        localWindowsRuntimeDefault: { kind: 'wsl', distro: 'Ubuntu' }
+      },
+      platform: 'win32',
+      expected: { runtime: 'wsl', wslDistro: 'Ubuntu' }
+    }
+  ]
+
+  it.each(claudeScenarios)(
+    'uses CLI runtime settings: $settings',
+    ({ settings, platform, expected }) => {
+      expect(getInitialClaudeRateLimitTarget({ ...getDefaultSettings('/tmp'), ...settings }, platform))
+        .toEqual(expected)
+    }
+  )
 })

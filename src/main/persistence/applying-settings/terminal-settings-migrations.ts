@@ -63,7 +63,7 @@ type RetiredGlobalSettings = {
   showAgentsSidebar?: unknown
   // Managed servers are the default SSH path now; an older build reads a missing key as off.
   experimentalManagedServers?: unknown
-  // Why: #22551 kept this key in settings; it now lives in a main-owned store and must never ride along.
+  // The retired provider credential must not enter settings or remote snapshots.
   opencodeGoApiKey?: unknown
   experimentalStructuredNativeChat?: unknown
   openAgentTabsInChatByDefault?: unknown
@@ -71,6 +71,13 @@ type RetiredGlobalSettings = {
   telemetry?: unknown
   experimentalPet?: unknown
   experimentalSidekick?: unknown
+  codexManagedAccounts?: unknown
+  activeCodexManagedAccountId?: unknown
+  activeCodexManagedAccountIdsByRuntime?: unknown
+  claudeManagedAccounts?: unknown
+  activeClaudeManagedAccountId?: unknown
+  activeClaudeManagedAccountIdsByRuntime?: unknown
+  claudeCopiedSystemDefaultNoticeDismissed?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -89,6 +96,13 @@ export function stripRetiredGlobalSettings(
     telemetry: _retiredTelemetrySettings,
     experimentalPet: _retiredPetExperiment,
     experimentalSidekick: _retiredSidekickExperiment,
+    codexManagedAccounts: _retiredCodexManagedAccounts,
+    activeCodexManagedAccountId: _retiredActiveCodexManagedAccountId,
+    activeCodexManagedAccountIdsByRuntime: _retiredActiveCodexManagedAccountIdsByRuntime,
+    claudeManagedAccounts: _retiredClaudeManagedAccounts,
+    activeClaudeManagedAccountId: _retiredActiveClaudeManagedAccountId,
+    activeClaudeManagedAccountIdsByRuntime: _retiredActiveClaudeManagedAccountIdsByRuntime,
+    claudeCopiedSystemDefaultNoticeDismissed: _retiredClaudeCopiedSystemDefaultNoticeDismissed,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacySetupScriptLaunchMode
@@ -103,6 +117,13 @@ export function stripRetiredGlobalSettings(
   void _retiredTelemetrySettings
   void _retiredPetExperiment
   void _retiredSidekickExperiment
+  void _retiredCodexManagedAccounts
+  void _retiredActiveCodexManagedAccountId
+  void _retiredActiveCodexManagedAccountIdsByRuntime
+  void _retiredClaudeManagedAccounts
+  void _retiredActiveClaudeManagedAccountId
+  void _retiredActiveClaudeManagedAccountIdsByRuntime
+  void _retiredClaudeCopiedSystemDefaultNoticeDismissed
   return rest
 }
 

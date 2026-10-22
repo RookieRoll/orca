@@ -1,12 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installFakeAppEnvironment } from '../../../config/scripts/vitest-host-ports-setup'
-import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { readdirSync } from 'node:fs'
 import type * as NodeOs from 'node:os'
-import { join } from 'node:path'
 import { createSettings } from './runtime-home-settings-test-fixtures'
 import {
   createStore,
-  getRuntimeCodexHomePath,
+  getSystemCodexHomePath,
   setupRuntimeHomeTest,
   teardownRuntimeHomeTest,
   testState
@@ -36,25 +35,8 @@ describe('Codex session discovery on a transcript lookup miss', () => {
     teardownRuntimeHomeTest()
   })
 
-  it('creates no directories and reads no account ownership markers', async () => {
-    const accountHome = join(testState.userDataDir, 'codex-accounts', 'account-1', 'home')
-    const store = createStore(
-      createSettings({
-        codexManagedAccounts: [
-          {
-            id: 'account-1',
-            email: 'user@example.com',
-            managedHomePath: accountHome,
-            providerAccountId: null,
-            workspaceLabel: null,
-            workspaceAccountId: null,
-            createdAt: 1,
-            updatedAt: 1,
-            lastAuthenticatedAt: 1
-          }
-        ]
-      })
-    )
+  it('discovers only the CLI system home without creating directories', async () => {
+    const store = createStore(createSettings())
     const { CodexRuntimeHomeService } = await import('./runtime-home-service')
     // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: the service reads only getSettings/updateSettings, which the harness store implements.
     const service = new CodexRuntimeHomeService(store as never)
@@ -64,9 +46,6 @@ describe('Codex session discovery on a transcript lookup miss', () => {
     configureHostReadableTranscriptPathSources({
       getAdditionalCodexHomePaths: () => service.getHostCodexHomePathsForSessionDiscovery()
     })
-    // A user who never ran Codex through Orca: neither the mirror nor any account home exists.
-    rmSync(join(testState.userDataDir, 'codex-runtime-home'), { recursive: true, force: true })
-    rmSync(join(testState.userDataDir, 'codex-accounts'), { recursive: true, force: true })
     const before = readdirSync(testState.userDataDir).sort()
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
@@ -74,13 +53,9 @@ describe('Codex session discovery on a transcript lookup miss', () => {
       await expect(resolveSessionFilePath('codex', 'never-written-session')).resolves.toBeNull()
       await expect(resolveSessionFilePath('codex', 'never-written-session')).resolves.toBeNull()
 
-      expect(existsSync(getRuntimeCodexHomePath())).toBe(false)
       expect(readdirSync(testState.userDataDir).sort()).toEqual(before)
-      // The ownership check warns on every missing account home; the poll must not reach it.
       expect(warn).not.toHaveBeenCalled()
-      expect(service.getHostCodexHomePathsForSessionDiscovery()).toContain(
-        getRuntimeCodexHomePath()
-      )
+      expect(service.getHostCodexHomePathsForSessionDiscovery()).toEqual([getSystemCodexHomePath()])
     } finally {
       warn.mockRestore()
       configureHostReadableTranscriptPathSources({})

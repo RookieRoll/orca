@@ -15,15 +15,15 @@ vi.mock('electron', () => ({
 import { registerRateLimitHandlers } from './rate-limits'
 import type { RateLimitService } from '../rate-limits/service'
 import type { RateLimitState } from '../../shared/rate-limit-types'
-import type { CodexAccountService } from '../codex-accounts/service'
+import type { CodexResetCreditCoordinator } from '../codex-accounts/codex-reset-credit-coordinator'
 
-function makeCodexAccounts() {
-  const consumeCurrentRateLimitResetCredit = vi.fn(() =>
+function makeCodexResetCredits() {
+  const consumeCurrent = vi.fn(() =>
     Promise.resolve({ outcome: 'noCredit', state: {} as RateLimitState })
   )
   return {
-    service: { consumeCurrentRateLimitResetCredit } as unknown as CodexAccountService,
-    consumeCurrentRateLimitResetCredit
+    service: { consumeCurrent } as unknown as CodexResetCreditCoordinator,
+    consumeCurrent
   }
 }
 
@@ -46,8 +46,6 @@ function makeService(): {
     refreshClaudeForTarget: vi.fn(() => Promise.resolve({} as RateLimitState)),
     consumeCodexRateLimitResetCredit,
     setPollingInterval: vi.fn(() => Promise.resolve()),
-    fetchInactiveClaudeAccountsOnOpen: vi.fn(() => Promise.resolve()),
-    fetchInactiveCodexAccountsOnOpen: vi.fn(() => Promise.resolve())
   }
   return {
     service: service as unknown as RateLimitService,
@@ -64,7 +62,7 @@ describe('registerRateLimitHandlers', () => {
 
   it('registers a refreshMiniMax channel that delegates to refresh()', async () => {
     const { service, refresh } = makeService()
-    registerRateLimitHandlers(service, makeCodexAccounts().service)
+    registerRateLimitHandlers(service, makeCodexResetCredits().service)
     const handler = ipcState.handleHandlers.get('rateLimits:refreshMiniMax')
     expect(handler).toBeDefined()
     await handler!({})
@@ -73,7 +71,7 @@ describe('registerRateLimitHandlers', () => {
 
   it('keeps the existing rate-limit channels registered', () => {
     const { service } = makeService()
-    registerRateLimitHandlers(service, makeCodexAccounts().service)
+    registerRateLimitHandlers(service, makeCodexResetCredits().service)
     expect(ipcState.handleHandlers.has('rateLimits:get')).toBe(true)
     expect(ipcState.handleHandlers.has('rateLimits:refresh')).toBe(true)
     expect(ipcState.handleHandlers.has('rateLimits:refreshMiniMax')).toBe(true)
@@ -82,22 +80,22 @@ describe('registerRateLimitHandlers', () => {
 
   it('registers a refreshGrok channel that delegates to refreshGrok()', async () => {
     const { service, refreshGrok } = makeService()
-    registerRateLimitHandlers(service, makeCodexAccounts().service)
+    registerRateLimitHandlers(service, makeCodexResetCredits().service)
     const handler = ipcState.handleHandlers.get('rateLimits:refreshGrok')
     expect(handler).toBeDefined()
     await handler!({})
     expect(refreshGrok).toHaveBeenCalledTimes(1)
   })
 
-  it('serializes desktop reset consumption through CodexAccountService', async () => {
+  it('routes desktop reset consumption through the default Codex reset coordinator', async () => {
     const { service, consumeCodexRateLimitResetCredit } = makeService()
-    const codexAccounts = makeCodexAccounts()
-    registerRateLimitHandlers(service, codexAccounts.service)
+    const resetCredits = makeCodexResetCredits()
+    registerRateLimitHandlers(service, resetCredits.service)
     const handler = ipcState.handleHandlers.get('rateLimits:consumeCodexResetCredit')
 
     await handler!({})
 
-    expect(codexAccounts.consumeCurrentRateLimitResetCredit).toHaveBeenCalledOnce()
+    expect(resetCredits.consumeCurrent).toHaveBeenCalledOnce()
     expect(consumeCodexRateLimitResetCredit).not.toHaveBeenCalled()
   })
 })

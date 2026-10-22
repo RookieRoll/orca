@@ -2,34 +2,15 @@ import { createAcpStructuredLaunchResolver } from '../runtime/structured-agent-l
 import { describe, expect, it, vi } from 'vitest'
 import type { AgentSessionRecord } from '../../shared/agent-session-record'
 import { agentSessionRecordFixture } from '../../shared/agent-session-record.test-fixture'
-import type { ManagedDataAccountsState } from '../../shared/managed-account-types'
-import { restoreManagedDataAccountEnvironment } from '../../shared/managed-data-account-environment'
 import { createProviderSpawnSpec } from '../provider-process/provider-process-supervisor'
 import { openCodeAcpAccountBinding } from '../opencode/opencode-structured-account-home'
 import { scrubOpenCodeAcpEnvironment } from '../opencode/opencode-acp-environment'
 import { acpLaunchSpecFor, type AcpLaunchSpec } from './acp-launch-specs'
 import { STRUCTURED_CHILD_ENV_TO_DELETE } from '../runtime/structured-session-child-env'
 
-const PROFILE = '123e4567-e89b-42d3-a456-426614174000'
-
-const managedAccounts = {
-  list: (): ManagedDataAccountsState => ({
-    accounts: [{ id: PROFILE, label: 'work', integrations: [], createdAt: 0 }],
-    activeAccountId: PROFILE
-  }),
-  restoreOriginalEnvironment: (environment: Record<string, string | undefined>) =>
-    restoreManagedDataAccountEnvironment(environment),
-  environmentForAccount: (_provider: 'opencode' | 'devin', id: string) => ({
-    XDG_DATA_HOME: `/profiles/${id}/data`,
-    XDG_STATE_HOME: `/profiles/${id}/state`,
-    OPENCODE_DB: 'opencode.db',
-    OPENCODE_AUTH_CONTENT: ''
-  })
-}
-
 const OPENCODE = {
   ...acpLaunchSpecFor('opencode')!,
-  account: openCodeAcpAccountBinding(() => managedAccounts)
+  account: openCodeAcpAccountBinding()
 }
 const identity = {
   sessionId: 'session-alpha-1',
@@ -113,11 +94,15 @@ describe('OpenCode ACP launch resolution', () => {
     expect(child).toMatchObject(userEnv)
   })
 
-  it('leaves unset what the user left unset, whatever Orca itself inherited', async () => {
-    const inheritedEnv = { OPENCODE_DB: '/elsewhere/other.db', OPENCODE_AUTH_CONTENT: '' }
+  it("keeps the user's default OpenCode auth environment", async () => {
+    const inheritedEnv = {
+      XDG_DATA_HOME: '/home/user/.local/share',
+      OPENCODE_DB: '/home/user/.local/share/opencode/opencode.db',
+      OPENCODE_AUTH_CONTENT: '{"opencode-go":{"type":"api","key":"user-key"}}'
+    }
     const launch = await resolver(openCodeRecord(UNMANAGED), { inheritedEnv })({ identity })
-    expect(launch.env.XDG_DATA_HOME).toBeUndefined()
-    expect(launch.env.OPENCODE_DB).toBeUndefined()
+    expect(launch.env.XDG_DATA_HOME).toBe(inheritedEnv.XDG_DATA_HOME)
+    expect(launch.env.OPENCODE_DB).toBe(inheritedEnv.OPENCODE_DB)
     const child = createProviderSpawnSpec(
       {
         command: launch.command,
@@ -128,20 +113,8 @@ describe('OpenCode ACP launch resolution', () => {
       inheritedEnv,
       'darwin'
     ).env
-    expect(child.OPENCODE_DB).toBeUndefined()
-    expect(child.OPENCODE_AUTH_CONTENT).toBeUndefined()
-  })
-
-  it('points a managed profile at its own directories', async () => {
-    const launch = await resolver(
-      openCodeRecord({ kind: 'opencode', locator: { kind: 'managed', managedProfileId: PROFILE } })
-    )({ identity })
-    expect(launch.env).toMatchObject({
-      XDG_DATA_HOME: `/profiles/${PROFILE}/data`,
-      XDG_STATE_HOME: `/profiles/${PROFILE}/state`,
-      OPENCODE_DB: 'opencode.db',
-      OPENCODE_AUTH_CONTENT: ''
-    })
+    expect(child.OPENCODE_DB).toBe(inheritedEnv.OPENCODE_DB)
+    expect(child.OPENCODE_AUTH_CONTENT).toBe(inheritedEnv.OPENCODE_AUTH_CONTENT)
   })
 
   it("restores the user's own config directory over Orca's status overlay", async () => {

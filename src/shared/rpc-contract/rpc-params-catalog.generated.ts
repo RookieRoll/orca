@@ -24,7 +24,6 @@ import {
   DesktopBrowserBridgeResultParams
 } from '../desktop-browser-bridge-protocol'
 import { RegisterDeviceKeyParamsSchema } from '../device-key-registration-contract'
-import { HostAccountLaunchEnvParams } from '../host-account-launch-env'
 import {
   PairingGetEndpointsParamsSchema,
   PairingProvisionRelayParamsSchema
@@ -34,21 +33,7 @@ import { OrcadMigrationBlobChunkRequestSchema } from '../orcad-migration/orcad-m
 import { OrcadMigrationSnapshotChunkRequestSchema } from '../orcad-migration/orcad-migration-scrollback'
 import { OrcadTerminalCensusParamsSchema } from '../orcad-terminal-census'
 import { pluginConsentRequestSchema } from '../plugins/plugin-consent-request'
-import {
-  AccountsUnsubscribeParams,
-  AddClaudeFromConfigDirParams,
-  AddCodexFromHomeParams,
-  AddDataAccountParams,
-  BeginClaudeSignInParams,
-  ConsumeCodexResetCreditParams,
-  FinishClaudeSignInParams,
-  ListAccountsParams,
-  RemoveAccountParams,
-  RemoveDataAccountParams,
-  SelectAccountParams,
-  SelectCodexAccountForTargetParams,
-  SelectDataAccountParams
-} from './accounts-params'
+import { AccountsUnsubscribeParams, ListAccountsParams } from './accounts-params'
 import { PrepareCodexForWslPaneParams } from './agent-hooks-params'
 import { AgentLaunch, AgentLaunchReplay } from './agent-launch-params'
 import { AgentLaunchSettingsMutation } from './agent-launch-settings-params'
@@ -596,10 +581,6 @@ import {
   TerminalUnsubscribe,
   TerminalUpdateViewport
 } from './terminal-viewport-schemas-params'
-import {
-  UsageCredentialApiKeyParams,
-  UsageCredentialSessionCookieParams
-} from './usage-credentials-params'
 import { LayoutReopenHeldPanesParams } from './workspace-layout-held-panes-params'
 import {
   LayoutApplyParams,
@@ -649,9 +630,6 @@ import {
 // matches the dispatcher. Clients must import it for types only — parsing a params
 // schema client-side runs the coercing transforms and rewrites the wire bytes.
 export const RPC_PARAMS_BY_METHOD = {
-  'accounts.addClaudeFromConfigDir': AddClaudeFromConfigDirParams,
-  'accounts.addCodexFromHome': AddCodexFromHomeParams,
-  'accounts.addDataFromHome': AddDataAccountParams,
   'accounts.antigravityAddCurrent': AntigravityAccountTargetParams,
   'accounts.antigravityChatSignInCancel': AntigravityChatSignInFlowParams,
   'accounts.antigravityChatSignInComplete': AntigravityChatSignInCompleteParams,
@@ -660,30 +638,11 @@ export const RPC_PARAMS_BY_METHOD = {
   'accounts.antigravityList': AntigravityAccountTargetParams,
   'accounts.antigravityRemove': AntigravityAccountMutationParams,
   'accounts.antigravitySelect': AntigravityAccountMutationParams,
-  'accounts.beginClaudeSignIn': BeginClaudeSignInParams,
-  'accounts.cancelClaudeSignIn': FinishClaudeSignInParams,
-  'accounts.consumeCodexResetCredit': ConsumeCodexResetCreditParams,
-  'accounts.finishClaudeSignIn': FinishClaudeSignInParams,
   'accounts.list': ListAccountsParams,
-  'accounts.listData': null,
-  'accounts.minimaxClearApiKey': null,
-  'accounts.minimaxClearSessionCookie': null,
   'accounts.minimaxCredentialsStatus': null,
-  'accounts.minimaxSaveApiKey': UsageCredentialApiKeyParams,
-  'accounts.minimaxSaveSessionCookie': UsageCredentialSessionCookieParams,
-  'accounts.removeClaude': RemoveAccountParams,
-  'accounts.removeCodex': RemoveAccountParams,
-  'accounts.removeData': RemoveDataAccountParams,
-  'accounts.selectClaude': SelectAccountParams,
-  'accounts.selectCodex': SelectAccountParams,
-  'accounts.selectCodexForTarget': SelectCodexAccountForTargetParams,
-  'accounts.selectData': SelectDataAccountParams,
-  'accounts.setHostLaunchEnv': HostAccountLaunchEnvParams,
   'accounts.subscribe': null,
   'accounts.unsubscribe': AccountsUnsubscribeParams,
-  'accounts.zcodePlanClearApiKey': null,
   'accounts.zcodePlanCredentialsStatus': null,
-  'accounts.zcodePlanSaveApiKey': UsageCredentialApiKeyParams,
   'agent.launch': AgentLaunch,
   'agent.launchReplay': AgentLaunchReplay,
   'agentHooks.prepareCodexForWslPane': PrepareCodexForWslPaneParams,

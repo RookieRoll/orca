@@ -13,10 +13,6 @@ vi.mock('node:os', async () => {
   return { ...actual, homedir: () => state.home }
 })
 
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  claudeProfileHistoryDirs: () => []
-}))
-
 vi.mock('node:fs/promises', async () => {
   const actual = await vi.importActual<typeof FsPromises>('node:fs/promises')
   return {

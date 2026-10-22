@@ -1,12 +1,11 @@
 import { createReadStream } from 'node:fs'
 import { join } from 'node:path'
-import { requireLegacyAgentSessionAccountHome } from '../../shared/agent-session-account-home'
 import {
   agentSessionProviderHandleChainHead,
   type AgentSessionProviderHandle
 } from '../../shared/agent-session-provider-handle'
 import type { AgentSessionRewindFork } from '../../shared/agent-session-rewind'
-import { getClaudeProfileRouter } from '../claude-accounts/claude-profile-installed-router'
+import { claudeConfigHostDirs } from '../ai-vault/session-scanner-roots'
 import type { StructuredAgentSessionAdapter } from '../native-chat/agent-session-wire/structured-agent-session-adapter'
 import { resolveSessionFilePath } from '../native-chat/session-file-resolver'
 import { splitTranscriptStreamLines } from '../native-chat/transcript-stream-lines'
@@ -97,8 +96,7 @@ export async function resolveClaudeRewindFork(input: {
   return null
 }
 
-/** The adapter's answer: the fork for a rewind of `record` to before `beforeMessage`, read from any
- *  Claude home Orca knows, since the chat's account may have changed since that message. */
+/** The adapter's answer: read a rewind transcript from the configured or default CLI home. */
 export const claudeForkForRewind: NonNullable<
   StructuredAgentSessionAdapter['forkForRewind']
 > = async ({ record, beforeMessage, rewindOperationId }) => {
@@ -106,16 +104,12 @@ export const claudeForkForRewind: NonNullable<
   if (!head) {
     return { ok: false, reason: 'invalid-target' }
   }
-  const router = getClaudeProfileRouter()
   const fork = await resolveClaudeRewindFork({
     orcaSessionId: record.sessionId,
     rewindOperationId,
     head,
     prompt: beforeMessage,
-    claudeConfigDirs: [
-      requireLegacyAgentSessionAccountHome(record.accountHome).path,
-      ...(router ? [...router.accountHomes(), router.systemDefaultHome()] : [])
-    ]
+    claudeConfigDirs: claudeConfigHostDirs()
   })
   return fork ? { ok: true, fork } : { ok: false, reason: 'invalid-target' }
 }

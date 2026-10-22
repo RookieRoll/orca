@@ -64,7 +64,6 @@ export type RuntimeConstructionDependencies = {
   resolveCodexStructuredLaunchHome?: (input: {
     launchEnv: NodeJS.ProcessEnv
   }) => string | null | Promise<string | null>
-  prepareCodexCatalogProbeHome?: (homePath: string) => void
   buildAgentHookPtyEnv?: () => Record<string, string>
   getDesktopWindowStatus?: () => RuntimeDesktopWindowStatus
   agentSessionClaimSigner?: AgentSessionClaimSigner

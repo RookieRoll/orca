@@ -77,7 +77,6 @@ export function renderAccountsSettingsSection(context: SettingsRenderContext): R
           wslAvailable={terminal.windowsTerminalCapabilities.wslAvailable}
           wslDistros={terminal.windowsTerminalCapabilities.wslDistros}
           wslCapabilitiesLoading={terminal.windowsTerminalCapabilities.isLoading}
-          accountOwnerPlatform={terminal.windowsTerminalCapabilities.hostPlatform}
         />
       )}
     </SettingsSection>

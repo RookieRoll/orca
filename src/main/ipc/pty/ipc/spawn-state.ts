@@ -5,7 +5,6 @@ import type {
   PtySpawnOptions,
   PtySpawnResult
 } from '../../../providers/pty-provider-contract'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
 import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
 import type { SleepingAgentLaunchConfig } from '../../../../shared/agent-session-resume'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
@@ -25,7 +24,6 @@ export type PtyIpcSpawnState = {
   spawnTiming: PtySpawnTiming
   codexHomeLaunchStartedAt: Date | undefined
   codexHomeLaunchStartedSequence: number | undefined
-  reattachedCodexHomeRoutes: Map<string, CodexPaneHomeRoute | null>
   cwd: string | undefined
   prevalidatedCwd: string | undefined
   startupCwdFallback: { kind: 'worktree'; cwd: string } | undefined
@@ -109,7 +107,6 @@ export function createPtyIpcSpawnState(
     spawnTiming: createPtySpawnTiming(),
     codexHomeLaunchStartedAt: undefined,
     codexHomeLaunchStartedSequence: undefined,
-    reattachedCodexHomeRoutes: new Map(),
     cwd: undefined,
     prevalidatedCwd: undefined,
     startupCwdFallback: undefined,

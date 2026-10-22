@@ -93,8 +93,7 @@ vi.mock('node:os', async () => {
 
 const realFs = await vi.importActual<typeof NodeFs>('node:fs')
 
-const { syncSystemConfigIntoLegacySharedCodexHome, syncSystemConfigIntoManagedCodexHome } =
-  await import('./codex-config-mirror')
+const { syncSystemConfigIntoManagedCodexHome } = await import('./codex-config-mirror')
 const { promoteCodexRuntimeSettingsToSystem, snapshotCodexRuntimeSettingsBaseline } =
   await import('./config-settings-promotion')
 const { syncCodexGlobalInstructionsIntoManagedHome } = await import('./codex-home-paths')
@@ -200,19 +199,6 @@ describe('STA-4737 the config mirror must not overwrite a runtime config it coul
     expect(realFs.readFileSync(runtimeConfigPath(), 'utf-8')).toContain('model = "system-model"')
   })
 
-  it('refuses the retained-pane mirror when its runtime config is denied', () => {
-    realFs.writeFileSync(systemConfigPath(), SYSTEM_CONFIG, 'utf-8')
-    realFs.writeFileSync(runtimeConfigPath(), RUNTIME_CONFIG, 'utf-8')
-    denials.deny(runtimeConfigPath())
-
-    expect(() =>
-      syncSystemConfigIntoLegacySharedCodexHome({
-        runtimeHomePath: runtimeHome(),
-        systemHomePath: systemHome()
-      })
-    ).toThrow('EPERM')
-    expect(realFs.readFileSync(runtimeConfigPath(), 'utf-8')).toBe(RUNTIME_CONFIG)
-  })
 })
 
 describe('STA-4737 promotion must not rebuild a system config it could not read', () => {

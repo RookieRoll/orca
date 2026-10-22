@@ -40,10 +40,7 @@ import {
 import { interruptedLocalWorktreeRemovalJob } from '../runtime-interrupted-local-worktree-removal'
 import { retryFailedRemovalUnlessRegistered } from '../../worktree-removal-leftover'
 import type { GitWorktreeInfo } from '../../../shared/worktree/types'
-import {
-  resolveAgentTerminalCreateOptions,
-  withHostAccountLaunchEnv
-} from '../runtime-agent-terminal-startup'
+import { resolveAgentTerminalCreateOptions } from '../runtime-agent-terminal-startup'
 import { removeWorktreeMetaRow } from '../../persistence/host-qualified-worktree-meta'
 
 export abstract class OrcaRuntimeWithResolveWorktreeRemovalTarget extends OrcaRuntimeWithRemoveManagedWorktree {
@@ -300,9 +297,6 @@ export abstract class OrcaRuntimeWithResolveWorktreeRemovalTarget extends OrcaRu
       resolvedLaunch,
       opts.terminalImageViewerSupported
     )
-    // An SSH workspace's shell runs on that machine, where this distro's account paths mean nothing.
-    return workspace.connectionId
-      ? launch
-      : withHostAccountLaunchEnv(opts, launch, this.accounts.hostLaunchEnvFor(launch.launchAgent))
+    return launch
   }
 }

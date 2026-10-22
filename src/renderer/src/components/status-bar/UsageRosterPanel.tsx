@@ -214,7 +214,6 @@ export function UsageRosterPanel({
   onOpenProvider,
   onSignIn,
   canSignIn,
-  onManageAccounts,
   onUsageDetails,
   renderRow
 }: {
@@ -227,11 +226,8 @@ export function UsageRosterPanel({
   onOpenProvider: (provider: ProviderId) => void
   onSignIn: (provider: ProviderId) => void
   canSignIn: (provider: ProviderId) => boolean
-  onManageAccounts: () => void
   onUsageDetails: () => void
-  // Lets the host wrap a provider's row in a richer control (e.g. the
-  // Claude/Codex account-switch drill-in submenu); return null to use the
-  // default clickable row.
+  // Lets the host add provider-specific details actions to a row.
   renderRow?: (p: ProviderRateLimits, row: React.ReactNode) => React.ReactNode
 }): React.JSX.Element {
   // Why: one boundary-scheduled clock keeps every open row current without per-provider timers.
@@ -350,13 +346,6 @@ export function UsageRosterPanel({
           'auto.components.status.bar.UsageRosterPanel.usageDetails',
           'Usage details & history'
         )}
-        <ChevronRight size={14} className="text-muted-foreground" />
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onSelect={onManageAccounts}
-        className="w-full cursor-pointer justify-between rounded-none px-3.5 py-2.5 text-[13px] text-foreground"
-      >
-        {translate('auto.components.status.bar.StatusBar.75ded02687', 'Manage Accounts…')}
         <ChevronRight size={14} className="text-muted-foreground" />
       </DropdownMenuItem>
     </div>

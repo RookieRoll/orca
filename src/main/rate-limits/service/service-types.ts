@@ -10,10 +10,8 @@ export type {
   CodexRateLimitResetResult,
   RateLimitState,
   ProviderRateLimits,
-  InactiveAccountUsage,
   RateLimitRuntimeTarget
 } from '../../../shared/rate-limit-types'
-export type { InactiveClaudeAccountInfo } from '../claude-fetcher'
 export type { ClaudeStatusLineRateLimits } from '../../../shared/claude-statusline-rate-limits'
 export type { NetworkProxySettings } from '../../../shared/network-proxy'
 export type { ClaudeRuntimeAuthPreparation } from '../../claude-accounts/runtime-auth-service'
@@ -28,11 +26,6 @@ export type {
 } from '../../codex-accounts/runtime-selection'
 export { normalizeCodexAccountSelectionTarget } from '../../codex-accounts/runtime-selection'
 export type { CodexRateLimitHomeResolution } from '../../codex-accounts/runtime-home-service'
-
-export type InactiveCodexAccountInfo = {
-  id: string
-  resolveHome: () => { kind: 'ready'; managedHomePath: string } | { kind: 'skip' }
-}
 
 export type CodexHomePathResolver = (
   target?: CodexAccountSelectionTarget
@@ -113,14 +106,8 @@ export const STALE_THRESHOLD_MS = 30 * 60 * 1000 // 30 minutes — after this, s
 export const RATE_LIMITED_STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000
 // Why: statusline posts arrive on every turn; skip renderer pushes for identical windows so streaming sessions don't spam state updates.
 export const LIVE_CLAUDE_INGEST_DEDUPE_MS = 30 * 1000
-export const INACTIVE_FETCH_DEBOUNCE_MS = 60 * 1000 // 60 seconds — debounce fetch-on-open
-// Why: each inactive Codex probe spawns a real codex process inside that
-// account's live credential home; pace them out instead of bursting every
-// account the moment the switcher opens.
-export const INACTIVE_CODEX_PROBE_STAGGER_MS = 2_000
 export const DEFERRED_STARTUP_ACTIVE_REFRESH_MS = 1000
 
-// Why: inactive account arrays are derived from provider caches on demand in getState()/pushToRenderer().
 export type InternalRateLimitState = {
   claude: ProviderRateLimits | null
   codex: ProviderRateLimits | null

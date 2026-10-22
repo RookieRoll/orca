@@ -1,13 +1,9 @@
-import type { CodexManagedAccount } from '../../shared/managed-account-types'
 import type {
   CodexResetCreditAttemptLedger,
   DurableCodexResetCreditAttempt
 } from '../../shared/codex-reset-credit-attempt-ledger'
 import type { CodexResetCreditExpectedScope } from '../../shared/codex-reset-credit-scope'
-import type {
-  CodexRateLimitResetOutcome,
-  RateLimitRuntimeTarget
-} from '../../shared/rate-limit-types'
+import type { CodexRateLimitResetOutcome } from '../../shared/rate-limit-types'
 import type { Store } from '../persistence'
 import { profileStateWriterFailureOutcome } from '../persistence/profile-state/profile-state-writer-errors'
 
@@ -107,36 +103,6 @@ export class CodexResetCreditLedger {
     return attempt
   }
 
-  getPendingForAccount(
-    target: RateLimitRuntimeTarget,
-    account: CodexManagedAccount
-  ): { idempotencyKey: string; expectedScope: CodexResetCreditExpectedScope } | null {
-    const accountScopeKey = resetAccountScopeKey({
-      target,
-      accountId: account.id,
-      accountRevision: account.updatedAt
-    })
-    const idempotencyKey = this.unresolvedKeyByAccountScope.get(accountScopeKey)
-    if (!idempotencyKey) {
-      return null
-    }
-    const attempt = this.attemptsByKey.get(idempotencyKey)
-    if (attempt?.state !== 'providerPending') {
-      throw new Error('Codex reset-credit attempt state is inconsistent.')
-    }
-    // Why: a durable providerPending attempt can only be resolved with its original key.
-    return { idempotencyKey, expectedScope: attempt.expectedScope }
-  }
-
-  hasPendingForTarget(target: RateLimitRuntimeTarget): boolean {
-    return [...this.attemptsByKey.values()].some(
-      (attempt) =>
-        attempt.state === 'providerPending' &&
-        attempt.expectedScope.target.runtime === target.runtime &&
-        attempt.expectedScope.target.wslDistro === target.wslDistro
-    )
-  }
-
   markProviderPending(idempotencyKey: string, attempt: CodexResetCreditAttempt): Promise<void> {
     return this.serializeMutation(async () => {
       await this.persist({
@@ -176,44 +142,6 @@ export class CodexResetCreditLedger {
     this.attemptsByKey.delete(idempotencyKey)
     if (this.attemptKeyByOffer.get(attempt.scopeKey) === idempotencyKey) {
       this.attemptKeyByOffer.delete(attempt.scopeKey)
-    }
-  }
-
-  // Why: a removed account's managed home is gone, so its unresolved providerPending
-  // attempt can never validate or be replayed; drop it so a target-scoped default reset
-  // is not wedged forever by hasPendingResetForTarget matching the orphan.
-  discardForRemovedAccount(accountId: string): Promise<void> {
-    return this.serializeMutation(() => this.discardAccountAttempts(accountId))
-  }
-
-  private async discardAccountAttempts(accountId: string): Promise<void> {
-    const staleAttempts = [...this.attemptsByKey].filter(
-      ([, attempt]) => attempt.expectedScope.accountId === accountId
-    )
-    if (staleAttempts.length === 0) {
-      return
-    }
-    const staleKeySet = new Set(staleAttempts.map(([idempotencyKey]) => idempotencyKey))
-    if (this.durableLedger) {
-      const attempts = this.durableLedger.attempts.filter(
-        (attempt) => !staleKeySet.has(attempt.idempotencyKey)
-      )
-      if (attempts.length !== this.durableLedger.attempts.length) {
-        const nextLedger: CodexResetCreditAttemptLedger = { version: 1, attempts }
-        // Persist first so a failed durability barrier leaves the in-memory
-        // fail-closed guards aligned with the ledger that will reload.
-        await this.store.replaceCodexResetCreditAttemptLedgerAndFlush(nextLedger)
-        this.durableLedger = structuredClone(nextLedger)
-      }
-    }
-    for (const [idempotencyKey, attempt] of staleAttempts) {
-      this.attemptsByKey.delete(idempotencyKey)
-      if (this.attemptKeyByOffer.get(attempt.scopeKey) === idempotencyKey) {
-        this.attemptKeyByOffer.delete(attempt.scopeKey)
-      }
-      if (this.unresolvedKeyByAccountScope.get(attempt.accountScopeKey) === idempotencyKey) {
-        this.unresolvedKeyByAccountScope.delete(attempt.accountScopeKey)
-      }
     }
   }
 

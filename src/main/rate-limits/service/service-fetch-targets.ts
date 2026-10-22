@@ -213,7 +213,7 @@ export abstract class RateLimitServiceFetchTargets extends RateLimitServiceResul
         ...config,
         apiKey: '',
         apiKeyError:
-          'OpenCode Go API key could not be decrypted. Re-enter or clear the key in Settings.',
+          'OpenCode Go API key could not be decrypted. Refresh OpenCode credentials and retry.',
         apiKeyReadSkipped: false
       }
     }

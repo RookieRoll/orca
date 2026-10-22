@@ -67,6 +67,29 @@ describe('retired global settings', () => {
       telemetry: { optedIn: true, installId: 'legacy-id', existedBeforeTelemetryRelease: false },
       experimentalPet: true,
       experimentalSidekick: true,
+      claudeManagedAccounts: [
+        {
+          id: 'old-claude-profile',
+          email: 'old@example.test',
+          managedAuthPath: '/old/claude',
+          authMethod: 'unknown',
+          createdAt: 1,
+          updatedAt: 1,
+          lastAuthenticatedAt: 1
+        }
+      ],
+      activeClaudeManagedAccountId: 'old-claude-profile',
+      codexManagedAccounts: [
+        {
+          id: 'old-codex-profile',
+          email: 'old@example.test',
+          managedHomePath: '/old/codex',
+          createdAt: 1,
+          updatedAt: 1,
+          lastAuthenticatedAt: 1
+        }
+      ],
+      activeCodexManagedAccountId: 'old-codex-profile',
       terminalFocusFollowsMouse: true
     })
     const serialized = JSON.parse(JSON.stringify(normalized))
@@ -75,6 +98,10 @@ describe('retired global settings', () => {
     expect(serialized).not.toHaveProperty('telemetry')
     expect(serialized).not.toHaveProperty('experimentalPet')
     expect(serialized).not.toHaveProperty('experimentalSidekick')
+    expect(serialized).not.toHaveProperty('claudeManagedAccounts')
+    expect(serialized).not.toHaveProperty('activeClaudeManagedAccountId')
+    expect(serialized).not.toHaveProperty('codexManagedAccounts')
+    expect(serialized).not.toHaveProperty('activeCodexManagedAccountId')
     expect(serialized.terminalFocusFollowsMouse).toBe(true)
   })
 })

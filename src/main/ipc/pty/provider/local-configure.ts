@@ -87,8 +87,7 @@ export function configureLocalPtyProvider(args: {
         stripInheritedOrcaCodexHome: shouldStripInheritedOrcaCodexHome({
           target: codexSelectionTarget,
           selectedCodexHomePath,
-          skipCodexHomeEnv,
-          settings: ptySettings
+          skipCodexHomeEnv
         }),
         launchCommand: ctx?.command,
         launchAgent: ctx?.launchAgent,

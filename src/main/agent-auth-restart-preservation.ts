@@ -1,28 +1,17 @@
-import type { CodexRuntimeHomeService } from './codex-accounts/runtime-home-service'
 import type { Store } from './persistence'
 
 const AUTH_PRESERVATION_TIMEOUT_MS = 2_000
 
-export type CodexRuntimeAuthSync = Pick<CodexRuntimeHomeService, 'syncForCurrentSelection'> &
-  Partial<Pick<CodexRuntimeHomeService, 'syncActiveWslSelectionsBeforeRestart'>>
 type ShutdownStore = Pick<Store, 'flushPendingOrThrowAsync'>
 
-type AuthPreservationStep = 'Codex auth preservation' | 'Store persistence'
+type AuthPreservationStep = 'Store persistence'
 
 export type AgentAuthRestartPreservationOptions = {
-  codexRuntimeHome?: CodexRuntimeAuthSync | null
   store?: ShutdownStore | null
 }
 
-export async function preserveAgentAuthBeforeRestart({
-  codexRuntimeHome,
-  store
-}: AgentAuthRestartPreservationOptions): Promise<void> {
+export async function preserveAgentAuthBeforeRestart({ store }: AgentAuthRestartPreservationOptions): Promise<void> {
   const startedAt = Date.now()
-  runCodexPreservationStep(codexRuntimeHome)
-  // Why: the drain owns guest-process timeouts; a shared 2s cutoff can relaunch before promotion.
-  const wslCodexPreservation = runWslCodexPreservationStep(codexRuntimeHome)
-
   const storePreservation = store
     ? runWithinLifecycleTimeout(
         'Store persistence',
@@ -30,29 +19,11 @@ export async function preserveAgentAuthBeforeRestart({
         remainingLifecycleTime(startedAt)
       )
     : Promise.resolve()
-  await Promise.all([wslCodexPreservation, storePreservation])
+  await storePreservation
 }
 
 function remainingLifecycleTime(startedAt: number): number {
   return Math.max(0, AUTH_PRESERVATION_TIMEOUT_MS - (Date.now() - startedAt))
-}
-
-function runCodexPreservationStep(codexRuntimeHome: CodexRuntimeAuthSync | null | undefined): void {
-  try {
-    codexRuntimeHome?.syncForCurrentSelection()
-  } catch (error) {
-    logStepFailure('Codex auth preservation', error)
-  }
-}
-
-async function runWslCodexPreservationStep(
-  codexRuntimeHome: CodexRuntimeAuthSync | null | undefined
-): Promise<void> {
-  try {
-    await codexRuntimeHome?.syncActiveWslSelectionsBeforeRestart?.()
-  } catch (error) {
-    logStepFailure('Codex auth preservation', error)
-  }
 }
 
 async function runWithinLifecycleTimeout(

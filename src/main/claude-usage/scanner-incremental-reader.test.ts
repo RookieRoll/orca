@@ -37,10 +37,6 @@ vi.mock('node:os', async () => ({
   homedir: homedirMock
 }))
 
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  claudeProfileHistoryDirs: () => []
-}))
-
 vi.mock('node:fs/promises', async () => {
   const actual = await vi.importActual<typeof NodeFsPromises>('node:fs/promises')
   return {
@@ -164,7 +160,7 @@ function padding(ending = '\n'): string {
 
 async function scan(previous: ClaudeUsagePersistedFile[] = []): Promise<ScanResult> {
   const { scanClaudeUsageFiles } = await import('./scanner')
-  return scanClaudeUsageFiles([], previous, undefined, [])
+  return scanClaudeUsageFiles([], previous)
 }
 
 function onlyFile(result: ScanResult): ClaudeUsagePersistedFile {

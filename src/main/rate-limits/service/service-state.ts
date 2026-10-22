@@ -1,12 +1,7 @@
 import type { BrowserWindow } from 'electron'
-import type {
-  InactiveAccountUsage,
-  ProviderRateLimits,
-  RateLimitState
-} from '../../../shared/rate-limit-types'
+import type { RateLimitState } from '../../../shared/rate-limit-types'
 import {
   type ActiveRateLimitProvider,
-  type InactiveCodexAccountInfo,
   type InternalRateLimitState,
   type CodexHomePathResolver,
   type KimiHomeResolver,
@@ -18,7 +13,6 @@ import {
   type GeminiCliOAuthEnabledResolver,
   type NormalizedCodexAccountSelectionTarget,
   type NormalizedClaudeAccountSelectionTarget,
-  type InactiveClaudeAccountInfo,
   type NetworkProxySettings,
   DEFAULT_POLL_MS
 } from './service-types'
@@ -108,18 +102,7 @@ export abstract class RateLimitServiceState {
   protected zcodePlanConfigResolver: (() => ZcodePlanRateLimitConfig) | null = null
   protected geminiCliOAuthEnabledResolver: GeminiCliOAuthEnabledResolver | null = null
   protected antigravityUsageEnabledResolver: AntigravityUsageEnabledResolver | null = null
-  protected inactiveClaudeAccountsResolver: (() => InactiveClaudeAccountInfo[]) | null = null
-  protected inactiveCodexAccountsResolver: (() => InactiveCodexAccountInfo[]) | null = null
   protected networkProxySettingsResolver: (() => NetworkProxySettings) | null = null
-  protected inactiveClaudeCache = new Map<string, ProviderRateLimits>()
-  protected inactiveCodexCache = new Map<string, ProviderRateLimits>()
-  protected inactiveClaudeFetching = new Set<string>()
-  protected inactiveCodexFetching = new Set<string>()
-  protected inactiveCodexFetchInFlight = false
-  protected lastInactiveClaudeFetchAt = 0
-  protected inactiveClaudeAccountsGeneration = 0
-  protected lastInactiveCodexFetchAt = 0
-  protected inactiveCodexAccountsGeneration = 0
   protected stateListeners = new Set<(state: RateLimitState) => void>()
 
   constructor() {}
@@ -132,33 +115,6 @@ export abstract class RateLimitServiceState {
   }
 
   protected abstract getState(): RateLimitState
-
-  protected buildInactiveArray(
-    cache: Map<string, ProviderRateLimits>,
-    fetching: Set<string>
-  ): InactiveAccountUsage[] {
-    const result: InactiveAccountUsage[] = []
-    for (const [accountId, limits] of cache) {
-      result.push({
-        accountId,
-        rateLimits: limits,
-        updatedAt: limits.updatedAt,
-        isFetching: fetching.has(accountId)
-      })
-    }
-    // Why: include fetching-but-uncached accounts so the renderer shows a loading indicator for newly added accounts.
-    for (const accountId of fetching) {
-      if (!cache.has(accountId)) {
-        result.push({
-          accountId,
-          rateLimits: null,
-          updatedAt: 0,
-          isFetching: true
-        })
-      }
-    }
-    return result
-  }
 
   protected updateState(next: InternalRateLimitState): void {
     this.state = next

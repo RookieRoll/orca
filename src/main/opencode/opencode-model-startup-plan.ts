@@ -12,7 +12,6 @@ import { probeOpenCodeLaunchModelContext } from './opencode-launch-model-context
 import { resolveOpenCodeLaunchModelConfig } from './opencode-launch-model-config'
 import { isVerifiedOpenCodeLegacyModelVersion } from './opencode-model-version-policy'
 import { getTuiAgentLaunchCommand, TUI_AGENT_CONFIG } from '../../shared/tui-agent-config'
-import { applyManagedDataAccountEnvironment } from '../managed-data-accounts/launch-environment'
 import { OrchestrationError } from '../runtime/orchestration/orchestration-error'
 import { probeOpenCodeLaunchCapabilities } from './opencode-launch-capabilities'
 import {
@@ -69,7 +68,6 @@ export async function prepareOpenCodeModelStartupInputs(
       env[key] = value
     }
   }
-  applyManagedDataAccountEnvironment(env, { launchAgent: 'opencode' })
   const executable = await resolveOpenCodeDirectModelExecutable({
     command,
     model,

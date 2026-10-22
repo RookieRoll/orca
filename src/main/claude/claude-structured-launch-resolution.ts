@@ -1,6 +1,5 @@
 import { activeProviderContext } from '../../shared/agent-session-provider-context'
-import { getClaudeProfileRouter } from '../claude-accounts/claude-profile-installed-router'
-import { requireLegacyAgentSessionAccountHome } from '../../shared/agent-session-account-home'
+import { getClaudeCliHomeResolver } from '../claude-accounts/claude-cli-home-resolver'
 import type {
   Options as ClaudeAgentSdkOptions,
   PermissionMode
@@ -169,8 +168,7 @@ export function claudeStructuredLaunchPart(
 ): StructuredAgentLaunchPartResolver<ClaudeStructuredLaunch> {
   return async (basis, identity) => {
     const { record } = basis
-    const accountHome = requireLegacyAgentSessionAccountHome(record.accountHome)
-    const router = getClaudeProfileRouter()
+    const homeResolver = getClaudeCliHomeResolver()
     // A Claude record's chain holds only Claude handles; the launch admission refuses anything else.
     const active = activeProviderContext(record)
     const head = active.head?.handle ?? null
@@ -223,14 +221,11 @@ export function claudeStructuredLaunchPart(
     const resumes = async (claudeConfigDir: string): Promise<boolean> =>
       (head !== null || active.pendingClear) &&
       (await claudeLaunchResumesTranscript({
-        router,
         leafUuid,
         providerSessionId,
         claudeConfigDir,
         hasTranscript: deps.hasTranscript
       }))
-    // Why: without a router the home is fixed, so check it before the recheck that must stay last.
-    const resumedWithoutRouter = router ? undefined : await resumes(accountHome.path)
     // Last: it rechecks the account switch, which may have begun during any await above.
     const { command, env, account } = await resolveClaudeStructuredInvocation(
       envDeps,
@@ -246,12 +241,11 @@ export function claudeStructuredLaunchPart(
       sources,
       { runtimeOnPath: false }
     )
-    const launchHome = await resolveClaudeStructuredLaunchHome(router, env, accountHome.path)
-    const resumesTranscript = resumedWithoutRouter ?? (await resumes(launchHome))
+    const launchHome = await resolveClaudeStructuredLaunchHome(homeResolver, env, '')
+    const resumesTranscript = await resumes(launchHome)
     if (fork?.throughEntryId && !resumesTranscript) {
       // The fork reads its source, so a source only another account holds is refused as a resume is.
       await claudeLaunchResumesTranscript({
-        router,
         leafUuid: fork.throughEntryId,
         providerSessionId: fork.sourceSessionId,
         claudeConfigDir: launchHome,

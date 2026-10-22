@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { resolveAgentStartupPlanInputs } from '../../shared/agent-startup-plan-inputs'
-import { applyManagedDataAccountEnvironment } from '../managed-data-accounts/launch-environment'
 import { probeOpenCodeLaunchCapabilities } from './opencode-launch-capabilities'
 import {
   probeOpenCodeModelAvailability,
@@ -9,9 +8,6 @@ import {
 import { probeOpenCodeLaunchModelContext } from './opencode-launch-model-context'
 import { buildExecutionHostAgentStartupPlan } from './opencode-model-startup-plan'
 
-vi.mock('../managed-data-accounts/launch-environment', () => ({
-  applyManagedDataAccountEnvironment: vi.fn()
-}))
 vi.mock('./opencode-launch-capabilities', () => ({ probeOpenCodeLaunchCapabilities: vi.fn() }))
 vi.mock('./opencode-model-availability', () => ({
   resolveOpenCodeDirectModelExecutable: vi.fn(),
@@ -95,20 +91,6 @@ describe('execution-host OpenCode model startup', () => {
       agentEnv: { OPENCODE_CONFIG_CONTENT: original }
     })
     expect(options.inputs.agentEnv.OPENCODE_CONFIG_CONTENT).toBe(original)
-  })
-
-  it('uses the selected account environment in both authoritative probes', async () => {
-    vi.mocked(applyManagedDataAccountEnvironment).mockImplementation((env) => {
-      env.XDG_DATA_HOME = '/selected/data'
-      env.OPENCODE_DB = 'opencode.db'
-    })
-    await buildExecutionHostAgentStartupPlan(scope())
-    for (const call of vi.mocked(probeOpenCodeLaunchModelContext).mock.calls) {
-      expect(call[0].env).toMatchObject({
-        XDG_DATA_HOME: '/selected/data',
-        OPENCODE_DB: 'opencode.db'
-      })
-    }
   })
 
   it.each(['1.18.30', '1.18.32'])(

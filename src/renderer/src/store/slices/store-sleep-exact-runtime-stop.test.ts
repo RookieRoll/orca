@@ -439,10 +439,6 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       },
       ptyIdsByTabId: { 'tab-1': [legacyPtyId] },
       suppressedPtyExitIds: { [legacyPtyId]: true },
-      pendingPaneAccountRestarts: { [legacyPtyId]: 'codex' },
-      codexRestartNoticeByPtyId: {
-        [legacyPtyId]: { previousAccountLabel: 'old', nextAccountLabel: 'new' }
-      },
       migrationUnsupportedByPtyId: {
         [legacyPtyId]: {
           ptyId: legacyPtyId,
@@ -461,11 +457,6 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
     expect(state.tabsByWorktree[wt][0]?.ptyId).toBe(scopedPtyId)
     expect(state.suppressedPtyExitIds[legacyPtyId]).toBeUndefined()
     expect(state.suppressedPtyExitIds[scopedPtyId]).toBeUndefined()
-    expect(state.pendingPaneAccountRestarts).toEqual({ [scopedPtyId]: 'codex' })
-    expect(state.codexRestartNoticeByPtyId[scopedPtyId]).toEqual({
-      previousAccountLabel: 'old',
-      nextAccountLabel: 'new'
-    })
     expect(state.migrationUnsupportedByPtyId[scopedPtyId]?.ptyId).toBe(scopedPtyId)
   })
 

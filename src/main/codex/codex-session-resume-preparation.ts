@@ -18,9 +18,7 @@ export async function prepareCodexSessionResume(args: {
   sessionId: string
   transcriptPath: string | undefined
   trustedCodexHomes: readonly string[]
-  getSelectedAccountCodexHome: () => string | null
   systemCodexHomePath: string | null
-  sharedRuntimeCodexHomePath: string | null
   resolveVerifiedResumeHome: (source: VerifiedCodexResumeSource) => Promise<string>
   fileIsRegular?: (filePath: string) => boolean
   listSessionFiles?: (sessionsRoot: string) => AsyncIterable<string>
@@ -29,9 +27,7 @@ export async function prepareCodexSessionResume(args: {
     sessionId: args.sessionId,
     transcriptPath: args.transcriptPath,
     trustedCodexHomes: args.trustedCodexHomes,
-    getSelectedAccountCodexHome: args.getSelectedAccountCodexHome,
     systemCodexHomePath: args.systemCodexHomePath,
-    sharedRuntimeCodexHomePath: args.sharedRuntimeCodexHomePath,
     ...(args.fileIsRegular ? { fileIsRegular: args.fileIsRegular } : {}),
     ...(args.listSessionFiles ? { listSessionFiles: args.listSessionFiles } : {})
   })

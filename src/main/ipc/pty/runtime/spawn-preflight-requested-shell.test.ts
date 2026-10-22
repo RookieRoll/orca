@@ -10,8 +10,6 @@ import { prepareRuntimePtySpawn } from './spawn-preflight'
 import { buildRuntimePtySpawnOptions } from './spawn-options'
 import { createRuntimePtySpawnState, type RuntimePtySpawnArgs } from './spawn-state'
 import type { PtyRuntimeControllerDeps } from './controller-deps'
-import { ClaudeProfileRouter } from '../../../claude-accounts/claude-profile-router'
-import { installClaudeProfileRouter } from '../../../claude-accounts/claude-profile-installed-router'
 
 const { regQueryStdout } = vi.hoisted(() => ({ regQueryStdout: { value: '' } }))
 
@@ -61,7 +59,6 @@ function makeDeps(): PtyRuntimeControllerDeps {
     prepareCodexResumeHome: () => null,
     resolveCodexResumeLaunch: async (command) => noCodexResumeLaunch(command),
     noCodexResumeLaunch,
-    reconcileSharedRuntimeResumeHome: async (resumeHome) => resumeHome.codexHomePath,
     stripSequencedStartupResumeArgv: (env) => env,
     assertWorkspaceAcceptsNewPty: () => undefined,
     resolvePtySpawnStartupCwd: (_worktreeId, cwd) => cwd,
@@ -104,7 +101,6 @@ describe('runtime pty spawn options: declared spawn intent', () => {
     )
   })
 })
-
 /**
  * Behavioural twin of `pty-spawn-shell-override-parity.test.ts`: a local Windows runtime spawn
  * (`terminal create --shell`, headless serve) must hand the caller's shell to the provider, not
@@ -172,40 +168,5 @@ describe('runtime pty spawn preflight: OpenSSH login shell on a managed SSH host
     await expect(resolveWithLoginShell(false)).resolves.toMatchObject({
       shell: HOST_DEFAULT_SHELL
     })
-  })
-})
-
-describe('runtime pty spawn preflight: Claude account routing in a WSL pane', () => {
-  afterEach(() => {
-    installClaudeProfileRouter(undefined)
-    Object.defineProperty(process, 'platform', { configurable: true, value: hostPlatform })
-  })
-
-  it('gives a wsl.exe pane the guest-relative pointer without touching the guest', async () => {
-    Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
-    const runSetup = vi.fn()
-    installClaudeProfileRouter(
-      new ClaudeProfileRouter({
-        getSettings: () => getDefaultSettings('/tmp'),
-        dataRoot: '/data/orca',
-        env: {},
-        runSetup
-      })
-    )
-    const args: RuntimePtySpawnArgs = {
-      cols: 120,
-      rows: 40,
-      cwd: '\\\\wsl.localhost\\Ubuntu\\home\\u',
-      shellOverride: 'wsl.exe',
-      env: { KEEP: '1' }
-    }
-    const ctx = createRuntimePtySpawnState(makeDeps(), args)
-    await expect(prepareRuntimePtySpawn(ctx)).resolves.toBeNull()
-    expect(ctx.codexSelectionTarget).toEqual({ runtime: 'wsl', wslDistro: 'Ubuntu' })
-    expect(args.env).toEqual({
-      KEEP: '1',
-      ORCA_CLAUDE_PROFILE_POINTER: '~/.local/share/orca/claude-profiles/selected-wsl-orca'
-    })
-    expect(runSetup).not.toHaveBeenCalled()
   })
 })

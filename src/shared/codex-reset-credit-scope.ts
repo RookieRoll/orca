@@ -3,7 +3,6 @@ import type {
   RateLimitRuntimeTarget,
   RateLimitWindow
 } from './rate-limit-types'
-import type { CodexManagedAccountSummary } from './managed-account-types'
 
 export type CodexResetCreditExpectedScope = {
   target: RateLimitRuntimeTarget
@@ -14,10 +13,14 @@ export type CodexResetCreditExpectedScope = {
 
 type BuildCodexResetCreditExpectedScopeOptions = {
   target: RateLimitRuntimeTarget
-  account: Pick<
-    CodexManagedAccountSummary,
-    'id' | 'managedHomeRuntime' | 'wslDistro' | 'updatedAt'
-  > | null
+  account:
+    | {
+        id: string
+        managedHomeRuntime?: 'host' | 'wsl'
+        wslDistro?: string | null
+        updatedAt: number
+      }
+    | null
   limits: ProviderRateLimits | null
 }
 

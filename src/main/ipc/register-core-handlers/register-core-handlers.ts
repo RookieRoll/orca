@@ -60,12 +60,8 @@ import { registerEmulatorFrameStreamHandlers } from '../emulator-frame-stream'
 import { registerEmulatorVideoStreamHandlers } from '../emulator-video-stream'
 import { registerTerminalRenderDesyncEvidenceHandler } from '../terminal-render-desync-evidence'
 import { registerOrcaProfileHandlers } from '../orca-profiles'
-import { registerCodexAccountHandlers } from '../codex-accounts'
 import { registerAgentHookHandlers } from '../agent-hooks'
-import { registerCodexConfigSyncHandlers } from '../codex-config-sync'
 import { getPtyIdForPaneKey } from '../pty/pane/key-state'
-import { registerClaudeAccountHandlers } from '../claude-accounts'
-import { registerOpenCodeGoCredentialsHandlers } from '../opencode-go-credentials'
 import { registerMiniMaxCredentialsHandlers } from '../minimax-credentials'
 import { registerZcodePlanCredentialsHandlers } from '../zcode-plan-credentials'
 import { registerGrokAccountHandlers } from '../grok-accounts'
@@ -80,8 +76,7 @@ import type { CodexUsageStore } from '../../codex-usage/store'
 import type { OpenCodeUsageStore } from '../../opencode-usage/store'
 import type { MuseUsageStore } from '../../muse-usage/store'
 import type { RateLimitService } from '../../rate-limits/service'
-import type { CodexAccountService } from '../../codex-accounts/service'
-import type { ClaudeAccountService } from '../../claude-accounts/service'
+import type { CodexResetCreditCoordinator } from '../../codex-accounts/codex-reset-credit-coordinator'
 import type { AutomationService } from '../../automations/service'
 import type { AgentAwakeService } from '../../agent-awake-service'
 import type { CrashReportStore } from '../../crash-reporting/crash-report-store'
@@ -137,8 +132,7 @@ export function registerCoreHandlers(
   codexUsage: CodexUsageStore,
   openCodeUsage: OpenCodeUsageStore,
   museUsage: MuseUsageStore,
-  codexAccounts: CodexAccountService,
-  claudeAccounts: ClaudeAccountService,
+  codexResetCredits: CodexResetCreditCoordinator,
   rateLimits: RateLimitService,
   mainWindowWebContentsId: number | null = null,
   automations?: AutomationService,
@@ -179,16 +173,12 @@ export function registerCoreHandlers(
   registerCliHandlers()
   registerPreflightHandlers()
   registerUsageProviderHandlers({ claudeUsage, codexUsage, openCodeUsage, museUsage })
-  registerCodexAccountHandlers(codexAccounts, () => store.getSettings())
   registerAgentHookHandlers(runtime, { getPtyIdForPaneKey })
-  registerCodexConfigSyncHandlers(codexAccounts.runtimeHomeService)
-  registerClaudeAccountHandlers(claudeAccounts)
-  registerOpenCodeGoCredentialsHandlers(rateLimits)
-  registerMiniMaxCredentialsHandlers(rateLimits)
-  registerZcodePlanCredentialsHandlers(rateLimits)
+  registerMiniMaxCredentialsHandlers()
+  registerZcodePlanCredentialsHandlers()
   registerGrokAccountHandlers()
   registerCursorAccountHandlers()
-  registerRateLimitHandlers(rateLimits, codexAccounts)
+  registerRateLimitHandlers(rateLimits, codexResetCredits)
   registerGitHubHandlers(store, stats)
   registerGitLabHandlers(store)
   registerHostedReviewHandlers(store, stats)

@@ -1,4 +1,3 @@
-import { withClaudeProfileTerminalEnv } from '../../../claude-accounts/claude-profile-installed-router'
 import type { PtySpawnResult } from '../../../providers/pty-provider-contract'
 import { LocalPtyProvider } from '../../../providers/local-pty-provider'
 import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
@@ -76,7 +75,6 @@ export async function prepareRuntimePtySpawn(
   ctx.daemonShellOverride = ctx.terminalRuntimeOptions.shellOverride
   ctx.expectedWslDistro = target.expectedWslDistro
   ctx.codexSelectionTarget = target.codexSelectionTarget
-  args.env = withClaudeProfileTerminalEnv(args.env, ctx.codexSelectionTarget)
   ctx.claudeAuth =
     ctx.isClaudeLaunch && ctx.deps.prepareClaudeAuth
       ? await ctx.deps.prepareClaudeAuth(ctx.codexSelectionTarget)
@@ -134,9 +132,7 @@ export async function prepareRuntimePtySpawn(
     preAdopted: Boolean(ctx.preAdoptedStablePane),
     isDaemonHostSpawn: ctx.isDaemonHostSpawn,
     sessionId: ctx.sessionId,
-    callerNamedSession: ctx.callerRequestedSessionId !== undefined,
     mintedSessionId: ctx.requestedSessionId === undefined,
-    resumeOnSelectedAccount: false,
     emptySessionIdSkipsHostEnv: true,
     requestedAgentTeamsPath: ctx.requestedAgentTeamsPath,
     provider: ctx.provider,

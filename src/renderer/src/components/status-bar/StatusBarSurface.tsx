@@ -21,9 +21,8 @@ import { NativeChatResumeStatusSegment } from './NativeChatResumeStatusSegment'
 import { CaffeinateStatusSegment } from './CaffeinateStatusSegment'
 import { TOGGLE_FLOATING_TERMINAL_EVENT } from '@/lib/floating-terminal'
 import { FloatingTerminalIconContextMenu } from '@/components/floating-terminal/FloatingTerminalIconContextMenu'
-import { ClaudeSwitcherMenu } from './ClaudeSwitcherMenu'
-import { CodexSwitcherMenu } from './CodexSwitcherMenu'
 import { ProviderDetailsMenu } from './ProviderDetailsMenu'
+import { CodexResetCreditAction } from './CodexResetCreditAction'
 import { CLOSE_ALL_CONTEXT_MENUS_EVENT } from '@/lib/close-all-context-menus'
 import { ProviderSegment, UsageOverflowChip, getUsageTone } from './StatusBarProviderSegment'
 import {
@@ -32,7 +31,6 @@ import {
   usageChipShowsPercentage
 } from './usage-unit-label'
 import { useStatusBarController } from './use-status-bar-controller'
-import { isOwnerNotSetUpPlaceholder } from './owner-usage-rate-limits'
 import { StatusBarVisibilityMenu } from './StatusBarVisibilityMenu'
 
 const ResourceUsageStatusSegment = lazyWithRetry(() =>
@@ -70,7 +68,6 @@ export function StatusBarSurface({
     compact,
     floatingTerminalActionLabel,
     floatingTerminalShortcut,
-    handleManageAccounts,
     handleOpenProviderAccounts,
     handleRefresh,
     handleUsageDetails,
@@ -204,50 +201,23 @@ export function StatusBarSurface({
                     onOpenProvider={handleOpenProviderAccounts}
                     onSignIn={handleOpenProviderAccounts}
                     canSignIn={canSignInFromUsageRow}
-                    onManageAccounts={handleManageAccounts}
                     onUsageDetails={handleUsageDetails}
                     renderRow={(p, rowNode) => {
-                      // Why: a placeholder has nothing to drill into; its row opens the host's accounts.
-                      if (isOwnerNotSetUpPlaceholder(p)) {
-                        return null
-                      }
-                      // Every provider drills into its detail panel (parity with the
-                      // per-provider dropdowns on main); Claude/Codex additionally get
-                      // the account switcher + runtime toggle + Codex reset credits.
-                      if (p.provider === 'claude') {
-                        return (
-                          <ClaudeSwitcherMenu
-                            claude={p}
-                            compact={compact}
-                            iconOnly={false}
-                            asSubmenu
-                            triggerContent={rowNode}
-                          />
-                        )
-                      }
-                      if (p.provider === 'codex') {
-                        return (
-                          <CodexSwitcherMenu
-                            codex={p}
-                            compact={compact}
-                            iconOnly={false}
-                            asSubmenu
-                            triggerContent={rowNode}
-                          />
-                        )
-                      }
                       return (
                         <ProviderDetailsMenu
                           provider={p}
                           compact={compact}
                           iconOnly={false}
+                          hidePanelResetCredits={p.provider === 'codex'}
                           asSubmenu
                           triggerContent={rowNode}
                           ariaLabel={translate(
                             'auto.components.status.bar.UsageRosterPanel.openDetails',
                             'Open usage details'
                           )}
-                        />
+                        >
+                          {p.provider === 'codex' ? <CodexResetCreditAction codex={p} /> : null}
+                        </ProviderDetailsMenu>
                       )
                     }}
                   />

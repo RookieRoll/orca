@@ -24,7 +24,6 @@ export function createPtySpawnCommitDependencies(
     prepareCodexResumeHome: unexpectedPreflight,
     noCodexResumeLaunch: unexpectedPreflight,
     resolveCodexResumeLaunch: unexpectedPreflight,
-    reconcileSharedRuntimeResumeHome: unexpectedPreflight,
     stripSequencedStartupResumeArgv: unexpectedPreflight,
     transitionSpawnHiddenRendererPtyDeliveryState: unexpectedPreflight,
     trustedTerminalHandleEnv: new Set(),

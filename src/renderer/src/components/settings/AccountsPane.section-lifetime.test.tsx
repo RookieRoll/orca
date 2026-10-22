@@ -25,11 +25,8 @@ const fake = vi.hoisted(() => ({
     tokenFresh: false,
     error: null
   })),
-  pending: vi.fn(async () => null),
-  subscribe: vi.fn(() => vi.fn()),
   refresh: vi.fn(async () => {}),
   write: vi.fn(),
-  watcher: vi.fn(() => ({ close: vi.fn() })),
   grokUsage: { updatedAt: 0 }
 }))
 vi.mock('@/i18n/i18n', () => ({
@@ -58,25 +55,6 @@ vi.mock('@/store', () => ({
       fetchSettings: fake.write
     })
 }))
-vi.mock('@/runtime/runtime-provider-accounts-client', () => ({
-  emptyClaudeAccountsState: () => ({
-    accounts: [],
-    activeAccountId: null,
-    activeAccountIdsByRuntime: { host: null, wsl: {} }
-  }),
-  emptyCodexAccountsState: () => ({
-    accounts: [],
-    activeAccountId: null,
-    activeAccountIdsByRuntime: { host: null, wsl: {} }
-  }),
-  getProviderAccountsOwnerKey: (target: { kind: string; environmentId?: string }) =>
-    target.environmentId ?? 'local',
-  watchProviderAccounts: fake.watcher,
-  selectClaudeProviderAccount: fake.write,
-  selectCodexProviderAccount: fake.write,
-  removeClaudeProviderAccount: fake.write,
-  removeCodexProviderAccount: fake.write
-}))
 beforeEach(() => {
   vi.clearAllMocks()
   fake.query = ''
@@ -84,11 +62,6 @@ beforeEach(() => {
   fake.cursorUsage = { updatedAt: 0 }
   Object.assign(window, {
     api: {
-      opencodeGoCredentials: {
-        getStatus: vi.fn(async () => ({ apiKeyConfigured: false })),
-        saveApiKey: vi.fn(async () => ({ apiKeyConfigured: true })),
-        clearApiKey: vi.fn(async () => ({ apiKeyConfigured: false }))
-      },
       minimaxCredentials: {
         getStatus: vi.fn(async () => ({ cookieConfigured: false, apiKeyConfigured: false }))
       },
@@ -99,14 +72,6 @@ beforeEach(() => {
           apiKeyProtection: null
         }))
       },
-      codexConfigSync: {
-        status: vi.fn(async () => ({
-          state: 'synced',
-          reason: null,
-          systemConfigPath: '/synthetic/config.toml'
-        }))
-      },
-      codexAccounts: { getPendingLoginUrl: fake.pending, onPendingLoginUrlChanged: fake.subscribe },
       cursorAccounts: { getStatus: fake.cursorStatus },
       grokAccounts: { getStatus: fake.status }
     }
@@ -128,53 +93,15 @@ it.each([false, true])(
     }
     const view = render(<AccountsPane {...props} />)
     await act(async () => {})
-    // The invariant is identity, not a magic number: the matched section keeps the same DOM
-    // node across every query edit, so editing the query cannot cost an extra read or watcher.
+    // The invariant is identity, not a magic number: editing the query keeps the section mounted.
     const mountedHeading = screen.getByText('Grok (xAI)', { exact: true })
-    const watchersAfterMount = fake.watcher.mock.calls.length
     const statusReadsAfterMount = fake.status.mock.calls.length
     for (const query of ['g', 'gr', 'gro', 'grok', '', 'g', 'gr', 'gro', 'grok']) {
       fake.query = query
       await act(async () => view.rerender(<AccountsPane {...props} />))
       expect(screen.getByText('Grok (xAI)', { exact: true })).toBe(mountedHeading)
     }
-    expect(fake.watcher.mock.calls.length).toBe(watchersAfterMount)
     expect(fake.status.mock.calls.length).toBe(statusReadsAfterMount)
-  }
-)
-it.each([false, true])(
-  'retains Codex login reads with Windows account support %s',
-  async (wslSupportedPlatform) => {
-    const props = {
-      settings: getDefaultSettings('/synthetic'),
-      updateSettings: fake.write,
-      hostScope: LOCAL_SETTINGS_HOST_SCOPE,
-      wslSupportedPlatform
-    }
-    const view = render(<AccountsPane {...props} />)
-    await act(async () => {})
-    const mountedHeading = screen.getByText('Codex', { exact: true })
-    const pendingReadsAfterMount = fake.pending.mock.calls.length
-    const subscriptionsAfterMount = fake.subscribe.mock.calls.length
-    for (const query of [
-      'c',
-      'co',
-      'cod',
-      'code',
-      'codex',
-      '',
-      'c',
-      'co',
-      'cod',
-      'code',
-      'codex'
-    ]) {
-      fake.query = query
-      await act(async () => view.rerender(<AccountsPane {...props} />))
-      expect(screen.getByText('Codex', { exact: true })).toBe(mountedHeading)
-    }
-    expect(fake.pending.mock.calls.length).toBe(pendingReadsAfterMount)
-    expect(fake.subscribe.mock.calls.length).toBe(subscriptionsAfterMount)
   }
 )
 it('preserves explicit Grok refresh and real hide/reopen status reads', async () => {
@@ -217,28 +144,6 @@ it('keeps usage-driven Grok status refreshes while the section stays mounted', a
   fake.grokUsage = { updatedAt: 11 }
   await act(async () => view.rerender(<AccountsPane {...props} />))
   expect(fake.status).toHaveBeenCalledTimes(3)
-})
-
-it('keeps the login subscription until Codex genuinely hides', async () => {
-  const props = {
-    settings: getDefaultSettings('/synthetic'),
-    updateSettings: fake.write,
-    hostScope: LOCAL_SETTINGS_HOST_SCOPE
-  }
-  const view = render(<AccountsPane {...props} />)
-  await act(async () => {})
-  const unsubscribe = fake.subscribe.mock.results[0].value
-  fake.query = 'codex'
-  await act(async () => view.rerender(<AccountsPane {...props} />))
-  expect(unsubscribe).not.toHaveBeenCalled()
-  fake.query = 'grok'
-  await act(async () => view.rerender(<AccountsPane {...props} />))
-  expect(unsubscribe).toHaveBeenCalledTimes(1)
-  fake.query = 'codex'
-  await act(async () => view.rerender(<AccountsPane {...props} />))
-  expect(fake.subscribe).toHaveBeenCalledTimes(2)
-  view.unmount()
-  expect(fake.subscribe.mock.results[1].value).toHaveBeenCalledTimes(1)
 })
 
 it.each([false, true])(

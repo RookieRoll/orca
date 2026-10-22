@@ -100,7 +100,6 @@ async function runScan(
         request.worktrees,
         previous.sources,
         onFilesScanned,
-        request.profileDirs,
         previous.verifiedSources
       )
       try {

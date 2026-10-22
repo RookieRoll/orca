@@ -75,14 +75,13 @@ export async function scanClaudeUsageFiles(
   worktrees: ClaudeUsageWorktreeRef[],
   previousProcessedFiles: ClaudeUsagePersistedFile[] = [],
   onFilesScanned?: (count: number) => void,
-  profileDirs?: string[],
   verifiedSources?: ClaudeUsageVerifiedSources
 ): Promise<{
   processedFiles: ClaudeUsagePersistedFile[]
   sessions: ClaudeUsageSession[]
   dailyAggregates: ClaudeUsageDailyAggregate[]
 }> {
-  const files = await listClaudeTranscriptFiles(profileDirs)
+  const files = await listClaudeTranscriptFiles()
   const normalized = normalizeClaudeUsageSourceFiles(previousProcessedFiles, verifiedSources)
   previousProcessedFiles = normalized.processedFiles
   const previousByPath = new Map(previousProcessedFiles.map((file) => [file.path, file]))

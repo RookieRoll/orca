@@ -14,8 +14,6 @@ import {
   type AntigravityUsageEnabledResolver,
   type ZcodePlanRateLimitConfig,
   type GeminiCliOAuthEnabledResolver,
-  type InactiveCodexAccountInfo,
-  type InactiveClaudeAccountInfo,
   type RateLimitState,
   normalizeCodexAccountSelectionTarget,
   normalizeClaudeAccountSelectionTarget,
@@ -71,16 +69,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
     this.networkProxySettingsResolver = resolver
   }
 
-  setInactiveClaudeAccountsResolver(resolver: () => InactiveClaudeAccountInfo[]): void {
-    this.inactiveClaudeAccountsResolver = resolver
-    this.inactiveClaudeAccountsGeneration += 1
-  }
-
-  setInactiveCodexAccountsResolver(resolver: () => InactiveCodexAccountInfo[]): void {
-    this.inactiveCodexAccountsResolver = resolver
-    this.inactiveCodexAccountsGeneration += 1
-    this.pruneInactiveCodexState()
-  }
   attach(mainWindow: BrowserWindow): void {
     this.detachWindowListeners?.()
     this.mainWindow = mainWindow
@@ -122,8 +110,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
   stop(): void {
     this.abortActiveFetchCycle()
     this.clearQueuedFetches()
-    this.inactiveClaudeFetching.clear()
-    this.inactiveCodexFetching.clear()
     this.resolveAndClearFetchIdleWaiters()
     this.stopTimer()
     this.clearDeferredStartupRefresh()
@@ -133,8 +119,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
   }
 
   getState(): RateLimitState {
-    this.pruneInactiveClaudeState()
-    this.pruneInactiveCodexState()
     return {
       ...this.state,
       // Why: the cookie lives on the filesystem, not GlobalSettings; surface its presence so the renderer keeps the MiniMax bar across reloads.
@@ -145,15 +129,7 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
       grokAuthConfigured: this.grokAuthConfigured,
       cursorAuthConfigured: this.cursorAuthConfigured,
       claudeTarget: this.claudeFetchTarget,
-      codexTarget: this.codexFetchTarget,
-      inactiveClaudeAccounts: this.buildInactiveArray(
-        this.inactiveClaudeCache,
-        this.inactiveClaudeFetching
-      ),
-      inactiveCodexAccounts: this.buildInactiveArray(
-        this.inactiveCodexCache,
-        this.inactiveCodexFetching
-      )
+      codexTarget: this.codexFetchTarget
     }
   }
 }

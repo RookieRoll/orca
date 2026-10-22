@@ -7,9 +7,6 @@ import { MOBILE_RPC_METHOD_ALLOWLIST } from './runtime-rpc/runtime-rpc-mobile-me
 const MOBILE_DYNAMIC_RPC_METHODS = [
   // Why: computed sendRequest method names do not appear as literals in the
   // mobile source scan below, but still must stay mobile-authorized.
-  'accounts.selectClaude',
-  'accounts.selectCodex',
-  'accounts.selectCodexForTarget',
   'terminal.createAgentSession',
   'terminal.ensureAgentSession',
   'github.updateIssue',

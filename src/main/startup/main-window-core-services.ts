@@ -34,8 +34,7 @@ export function attachMainWindowCoreServices(
   const codexUsage = state.codexUsage
   const openCodeUsage = state.openCodeUsage
   const museUsage = state.museUsage
-  const codexAccounts = state.codexAccounts
-  const claudeAccounts = state.claudeAccounts
+  const codexResetCredits = state.codexResetCredits
   const rateLimits = state.rateLimits
   const automations = state.automations
   const keybindings = state.keybindings
@@ -49,8 +48,7 @@ export function attachMainWindowCoreServices(
     !codexUsage ||
     !openCodeUsage ||
     !museUsage ||
-    !codexAccounts ||
-    !claudeAccounts ||
+    !codexResetCredits ||
     !rateLimits ||
     !automations ||
     !keybindings ||
@@ -67,8 +65,7 @@ export function attachMainWindowCoreServices(
     codexUsage,
     openCodeUsage,
     museUsage,
-    codexAccounts,
-    claudeAccounts,
+    codexResetCredits,
     rateLimits,
     window.webContents.id,
     automations,
@@ -92,7 +89,7 @@ export function attachMainWindowCoreServices(
       onBeforeRelaunch: async () => {
         state.isQuitting = true
         state.desktopRelayService?.fenceAndCloseNow()
-        await preserveAgentAuthBeforeRestart({ codexRuntimeHome, store })
+        await preserveAgentAuthBeforeRestart({ store })
       },
       onOrcaProfileAuthMutation: () => {
         // Why: a provider whose launch-time install failed is installed by the next auth change.

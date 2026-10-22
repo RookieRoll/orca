@@ -19,10 +19,6 @@ vi.mock('node:os', async () => ({
   homedir: homedirMock
 }))
 
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  claudeProfileHistoryDirs: () => []
-}))
-
 vi.mock('node:fs', async () => {
   const actual = await vi.importActual<typeof NodeFs>('node:fs')
   return {
@@ -168,7 +164,7 @@ function parseReadOffsets(path: string): number[] {
 async function scanner() {
   const { scanClaudeUsageFiles } = await import('./scanner')
   return (previous: ClaudeUsagePersistedFile[] = []) =>
-    scanClaudeUsageFiles(worktrees, previous, undefined, [])
+    scanClaudeUsageFiles(worktrees, previous)
 }
 
 describe('Claude usage append ownership', () => {

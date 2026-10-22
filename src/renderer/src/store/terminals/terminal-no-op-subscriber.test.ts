@@ -18,10 +18,6 @@ describe('terminal no-op subscriber budget', () => {
       const s = store.getState()
       s.replaceTerminalLayoutPanePtyId('missing', 'leaf', 'pty')
       expect(s.consumeSuppressedPtyExit('missing')).toBe(false)
-      expect(s.consumePendingPaneAccountRestart('missing')).toBeNull()
-      s.clearCodexRestartNotice('missing')
-      s.dismissCodexRestartNotices(['missing'])
-      s.reopenCodexRestartPrompt('missing')
       s.markNativeChatLaunchPromptFailed('missing')
       s.clearNativeChatLaunchPrompt('missing')
       s.markNativeChatLaunchDraftAdopted('missing')
@@ -81,20 +77,17 @@ describe('terminal no-op subscriber budget', () => {
     expect(store.getState().nativeChatLaunchDraftByTabId.tab).toBe(draft)
   })
 
-  it('consumes real restart entries and leaves repeated consumes silent', () => {
+  it('consumes real exit suppression entries and leaves repeated consumes silent', () => {
     const store = createTestStore()
     store.getState().suppressPtyExit('pty')
-    store.getState().queuePaneAccountRestarts(['pty'], 'codex')
     const listener = vi.fn()
     store.subscribe(listener)
 
     expect(store.getState().consumeSuppressedPtyExit('pty')).toBe(true)
-    expect(store.getState().consumePendingPaneAccountRestart('pty')).toBe('codex')
-    expect(listener).toHaveBeenCalledTimes(2)
+    expect(listener).toHaveBeenCalledTimes(1)
     const before = store.getState()
     expect(store.getState().consumeSuppressedPtyExit('pty')).toBe(false)
-    expect(store.getState().consumePendingPaneAccountRestart('pty')).toBeNull()
-    expect(listener).toHaveBeenCalledTimes(2)
+    expect(listener).toHaveBeenCalledTimes(1)
     expect(store.getState()).toBe(before)
   })
 
@@ -114,33 +107,4 @@ describe('terminal no-op subscriber budget', () => {
     expect(store.getState().lastTerminalInputAtByPaneKey['tab:leaf']).toBeUndefined()
   })
 
-  it('dismisses, reopens and clears restart notices without replaying no-op notifications', () => {
-    const store = createTestStore()
-    store
-      .getState()
-      .markCodexRestartNotices([
-        { ptyId: 'pty', previousAccountLabel: 'old', nextAccountLabel: 'new' }
-      ])
-    const listener = vi.fn()
-    store.subscribe(listener)
-    const actions = [
-      () => store.getState().dismissCodexRestartNotices(['pty']),
-      () => store.getState().reopenCodexRestartPrompt('pty'),
-      () => store.getState().clearCodexRestartNotice('pty')
-    ]
-    for (const [index, action] of actions.entries()) {
-      if (index === 1) {
-        store.getState().queuePaneAccountRestarts(['pty'], 'codex')
-      }
-      listener.mockClear()
-      action()
-      expect(listener).toHaveBeenCalledTimes(1)
-      const before = store.getState()
-      action()
-      expect(listener).toHaveBeenCalledTimes(1)
-      expect(store.getState()).toBe(before)
-    }
-    expect(store.getState().codexRestartNoticeByPtyId.pty).toBeUndefined()
-    expect(store.getState().pendingPaneAccountRestarts.pty).toBeUndefined()
-  })
 })

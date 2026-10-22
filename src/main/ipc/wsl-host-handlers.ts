@@ -27,11 +27,6 @@ import { resolveEnvironment } from '../../shared/runtime-environment-store'
 import { getPreferredPairedRuntimeConnection } from '../../shared/runtime-environments'
 import { requestOrcadTerminalCensus } from '../ssh/orcad-terminal-census-client'
 import type { WslHostRuntimeAccess } from '../wsl/wsl-host-server-stop'
-import {
-  changesWslHostAccounts,
-  pushWslOrcadHostAccountEnv
-} from '../wsl/wsl-orcad-host-account-push'
-import { wslOrcadHostSupports } from '../wsl/wsl-orcad-host-environments'
 
 export const WSL_HOST_HANDLER_CHANNELS = [
   'wslHosts:listDistros',
@@ -83,22 +78,6 @@ function wslHostRuntimeAccess(getUserDataPath: () => string): WslHostRuntimeAcce
   }
 }
 
-function pushHostAccounts(
-  getUserDataPath: () => string,
-  environmentId: string,
-  distro: string
-): void {
-  const call = (method: string, params: unknown) =>
-    callRuntimeEnvironment(getUserDataPath(), environmentId, method, params)
-  void pushWslOrcadHostAccountEnv({
-    environmentId,
-    distro,
-    call,
-    hostSupports: (capability) =>
-      wslOrcadHostSupports(environmentId, capability, () => call('status.get', undefined))
-  })
-}
-
 type WslHostHandlerArgs = {
   store: Store
   getUserDataPath: () => string
@@ -124,10 +103,6 @@ function createService(args: WslHostHandlerArgs): WslHostService | null {
       void getRuntimeEnvironmentStatus(args.getUserDataPath(), environmentId, undefined, {
         reconnect: true
       }).catch(() => {})
-      const distro = created.recordForEnvironment(environmentId)?.distro
-      if (distro) {
-        pushHostAccounts(args.getUserDataPath, environmentId, distro)
-      }
     },
     removed: (environmentId) =>
       retireRemovedRuntimeEnvironment(environmentId, args.invalidateTransport, args.store)
@@ -155,14 +130,7 @@ function startService(args: WslHostHandlerArgs): WslHostService | null {
     return null
   }
   setWslHostService(created)
-  args.store.onSettingsChanged((updates, settings) => {
-    if (changesWslHostAccounts(updates)) {
-      for (const status of created.getStatuses()) {
-        if (status.state === 'ready') {
-          pushHostAccounts(args.getUserDataPath, status.environmentId, status.distro)
-        }
-      }
-    }
+  args.store.onSettingsChanged((_updates, settings) => {
     if ('experimentalWslHosts' in updates) {
       void created.enabledChanged(settings.experimentalWslHosts === true).catch((error) => {
         console.warn('[wsl-hosts] Could not apply the WSL hosts setting:', error)

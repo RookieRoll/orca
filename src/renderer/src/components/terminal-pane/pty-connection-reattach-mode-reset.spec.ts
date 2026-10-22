@@ -162,13 +162,10 @@ export function registerPtyConnectionReattachModeResetTests(): void {
       expect(resetWriteCall as number).toBeLessThan(tailWriteCall as number)
     })
 
-    it('answers cursor queries while an account notice blocks user input', async () => {
+    it('answers cursor queries and forwards ordinary user input', async () => {
       const { connectPanePty } = await import('./pty-connection')
       const transport = createMockTransport('pty-live')
       transportFactoryQueue.push(transport)
-      mockStoreState.codexRestartNoticeByPtyId = {
-        'pty-live': { previousAccountLabel: 'A', nextAccountLabel: 'B' }
-      }
       const pane = createPane(1)
       // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: fixtures implement the connection's pane, manager and dependency contract.
       const args = [pane, createManager(1), createDeps()] as unknown as Parameters<
@@ -176,13 +173,10 @@ export function registerPtyConnectionReattachModeResetTests(): void {
       >
       const binding = connectPanePty(...args)
       transport.getPtyId.mockReturnValue('pty-live')
-      mockStoreState.codexRestartNoticeByPtyId = {
-        'pty-live': { previousAccountLabel: 'A', nextAccountLabel: 'B' }
-      }
       sendTerminalInputThroughPane(pane, '\x1b[1;1R')
       sendTerminalInputThroughPane(pane, 'do work\r')
       expect(transport.sendInputImmediate).toHaveBeenCalledWith('\x1b[1;1R')
-      expect(transport.sendInput).not.toHaveBeenCalledWith('do work\r', expect.anything())
+      expect(transport.sendInput).toHaveBeenCalledWith('do work\r', 'driving')
       binding.dispose()
     })
 

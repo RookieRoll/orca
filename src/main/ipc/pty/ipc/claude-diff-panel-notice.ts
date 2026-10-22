@@ -4,20 +4,18 @@ import { getPtyIpc } from '../../pty-host-bindings'
 import { parseAppSshPtyId } from '../../../providers/ssh-pty-id'
 import { claudeDiffPanelMayAutoOpen } from '../../../claude/claude-diff-panel-auto-open'
 import { probeRecentClaudeCliVersion } from '../../../claude/claude-hook-event-versions'
-import { getClaudeProfileRouter } from '../../../claude-accounts/claude-profile-installed-router'
+import { getClaudeCliHomeResolver } from '../../../claude-accounts/claude-cli-home-resolver'
 import { resolveClaudeCommand } from '../../../codex-cli/command'
 import { ptyOwnership } from '../provider/ownership-state'
 import { tryGetProviderForPty } from '../provider/registry'
 
 type Deps = { getLocalPtyProviderStartupPromise: () => Promise<void> | undefined }
 
-/** The CLAUDE_CONFIG_DIR a host pane's `claude` sees: the selected account's home, else the
- *  user's own; undefined when it runs on the CLI default. */
+/** The user's explicit CLI config dir, or undefined when Claude uses its default. */
 function hostPaneClaudeConfigDirEnv(): string | undefined {
-  const router = getClaudeProfileRouter()
-  return router
-    ? (router.routedHome() ?? router.userConfigDir())
-    : process.env.CLAUDE_CONFIG_DIR?.trim() || undefined
+  return (
+    getClaudeCliHomeResolver()?.userConfigDir() ?? process.env.CLAUDE_CONFIG_DIR?.trim()
+  ) || undefined
 }
 
 /** Whether Claude in a local host pane may open its diff panel unasked; false for any other pane. */

@@ -1,8 +1,6 @@
 import { createPortal } from 'react-dom'
 import { focusTerminalTabSurface } from '@/lib/focus-terminal-tab-surface'
-import CodexRestartChip from '../CodexRestartChip'
 import { CodexSharedServerBanner } from './CodexSharedServerBanner'
-import { ClaudeOldTerminalBanner } from './ClaudeOldTerminalBanner'
 import { ClaudeDiffPanelNoticeBanner } from './ClaudeDiffPanelNoticeBanner'
 import { NewerDaemonHoldBanner } from './NewerDaemonHoldBanner'
 import { ORCA_LAYOUT_OWNER_IS_MAIN } from '../../../../shared/layout-owner-switch'
@@ -18,7 +16,7 @@ import { shouldShowMobileDriverOverlay } from './mobile-driver-overlay-visibilit
 import { shouldChatTakeOverMobileSurface } from '../native-chat/native-chat-send-eligibility'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
 
-export function TerminalPaneCodexRestartPortals({
+export function TerminalPaneSharedRuntimePortals({
   controller
 }: {
   controller: TerminalPaneController
@@ -55,24 +53,8 @@ export function TerminalPaneCodexRestartPortals({
         }
         return createPortal(
           <>
-            <CodexRestartChip
-              key={`codex-restart-${pane.id}-${ptyId}`}
-              isVisible={isVisible}
-              ptyId={ptyId}
-              onReturnFocus={() => {
-                managerRef.current?.setActivePane(pane.id, { focus: false })
-                focusTerminalTabSurface(tabId, pane.leafId)
-              }}
-              shouldFocus={isActive && isVisible && activePane?.id === pane.id}
-            />
             <CodexSharedServerBanner
               key={`codex-shared-server-${pane.id}-${ptyId}`}
-              ptyId={ptyId}
-              tabId={tabId}
-              leafId={pane.leafId}
-            />
-            <ClaudeOldTerminalBanner
-              key={`claude-old-terminal-${pane.id}-${ptyId}`}
               ptyId={ptyId}
               tabId={tabId}
               leafId={pane.leafId}

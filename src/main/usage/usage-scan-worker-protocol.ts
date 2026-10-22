@@ -30,7 +30,6 @@ export type UsageScanWorkerScanBody =
   | {
       operation: 'scan'
       providerId: 'claude'
-      profileDirs?: string[]
       worktrees: UsageScanWorktreeRef[]
       sourceCache: UsageSourceCacheRef
     }

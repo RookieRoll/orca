@@ -1,4 +1,3 @@
-import { claudeProfileHistoryDirs } from '../claude-accounts/claude-profile-installed-router'
 import { homedir } from 'node:os'
 import { extname, join } from 'node:path'
 import type { AgentType } from '../../shared/native-chat-types'
@@ -29,13 +28,6 @@ import { SESSION_FILE_ID_LAYOUTS, type SessionIdLookupAgent } from './session-fi
 import { findWslSessionPath } from './wsl-session-path-scan'
 import { parseSshTranscriptPath } from './ssh-transcript-path'
 import { wslTranscriptFsRefusal, type WslTranscriptFsError } from './wsl-transcript-fs-gate'
-
-// Why: roots come from the shared table AI Vault discovery reads, computed per
-// call so they track the live home. An earlier root wins: that is what keeps one
-// account's transcript from resolving to another's.
-function claudeProjectsDirs(): string[] {
-  return uniqueDirs([...claudeProjectsHostDirs(), ...claudeProfileHistoryDirs('projects')])
-}
 
 // Why: Orca launches Codex with its own managed CODEX_HOME, so Orca-started rollouts
 // land there; search it first, then CODEX_HOME/~/.codex for non-Orca sessions.
@@ -177,7 +169,7 @@ async function resolveSessionFileById(
   // transcript, so overrides get no WSL tier.
   if (transcriptAgent === 'claude') {
     const override = options.claudeProjectsDir
-    return resolveTiered('claude', trimmedId, override ? [override] : claudeProjectsDirs(), {
+    return resolveTiered('claude', trimmedId, override ? [override] : claudeProjectsHostDirs(), {
       wslTier: !override,
       signal,
       strictErrors: options.strictErrors

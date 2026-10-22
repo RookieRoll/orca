@@ -9,11 +9,6 @@ import { quotePosixShell } from '../../shared/shell-argument-quoting'
 export const WSL_CODEX_AVAILABILITY_TIMEOUT_MS = 5_000
 export const WSL_CODEX_NOT_FOUND_MESSAGE = 'Codex CLI not found in the WSL login-shell PATH.'
 
-/** Exits 0 only when `codex` resolves on the login PATH the runner supplies. */
-export function buildWslCodexAvailabilityScript(): string {
-  return [buildCodexPathLookup(), '[ -n "$resolved" ]'].join('\n')
-}
-
 export type WslCodexIdentityProbe = {
   args: string[]
   /** The `<path>\n<version>` payload, or null when the fence never appeared. */
@@ -59,25 +54,6 @@ export function buildWslCodexAppServerArgs(
     'fi',
     `export CODEX_HOME=${quotePosixShell(linuxHomePath)}`,
     `exec "$resolved" ${appServerArgs.map(quotePosixShell).join(' ')}`
-  ].join('\n')
-  return buildWslCodexShellArgs(distro, command)
-}
-
-export function buildWslCodexLoginArgs(
-  distro: string,
-  linuxHomePath: string,
-  options: { orcaOpensSignInLink?: boolean } = {}
-): string[] {
-  const command = [
-    buildCodexPathLookup(),
-    'if [ -z "$resolved" ]; then',
-    "  printf '%s\\n' 'Codex CLI not found in the WSL login-shell PATH.' >&2",
-    '  exit 127',
-    'fi',
-    `export CODEX_HOME=${quotePosixShell(linuxHomePath)}`,
-    // Why: Orca opens the printed link itself; a distro opener would open a second tab.
-    ...(options.orcaOpensSignInLink ? ['export BROWSER=true'] : []),
-    'exec "$resolved" login'
   ].join('\n')
   return buildWslCodexShellArgs(distro, command)
 }

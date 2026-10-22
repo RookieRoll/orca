@@ -1,11 +1,8 @@
-import { claudeProfileHistoryDirs } from '../claude-accounts/claude-profile-installed-router'
-import { homedir } from 'node:os'
+import { claudeConfigHostDirs, claudeProjectsHostDirs } from '../ai-vault/session-scanner-roots'
 import { join } from 'node:path'
 import { readdir } from 'node:fs/promises'
 import { isDefinitiveAbsence } from '../../shared/definitive-filesystem-absence'
 
-const CLAUDE_PROJECTS_DIR = join(homedir(), '.claude', 'projects')
-const CLAUDE_TRANSCRIPTS_DIR = join(homedir(), '.claude', 'transcripts')
 
 async function walkJsonlFiles(dirPath: string): Promise<string[]> {
   const entries = await readdir(dirPath, { withFileTypes: true }).catch((error: unknown) => {
@@ -39,14 +36,11 @@ function appendDiscoveredFiles(target: string[], source: readonly string[]): voi
 }
 
 /** Resolved by the host process: a scan worker has no account router of its own. */
-export function claudeProfileTranscriptDirs(): string[] {
-  return [...claudeProfileHistoryDirs('projects'), ...claudeProfileHistoryDirs('transcripts')]
-}
-
-export async function listClaudeTranscriptFiles(
-  profileDirs = claudeProfileTranscriptDirs()
-): Promise<string[]> {
-  const roots = [CLAUDE_PROJECTS_DIR, CLAUDE_TRANSCRIPTS_DIR, ...profileDirs]
+export async function listClaudeTranscriptFiles(): Promise<string[]> {
+  const roots = [
+    ...claudeProjectsHostDirs(),
+    ...claudeConfigHostDirs().map((configDir) => join(configDir, 'transcripts'))
+  ]
   const files = await Promise.all(roots.map((root) => walkJsonlFiles(root)))
   return [...new Set(files.flat())].sort()
 }

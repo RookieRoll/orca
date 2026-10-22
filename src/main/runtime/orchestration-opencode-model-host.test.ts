@@ -14,9 +14,6 @@ vi.mock('../opencode/opencode-model-availability', () => ({
   probeOpenCodeModelAvailability: vi.fn(),
   resolveOpenCodeDirectModelExecutable: vi.fn()
 }))
-vi.mock('../managed-data-accounts/launch-environment', () => ({
-  applyManagedDataAccountEnvironment: vi.fn()
-}))
 vi.mock('../project-runtime-git-options', () => ({ resolveLocalProjectRuntimeForRepo: vi.fn() }))
 
 function host(

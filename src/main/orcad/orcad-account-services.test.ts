@@ -100,7 +100,7 @@ async function call(runtime: OrcaRuntimeService, name: string, params: unknown):
 }
 
 describe('orcad account services', () => {
-  it('serves accounts.* from this host', async () => {
+  it('publishes this host rate-limit usage to paired clients', async () => {
     const { runtime, store } = createRuntime()
     expect(install(runtime, store, false)).not.toBeNull()
     // Saved MiniMax/GLM keys refresh this host's own usage poller.
@@ -108,21 +108,11 @@ describe('orcad account services', () => {
     expect(runtime.getStatus().capabilities).toContain(USAGE_CREDENTIALS_RUNTIME_CAPABILITY)
 
     await expect(call(runtime, 'accounts.list', { refreshUsage: false })).resolves.toMatchObject({
-      claude: { accounts: [], activeAccountId: null },
-      codex: { accounts: [], activeAccountId: null },
       rateLimits: expect.any(Object)
     })
-    await expect(
-      call(runtime, 'accounts.selectClaude', { accountId: null })
-    ).resolves.toMatchObject({ activeAccountId: null })
-    await expect(call(runtime, 'accounts.selectCodex', { accountId: null })).resolves.toMatchObject(
-      {
-        activeAccountId: null
-      }
-    )
   })
 
-  it("resolves structured Codex launches to a client-sent home, else this host's selection", async () => {
+  it('resolves structured Codex launches to a client-sent home, else the default CLI home', async () => {
     const { store } = createRuntime()
     const services = create(store, false)
     if (!services) {
@@ -133,7 +123,7 @@ describe('orcad account services', () => {
 
     await expect(prepareCodexStructuredLaunch({ launchEnv: clientEnv })).resolves.toBe(CLIENT_HOME)
     expect(resolveCodexStructuredLaunchHome({ launchEnv: clientEnv })).toBe(CLIENT_HOME)
-    // The system default selected here: null is the real ~/.codex, not an ambient CODEX_HOME.
+    // Null means the ordinary ~/.codex; it is not a failed home lookup.
     await expect(prepareCodexStructuredLaunch({ launchEnv: {} })).resolves.toBeNull()
     expect(resolveCodexStructuredLaunchHome({ launchEnv: {} })).toBeNull()
     expect(services.listCodexSessionHomes()).toEqual(expect.any(Array))
@@ -167,9 +157,5 @@ describe('orcad account services', () => {
     await expect(call(runtime, 'accounts.list', { refreshUsage: false })).rejects.toThrow(
       'Account services are not configured on this runtime'
     )
-    // The desktop's push must still land.
-    expect(() =>
-      runtime.setHostAccountLaunchEnv({ wslDistro: 'Ubuntu', claude: {}, terminal: {} })
-    ).not.toThrow()
   })
 })

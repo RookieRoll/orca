@@ -34,8 +34,6 @@ export const createTerminalSlice: StateCreator<AppState, [], [], TerminalSlice> 
   runtimePaneTitlesByTabId: {},
   suppressedPtyExitIds: {},
   pendingPtyShutdownIds: {},
-  pendingPaneAccountRestarts: {},
-  codexRestartNoticeByPtyId: {},
   expandedPaneByTabId: {},
   canExpandPaneByTabId: {},
   terminalLayoutsByTabId: {},

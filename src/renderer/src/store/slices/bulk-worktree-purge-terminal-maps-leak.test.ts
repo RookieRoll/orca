@@ -13,8 +13,7 @@
  *   deferredSshSessionIdsByTabId, pendingInitialCwdByTabId,
  *   pendingIssueCommandSplitByTabId, pendingStartupByTabId
  * Pty-keyed (evicted via the doomed-pty set derived from live and durable bindings):
- *   codexRestartNoticeByPtyId, migrationUnsupportedByPtyId,
- *   suppressedPtyExitIds, pendingPaneAccountRestarts
+ *   migrationUnsupportedByPtyId, suppressedPtyExitIds
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type * as AgentStatusModule from '@/lib/agent-status'
@@ -98,10 +97,6 @@ function seedMaps(store: ReturnType<typeof createTestStore>): void {
       [TAB2]: { command: 'b' }
     },
     pendingStartupByTabId: { [TAB1]: { command: 'start-a' }, [TAB2]: { command: 'start-b' } },
-    codexRestartNoticeByPtyId: {
-      [PTY1]: { previousAccountLabel: 'a1', nextAccountLabel: 'a2' },
-      [PTY2]: { previousAccountLabel: 'b1', nextAccountLabel: 'b2' }
-    },
     migrationUnsupportedByPtyId: {
       [PTY1]: {
         ptyId: PTY1,
@@ -123,12 +118,6 @@ function seedMaps(store: ReturnType<typeof createTestStore>): void {
       [PTY1_SPLIT]: true,
       [REMOTE_PTY1]: true,
       [PTY2]: true
-    },
-    pendingPaneAccountRestarts: {
-      [PTY1]: 'codex',
-      [PTY1_SPLIT]: 'codex',
-      [REMOTE_PTY1]: 'codex',
-      [PTY2]: 'codex'
     }
   })
 }
@@ -150,14 +139,10 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
     expect(s.pendingInitialCwdByTabId[TAB1]).toBeUndefined()
     expect(s.pendingIssueCommandSplitByTabId[TAB1]).toBeUndefined()
     expect(s.pendingStartupByTabId[TAB1]).toBeUndefined()
-    expect(s.codexRestartNoticeByPtyId[PTY1]).toBeUndefined()
     expect(s.migrationUnsupportedByPtyId[PTY1]).toBeUndefined()
     expect(s.suppressedPtyExitIds[PTY1]).toBeUndefined()
     expect(s.suppressedPtyExitIds[PTY1_SPLIT]).toBeUndefined()
     expect(s.suppressedPtyExitIds[REMOTE_PTY1]).toBeUndefined()
-    expect(s.pendingPaneAccountRestarts[PTY1]).toBeUndefined()
-    expect(s.pendingPaneAccountRestarts[PTY1_SPLIT]).toBeUndefined()
-    expect(s.pendingPaneAccountRestarts[REMOTE_PTY1]).toBeUndefined()
 
     // Surviving worktree's tab/pty: every entry retained (no over-eviction).
     expect(s.lastKnownRelayPtyIdByTabId[TAB2]).toBe(PTY2)
@@ -166,10 +151,8 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
     expect(s.pendingInitialCwdByTabId[TAB2]).toBe('/path/wt2')
     expect(s.pendingIssueCommandSplitByTabId[TAB2]).toEqual({ command: 'b' })
     expect(s.pendingStartupByTabId[TAB2]).toEqual({ command: 'start-b' })
-    expect(s.codexRestartNoticeByPtyId[PTY2]).toBeDefined()
     expect(s.migrationUnsupportedByPtyId[PTY2]).toBeDefined()
     expect(s.suppressedPtyExitIds[PTY2]).toBe(true)
-    expect(s.pendingPaneAccountRestarts[PTY2]).toBe('codex')
   })
 
   it('keeps environment-scoped remote guard identities independent', () => {
@@ -183,10 +166,6 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
       suppressedPtyExitIds: {
         ...s.suppressedPtyExitIds,
         [REMOTE_PTY2_SAME_HANDLE]: true
-      },
-      pendingPaneAccountRestarts: {
-        ...s.pendingPaneAccountRestarts,
-        [REMOTE_PTY2_SAME_HANDLE]: 'codex'
       }
     }))
 
@@ -194,9 +173,7 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
     const s = store.getState()
 
     expect(s.suppressedPtyExitIds[REMOTE_PTY1]).toBeUndefined()
-    expect(s.pendingPaneAccountRestarts[REMOTE_PTY1]).toBeUndefined()
     expect(s.suppressedPtyExitIds[REMOTE_PTY2_SAME_HANDLE]).toBe(true)
-    expect(s.pendingPaneAccountRestarts[REMOTE_PTY2_SAME_HANDLE]).toBe('codex')
   })
 
   it('retains a raw remote handle that is also a surviving local PTY id', () => {
@@ -206,10 +183,6 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
       ptyIdsByTabId: {
         ...s.ptyIdsByTabId,
         [TAB2]: [...s.ptyIdsByTabId[TAB2], REMOTE_HANDLE1]
-      },
-      pendingPaneAccountRestarts: {
-        ...s.pendingPaneAccountRestarts,
-        [REMOTE_HANDLE1]: 'codex'
       },
       suppressedPtyExitIds: {
         ...s.suppressedPtyExitIds,
@@ -221,9 +194,7 @@ describe('bulk worktree purge evicts the per-tab/per-pty terminal maps it previo
     const s = store.getState()
 
     expect(s.suppressedPtyExitIds[REMOTE_PTY1]).toBeUndefined()
-    expect(s.pendingPaneAccountRestarts[REMOTE_PTY1]).toBeUndefined()
     expect(s.suppressedPtyExitIds[REMOTE_HANDLE1]).toBe(true)
-    expect(s.pendingPaneAccountRestarts[REMOTE_HANDLE1]).toBe('codex')
   })
 
   it('does not parse aliases for environment-scoped remote guard cleanup', () => {

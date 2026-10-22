@@ -40,7 +40,6 @@ describe('every RPC method declares a known permission', () => {
     expect(permissionOf('computer.click')).toBe('desktop-control')
     expect(permissionOf('computer.typeText')).toBe('desktop-control')
     expect(permissionOf('computer.permissionsStatus')).toBe('workspace')
-    expect(permissionOf('accounts.selectClaude')).toBe('accounts-admin')
     expect(permissionOf('settings.update')).toBe('settings-write')
     expect(permissionOf('settings.getAgentLaunch')).toBe('workspace')
     expect(permissionOf('settings.mutateAgentLaunch')).toBe('settings-write')
@@ -67,7 +66,7 @@ describe('paired runtime clients', () => {
     expect(errorCode(response)).not.toBe('forbidden')
   })
 
-  it.each(['settings.update', 'accounts.selectClaude', 'skills.install'])(
+  it.each(['settings.update', 'skills.install'])(
     'keep the remote UI surface: %s',
     async (method) => {
       const response = await dispatchAs(PAIRED, method, {})

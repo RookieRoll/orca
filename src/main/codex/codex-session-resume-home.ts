@@ -6,23 +6,22 @@ import {
   relativePathInsideRoot
 } from '../../shared/cross-platform-path'
 import { listCodexSessionRolloutFilesIncrementally } from './codex-session-file-listing'
-import { ManagedCodexHomeTemporarilyUnavailableError } from '../codex-accounts/host-codex-managed-home-ownership'
+import { resolveExplicitCustomCodexHomeForLaunch } from './codex-real-home-path'
 
-// Why: only Codex's dated rollout layout may establish account-home provenance; nested/misplaced JSONL must not select credentials.
+// Why: only Codex's dated rollout layout may establish home provenance; nested or misplaced JSONL must not select credentials.
 const CLAIMED_CODEX_ROLLOUT_TAIL = String.raw`\d{4}/\d{2}/\d{2}/rollout-[^/]+\.jsonl(?:\.zst)?`
 const TRUSTED_CODEX_ROLLOUT_TAIL = String.raw`\d{4}/\d{2}/\d{2}/rollout-[^/:]+\.jsonl(?:\.zst)?`
 const ROLLOUT_RELATIVE_PATH = new RegExp(`^${TRUSTED_CODEX_ROLLOUT_TAIL}$`)
 // Why: case-insensitive because trusted-home matching folds Windows path case too.
 const CODEX_ROLLOUT_LAYOUT_PATH = new RegExp(`(?:^|/)sessions/${CLAIMED_CODEX_ROLLOUT_TAIL}$`, 'i')
 
-/** `resume` pins CODEX_HOME to the account that owns the rollout. `fresh` means
+/** `resume` pins CODEX_HOME to the trusted CLI home that owns the rollout. `fresh` means
  *  provenance could not be verified, so the caller drops the resume argv — an
- *  unverifiable rollout must never resume under whichever account is selected now.
- *  `reconcileSharedRuntimeAuth` revalidates mutable shared-home auth before spawn.
+ *  unverifiable rollout must never resume under a different home.
  *  `claimedCodexProvenance` gates the user-facing notice: a path that claimed real
  *  Codex layout is worth reporting, stale cross-agent metadata is not. */
 export type CodexSessionResumePreparation =
-  | { outcome: 'resume'; codexHomePath: string; reconcileSharedRuntimeAuth?: boolean }
+  | { outcome: 'resume'; codexHomePath: string }
   | { outcome: 'fresh'; claimedCodexProvenance: boolean }
 
 // Why: fold only Win32's extended drive spelling; \\.\ device namespaces and every other \\?\ form
@@ -103,10 +102,25 @@ function resolveTrustedCodexSessionResume(args: {
 /** The homes this host itself lists for Codex sessions: the only ones a pane may pin as CODEX_HOME. */
 export function trustedCodexResumeHomes(
   runtimeHome: { getHostCodexHomePathsForSessionDiscovery(): string[] },
-  systemHomePath: string
+  systemHomePath: string,
+  launchEnv?: NodeJS.ProcessEnv
 ): string[] {
-  // Why: codexSessionSourceHome is import-only; treating it as CODEX_HOME would mutate history sources and bypass account auth.
-  return [systemHomePath, ...runtimeHome.getHostCodexHomePathsForSessionDiscovery()]
+  return uniqueCodexHomes([
+    systemHomePath,
+    ...runtimeHome.getHostCodexHomePathsForSessionDiscovery(),
+    resolveExplicitCustomCodexHomeForLaunch(launchEnv)
+  ])
+}
+
+function uniqueCodexHomes(paths: readonly (string | null)[]): string[] {
+  const seen = new Set<string>()
+  return paths.filter((path): path is string => {
+    if (!path) return false
+    const normalized = normalizeRuntimePathForComparison(path)
+    if (seen.has(normalized)) return false
+    seen.add(normalized)
+    return true
+  })
 }
 
 export function resolveTrustedCodexSessionResumeHome(args: {
@@ -120,8 +134,8 @@ export function resolveTrustedCodexSessionResumeHome(args: {
 /**
  * True when transcriptPath claims Codex's dated rollout layout, under any home and without
  * checking existence — separating rejected Codex provenance from cross-agent/stale metadata.
- * Not scoped to trusted homes: a rollout under a removed home is still rejected provenance,
- * and admitting it would resume that session under whichever account is selected now.
+ * Not scoped to trusted homes: a rollout under an untrusted home is still rejected provenance,
+ * and admitting it would resume that session under a different CLI home.
  */
 export function claimsCodexRolloutLayout(transcriptPath: string | undefined): boolean {
   const persistedPath = transcriptPath?.trim()
@@ -134,7 +148,7 @@ export function claimsCodexRolloutLayout(transcriptPath: string | undefined): bo
 /**
  * Verified provenance, or an explicit fall-back to a fresh session. Never rejects:
  * the caller drops the resume argv on `fresh`, so a rollout Orca cannot place under a
- * trusted home resumes nowhere instead of resuming under the selected account (#10793).
+ * trusted home resumes nowhere instead of resuming under another CLI home (#10793).
  *
  * The rescan ranking inputs are required here for the same reason they are required on
  * findTrustedCodexSessionResume, and are forwarded wholesale so this wrapper cannot drop one.
@@ -143,9 +157,7 @@ export async function resolveCodexSessionResumeProvenance(args: {
   sessionId: string
   transcriptPath: string | undefined
   trustedCodexHomes: readonly string[]
-  getSelectedAccountCodexHome: () => string | null
   systemCodexHomePath: string | null
-  sharedRuntimeCodexHomePath: string | null
   fileIsRegular?: (filePath: string) => boolean
   listSessionFiles?: (sessionsRoot: string) => AsyncIterable<string>
 }): Promise<
@@ -159,90 +171,32 @@ export async function resolveCodexSessionResumeProvenance(args: {
 }
 
 /**
- * Orders trusted homes for the legacy id rescan, lowest wins.
- *
- * The winning home becomes the resumed pane's CODEX_HOME, so it picks the
- * account. Rank the currently selected account's own home first — once the same
- * rollout sits in several homes the id alone no longer names an account, and
- * resuming under the account the user has selected is what
- * they asked for. The real system home ranks next because codex refreshes it
- * directly. Everything else is ordered by normalized path so no winner ever
- * depends on the order accounts happen to sit in settings.
- *
- * The shared runtime mirror ranks above the remaining homes because winning is
- * not inert for it: with no account selected it is the only home that triggers
- * the legacy migration into the real system home
- * (prepareLegacySharedCodexSessionResume, which also requires the system-default
- * selection), and that migration is how such a resume lands on ~/.codex instead
- * of some account's home. Letting a per-account home outrank it by mere path
- * order would silently route that selection to an account the user did not pick.
- * With an account selected the migration cannot fire either way, so this tier
- * just preserves the pre-ranking order rather than inventing a new winner.
- *
- * All inputs are required, not optional: a caller that forgot one would
- * silently degrade to pure path order, which is the accident this exists to
- * remove. The selection arrives as a thunk because resolving it stats the
- * account's ownership marker, and the far more common provenance-present
- * resume never reaches the ranking at all.
+ * Prefer the system CLI home when a legacy session id appears in multiple homes.
+ * Explicit homes use normalized path order, independent of discovery order.
  */
 function rankTrustedCodexHomesForRescan(
-  args: {
-    trustedCodexHomes: readonly string[]
-    getSelectedAccountCodexHome: () => string | null
-    systemCodexHomePath: string | null
-    sharedRuntimeCodexHomePath: string | null
-  },
-  selectedAccountHome = args.getSelectedAccountCodexHome()
+  args: { trustedCodexHomes: readonly string[]; systemCodexHomePath: string | null }
 ): string[] {
-  const toComparisonHome = (value: string | null | undefined): string | null => {
-    const trimmed = value?.trim()
-    return trimmed ? normalizeRuntimePathForComparison(trimmed) : null
-  }
-  const selectedComparison = toComparisonHome(selectedAccountHome)
-  const systemComparison = toComparisonHome(args.systemCodexHomePath)
-  const sharedRuntimeComparison = toComparisonHome(args.sharedRuntimeCodexHomePath)
-  const rankOf = (comparisonHome: string): number => {
-    if (selectedComparison && comparisonHome === selectedComparison) {
-      return 0
-    }
-    if (systemComparison && comparisonHome === systemComparison) {
-      return 1
-    }
-    return sharedRuntimeComparison && comparisonHome === sharedRuntimeComparison ? 2 : 3
-  }
-  return args.trustedCodexHomes
-    .map((homePath) => ({ homePath, comparisonHome: normalizeRuntimePathForComparison(homePath) }))
-    .sort((left, right) => {
-      const rankDelta = rankOf(left.comparisonHome) - rankOf(right.comparisonHome)
-      if (rankDelta !== 0) {
-        return rankDelta
-      }
-      return left.comparisonHome < right.comparisonHome
-        ? -1
-        : left.comparisonHome > right.comparisonHome
-          ? 1
-          : 0
-    })
-    .map((entry) => entry.homePath)
-}
-
-function isSelectedAccountHome(selectedAccountHome: string | null, homePath: string): boolean {
-  return (
-    selectedAccountHome !== null &&
-    normalizeRuntimePathForComparison(selectedAccountHome) ===
-      normalizeRuntimePathForComparison(homePath)
-  )
+  const systemHome = args.systemCodexHomePath?.trim()
+  const systemComparison = systemHome ? normalizeRuntimePathForComparison(systemHome) : null
+  return [...args.trustedCodexHomes].sort((left, right) => {
+    const leftComparison = normalizeRuntimePathForComparison(left)
+    const rightComparison = normalizeRuntimePathForComparison(right)
+    if (leftComparison === systemComparison) return -1
+    if (rightComparison === systemComparison) return 1
+    return leftComparison.localeCompare(rightComparison)
+  })
 }
 
 /**
  * Why: `existsSync` reports false for *any* stat error, so a briefly locked
  * sessions tree (antivirus, backup, indexer) reads as "this rollout is not
- * bridged here" and the scan moves on to the next ranked home. For the selected
- * account that silently resumes the session under a DIFFERENT account's
- * credentials while the UI still shows the selected one, so only a definitive
+ * bridged here" and the scan moves on to the next ranked home. For the system
+ * CLI home that silently resumes the session under a DIFFERENT home's
+ * credentials, so only a definitive
  * absence may skip it (STA-4607).
  */
-function sessionsTreeIsPresent(sessionsRoot: string, isSelectedAccount: boolean): boolean {
+function sessionsTreeIsPresent(sessionsRoot: string): boolean {
   try {
     statSync(sessionsRoot)
     return true
@@ -251,27 +205,16 @@ function sessionsTreeIsPresent(sessionsRoot: string, isSelectedAccount: boolean)
     if (code === 'ENOENT' || code === 'ENOTDIR') {
       return false
     }
-    if (isSelectedAccount) {
-      throw new ManagedCodexHomeTemporarilyUnavailableError(undefined, { cause: error })
-    }
-    // Why: an unreadable home that is NOT the selected account cannot cause a
-    // wrong-account resume; skipping it only forgoes a candidate.
+    // Why: skipping an unreadable candidate only forgoes a possible resume source.
     return false
   }
-}
-
-function isDefinitiveSessionTreeAbsence(error: unknown): boolean {
-  const code = (error as NodeJS.ErrnoException | null)?.code
-  return code === 'ENOENT' || code === 'ENOTDIR'
 }
 
 export async function findTrustedCodexSessionResume(args: {
   sessionId: string
   transcriptPath: string | undefined
   trustedCodexHomes: readonly string[]
-  getSelectedAccountCodexHome: () => string | null
   systemCodexHomePath: string | null
-  sharedRuntimeCodexHomePath: string | null
   fileIsRegular?: (filePath: string) => boolean
   listSessionFiles?: (sessionsRoot: string) => AsyncIterable<string>
 }): Promise<{ homePath: string; transcriptPath: string } | null> {
@@ -280,35 +223,20 @@ export async function findTrustedCodexSessionResume(args: {
     return directSession
   }
   if (args.transcriptPath?.trim()) {
-    // Why: stale/rejected provenance must not select a same-id rollout under different account credentials; scanning is legacy-only.
+    // Why: stale/rejected provenance must not select a same-id rollout under another CLI home; scanning is legacy-only.
     return null
   }
   if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(args.sessionId)) {
     return null
   }
 
-  const selectedAccountHome = args.getSelectedAccountCodexHome()
-  const selectedSessionsRoot = selectedAccountHome
-    ? normalizeRuntimePathForComparison(join(selectedAccountHome, 'sessions'))
-    : null
   const listSessionFiles =
     args.listSessionFiles ??
     ((sessionsRoot: string) =>
-      listCodexSessionRolloutFilesIncrementally(
-        sessionsRoot,
-        { batchSize: 64, yieldMs: 0 },
-        (_directoryPath, error) => {
-          if (
-            selectedSessionsRoot === normalizeRuntimePathForComparison(sessionsRoot) &&
-            !isDefinitiveSessionTreeAbsence(error)
-          ) {
-            throw new ManagedCodexHomeTemporarilyUnavailableError(undefined, { cause: error })
-          }
-        }
-      ))
+      listCodexSessionRolloutFilesIncrementally(sessionsRoot, { batchSize: 64, yieldMs: 0 }))
   const expectedSuffix = `-${args.sessionId}.jsonl`.toLowerCase()
   const seenHomes = new Set<string>()
-  for (const homePath of rankTrustedCodexHomesForRescan(args, selectedAccountHome)) {
+  for (const homePath of rankTrustedCodexHomesForRescan(args)) {
     const comparisonHome = normalizeRuntimePathForComparison(homePath)
     if (seenHomes.has(comparisonHome)) {
       continue
@@ -317,7 +245,7 @@ export async function findTrustedCodexSessionResume(args: {
     const sessionsRoot = join(homePath, 'sessions')
     if (
       !args.listSessionFiles &&
-      !sessionsTreeIsPresent(sessionsRoot, isSelectedAccountHome(selectedAccountHome, homePath))
+      !sessionsTreeIsPresent(sessionsRoot)
     ) {
       continue
     }

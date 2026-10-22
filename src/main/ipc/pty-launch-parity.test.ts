@@ -54,7 +54,6 @@ import { DESKTOP_RPC_CALLER } from '../runtime/rpc/rpc-caller-identity'
 import { DESKTOP_RENDERER_RUNTIME_CLIENT_CAPABILITIES } from './desktop-renderer-runtime-capabilities'
 import { TERMINAL_LIFECYCLE_METHODS } from '../runtime/rpc/methods/terminal/terminal-lifecycle-methods'
 import { AGENT_SESSION_METHODS } from '../runtime/rpc/methods/agent-session'
-import { applyManagedDataAccountEnvironment } from '../managed-data-accounts/launch-environment'
 import { probeOpenCodeLaunchCapabilities } from '../opencode/opencode-launch-capabilities'
 import {
   probeOpenCodeModelAvailability,
@@ -97,10 +96,6 @@ vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
 vi.mock('../codex/codex-pane-account-registry', () =>
   import('./pty-ipc-mock-registry').then((m) => m.codexPaneAccountRegistryModuleMock())
 )
-// Why: an OpenCode v2 install with the picked model available; the probes would run the binary.
-vi.mock('../managed-data-accounts/launch-environment', () => ({
-  applyManagedDataAccountEnvironment: vi.fn()
-}))
 vi.mock('../opencode/opencode-launch-capabilities', () => ({
   probeOpenCodeLaunchCapabilities: vi.fn()
 }))
@@ -193,7 +188,6 @@ function pick(source: Record<string, unknown>, keys: string[]): Record<string, u
 }
 
 function stubOpenCodeV2(): void {
-  vi.mocked(applyManagedDataAccountEnvironment).mockReset()
   vi.mocked(resolveOpenCodeDirectModelExecutable).mockReset().mockResolvedValue('/bin/opencode')
   vi.mocked(probeOpenCodeLaunchCapabilities)
     .mockReset()

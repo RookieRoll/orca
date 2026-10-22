@@ -4,18 +4,15 @@ import '@testing-library/jest-dom/vitest'
 
 import React from 'react'
 import type { ZcodePlanSite } from '../../../../shared/zcode-plan-sites'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => {
   const settings: { zcodePlanSite?: ZcodePlanSite } = { zcodePlanSite: 'zai' }
   return {
     getStatus: vi.fn(),
-    saveApiKey: vi.fn(),
-    clearApiKey: vi.fn(),
     refreshRateLimits: vi.fn(),
     updateSettings: vi.fn(),
-    recordFeatureInteraction: vi.fn(),
     zcodeUsage: vi.fn<() => unknown>(() => null),
     settings
   }
@@ -40,7 +37,6 @@ vi.mock('../../store', () => ({
     selector({
       refreshRateLimits: mocks.refreshRateLimits,
       updateSettings: mocks.updateSettings,
-      recordFeatureInteraction: mocks.recordFeatureInteraction,
       settingsSearchQuery: '',
       settings: mocks.settings,
       rateLimits: { zcode: mocks.zcodeUsage() }
@@ -62,20 +58,15 @@ function renderSection() {
 describe('ZcodePlanAccountsSection', () => {
   beforeEach(() => {
     mocks.getStatus.mockResolvedValue({ apiKeyConfigured: false, zcodeCliConfigured: false })
-    mocks.saveApiKey.mockResolvedValue({ apiKeyConfigured: true, zcodeCliConfigured: false })
-    mocks.clearApiKey.mockResolvedValue({ apiKeyConfigured: false, zcodeCliConfigured: false })
     mocks.refreshRateLimits.mockResolvedValue(undefined)
     mocks.updateSettings.mockResolvedValue(undefined)
-    mocks.recordFeatureInteraction.mockReset()
     mocks.zcodeUsage.mockReturnValue(null)
     mocks.settings.zcodePlanSite = 'zai'
     Object.defineProperty(window, 'api', {
       configurable: true,
       value: {
         zcodePlanCredentials: {
-          getStatus: mocks.getStatus,
-          saveApiKey: mocks.saveApiKey,
-          clearApiKey: mocks.clearApiKey
+          getStatus: mocks.getStatus
         }
       }
     })
@@ -93,50 +84,12 @@ describe('ZcodePlanAccountsSection', () => {
     expect(screen.queryByText('Using the ZCode CLI sign-in')).not.toBeInTheDocument()
   })
 
-  it('explains the CLI fallback when only the ZCode CLI config exists', async () => {
+  it('shows the CLI sign-in status when only the ZCode CLI config exists', async () => {
     mocks.getStatus.mockResolvedValue({ apiKeyConfigured: false, zcodeCliConfigured: true })
 
     renderSection()
 
     expect(await screen.findByText('Using the ZCode CLI sign-in')).toBeInTheDocument()
-    expect(
-      screen.getByText(/selected Coding Plan from the ZCode CLI credential store/)
-    ).toBeInTheDocument()
-  })
-
-  it('saves a trimmed API key through the credential IPC', async () => {
-    renderSection()
-
-    const input = await screen.findByPlaceholderText('Paste your GLM Coding Plan API key')
-    mocks.getStatus.mockResolvedValue({ apiKeyConfigured: true, zcodeCliConfigured: false })
-    fireEvent.change(input, { target: { value: '  glm-secret  ' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-
-    await waitFor(() => {
-      expect(mocks.saveApiKey).toHaveBeenCalledWith('glm-secret')
-    })
-    expect(mocks.recordFeatureInteraction).toHaveBeenCalledWith('usage-tracking')
-    await screen.findByText('Replace')
-  })
-
-  it('requires a non-empty key before saving', async () => {
-    renderSection()
-
-    const save = await screen.findByRole('button', { name: 'Save' })
-    expect(save).toBeDisabled()
-  })
-
-  it('forgets a saved key through the credential IPC', async () => {
-    mocks.getStatus.mockResolvedValue({ apiKeyConfigured: true, zcodeCliConfigured: true })
-
-    renderSection()
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Forget key' }))
-
-    await waitFor(() => {
-      expect(mocks.clearApiKey).toHaveBeenCalledTimes(1)
-    })
-    expect(mocks.recordFeatureInteraction).toHaveBeenCalledWith('usage-tracking')
   })
 
   it('labels the saved state with the selected site', async () => {
@@ -196,51 +149,11 @@ describe('ZcodePlanAccountsSection', () => {
     expect(screen.getByText(/5 hours — resets in 47m/)).toBeInTheDocument()
     expect(screen.queryByText(/Resets in Resets/)).not.toBeInTheDocument()
   })
-})
 
-describe('GLM credential status races', () => {
-  afterEach(() => {
-    cleanup()
-    vi.clearAllMocks()
-  })
-
-  it('keeps the saved status when an earlier status read finishes late', async () => {
-    let finishRead: ((value: unknown) => void) | undefined
-    mocks.getStatus.mockResolvedValue({
-      apiKeyConfigured: true,
-      zcodeCliConfigured: false,
-      apiKeyProtection: 'sealed'
-    })
-    mocks.getStatus.mockImplementationOnce(
-      () =>
-        new Promise((resolve) => {
-          finishRead = resolve
-        })
-    )
-    mocks.saveApiKey.mockResolvedValue({
-      apiKeyConfigured: true,
-      zcodeCliConfigured: false,
-      apiKeyProtection: 'sealed'
-    })
-    Object.defineProperty(window, 'api', {
-      configurable: true,
-      value: {
-        zcodePlanCredentials: {
-          getStatus: mocks.getStatus,
-          saveApiKey: mocks.saveApiKey,
-          clearApiKey: mocks.clearApiKey
-        }
-      }
-    })
+  it('keeps usage refresh available without a saved plan key', async () => {
     renderSection()
-    fireEvent.change(screen.getByPlaceholderText('Paste your GLM Coding Plan API key'), {
-      target: { value: 'synthetic-key' }
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await screen.findByRole('button', { name: 'Forget key' })
-    finishRead?.({ apiKeyConfigured: false, zcodeCliConfigured: false, apiKeyProtection: null })
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Forget key' })).toBeInTheDocument()
-    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Refresh usage' }))
+    expect(mocks.refreshRateLimits).toHaveBeenCalledOnce()
   })
 })

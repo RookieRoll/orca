@@ -2,7 +2,7 @@ import { translate } from '@/i18n/i18n'
 import type { RuntimeClientTarget } from '../../../../shared/runtime-client-target'
 import { UsageCredentialsHostOutdatedError } from '@/runtime/runtime-usage-credentials-client'
 
-/** Where a usage key is saved: this computer, or the Settings host whose usage poller reads it. */
+/** Which computer reports the usage credential status. */
 export type UsageCredentialHost = {
   owner: RuntimeClientTarget
   /** Null for this computer. */
@@ -41,7 +41,7 @@ export function usageCredentialAccessNotice(
   if (access === 'outdated') {
     return translate(
       'auto.components.settings.usageCredentialHost.outdated',
-      'Update Orca on {{host}} to save this key there.',
+      'Update Orca on {{host}} to check its usage credential status.',
       { host: host.label }
     )
   }
@@ -91,17 +91,4 @@ export function usageCredentialStoredLabel(host: UsageCredentialHost): string {
     : translate('auto.components.settings.usageCredentialHost.storedOnHost', 'Stored on {{host}}', {
         host: host.label
       })
-}
-
-export function zcodePlanKeyDescription(host: UsageCredentialHost): string {
-  return host.label === null
-    ? translate(
-        'auto.components.settings.ZcodePlanAccountsSection.keyDescription',
-        'Paste the API key from the selected console’s API Keys page. Stored locally, encrypted when the OS supports it, and sent only to that site for usage refreshes.'
-      )
-    : translate(
-        'auto.components.settings.ZcodePlanAccountsSection.keyOnHostDescription',
-        'Paste the API key from the selected console’s API Keys page. Stored on {{host}} and sent from there only to that site for usage refreshes.',
-        { host: host.label }
-      )
 }

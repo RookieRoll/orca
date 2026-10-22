@@ -13,8 +13,6 @@ const UNTOUCHED_FIELDS = [
   'ptyIdsByTabId',
   'suppressedPtyExitIds',
   'pendingPtyShutdownIds',
-  'pendingPaneAccountRestarts',
-  'codexRestartNoticeByPtyId',
   'pendingIssueCommandSplitByTabId',
   'terminalLayoutsByTabId',
   'runtimePaneTitlesByTabId',
@@ -29,8 +27,6 @@ function buildState(overrides: Partial<AppState> = {}): AppState {
     ptyIdsByTabId: { [TAB_ID]: [] },
     suppressedPtyExitIds: {},
     pendingPtyShutdownIds: {},
-    pendingPaneAccountRestarts: {},
-    codexRestartNoticeByPtyId: {},
     pendingIssueCommandSplitByTabId: {},
     terminalLayoutsByTabId: {},
     runtimePaneTitlesByTabId: {},
@@ -95,7 +91,6 @@ describe('terminal shutdown map identity', () => {
     const before = buildState({
       ptyIdsByTabId: { [TAB_ID]: ['pty-1'] },
       pendingPtyShutdownIds: { 'pty-1': 1 },
-      codexRestartNoticeByPtyId: { 'pty-1': { reason: 'x' } }
     } as unknown as Partial<AppState>)
 
     const after = commit(before, ['pty-1'])
@@ -103,6 +98,5 @@ describe('terminal shutdown map identity', () => {
     expect(after.ptyIdsByTabId[TAB_ID]).toEqual([])
     expect(after.suppressedPtyExitIds['pty-1']).toBe(true)
     expect('pty-1' in after.pendingPtyShutdownIds).toBe(false)
-    expect('pty-1' in after.codexRestartNoticeByPtyId).toBe(false)
   })
 })

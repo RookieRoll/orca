@@ -36,17 +36,13 @@ import { callRuntimeEnvironment } from './runtime-environment-transport-routing'
 import { getRuntimeEnvironmentStatus } from './runtime-environment-status-probe'
 import { noteRuntimeEnvironmentConnectRequested } from './runtime-environment-pairing-refusal-registry'
 import { publicRuntimeEnvironmentWithHostKey } from './runtime-environment-host-key'
-import { withWslOrcadAccountEnv } from '../../wsl/wsl-orcad-account-env'
 import { clearSshCredentialDeclinedForEnvironment } from '../../ssh/ssh-credential-decline'
 import {
   disconnectManagedHostOfEnvironmentForUser,
   disconnectRuntimeEnvironmentForUser,
   liftSshUserDisconnectForEnvironment
 } from '../ssh/ssh-host-user-disconnect'
-import {
-  observeWslOrcadHostResponse,
-  wslOrcadHostSupports
-} from '../../wsl/wsl-orcad-host-environments'
+import { observeWslOrcadHostResponse } from '../../wsl/wsl-orcad-host-environments'
 import { assertWslHostReachable, isGatedOffWslHost } from '../../wsl/wsl-host-gate'
 
 function manuallyDisconnectedResponse(
@@ -259,31 +255,13 @@ function registerPassiveCallHandler(getUserDataPath: () => string): void {
       if (isRuntimeEnvironmentManuallyDisconnected(environment.id)) {
         return manuallyDisconnectedResponse(environment)
       }
-      // Why here: every renderer call to a paired host passes this one handler.
-      const accounts = await withWslOrcadAccountEnv({
-        environmentId: environment.id,
-        method: args.method,
-        params: args.params,
-        hostSupports: (capability) =>
-          wslOrcadHostSupports(environment.id, capability, () =>
-            callRuntimeEnvironment(getUserDataPath(), environment.id, 'status.get', undefined)
-          )
-      })
-      if (!accounts.ok) {
-        return {
-          id: args.method,
-          ok: false,
-          error: { code: 'account_preparation_failed', message: accounts.message },
-          _meta: { runtimeId: environment.runtimeId }
-        }
-      }
       let response: RuntimeRpcResponse<unknown>
       try {
         response = await callRuntimeEnvironment(
           getUserDataPath(),
           environment.id,
           args.method,
-          accounts.params,
+          args.params,
           args.timeoutMs,
           args.expectedEnvironmentPairingRevision,
           undefined,

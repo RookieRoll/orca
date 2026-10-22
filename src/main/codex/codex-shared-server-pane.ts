@@ -9,8 +9,7 @@ import {
 import { getProcessTableSnapshot } from '../../shared/process-table-snapshot-reader'
 import { readWindowsProcessTable } from '../windows/windows-process-table'
 import { fishArgsSkipConfig } from '../fish-xdg-data-dirs-handoff'
-import { getSystemCodexHomePath } from './codex-home-paths'
-import { getCodexPaneAccount } from './codex-pane-account-registry'
+import { getCodexPtyLaunchHome } from './codex-pane-account-registry'
 import { probeCodexSharedServer } from './codex-shared-server-probe'
 
 type CommandRow = ProcessIdentityRow & { command: string; name?: string }
@@ -67,24 +66,7 @@ export function findPaneCodex(
  * A CODEX_HOME the user exports later in the pane's shell is not seen.
  */
 export function resolveCodexPaneHome(ptyId: string): string | null {
-  const record = getCodexPaneAccount(ptyId)
-  if (record?.selectionKey !== 'host') {
-    return null
-  }
-  switch (record.homeRoute) {
-    // Why: a custom CODEX_HOME routes a pane to Orca's mirror, so real-home is always ~/.codex.
-    case 'real-home':
-      return getSystemCodexHomePath()
-    // Why: an unnamed home (managed account, WSL, pre-route record) skips the
-    // warning rather than probing the wrong server. Orca's mirror (shared-home)
-    // gets none either, as macOS and Linux already did: it is a fallback lane
-    // (custom CODEX_HOME, hook approval) or a pre-upgrade home refreshed from ~/.codex.
-    case 'shared-home':
-    case 'account-home':
-    case 'wsl-home':
-    case undefined:
-      return null
-  }
+  return getCodexPtyLaunchHome?.(ptyId) ?? null
 }
 
 /** This local pane's Codex when it is a client of Codex's shared server; otherwise null. */

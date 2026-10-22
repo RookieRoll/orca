@@ -1,6 +1,6 @@
 import { closeStartupQueryAuthorityForPty } from '../provider/registry'
 import { createTerminalSessionStateSaveFailureMessage } from '../../../../shared/terminal-session-state-save-failure'
-import { recordCodexPaneAccountForSpawn } from '../host-env/codex-home'
+import { recordCodexPtyLaunchHomeForSpawn } from '../host-env/codex-home'
 import { swapReplacedPaneBinding } from '../pane/pane-owner-replacement'
 import { PaneOwnerContentionError } from '../pane/pane-spawn-operation'
 import { persistFreshPaneBinding } from '../runtime/spawn-commit'
@@ -83,14 +83,13 @@ export function publishPtyIpcSpawnCommit(ctx: PtyIpcSpawnState, committedSize: P
     daemon: ctx.isDaemonHostSpawn,
     reattach: ctx.result.isReattach ?? false
   })
-  recordCodexPaneAccountForSpawn({
+  recordCodexPtyLaunchHomeForSpawn({
     ptyId: ctx.result.id,
-    isDaemonHostSpawn: ctx.isDaemonHostSpawn,
     isReattach: ctx.result.isReattach === true,
-    pinnedByResume: ctx.codexResumeHomeSelected,
-    launchCodexHomePath: ctx.selectedCodexHomePath,
     target: ctx.codexSelectionTarget,
-    settings: ctx.deps.getSettings?.()
+    selectedCodexHomePath: ctx.selectedCodexHomePath,
+    skipCodexHomeEnv: ctx.skipCodexHomeEnv,
+    launchEnv: ctx.env
   })
   if (ctx.initiallyHidden) {
     // Refresh the pre-spawn hidden mark only after this incarnation survives its save.

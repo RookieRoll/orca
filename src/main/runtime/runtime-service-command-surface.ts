@@ -42,7 +42,6 @@ export type RuntimeServiceCommandSurface = {
   registerMobilePushDevice: RuntimeMobileNotificationController['registerPushDevice']
   unregisterMobilePushDevice: RuntimeMobileNotificationController['unregisterPushDevice']
   setAccountServices: RuntimeAccountController['setServices']
-  getDataAccountsSnapshot: RuntimeAccountController['dataAccountsSnapshot']
   setCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['setCommitMessageAgentEnvironment']
   getCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['getCommitMessageAgentEnvironment']
   getAccountsSnapshot: RuntimeAccountController['getSnapshot']
@@ -50,22 +49,7 @@ export type RuntimeServiceCommandSurface = {
   requireUsageRateLimits: RuntimeAccountController['requireUsageRateLimits']
   refreshAccountsForMobile: RuntimeAccountController['refreshForMobile']
   refreshAccountsForMobileSubscriber: RuntimeAccountController['refreshForMobileSubscriber']
-  selectClaudeAccount: RuntimeAccountController['selectClaude']
-  selectCodexAccount: RuntimeAccountController['selectCodex']
-  selectCodexAccountForTarget: RuntimeAccountController['selectCodexForTarget']
-  consumeCodexRateLimitResetCredit: RuntimeAccountController['consumeCodexResetCredit']
-  removeClaudeAccount: RuntimeAccountController['removeClaude']
-  beginClaudeSignIn: RuntimeAccountController['beginClaudeSignIn']
-  finishClaudeSignIn: RuntimeAccountController['finishClaudeSignIn']
-  cancelClaudeSignIn: RuntimeAccountController['cancelClaudeSignIn']
-  removeCodexAccount: RuntimeAccountController['removeCodex']
-  addCodexAccountFromHome: RuntimeAccountController['addCodexFromHome']
-  addDataAccountFromHome: RuntimeAccountController['addDataFromHome']
-  selectDataAccount: RuntimeAccountController['selectData']
-  removeDataAccount: RuntimeAccountController['removeData']
   onAccountsChanged: RuntimeAccountController['onChanged']
-  setHostAccountLaunchEnv: RuntimeAccountController['setHostLaunchEnv']
-  restoreHostAccountLaunchEnv: RuntimeAccountController['restoreHostLaunchEnv']
   getAllBrowserDrivers: RuntimeBrowserDriverController['getAll']
   reclaimBrowserForDesktop: RuntimeBrowserDriverController['reclaimForDesktop']
   notifyMessageArrived(handle: string, messageType?: string): void
@@ -134,7 +118,6 @@ export function installRuntimeServiceCommandSurface(
     registerMobilePushDevice: notifications.registerPushDevice.bind(notifications),
     unregisterMobilePushDevice: notifications.unregisterPushDevice.bind(notifications),
     setAccountServices: accounts.setServices.bind(accounts),
-    getDataAccountsSnapshot: accounts.dataAccountsSnapshot.bind(accounts),
     setCommitMessageAgentEnvironmentResolvers:
       accounts.setCommitMessageAgentEnvironment.bind(accounts),
     getCommitMessageAgentEnvironmentResolvers:
@@ -144,22 +127,7 @@ export function installRuntimeServiceCommandSurface(
     requireUsageRateLimits: accounts.requireUsageRateLimits.bind(accounts),
     refreshAccountsForMobile: accounts.refreshForMobile.bind(accounts),
     refreshAccountsForMobileSubscriber: accounts.refreshForMobileSubscriber.bind(accounts),
-    selectClaudeAccount: accounts.selectClaude.bind(accounts),
-    selectCodexAccount: accounts.selectCodex.bind(accounts),
-    selectCodexAccountForTarget: accounts.selectCodexForTarget.bind(accounts),
-    consumeCodexRateLimitResetCredit: accounts.consumeCodexResetCredit.bind(accounts),
-    removeClaudeAccount: accounts.removeClaude.bind(accounts),
-    beginClaudeSignIn: accounts.beginClaudeSignIn.bind(accounts),
-    finishClaudeSignIn: accounts.finishClaudeSignIn.bind(accounts),
-    cancelClaudeSignIn: accounts.cancelClaudeSignIn.bind(accounts),
-    removeCodexAccount: accounts.removeCodex.bind(accounts),
-    addCodexAccountFromHome: accounts.addCodexFromHome.bind(accounts),
-    addDataAccountFromHome: accounts.addDataFromHome.bind(accounts),
-    selectDataAccount: accounts.selectData.bind(accounts),
-    removeDataAccount: accounts.removeData.bind(accounts),
     onAccountsChanged: accounts.onChanged.bind(accounts),
-    setHostAccountLaunchEnv: accounts.setHostLaunchEnv.bind(accounts),
-    restoreHostAccountLaunchEnv: accounts.restoreHostLaunchEnv.bind(accounts),
     getAllBrowserDrivers: browsers.getAll.bind(browsers),
     reclaimBrowserForDesktop: browsers.reclaimForDesktop.bind(browsers),
     waitForMessage: waiters.wait.bind(waiters),

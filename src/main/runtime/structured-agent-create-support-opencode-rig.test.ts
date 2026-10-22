@@ -2,7 +2,6 @@ import { chmod, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { restoreManagedDataAccountEnvironment } from '../../shared/managed-data-account-environment'
 import { openCodeAcpAccountBinding } from '../opencode/opencode-structured-account-home'
 import { resolveHostStructuredAgentCreateSupport } from './structured-agent-launch-support'
 
@@ -41,15 +40,9 @@ function rigSettings(command: string, extraEnv: Record<string, string> = {}) {
   }
 }
 
-const managedAccounts = {
-  list: () => ({ accounts: [], activeAccountId: null }),
-  restoreOriginalEnvironment: restoreManagedDataAccountEnvironment,
-  environmentForAccount: () => ({})
-}
-
 /** OpenCode's account binding, as create resolves it: the account a new chat would pin. */
 function pinnedAccount(launchEnv: Record<string, string>) {
-  return openCodeAcpAccountBinding(() => managedAccounts).resolve({
+  return openCodeAcpAccountBinding().resolve({
     launchEnv,
     stateDirectory: '/orca-data'
   })

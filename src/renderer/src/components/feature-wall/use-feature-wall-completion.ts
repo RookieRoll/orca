@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import type { FeatureWallWorkflowId } from '../../../../shared/feature-wall-workflows'
 import type { AgentsStepId } from '../../../../shared/agents-orchestration-steps'
 import type { WorkbenchStepId } from '../../../../shared/workbench-steps'
@@ -19,7 +19,6 @@ import {
 import { hasFeatureWallUsageTracking } from './feature-wall-usage-tracking'
 import { usePersistedFeatureWallCompletion } from './use-persisted-feature-wall-completion'
 import { useFeatureWallSessionDepth } from './use-feature-wall-session-depth'
-import { useMountedRef } from '@/hooks/useMountedRef'
 
 export type FeatureWallCompletionState = {
   workflowDone: Record<FeatureWallWorkflowId, boolean>
@@ -30,7 +29,6 @@ export type FeatureWallCompletionState = {
   markAgentStepVisited: (id: AgentsStepId) => void
   markWorkbenchStepVisited: (id: WorkbenchStepId) => void
   markReviewStepVisited: (id: ReviewStepId) => void
-  refreshUsageAccountState: () => Promise<void>
   getTourDepthSummary: () => FeatureWallTourDepthSummary
 }
 
@@ -44,7 +42,6 @@ export function useFeatureWallCompletion(
 ): FeatureWallCompletionState {
   const { onTourDepthSummaryChange } = options
   const settings = useAppStore((s) => s.settings)
-  const mountedRef = useMountedRef()
   const preflightStatus = useAppStore((s) => s.preflightStatus)
   const rateLimits = useAppStore((s) => s.rateLimits)
   const fetchRateLimits = useAppStore((s) => s.fetchRateLimits)
@@ -67,7 +64,10 @@ export function useFeatureWallCompletion(
         ? getCommitMessageAgentCapability(resolvedCommitMessageAgent) !== undefined
         : false)
 
-  const [hasUsageAccount, setHasUsageAccount] = useState(false)
+  const hasUsageAccount = hasFeatureWallUsageTracking({
+    claudeRateLimits: rateLimits.claude,
+    codexRateLimits: rateLimits.codex
+  })
   const persistedCompletion = usePersistedFeatureWallCompletion()
   const {
     visitedWorkflows,
@@ -88,26 +88,6 @@ export function useFeatureWallCompletion(
     markReviewStepCompleted
   } = persistedCompletion
 
-  const readUsageAccountState = useCallback(async (): Promise<boolean> => {
-    const [claude, codex] = await Promise.all([
-      window.api.claudeAccounts.list().catch(() => null),
-      window.api.codexAccounts.list().catch(() => null)
-    ])
-    return hasFeatureWallUsageTracking({
-      claudeManagedAccountCount: claude?.accounts.length ?? 0,
-      codexManagedAccountCount: codex?.accounts.length ?? 0,
-      claudeRateLimits: rateLimits.claude,
-      codexRateLimits: rateLimits.codex
-    })
-  }, [rateLimits.claude, rateLimits.codex])
-
-  const refreshUsageAccountState = useCallback(async (): Promise<void> => {
-    const nextHasUsageAccount = await readUsageAccountState()
-    if (mountedRef.current) {
-      setHasUsageAccount(nextHasUsageAccount)
-    }
-  }, [mountedRef, readUsageAccountState])
-
   const sessionDepth = useFeatureWallSessionDepth({
     isOpen,
     hasConnectedTaskSource,
@@ -120,34 +100,12 @@ export function useFeatureWallCompletion(
     onTourDepthSummaryChange
   })
 
-  // Pull current account state once when the modal opens, then refresh on focus
-  // after a sign-in flow that happens outside the modal.
+  // Refresh CLI usage snapshots when the modal opens.
   useEffect(() => {
     if (isOpen) {
       void fetchRateLimits()
     }
   }, [fetchRateLimits, isOpen])
-
-  useEffect(() => {
-    if (!isOpen) {
-      return
-    }
-    let stale = false
-    const refresh = async (): Promise<void> => {
-      const nextHasUsageAccount = await readUsageAccountState()
-      if (stale) {
-        return
-      }
-      setHasUsageAccount(nextHasUsageAccount)
-    }
-    void refresh()
-    const onFocus = (): void => void refresh()
-    window.addEventListener('focus', onFocus)
-    return () => {
-      stale = true
-      window.removeEventListener('focus', onFocus)
-    }
-  }, [isOpen, readUsageAccountState])
 
   const currentProgress = useMemo(
     () =>
@@ -302,7 +260,6 @@ export function useFeatureWallCompletion(
     markAgentStepVisited: markAgentStepVisitedForSession,
     markWorkbenchStepVisited: markWorkbenchStepVisitedForSession,
     markReviewStepVisited: markReviewStepVisitedForSession,
-    refreshUsageAccountState,
     getTourDepthSummary
   }
 }

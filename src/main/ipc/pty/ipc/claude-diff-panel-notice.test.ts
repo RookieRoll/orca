@@ -8,7 +8,6 @@ type Mocks = {
   startup: ReturnType<typeof vi.fn<() => Promise<void> | undefined>>
   version: string | null
   size: { cols: number; rows: number } | null
-  routedHome: string | null
   userConfigDir: string | undefined
   mayAutoOpen: ReturnType<typeof vi.fn<(input: unknown) => Promise<boolean>>>
 }
@@ -19,7 +18,6 @@ const mocks = vi.hoisted((): Mocks => ({
   startup: vi.fn<() => Promise<void> | undefined>(),
   version: 'unprobed',
   size: { cols: 180, rows: 40 },
-  routedHome: '/accounts/a/home',
   userConfigDir: '/home/me/claude-config',
   mayAutoOpen: vi.fn<(input: unknown) => Promise<boolean>>()
 }))
@@ -36,11 +34,8 @@ vi.mock('../../../claude/claude-hook-event-versions', () => ({
   probeRecentClaudeCliVersion: async () => mocks.version
 }))
 vi.mock('../../../codex-cli/command', () => ({ resolveClaudeCommand: () => '/bin/claude' }))
-vi.mock('../../../claude-accounts/claude-profile-installed-router', () => ({
-  getClaudeProfileRouter: () => ({
-    routedHome: () => mocks.routedHome,
-    userConfigDir: () => mocks.userConfigDir
-  })
+vi.mock('../../../claude-accounts/claude-cli-home-resolver', () => ({
+  getClaudeCliHomeResolver: () => ({ userConfigDir: () => mocks.userConfigDir })
 }))
 vi.mock('../../../claude/claude-diff-panel-auto-open', () => ({
   claudeDiffPanelMayAutoOpen: mocks.mayAutoOpen
@@ -56,7 +51,6 @@ beforeEach(() => {
   mocks.ownership.clear()
   mocks.version = '2.1.301'
   mocks.size = { cols: 180, rows: 40 }
-  mocks.routedHome = '/accounts/a/home'
   mocks.userConfigDir = '/home/me/claude-config'
   mocks.mayAutoOpen.mockReset().mockResolvedValue(true)
   installPtyClaudeDiffPanelNoticeIpcHandler({ getLocalPtyProviderStartupPromise: mocks.startup })
@@ -70,13 +64,12 @@ it('judges a host pane by the config dir its claude sees, its Claude version and
   expect(await ask('pty-1')).toBe(true)
   expect(mocks.startup).toHaveBeenCalled()
   expect(mocks.mayAutoOpen).toHaveBeenCalledWith({
-    configDirEnv: '/accounts/a/home',
+    configDirEnv: '/home/me/claude-config',
     version: '2.1.301',
     cols: 180
   })
 
-  // System default runs on the user's own CLAUDE_CONFIG_DIR, or on the CLI default without one.
-  mocks.routedHome = null
+  // System default runs on the CLI default when no config directory is set.
   mocks.size = null
   await ask('pty-1')
   expect(mocks.mayAutoOpen).toHaveBeenLastCalledWith({

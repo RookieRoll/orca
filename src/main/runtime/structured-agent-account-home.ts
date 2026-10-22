@@ -1,9 +1,7 @@
 import type { AgentSessionAccountKind } from '../../shared/agent-session-availability'
-import type { GlobalSettings } from '../../shared/global-settings-types'
 import { normalizeRuntimePathForComparison } from '../../shared/cross-platform-path'
-import { getClaudeProfileRouter } from '../claude-accounts/claude-profile-installed-router'
-import { normalizeCodexRuntimeSelection } from '../codex-accounts/runtime-selection'
-import { resolveOrcaManagedCodexHomePath, getSystemCodexHomePath } from '../codex/codex-home-paths'
+import { getClaudeCliHomeResolver } from '../claude-accounts/claude-cli-home-resolver'
+import { getSystemCodexHomePath } from '../codex/codex-home-paths'
 import { resolveAbsoluteDirOverride } from '../../shared/absolute-dir-override'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -24,13 +22,12 @@ export type StructuredClaudeAccountHomeDeps = {
 export function resolveStructuredClaudeAccountHomePath(
   deps: StructuredClaudeAccountHomeDeps
 ): string {
-  // Why only an account: System default keeps the launch-env and configured homes below.
-  const accountHome = deps.wslDistro ? null : getClaudeProfileRouter()?.routedHome()
-  if (accountHome) {
-    return accountHome
-  }
+  const standardHome = deps.wslDistro
+    ? null
+    : getClaudeCliHomeResolver()?.systemDefaultHome()
   return (
     deps.launchEnv.CLAUDE_CONFIG_DIR?.trim() ||
+    standardHome?.trim() ||
     deps
       .getClaudeConfigDirectory(
         deps.wslDistro ? { runtime: 'wsl', wslDistro: deps.wslDistro } : { runtime: 'host' }
@@ -67,30 +64,12 @@ export async function resolveStructuredCodexAccountHomePath(
 }
 
 export function resolveStructuredCodexAccountKind(
-  home: string,
-  settings: Partial<
-    Pick<
-      GlobalSettings,
-      | 'codexManagedAccounts'
-      | 'activeCodexManagedAccountId'
-      | 'activeCodexManagedAccountIdsByRuntime'
-    >
-  >
+  home: string
 ): AgentSessionAccountKind | undefined {
   const same = (other: string): boolean =>
     normalizeRuntimePathForComparison(home) === normalizeRuntimePathForComparison(other)
-  if (
-    (settings.codexManagedAccounts ?? []).some(
-      (account) => account.managedHomeRuntime !== 'wsl' && same(account.managedHomePath)
-    )
-  ) {
-    return 'managed'
-  }
   if (same(getSystemCodexHomePath())) {
     return 'system'
-  }
-  if (same(resolveOrcaManagedCodexHomePath())) {
-    return normalizeCodexRuntimeSelection(settings).host ? 'managed' : 'system'
   }
   return undefined
 }

@@ -1,8 +1,6 @@
 import type { ProviderRateLimits } from '../../../../shared/rate-limit-types'
 import { formatResetCreditExpiry } from './tooltip'
 
-export { getCodexAccountSyncKey } from './provider-account-sync-key'
-
 export function getCodexResetProjection(
   codex: ProviderRateLimits,
   hasActiveRuntimeEnvironment: boolean

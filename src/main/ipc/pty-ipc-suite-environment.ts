@@ -38,9 +38,9 @@ import {
   clearMigrationUnsupportedPtyMock,
   clearMigrationUnsupportedPtysForPaneKeyMock,
   clearPaneKeyAliasesForPtyMock,
-  recordCodexPaneAccountMock,
-  forgetCodexPaneAccountMock,
-  getCodexPaneAccountMock,
+  recordCodexPtyLaunchHomeMock,
+  forgetCodexPtyLaunchHomeMock,
+  getCodexPtyLaunchHomeMock,
   ensureCodexBackfillRecoveryMock
 } from './pty-ipc-mock-registry'
 import { makeDisposable } from './pty-ipc-test-constants'
@@ -168,9 +168,9 @@ export function createPtyIpcSuiteEnvironment(): PtyIpcSuiteEnvironment {
     clearMigrationUnsupportedPtyMock.mockReset()
     clearMigrationUnsupportedPtysForPaneKeyMock.mockReset()
     clearPaneKeyAliasesForPtyMock.mockReset()
-    recordCodexPaneAccountMock.mockReset()
-    forgetCodexPaneAccountMock.mockReset()
-    getCodexPaneAccountMock.mockReset()
+    recordCodexPtyLaunchHomeMock.mockReset()
+    forgetCodexPtyLaunchHomeMock.mockReset()
+    getCodexPtyLaunchHomeMock.mockReset()
     ensureCodexBackfillRecoveryMock.mockReset()
     ensureCodexBackfillRecoveryMock.mockResolvedValue(undefined)
     mainWindow.webContents.on.mockReset()

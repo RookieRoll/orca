@@ -47,7 +47,7 @@ import { resolveTuiAgentLaunchEnv } from '../../../shared/tui-agent-launch-defau
 import { preModeChatGetsFullAccess } from '../../../shared/agent-chat-permission-mode'
 import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { nativeChatShellEnvironmentPolicy } from '../../../shared/native-chat-shell-environment'
-import { claudeStructuredAuthPolicyForSettings } from '../../claude-accounts/claude-structured-auth-policy'
+import { claudeStructuredAuthPolicy } from '../../claude-accounts/claude-structured-auth-policy'
 import { resolveStructuredAgentCommand } from '../../native-chat/structured-agent-command-resolution'
 import { structuredAgentConfiguredArgs } from '../../native-chat/structured-agent-configured-args'
 import { claudeCliFlagSupport } from '../../claude/claude-cli-flag-support'
@@ -165,15 +165,13 @@ export abstract class OrcaRuntimeWithGetWorktreePs extends OrcaRuntimeWithWorktr
     }
   }
 
-  /** The agent's configured env, with the account a desktop that owns this host's accounts chose
-   *  laid over it, as its own launches here carry. */
+  /** The agent's configured environment for this workspace. */
   protected structuredAgentLaunchEnv(
     agent: StructuredAgentId,
     settings: Pick<GlobalSettings, 'agentDefaultEnv'>
   ) {
     return {
       ...resolveTuiAgentLaunchEnv(agent, settings.agentDefaultEnv),
-      ...this.accounts.hostLaunchEnvFor(agent)
     }
   }
 
@@ -271,7 +269,7 @@ export abstract class OrcaRuntimeWithGetWorktreePs extends OrcaRuntimeWithWorktr
       resolveShellEnvironmentPolicy: () =>
         nativeChatShellEnvironmentPolicy(this.requireStore().getSettings()),
       resolveClaudeAuthPolicy: () =>
-        claudeStructuredAuthPolicyForSettings(this.requireStore().getSettings()),
+        claudeStructuredAuthPolicy(),
       resolveAgentFullAccess: (agent) =>
         isTuiAgent(agent) &&
         preModeChatGetsFullAccess(agent, this.requireStore().getSettings(), process.platform),
@@ -281,11 +279,8 @@ export abstract class OrcaRuntimeWithGetWorktreePs extends OrcaRuntimeWithWorktr
           : {},
       resolveAgentCommandSettings: () => this.requireStore().getSettings(),
       resolveCodexAccountKind: (home) =>
-        resolveStructuredCodexAccountKind(home, this.requireStore().getSettings()),
+        resolveStructuredCodexAccountKind(home),
       resolveAgentAccountHome: (agent) => this.resolveStructuredAgentAccountHome(agent),
-      ...(this.prepareCodexCatalogProbeHomeFn
-        ? { prepareCodexCatalogProbeHome: this.prepareCodexCatalogProbeHomeFn }
-        : {}),
       // Structured chat has no agent CLI hooks, so this projection is what the first-work
       // workspace rename listens to instead of `agentStatus:set`.
       onSessionStatusChanged: (summary, options) => {

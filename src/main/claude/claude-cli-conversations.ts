@@ -1,6 +1,6 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { getClaudeProfileRouter } from '../claude-accounts/claude-profile-installed-router'
+import { claudeConfigHostDirs } from '../ai-vault/session-scanner-roots'
 import { resolveSessionFilePath } from '../native-chat/session-file-resolver'
 import {
   directoryTranscriptImport,
@@ -15,7 +15,7 @@ const CLAUDE_TRANSCRIPT_IMPORT = directoryTranscriptImport({
   accountHomeCandidates: ({ selectedAccountHomePath }) => [
     selectedAccountHomePath,
     join(homedir(), '.claude'),
-    ...(getClaudeProfileRouter()?.accountHomes() ?? [])
+    ...claudeConfigHostDirs()
   ],
   findTranscript: ({ providerSessionId, store, strictErrors }) =>
     resolveSessionFilePath('claude', providerSessionId, { claudeProjectsDir: store, strictErrors })

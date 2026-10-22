@@ -14,7 +14,7 @@ describe('claude session roots', () => {
     vi.stubEnv('CLAUDE_CONFIG_DIR', '/opt/claude-home')
 
     expect(
-      AI_VAULT_AGENT_SOURCES.claude.rootDirs({ claudeProfileProjectsDirs: [] }, ['/wsl/home/ada'])
+      AI_VAULT_AGENT_SOURCES.claude.rootDirs({}, ['/wsl/home/ada'])
     ).toEqual([
       join('/opt/claude-home', 'projects'),
       join(homedir(), '.claude', 'projects'),
@@ -27,7 +27,7 @@ describe('claude session roots', () => {
 
     expect(
       AI_VAULT_AGENT_SOURCES.claude.rootDirs(
-        { claudeProjectsDir: '/scan/projects', claudeProfileProjectsDirs: [] },
+        { claudeProjectsDir: '/scan/projects' },
         []
       )
     ).toEqual(['/scan/projects'])

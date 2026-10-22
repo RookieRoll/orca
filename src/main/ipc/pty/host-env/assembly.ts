@@ -31,7 +31,6 @@ import {
 } from './pi-agent'
 import { restoreOrStripOverlayEnv } from '../../../../shared/agent-overlay-env'
 import { AGENT_HOOK_RUNTIME_ENV_KEYS } from './spawn-env-keys'
-import { applyManagedDataAccountEnvironment } from '../../../managed-data-accounts/launch-environment'
 import { applyOpenCodeStatusPluginEnv, captureOpenCodeSourceConfig } from './opencode-config'
 import { applyCodexRemoteViewerClipboardEnv } from './codex-terminal-clipboard'
 
@@ -61,7 +60,6 @@ export function buildPtyHostEnv(
 
   const openCodeConfig = captureOpenCodeSourceConfig(baseEnv, opts.userDataPath)
   const launchCommandHint = resolveSetupAgentSequenceLaunchCommand(baseEnv, opts.launchCommand)
-  applyManagedDataAccountEnvironment(baseEnv, { ...opts, launchCommand: launchCommandHint })
   const explicitPiAgentKind = isPiCompatibleAgentType(opts.launchAgent)
     ? opts.launchAgent
     : opts.launchAgent === undefined

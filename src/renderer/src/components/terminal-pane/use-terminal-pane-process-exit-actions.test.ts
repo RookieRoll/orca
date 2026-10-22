@@ -6,22 +6,15 @@ import type { TerminalPaneCloseController } from './use-terminal-pane-close-acti
 
 type MockState = {
   storeState: { tabsByWorktree: Record<string, unknown[]> }
-  readyRestartPtyIds: string[]
-  pendingAgent: 'codex' | 'claude' | null
 }
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
-    storeState: { tabsByWorktree: {} },
-    readyRestartPtyIds: [],
-    pendingAgent: null
+    storeState: { tabsByWorktree: {} }
   }
   return {
     ...state,
-    connectPanePty: vi.fn(() => ({ dispose: vi.fn() })),
-    buildPaneAccountRestartStartup: vi.fn((agent: string) => ({
-      command: `${agent} resume session-1`
-    }))
+    connectPanePty: vi.fn(() => ({ dispose: vi.fn() }))
   }
 })
 
@@ -32,13 +25,6 @@ vi.mock('../../store', () => ({
   )
 }))
 vi.mock('./pty-connection', () => ({ connectPanePty: mocks.connectPanePty }))
-vi.mock('@/lib/agent-account-restart-startup', () => ({
-  buildPaneAccountRestartStartup: mocks.buildPaneAccountRestartStartup
-}))
-vi.mock('./pane-account-restart-readiness', () => ({
-  selectReadyAccountRestartPtyIds: () => mocks.readyRestartPtyIds,
-  isAccountRestartReady: () => true
-}))
 
 import { useTerminalPaneProcessExitActions } from './use-terminal-pane-process-exit-actions'
 
@@ -55,7 +41,6 @@ function createController(): TerminalPaneCloseController {
       savedLayout: { ptyIdsByLeafId: { [PANE.leafId]: 'pty-1' } },
       tabId: 'tab-1',
       worktreeId: 'wt-1',
-      consumePendingPaneAccountRestart: () => mocks.pendingAgent,
       setPaneProcessExitsByPaneId: vi.fn(),
       setTerminalErrorsByPaneId: vi.fn()
     })
@@ -69,10 +54,7 @@ function createController(): TerminalPaneCloseController {
 
 describe('useTerminalPaneProcessExitActions', () => {
   beforeEach(() => {
-    mocks.readyRestartPtyIds = []
-    mocks.pendingAgent = null
     mocks.connectPanePty.mockClear()
-    mocks.buildPaneAccountRestartStartup.mockClear()
   })
 
   it('restarts a failed shell as a plain shell, not an agent', () => {
@@ -91,24 +73,6 @@ describe('useTerminalPaneProcessExitActions', () => {
       PANE,
       expect.anything(),
       expect.objectContaining({ startup: null })
-    )
-    expect(mocks.buildPaneAccountRestartStartup).not.toHaveBeenCalled()
-  })
-
-  it('still resumes Codex when an account switch restarts the pane', () => {
-    mocks.readyRestartPtyIds = ['pty-1']
-    mocks.pendingAgent = 'codex'
-
-    renderHook(() => useTerminalPaneProcessExitActions(createController()))
-
-    expect(mocks.buildPaneAccountRestartStartup).toHaveBeenCalledWith(
-      'codex',
-      expect.objectContaining({ leafId: PANE.leafId })
-    )
-    expect(mocks.connectPanePty).toHaveBeenCalledWith(
-      PANE,
-      expect.anything(),
-      expect.objectContaining({ startup: { command: 'codex resume session-1' } })
     )
   })
 })

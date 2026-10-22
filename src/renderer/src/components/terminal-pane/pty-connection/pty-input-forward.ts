@@ -21,7 +21,6 @@ import {
 
 import { FOREGROUND_GRID_DRIFT_CHECK_MIN_MS } from './foreground-output-budgets'
 import { TERMINAL_FOCUS_IN_SEQUENCE, TERMINAL_FOCUS_OUT_SEQUENCE } from './foreground-output-scan'
-import { isCodexPaneStale } from './codex-pane-stale'
 import { installTerminalSelectionFitGuard } from '../terminal-selection-fit-guard'
 import { initializePaneGeometry, readPaneSize } from './read-pane-size'
 
@@ -46,25 +45,8 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
       return
     }
     const currentPtyId = session.transport.getPtyId()
-    // Protocol replies keep the TUI responsive while an account notice blocks typing.
     if (isTerminalQueryReply(data)) {
       session.sendDesktopQueryReplyImmediate(data)
-      return
-    }
-    // Why: after a Codex account switch, the runtime auth has already moved to
-    // the newly selected account. Stale panes must not keep sending input until
-    // they restart, or work can execute under the wrong account while the UI
-    // still says the pane is stale. Fall back to the tab's persisted PTY ID so
-    // the block still holds during reconnect races before the live transport has
-    // updated its local PTY binding.
-    if (
-      isCodexPaneStale({
-        tabId: session.deps.tabId,
-        worktreeId: session.deps.worktreeId,
-        panePtyId: currentPtyId
-      })
-    ) {
-      session.clearPendingTerminalInputIntent()
       return
     }
     // Why: presence-lock input drop. While mobile is the driver for this

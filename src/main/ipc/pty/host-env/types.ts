@@ -4,7 +4,6 @@ import type { NetworkProxySettings } from '../../../../shared/network-proxy'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { ClaudeAccountSelectionTarget } from '../../../claude-accounts/runtime-selection'
 import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 
 export type BuildPtyHostEnvOptions = {
@@ -40,7 +39,6 @@ export type BuildPtyHostEnvOptions = {
 }
 
 export type CodexHomeLaunchContext = {
-  unavailableManagedHomePath?: string
   /** An Orca-launched Codex, which may wait briefly for its status hook; other spawns never do. */
   launchesCodex?: boolean
 }
@@ -58,14 +56,12 @@ export type PrepareCodexSessionResume = (args: {
   providerSession: AgentProviderSessionMetadata
   target: CodexAccountSelectionTarget
   launchEnv?: NodeJS.ProcessEnv
-  useSelectedAccount?: boolean
 }) => Promise<CodexSessionResumePreparation | null>
 
 export type CodexHomePtySpawnedLifecycleArgs = {
   id: string
   codexHomePath: string | null
   reattached?: boolean
-  reattachedHomeRoute?: CodexPaneHomeRoute | null
   launchEnv?: NodeJS.ProcessEnv
   startedAt?: Date
   startedSequence?: number

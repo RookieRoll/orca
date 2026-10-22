@@ -15,14 +15,13 @@ import {
 } from './rate-limit-service-test-harness'
 
 const profileRouter = vi.hoisted((): { userConfigDir?: string } => ({}))
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  getClaudeProfileRouter: () =>
+vi.mock('../claude-accounts/claude-cli-home-resolver', () => ({
+  getClaudeCliHomeResolver: () =>
     profileRouter.userConfigDir ? { userConfigDir: () => profileRouter.userConfigDir } : undefined
 }))
 
 vi.mock('./claude-fetcher', () => ({
-  fetchClaudeRateLimits: vi.fn(),
-  fetchManagedAccountUsage: vi.fn()
+  fetchClaudeRateLimits: vi.fn()
 }))
 
 vi.mock('./codex-fetcher', () => ({
@@ -472,7 +471,7 @@ describe('RateLimitService', () => {
     }
   })
 
-  it('does not restore the outgoing account auth snapshot when the account switches mid-resolve', async () => {
+  it('does not restore the outgoing CLI auth snapshot when the runtime target changes mid-resolve', async () => {
     vi.useFakeTimers()
     try {
       const staleClaudeFetch = deferred<ProviderRateLimits>()
@@ -492,20 +491,20 @@ describe('RateLimitService', () => {
         }
         return {
           configDir: outgoing ? '/outgoing/.claude' : '/incoming/.claude',
-          runtime: 'host',
-          wslDistro: null,
-          wslLinuxConfigDir: null,
+          runtime: outgoing ? 'host' : 'wsl',
+          wslDistro: outgoing ? null : 'Ubuntu',
+          wslLinuxConfigDir: outgoing ? null : '/home/u/.claude',
           envPatch: {
             CLAUDE_CONFIG_DIR: outgoing ? '/outgoing/.claude' : '/incoming/.claude'
           },
-          provenance: outgoing ? 'managed:outgoing' : 'managed:incoming'
+          provenance: outgoing ? 'system' : 'wsl:Ubuntu:system'
         }
       })
 
-      // The first cycle is parked inside the outgoing account's resolver await when the switch lands.
+      // The first cycle is parked inside auth preparation when the runtime target changes.
       const firstRefresh = service.refresh()
       await flushMicrotasks()
-      const switchPromise = service.refreshForClaudeAccountChange('outgoing-account')
+      const switchPromise = service.refreshClaudeForTarget({ runtime: 'wsl', wslDistro: 'Ubuntu' })
       await flushMicrotasks()
       authGate.resolve()
       await flushMicrotasks(8)

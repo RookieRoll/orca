@@ -26,7 +26,6 @@ import {
 
 export { getManagedScript }
 import { getManagedStatusLineCommand, getManagedStatusLineScript } from './statusline-script'
-import { refuseProfileAtDefaultHome } from './claude-profile-hook-target'
 import {
   applyManagedHooks,
   applyManagedStatusLine,
@@ -105,10 +104,6 @@ export class ClaudeHookService {
   }
 
   getStatus(options: ClaudeHookTargetOptions = {}): AgentHookInstallStatus {
-    const refused = refuseProfileAtDefaultHome(this.options, options.configDir)
-    if (refused) {
-      return refused
-    }
     const configPath = getConfigPath(this.options.settings, options.configDir)
     const scriptPath = getManagedScriptPath(this.options.settings)
     const config = readHooksJson(configPath)
@@ -165,10 +160,6 @@ export class ClaudeHookService {
   }
 
   install(options: ClaudeHookTargetOptions = {}): AgentHookInstallStatus {
-    const refused = refuseProfileAtDefaultHome(this.options, options.configDir)
-    if (refused) {
-      return refused
-    }
     const configPath = getConfigPath(this.options.settings, options.configDir)
     const scriptPath = getManagedScriptPath(this.options.settings)
     const config = readHooksJson(configPath)

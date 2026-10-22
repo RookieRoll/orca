@@ -10,7 +10,7 @@ import { createMobileRpcSurfaceRuntime } from './runtime-rpc-mobile-method-allow
 describe('OrcaRuntimeRpcServer', () => {
   it('limits mobile-scoped WebSocket tokens to the mobile RPC surface', async () => {
     const userDataPath = mkdtempSync(join(tmpdir(), 'orca-runtime-rpc-'))
-    const { runtime, mocks, expectedCodexResetScope } = createMobileRpcSurfaceRuntime()
+    const { runtime, mocks } = createMobileRpcSurfaceRuntime()
     const server = new OrcaRuntimeRpcServer({ runtime, userDataPath, enableWebSocket: false })
     server['deviceRegistry'] = new DeviceRegistry(userDataPath)
     const mobile = server['deviceRegistry']!.addDevice('phone', 'mobile')
@@ -401,33 +401,6 @@ describe('OrcaRuntimeRpcServer', () => {
       params: { worktree: 'id:wt-1', filePaths: ['c.ts'] }
     })
     await dispatch({
-      id: 'req_select_claude',
-      method: 'accounts.selectClaude',
-      deviceToken: mobile.token,
-      params: { accountId: 'claude-account' }
-    })
-    await dispatch({
-      id: 'req_select_codex',
-      method: 'accounts.selectCodex',
-      deviceToken: mobile.token,
-      params: { accountId: null }
-    })
-    await dispatch({
-      id: 'req_consume_codex_reset',
-      method: 'accounts.consumeCodexResetCredit',
-      deviceToken: mobile.token,
-      params: {
-        idempotencyKey: '11111111-1111-4111-8111-111111111111',
-        expectedScope: expectedCodexResetScope
-      }
-    })
-    await dispatch({
-      id: 'req_remove_claude',
-      method: 'accounts.removeClaude',
-      deviceToken: mobile.token,
-      params: { accountId: 'claude-account' }
-    })
-    await dispatch({
       id: 'req_terminal_read',
       method: 'terminal.read',
       deviceToken: mobile.token,
@@ -623,10 +596,6 @@ describe('OrcaRuntimeRpcServer', () => {
     )
     expect(mocks.selectClaudeAccount).toHaveBeenCalledWith('claude-account')
     expect(mocks.selectCodexAccount).toHaveBeenCalledWith(null)
-    expect(mocks.consumeCodexRateLimitResetCredit).toHaveBeenCalledWith(
-      '11111111-1111-4111-8111-111111111111',
-      expectedCodexResetScope
-    )
     expect(mocks.readTerminal).toHaveBeenCalledWith('term-1', { cursor: undefined })
     expect(mocks.getRuntimeGitStatus).toHaveBeenCalledWith('id:wt-1', { admissionTier: 'status' })
     expect(mocks.pushRuntimeGit).toHaveBeenCalledWith('id:wt-1', true, undefined, undefined)

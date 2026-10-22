@@ -1,5 +1,7 @@
 import { ExternalLink, ShieldCheck } from 'lucide-react'
 import { translate } from '@/i18n/i18n'
+import { formatUiRelativeTime } from '@/i18n/relative-time-format'
+import { useNow } from '../../hooks/use-now'
 import { cn } from '@/lib/utils'
 import type { FeatureInteractionId } from '../../../../shared/feature-interaction-catalog'
 import type { ProviderRateLimits } from '../../../../shared/rate-limit-types'
@@ -7,15 +9,35 @@ import { Label } from '../ui/label'
 import { MiniMaxIcon } from '../status-bar/icons'
 import { SearchableSetting } from './SearchableSetting'
 import { DebouncedSettingsTextInput } from './DebouncedSettingsTextInput'
-import { MiniMaxCredentials, miniMaxStorageHelp } from './accounts-pane-minimax-credentials'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { useMiniMaxCredentials } from './use-minimax-credentials'
+import { UnsealedCredentialNotice } from './UnsealedCredentialNotice'
 import {
   usageCredentialAccessNotice,
   usageCredentialStoredLabel,
   type UsageCredentialHost
 } from './usage-credential-host'
 import type { UsageHostSettingsModel } from './use-usage-host-settings'
+
+function miniMaxStorageHelp(host: UsageCredentialHost): string {
+  return host.label === null
+    ? translate(
+        'auto.components.settings.AccountsPane.selectedEndpointStorage',
+        'Stored locally and sent to the selected MiniMax endpoint for usage refreshes.'
+      )
+    : translate(
+        'auto.components.settings.usageCredentialHost.miniMaxStorage',
+        'Stored on {{host}} and sent from there to the selected MiniMax endpoint for usage refreshes.',
+        { host: host.label }
+      )
+}
+
+function formatMiniMaxRelativeRefresh(updatedAt: number, now: number): string {
+  const diffMs = Math.max(0, now - updatedAt)
+  return diffMs < 60_000
+    ? translate('auto.components.settings.AccountsPane.3a30aaf526', 'just now')
+    : formatUiRelativeTime(-diffMs)
+}
 
 export function MiniMaxAccountsSection({
   host,
@@ -30,7 +52,13 @@ export function MiniMaxAccountsSection({
   recordFeatureInteraction: (featureId: FeatureInteractionId) => void
 }): React.JSX.Element {
   const credentials = useMiniMaxCredentials(host.owner)
-  const { miniMaxConfigured, miniMaxApiKeyConfigured, miniMaxCredentialBusy } = credentials
+  const {
+    miniMaxConfigured,
+    miniMaxApiKeyConfigured,
+    miniMaxCookieProtection,
+    miniMaxApiKeyProtection
+  } = credentials
+  const now = useNow(60_000)
   const settings = usageSettings.settings
   const consoleUrl =
     settings?.minimaxEndpoint === 'cn'
@@ -57,7 +85,7 @@ export function MiniMaxAccountsSection({
           <p className="text-xs text-muted-foreground">
             {translate(
               'auto.components.settings.AccountsPane.usageTracking',
-              'Configure MiniMax usage tracking for your account.'
+              'Review MiniMax usage status and endpoint settings.'
             )}
           </p>
         </div>
@@ -98,16 +126,37 @@ export function MiniMaxAccountsSection({
             </p>
           )}
           <p className="text-xs text-muted-foreground">{miniMaxStorageHelp(host)}</p>
+          <UnsealedCredentialNotice
+            protection={miniMaxCookieProtection}
+            credentialName={translate(
+              'auto.components.settings.AccountsPane.21d6eb141e',
+              'MiniMax Session Cookie'
+            )}
+          />
+          <UnsealedCredentialNotice
+            protection={miniMaxApiKeyProtection}
+            credentialName={translate(
+              'auto.components.settings.AccountsPane.83b6a1f7c4',
+              'MiniMax API key'
+            )}
+          />
+          {configured &&
+          miniMaxRateLimits?.status === 'ok' &&
+          miniMaxRateLimits.error === null ? (
+            <p className="text-xs text-muted-foreground">
+              {translate(
+                'auto.components.settings.AccountsPane.53f7b8c7a2',
+                'Last refresh: {{value0}}',
+                { value0: formatMiniMaxRelativeRefresh(miniMaxRateLimits.updatedAt, now) }
+              )}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <SearchableSetting
         title={translate('auto.components.settings.AccountsPane.f8a4b9d210', 'MiniMax endpoint')}
-        description={translate(
-          'auto.components.settings.AccountsPane.0b3a9f6c2e',
-          'Pick the host that matches your account. Both overseas (platform.minimax.io) and China (platform.minimaxi.com) accept either a session cookie or an API key.'
-        )}
-        keywords={['minimax', 'endpoint', 'region', 'host', 'cn', 'china', 'overseas', 'api key']}
+        keywords={['minimax', 'endpoint', 'region', 'host', 'cn', 'china', 'overseas']}
         className="space-y-2"
       >
         <Label htmlFor="minimax-endpoint">
@@ -116,7 +165,7 @@ export function MiniMaxAccountsSection({
         <Select
           value={settings?.minimaxEndpoint ?? ''}
           onValueChange={handleMiniMaxEndpointChange}
-          disabled={miniMaxCredentialBusy || settingsUnavailable}
+          disabled={settingsUnavailable}
         >
           <SelectTrigger id="minimax-endpoint" className="h-8 w-full text-xs">
             <SelectValue />
@@ -145,13 +194,6 @@ export function MiniMaxAccountsSection({
           </SelectContent>
         </Select>
       </SearchableSetting>
-
-      <MiniMaxCredentials
-        credentials={credentials}
-        host={host}
-        miniMaxRateLimits={miniMaxRateLimits}
-        consoleUrl={consoleUrl}
-      />
 
       <div className="space-y-3 rounded-lg border border-border/60 bg-muted/20 p-3">
         <div className="flex items-center justify-between gap-3">

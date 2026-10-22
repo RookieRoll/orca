@@ -22,8 +22,6 @@ export type StoreState = {
   ptyIdsByTabId?: Record<string, string[]>
   terminalLayoutsByTabId?: Record<string, TerminalLayoutSnapshot>
   terminalPaneStartsByPaneKey?: AppState['terminalPaneStartsByPaneKey']
-  /** Pty id → the agent its pane restarts as once the account change lands. */
-  pendingPaneAccountRestarts?: AppState['pendingPaneAccountRestarts']
   unreadTerminalTabs?: Record<string, true>
   deleteStateByWorktreeId?: Record<string, { isDeleting?: boolean; phase?: string }>
   worktreesByRepo: Record<
@@ -86,15 +84,6 @@ export type StoreState = {
     agentDefaultArgs?: Record<string, string>
     agentDefaultEnv?: Record<string, Record<string, string>>
   } | null
-  codexRestartNoticeByPtyId: Record<
-    string,
-    {
-      previousAccountLabel: string
-      nextAccountLabel: string
-      restartRequested?: true
-      dismissed?: true
-    }
-  >
   deferredSshReconnectTargets: string[]
   deferredSshSessionIdsByTabId: Record<string, string>
   removeDeferredSshReconnectTarget: ReturnType<typeof vi.fn>

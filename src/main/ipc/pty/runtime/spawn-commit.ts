@@ -13,8 +13,7 @@ import { ptySizes } from '../delivery/visibility-state'
 import { commitRuntimePtySize } from './spawn-commit-pty-size'
 import {
   shouldSkipCodexHomeEnvForWindowsShell,
-  recordCodexPaneAccountForSpawn,
-  codexReattachedHomeRouteField
+  recordCodexPtyLaunchHomeForSpawn
 } from '../host-env/codex-home'
 import { registerPty } from '../../../memory/pty-registry'
 import { rememberPaneKeyForPty } from '../pane/key-state'
@@ -99,7 +98,6 @@ async function commitReservedRuntimePtySpawn(ctx: RuntimePtySpawnState) {
       reattached: true,
       startedAt: ctx.codexHomeLaunchStartedAt,
       startedSequence: ctx.codexHomeLaunchStartedSequence,
-      ...codexReattachedHomeRouteField(ctx.reattachedCodexHomeRoutes, ctx.result.id, true),
       ...(ctx.env ? { launchEnv: ctx.env } : {})
     })
     // Why: this branch returns before the normal commit site; without this the cache keeps
@@ -207,14 +205,13 @@ async function commitReservedRuntimePtySpawn(ctx: RuntimePtySpawnState) {
   if (ctx.effectiveSessionAppId !== undefined && ctx.effectiveSessionAppId !== ctx.result.id) {
     ptySizes.delete(ctx.effectiveSessionAppId)
   }
-  recordCodexPaneAccountForSpawn({
+  recordCodexPtyLaunchHomeForSpawn({
     ptyId: ctx.result.id,
-    isDaemonHostSpawn: ctx.isDaemonHostSpawn,
     isReattach: ctx.result.isReattach === true,
-    pinnedByResume: ctx.codexResumeHomeSelected,
-    launchCodexHomePath: ctx.selectedCodexHomePath,
     target: ctx.codexSelectionTarget,
-    settings: ctx.deps.getSettings?.()
+    selectedCodexHomePath: ctx.selectedCodexHomePath,
+    skipCodexHomeEnv: ctx.skipCodexHomeEnv,
+    launchEnv: ctx.env
   })
   // Why: runtime-controller creates (headless serve, CLI, splits) adopt surviving daemon sessions too; without this seed their records stay blank.
   seedTerminalRestoreRecordsFromSpawnResult(ctx.deps.runtime, ctx.result)
@@ -261,11 +258,6 @@ async function commitReservedRuntimePtySpawn(ctx: RuntimePtySpawnState) {
     codexHomePath: ctx.selectedCodexHomePath,
     startedAt: ctx.codexHomeLaunchStartedAt,
     startedSequence: ctx.codexHomeLaunchStartedSequence,
-    ...codexReattachedHomeRouteField(
-      ctx.reattachedCodexHomeRoutes,
-      ctx.result.id,
-      ctx.result.isReattach === true
-    ),
     ...(ctx.result.isReattach === true
       ? { reattached: true }
       : ctx.env

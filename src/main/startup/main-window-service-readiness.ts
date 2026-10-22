@@ -12,12 +12,11 @@ const MAIN_WINDOW_SERVICE_REQUIREMENTS = [
   ['museUsage', 'Muse usage store must be initialized before opening the main window'],
   ['rateLimits', 'Rate limit service must be initialized before opening the main window'],
   ['automations', 'Automation service must be initialized before opening the main window'],
-  ['codexAccounts', 'Codex account service must be initialized before opening the main window'],
+  ['codexResetCredits', 'Codex reset service must be initialized before opening the main window'],
   [
     'codexRuntimeHome',
     'Codex runtime home service must be initialized before opening the main window'
   ],
-  ['claudeAccounts', 'Claude account service must be initialized before opening the main window'],
   [
     'claudeRuntimeAuth',
     'Claude runtime auth service must be initialized before opening the main window'

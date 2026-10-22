@@ -8,7 +8,6 @@ import { dropAgentResumeArgvFromCommand } from '../../../../shared/agent-resume-
 import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
 import { dropUnverifiedCodexResumeArgv } from '../../../codex/codex-unverified-resume-launch'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
-import { CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE, codexHomePathsEqual } from './codex-home'
 import type { PrepareCodexSessionResume } from './types'
 
 export type CodexResumeLaunch = {
@@ -30,7 +29,6 @@ export type PrepareCodexResumeHomeArgs = {
   providerSession?: AgentProviderSessionMetadata
   target: CodexAccountSelectionTarget
   launchEnv?: NodeJS.ProcessEnv
-  useSelectedAccount?: boolean
 }
 
 export function prepareCodexResumeHome(
@@ -49,8 +47,7 @@ export function prepareCodexResumeHome(
     preparation: prepareCodexSessionResume({
       providerSession,
       target: args.target,
-      launchEnv: args.launchEnv,
-      ...(args.useSelectedAccount ? { useSelectedAccount: true } : {})
+      launchEnv: args.launchEnv
     })
   }
 }
@@ -101,20 +98,6 @@ export function resolveCodexResumeLaunch(
       providerSession
     }
   })
-}
-
-export async function reconcileSharedRuntimeResumeHome(
-  resumeHome: Extract<CodexSessionResumePreparation, { outcome: 'resume' }>,
-  resolveCurrentHome: () => string | null | Promise<string | null>
-): Promise<string> {
-  if (!resumeHome.reconcileSharedRuntimeAuth) {
-    return resumeHome.codexHomePath
-  }
-  const currentHome = await resolveCurrentHome()
-  if (!codexHomePathsEqual(currentHome, resumeHome.codexHomePath)) {
-    throw new Error(CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE)
-  }
-  return resumeHome.codexHomePath
 }
 
 /** Why: buildPtyHostEnv prefers ORCA_SEQUENCED_STARTUP_COMMAND over the launch command

@@ -5,9 +5,8 @@
 import type { Store } from './persistence'
 import { RateLimitService } from './rate-limits/service'
 import { CodexRuntimeHomeService } from './codex-accounts/runtime-home-service'
-import { CodexAccountService } from './codex-accounts/service'
+import { CodexResetCreditCoordinator } from './codex-accounts/codex-reset-credit-coordinator'
 import { ClaudeRuntimeAuthService } from './claude-accounts/runtime-auth-service'
-import { ClaudeAccountService } from './claude-accounts/service'
 import { getInitialCodexRateLimitTarget } from './rate-limits/codex-rate-limit-target'
 import { getInitialClaudeRateLimitTarget } from './rate-limits/claude-rate-limit-target'
 import { getKimiRuntimeTarget, resolveKimiHome } from './kimi/kimi-runtime-home'
@@ -17,35 +16,25 @@ import { readMiniMaxApiKey } from './minimax/minimax-api-key-store'
 import { readZcodePlanApiKey } from './zcode/zcode-plan-api-key-store'
 import { readOpenCodeGoApiKey } from './opencode/opencode-go-api-key-store'
 import { createAccountRuntimeTargetSettingsSync } from './rate-limits/account-runtime-target-sync'
-import { normalizeCodexRuntimeSelection } from './codex-accounts/runtime-selection'
-import { normalizeClaudeRuntimeSelection } from './claude-accounts/runtime-selection'
 import type { ClaudeStatusLineRateLimits } from '../shared/claude-statusline-rate-limits'
 
 export type ProviderAccountServices = {
   rateLimits: RateLimitService
   codexRuntimeHome: CodexRuntimeHomeService
-  codexAccounts: CodexAccountService
+  codexResetCredits: CodexResetCreditCoordinator
   claudeRuntimeAuth: ClaudeRuntimeAuthService
-  claudeAccounts: ClaudeAccountService
 }
 
 export function createProviderAccountServices(
   store: Store,
   options: {
-    codexAccountLifecycle?: ConstructorParameters<typeof CodexAccountService>[3]
     setClaudeStatusLineListener: (listener: (event: ClaudeStatusLineRateLimits) => void) => void
   }
 ): ProviderAccountServices {
   const rateLimits = new RateLimitService()
   const codexRuntimeHome = new CodexRuntimeHomeService(store)
-  const codexAccounts = new CodexAccountService(
-    store,
-    rateLimits,
-    codexRuntimeHome,
-    options.codexAccountLifecycle
-  )
+  const codexResetCredits = new CodexResetCreditCoordinator(store, rateLimits, codexRuntimeHome)
   const claudeRuntimeAuth = new ClaudeRuntimeAuthService(store)
-  const claudeAccounts = new ClaudeAccountService(store, rateLimits, claudeRuntimeAuth)
   // Why: quota polls are background work and must not boot a stopped distro; user-driven
   // resets call prepareForRateLimitFetch directly.
   rateLimits.setCodexHomePathResolver(async (target) =>
@@ -138,42 +127,5 @@ export function createProviderAccountServices(
     store.getUI().statusBarItems.includes('antigravity')
   )
   rateLimits.setNetworkProxySettingsResolver(() => store.getSettings())
-  rateLimits.setInactiveClaudeAccountsResolver(() => {
-    const settings = store.getSettings()
-    const activeIds = new Set(
-      [
-        normalizeClaudeRuntimeSelection(settings).host,
-        ...Object.values(normalizeClaudeRuntimeSelection(settings).wsl)
-      ].filter(Boolean)
-    )
-    return settings.claudeManagedAccounts
-      .filter((account) => !activeIds.has(account.id))
-      .map((account) => ({
-        id: account.id,
-        managedAuthRuntime: account.managedAuthRuntime,
-        wslDistro: account.wslDistro,
-        wslLinuxAuthPath: account.wslLinuxAuthPath
-      }))
-  })
-  rateLimits.setInactiveCodexAccountsResolver(() => {
-    const settings = store.getSettings()
-    const activeIds = new Set(
-      [
-        normalizeCodexRuntimeSelection(settings).host,
-        ...Object.values(normalizeCodexRuntimeSelection(settings).wsl)
-      ].filter(Boolean)
-    )
-    return settings.codexManagedAccounts
-      .filter((account) => !activeIds.has(account.id))
-      .map((account) => ({
-        id: account.id,
-        resolveHome: () => {
-          const resolved = codexRuntimeHome.resolveCodexManagedAccountHomeForInactiveFetch(account)
-          return resolved.kind === 'ready'
-            ? { kind: 'ready' as const, managedHomePath: resolved.homePath }
-            : { kind: 'skip' as const }
-        }
-      }))
-  })
-  return { rateLimits, codexRuntimeHome, codexAccounts, claudeRuntimeAuth, claudeAccounts }
+  return { rateLimits, codexRuntimeHome, codexResetCredits, claudeRuntimeAuth }
 }

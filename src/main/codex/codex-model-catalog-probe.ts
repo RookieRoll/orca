@@ -18,7 +18,6 @@ import type {
 export type CodexModelCatalogProbeDeps = CodexStructuredInvocationDeps & {
   resolveAccountKind?: (home: string) => AgentSessionAccountKind | undefined
   /** The sync a launch runs on this home first, so the probe reads the login a launch would. */
-  prepareHome?: (home: string) => void
   /** Test seam; production runs the shared short-lived app-server session. */
   runSession?: typeof runCodexAppServerSession
 }
@@ -46,7 +45,6 @@ export function createCodexModelCatalogProbe(
   return async (accountHome, options): Promise<AgentModelCatalogSuccess> => {
     const accountHomePath = requireLegacyAgentSessionAccountHome(accountHome).path
     const { command, environment } = await resolveCodexStructuredInvocation(deps)
-    deps.prepareHome?.(accountHomePath)
     const run = deps.runSession ?? runCodexAppServerSession
     const { listing, unavailable } = await run(
       {

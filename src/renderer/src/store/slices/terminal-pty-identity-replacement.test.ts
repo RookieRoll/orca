@@ -37,14 +37,12 @@ import type { TerminalLayoutSnapshot, TerminalTab } from '../../../../shared/ter
         tabsByWorktree: {
           [worktreeId]: [makeTab({ id: 'tab-1', worktreeId, ptyId: replacementPtyId })]
         },
-        ptyIdsByTabId: { 'tab-1': [replacementPtyId] },
-        pendingPaneAccountRestarts: { [stalePtyId]: 'codex' }
+        ptyIdsByTabId: { 'tab-1': [replacementPtyId] }
       })
 
       store.getState().updateTabPtyId('tab-1', replacementPtyId, stalePtyId)
 
       expect(store.getState().ptyIdsByTabId['tab-1']).toEqual([replacementPtyId])
-      expect(store.getState().pendingPaneAccountRestarts).toEqual({ [replacementPtyId]: 'codex' })
     })
 
     it('publishes pane and tab replacement identities in one store commit', () => {

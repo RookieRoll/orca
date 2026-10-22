@@ -1,23 +1,12 @@
 import { app } from 'electron'
 import { isLocalExecutionHost } from '../../shared/execution-host'
 import { getPtyIdForPaneKey } from '../ipc/pty/pane/key-state'
-import { getDaemonProvider, listLiveDaemonPtyIds } from '../daemon/daemon-provider-state'
+import { getDaemonProvider } from '../daemon/daemon-provider-state'
 import { initDaemonPtyProvider } from '../daemon/daemon-provider-init'
 import { restartLocalTerminalsAfterElevation } from '../windows/windows-administrator-restart'
 import { resolveTerminalSpawnAdmissionMode } from '../daemon/terminal-spawn-gate'
 import {
-  getCodexPaneAccount,
-  hasAnyRecordedLegacyWslCodexPane,
-  hasRecordedManagedHostCodexPane,
-  isCodexPaneHomeRouteProvenAwayFromSharedHome,
-  reconcileCodexPaneAccountsWithLivePtys,
-  type CodexPaneHomeRoute
-} from '../codex/codex-pane-account-registry'
-import { reconcileRetainedCodexHookHomes } from '../codex/retained-codex-hook-state'
-import { codexHookService } from '../codex/hook-service'
-import {
-  isAgentStatusHooksEnabled,
-  isAgentStatusHooksEnabledForAgent
+  isAgentStatusHooksEnabled
 } from '../agent-hooks/managed-agent-hook-controls'
 import { agentHookServer } from '../agent-hooks/server'
 import { createLocalTmuxManagedPtyResolver } from '../agent-hooks/local-tmux-managed-pty'
@@ -45,23 +34,10 @@ export function handleCodexHomePtySpawned(args: {
   id: string
   codexHomePath: string | null
   reattached?: boolean
-  reattachedHomeRoute?: CodexPaneHomeRoute | null
   launchEnv?: NodeJS.ProcessEnv
   startedAt?: Date
   startedSequence?: number
 }): void {
-  // Why: only shared or ambiguous retained shells can create rollout logs that still need publication.
-  if (args.reattached && args.startedSequence !== undefined) {
-    const paneAccount = getCodexPaneAccount(args.id)
-    const homeRoute =
-      args.reattachedHomeRoute !== undefined
-        ? (args.reattachedHomeRoute ?? undefined)
-        : paneAccount?.homeRoute
-    if (state.codexSessionMigration && isCodexPaneHomeRouteProvenAwayFromSharedHome(homeRoute)) {
-      state.codexSessionMigration.ignoreLaunch(args.id, args.startedSequence)
-      return
-    }
-  }
   const fullScanRequired =
     state.codexRuntimeHome?.beginHostSystemDefaultSessionMigrationLaunch(args.codexHomePath, {
       reattached: args.reattached,
@@ -130,32 +106,6 @@ export function startTerminalRuntimeStartupServices(): WindowsDesktopStartupServ
         spawnAdmission: resolveTerminalSpawnAdmissionMode()
       })
       await restartLocalTerminalsAfterElevation(signal)
-      // Why: a retained shell keeps its launch-time Codex home even when the current routing lane changes.
-      const hasRetainedManagedHostPane = hasRecordedManagedHostCodexPane()
-      if (
-        state.codexRuntimeHome &&
-        (hasRetainedManagedHostPane || hasAnyRecordedLegacyWslCodexPane())
-      ) {
-        const livePtyIds = await listLiveDaemonPtyIds()
-        if (livePtyIds) {
-          reconcileCodexPaneAccountsWithLivePtys(livePtyIds)
-          const settings = state.store?.getSettings()
-          // Why (#16441): each retained home can run a codex app-server grant
-          // session. Awaiting them here delayed the first window by N sessions;
-          // a retained shell cannot invoke Codex before this provider serves.
-          if (hasRetainedManagedHostPane) {
-            void reconcileRetainedCodexHookHomes({
-              hookService: codexHookService,
-              hooksEnabled: isAgentStatusHooksEnabledForAgent(settings, 'codex'),
-              runtimeHomePaths: state.codexRuntimeHome.getRetainedHostCodexHookHomePaths(livePtyIds)
-            }).catch((error) =>
-              console.warn('[codex-hook-service] retained Codex home reconcile failed:', error)
-            )
-          }
-        }
-      }
-      // Why: retained shells can invoke Codex immediately after the startup gate.
-      state.codexRuntimeHome?.reconcileLegacySharedHomeForRetainedPanes()
       logStartupMilestone('startup-service-done', { service: 'daemon-pty-provider' })
     },
     // Why: PTY spawn env reads ORCA_AGENT_HOOK_* from live server state, so the renderer awaits this before restored terminals reconnect.

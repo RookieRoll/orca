@@ -242,7 +242,6 @@ vi.mock('react', async (importOriginal) => ({
   useLayoutEffect: (effect: () => void) => effect()
 }))
 vi.mock('@/runtime/sync-runtime-graph', () => ({ scheduleRuntimeGraphSync: vi.fn() }))
-vi.mock('@/lib/codex-stale-pane-sweep', () => ({ notifyCodexPaneBoundForStaleSweep: vi.fn() }))
 const { requestTerminalPaneRecovery } = vi.hoisted(() => ({
   requestTerminalPaneRecovery: vi.fn(async () => true)
 }))
@@ -254,129 +253,12 @@ vi.mock(
   })
 )
 
-describe('account restart through renderer connection and host spawn', () => {
+describe('terminal restart through renderer connection and host spawn', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
   afterEach(async () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('replaces a tombstoned owner while its persisted pane binding has not yet been cleared', async () => {
-    const host = installRestartHarness()
-    registerWithFakes(mainWindow, host.runtime, host.store)
-    rendererState = createInitialStoreState(() => rendererState)
-    rendererState.tabsByWorktree[worktreeId][0].ptyId = 'pty-old'
-    rendererState.ptyIdsByTabId = { ...rendererState.ptyIdsByTabId, [tabId]: ['pty-old'] }
-    rendererState.sleepingAgentSessionsByPaneKey[paneKey] = {
-      paneKey,
-      tabId,
-      worktreeId,
-      agent: 'claude',
-      providerSession: { key: 'session_id', id: 'another-agents-session' },
-      state: 'waiting',
-      prompt: '',
-      capturedAt: 1,
-      updatedAt: 1
-    }
-    const layouts = rendererState.terminalLayoutsByTabId ?? {}
-    const layout = layouts[tabId]!
-    rendererState.terminalLayoutsByTabId = {
-      ...layouts,
-      [tabId]: { ...layout, ptyIdsByLeafId: { ...layout.ptyIdsByLeafId, [leafId]: 'pty-old' } }
-    }
-    await installTerminalTestGlobals()
-    installIpcPtyWindow(window, {})
-    window.api.pty.claimViewport = vi.fn()
-    const spawnErrors: unknown[] = []
-    vi.mocked(window.api.pty.spawn).mockImplementation(async (args) => {
-      try {
-        // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: registered pty:spawn returns the preload's spawn response.
-        return (await handlers.get('pty:spawn')!(null, args)) as Awaited<
-          ReturnType<typeof window.api.pty.spawn>
-        >
-      } catch (error) {
-        spawnErrors.push(error)
-        throw error
-      }
-    })
-    const { createIpcPtyTransport } =
-      await import('../../src/renderer/src/components/terminal-pane/pty-transport')
-    const { useTerminalPaneProcessExitActions } =
-      await import('../../src/renderer/src/components/terminal-pane/use-terminal-pane-process-exit-actions')
-    const oldTransport = createIpcPtyTransport({ worktreeId, tabId, leafId })
-    oldTransport.attach({ existingPtyId: 'pty-old', callbacks: {} })
-    const pane = createPane(1)
-    const manager = createManager(1)
-    manager.getPanes.mockReturnValue([pane])
-    const transports = new Map<number, PtyTransport>([[1, oldTransport]])
-    const bindings = new Map<number, { dispose: () => void }>()
-    const deps = buildPaneConnectionDeps(() => rendererState, {
-      tabId,
-      worktreeId,
-      cwd,
-      paneTransportsRef: { current: transports },
-      clearTabPtyId: vi.fn(() => {
-        rendererState.tabsByWorktree[worktreeId][0].ptyId = null
-        rendererState.ptyIdsByTabId = { ...rendererState.ptyIdsByTabId, [tabId]: [] }
-      })
-    })
-    rendererState.pendingPaneAccountRestarts = { 'pty-old': 'codex' }
-    const controller = {
-      ...deps,
-      managerRef: { current: manager },
-      panePtyBindingsRef: { current: bindings },
-      savedLayout: { ptyIdsByLeafId: { [leafId]: 'pty-old' } },
-      consumePendingPaneAccountRestart: vi.fn(() => 'codex'),
-      clearCodexRestartNotice: vi.fn(),
-      suppressPtyExit: vi.fn(),
-      setTerminalError: vi.fn(),
-      setTerminalErrorsByPaneId: vi.fn(),
-      setPaneProcessExitsByPaneId: vi.fn(),
-      executeClosePane: vi.fn(),
-      handlePaneProcessDied: vi.fn(),
-      showRestoredSessionBanner: vi.fn(),
-      onPtyErrorClearedRef: { current: vi.fn() },
-      onPtyRecoveryStateRef: { current: vi.fn() }
-    }
-    useTerminalPaneProcessExitActions(
-      // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: existing connection fixture supplies restart callbacks; DOM/terminal rendering is simulated.
-      controller as unknown as Parameters<typeof useTerminalPaneProcessExitActions>[0]
-    )
-    try {
-      await vi.waitFor(() => expect(window.api.pty.spawn).toHaveBeenCalled())
-      await vi.waitFor(() =>
-        expect(
-          host.shutdown,
-          JSON.stringify(vi.mocked(window.api.pty.spawn).mock.calls)
-        ).toHaveBeenCalled()
-      )
-      await vi.waitFor(() =>
-        expect(transports.get(1)?.getPtyId(), String(spawnErrors[0])).toBe('pty-new')
-      )
-      expect(window.api.pty.spawn).toHaveBeenCalledWith(
-        expect.objectContaining({
-          replacesPtyId: 'pty-old',
-          command: 'codex',
-          launchAgent: 'codex',
-          startupCommandDelivery: 'shell-ready'
-        })
-      )
-      expect(vi.mocked(window.api.pty.spawn).mock.calls[0][0]).not.toHaveProperty(
-        'resumeProviderSession'
-      )
-      expect(requestTerminalPaneRecovery).not.toHaveBeenCalled()
-      // The replacement's own bind swapped the host's persisted pane binding.
-      expect(
-        host.store.getWorkspaceSession().terminalLayoutsByTabId[tabId].ptyIdsByLeafId[leafId]
-      ).toBe('pty-new')
-    } finally {
-      for (const binding of bindings.values()) {
-        binding.dispose()
-      }
-      for (const transport of transports.values()) {
-        transport.detach?.({ preserveExitObserver: false })
-      }
-    }
-  })
   it.each([false, true])(
     'paired restart retains the old owner (host authority: %s)',
     async (hostAuthority) => {
@@ -441,9 +323,7 @@ describe('account restart through renderer connection and host spawn', () => {
         await import('../../src/renderer/src/components/terminal-pane/remote-runtime-pty-transport')
       const { releasePaneTransportForRestart } =
         await import('../../src/renderer/src/components/terminal-pane/pane-restart-transport-handoff')
-      const { CODEX_ACCOUNT_RESTART_STARTUP } =
-        await import('../../src/renderer/src/lib/codex-session-restart')
-      const options = { worktreeId, tabId, leafId, ...CODEX_ACCOUNT_RESTART_STARTUP }
+      const options = { worktreeId, tabId, leafId }
       const old = createRemoteRuntimePtyTransport('fake-host', options)
       await old.connect({ url: '', callbacks: {} })
       expect(old.getPtyId()).toBe('remote:fake-host@@term-old')

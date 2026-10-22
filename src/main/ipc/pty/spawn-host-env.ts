@@ -9,7 +9,6 @@ import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { isAgentStatusHooksEnabled } from '../../agent-hooks/managed-agent-hook-controls'
 import { awaitExplicitPiOmpGuestReadiness } from '../../agent-hooks/wsl-pi-omp-guest-readiness'
 import { ensureCodexStateDbBackfillRecoveryStarted } from '../../codex/codex-state-db-backfill-recovery'
-import type { CodexSessionResumePreparation } from '../../codex/codex-session-resume-home'
 import type { CodexAccountSelectionTarget } from '../../codex-accounts/runtime-selection'
 import { isSafePtySessionId } from '../../daemon/pty-session-id'
 import type { IPtyProvider } from '../../providers/pty-provider-contract'
@@ -18,9 +17,8 @@ import { getRuntimeSourceStamp } from '../../runtime/host-descriptor'
 import type { OrcaRuntimeService } from '../../runtime/orca-runtime'
 import { buildPtyHostEnv } from './host-env/assembly'
 import {
-  codexHomePathsEqual,
+  codexHomeSelectionsEqual,
   getCompatibleSelectedCodexHomePath,
-  resolveCodexHomeAfterManagedAuthReadiness,
   shouldSkipCodexHomeEnvForWindowsShell,
   shouldStripInheritedOrcaCodexHome
 } from './host-env/codex-home'
@@ -42,10 +40,6 @@ export type PtySpawnCodexResumeDeps = {
     prepared: PreparedCodexResumeHome
   ) => Promise<CodexResumeLaunch>
   noCodexResumeLaunch: (command: string | undefined) => CodexResumeLaunch
-  reconcileSharedRuntimeResumeHome: (
-    resumeHome: Extract<CodexSessionResumePreparation, { outcome: 'resume' }>,
-    resolveCurrent: () => string | null | Promise<string | null>
-  ) => Promise<string>
   stripSequencedStartupResumeArgv: <T extends Record<string, string> | undefined>(
     env: T,
     launch: CodexResumeLaunch
@@ -78,12 +72,8 @@ type PtySpawnHostEnvArgs = {
   preAdopted: boolean
   isDaemonHostSpawn: boolean
   sessionId: string | undefined
-  /** Only a launch whose caller named no session waits on a managed Codex login. */
-  callerNamedSession: boolean
   /** A failed env build sweeps per-PTY state only for an id this request minted. */
   mintedSessionId: boolean
-  /** An account-switch restart resumes onto the selected account; only the window has one. */
-  resumeOnSelectedAccount: boolean
   /** TEMPORARY (row 7 removes it): the host builds no host env for an empty id; the window refuses it. */
   emptySessionIdSkipsHostEnv: boolean
   requestedAgentTeamsPath: string | undefined
@@ -105,8 +95,7 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
         providerSession: args.resumeProviderSession,
         target,
         // Why: a host runtime skips resume prep for a launch whose env names a client-sent CODEX_HOME.
-        launchEnv: args.env,
-        ...(args.resumeOnSelectedAccount ? { useSelectedAccount: true } : {})
+        launchEnv: args.env
       })
   const codexResumeLaunch = codexResumePreparation
     ? await deps.resolveCodexResumeLaunch(args.command, codexResumePreparation)
@@ -124,35 +113,11 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
   let selectedCodexHomePath = !args.preAdopted
     ? getCompatibleSelectedCodexHomePath(
         target,
-        codexResumeHome
-          ? await deps.reconcileSharedRuntimeResumeHome(codexResumeHome, async () =>
-              getCompatibleSelectedCodexHomePath(target, await selectLaunchCodexHome())
-            )
+        codexResumeHome?.outcome === 'resume'
+          ? codexResumeHome.codexHomePath
           : await selectLaunchCodexHome()
       )
     : null
-  if (!args.preAdopted && launchesCodex && !args.callerNamedSession) {
-    const resolution = resolveCodexHomeAfterManagedAuthReadiness({
-      selectedCodexHomePath,
-      getSettings: () => deps.getSettings?.(),
-      requiredCodexHomePath: codexResumeHome?.codexHomePath,
-      target,
-      resolveCurrent: async () =>
-        getCompatibleSelectedCodexHomePath(
-          target,
-          (await deps.getSelectedCodexHomePath?.(target, baseEnv, { launchesCodex })) ?? null
-        ),
-      resolveAfterUnavailable: async (unavailableManagedHomePath) =>
-        getCompatibleSelectedCodexHomePath(
-          target,
-          (await deps.getSelectedCodexHomePath?.(target, baseEnv, {
-            unavailableManagedHomePath,
-            launchesCodex
-          })) ?? null
-        )
-    })
-    selectedCodexHomePath = resolution instanceof Promise ? await resolution : resolution
-  }
   if (launchesCodex && selectedCodexHomePath) {
     await ensureCodexStateDbBackfillRecoveryStarted(selectedCodexHomePath)
   }
@@ -167,7 +132,8 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
     env: baseEnv,
     selectedCodexHomePath,
     codexResumeHomeSelected: Boolean(
-      codexResumeHome && codexHomePathsEqual(selectedCodexHomePath, codexResumeHome.codexHomePath)
+      codexResumeHome?.outcome === 'resume' &&
+      codexHomeSelectionsEqual(selectedCodexHomePath, codexResumeHome.codexHomePath)
     ),
     skipCodexHomeEnv,
     stripInheritedOrcaCodexHome:
@@ -175,8 +141,7 @@ export async function resolvePtySpawnHostEnv(args: PtySpawnHostEnvArgs): Promise
       shouldStripInheritedOrcaCodexHome({
         target,
         selectedCodexHomePath,
-        skipCodexHomeEnv,
-        settings: ptySettings
+        skipCodexHomeEnv
       })
   }
   const sessionId = args.sessionId

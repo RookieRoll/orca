@@ -3,7 +3,6 @@ import { admitTranscriptPath } from '../native-chat/transcript-path-admission'
 import { dirname } from 'node:path'
 import { homedir } from 'node:os'
 import { isLegacyAgentSessionAccountHome } from '../../shared/agent-session-account-home'
-import { getManagedDataAccountService } from '../managed-data-accounts/service'
 import {
   absoluteConversationStore,
   type StructuredAgentTranscriptImport
@@ -19,7 +18,6 @@ function accountDatabase(
     return null
   }
   const env = environmentForStructuredOpenCodeAccountHome(accountHome, {
-    managedAccounts: getManagedDataAccountService(),
     baseEnvironment: launchEnv
   })
   return absoluteConversationStore(
@@ -40,11 +38,7 @@ export const OPENCODE_TRANSCRIPT_IMPORT: StructuredAgentTranscriptImport = {
     ])
     return expected && actual && expected.path === actual.path ? actual.path : null
   },
-  // The selected account, then the unmanaged environment this chat would launch with.
-  accountHomeCandidates: ({ selectedAccountHome }) => [
-    selectedAccountHome,
-    { kind: 'opencode', locator: { kind: 'unmanaged' } }
-  ],
+  accountHomeCandidates: ({ selectedAccountHome }) => [selectedAccountHome],
   findTranscript: async ({ providerSessionId, store: dbPath }) => {
     try {
       if (!(await stat(dbPath)).isFile()) {

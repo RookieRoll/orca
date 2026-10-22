@@ -56,6 +56,22 @@ export function hasCustomCodexHomeOverrideForLaunch(launchEnv?: NodeJS.ProcessEn
   )
 }
 
+/** The explicit home this launch passes to Codex, if it names a user-owned home. */
+export function resolveExplicitCustomCodexHomeForLaunch(
+  launchEnv?: NodeJS.ProcessEnv
+): string | null {
+  const codexHome = getLaunchEnvValue(launchEnv, 'CODEX_HOME')?.trim()
+  if (!codexHome) {
+    return null
+  }
+  return hasCustomCodexHomeOverride({
+    CODEX_HOME: codexHome,
+    ORCA_CODEX_HOME: getLaunchEnvValue(launchEnv, 'ORCA_CODEX_HOME')
+  })
+    ? codexHome
+    : null
+}
+
 type LaunchEnvKey =
   | 'CODEX_HOME'
   | 'ORCA_CODEX_HOME'

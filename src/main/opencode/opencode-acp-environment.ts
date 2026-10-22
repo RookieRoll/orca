@@ -3,14 +3,12 @@ import { getAppEnvironment } from '../../shared/app-environment'
 import { isOpenCodeLegacySharedConfigDir } from './legacy-shared-config-dir'
 
 const ORCA_ENV_PREFIXES = ['ORCA_OPENCODE_', 'ORCA_DATA_ACCOUNT_']
-const ACCOUNT_ENV_KEYS = ['XDG_DATA_HOME', 'XDG_STATE_HOME', 'OPENCODE_DB', 'OPENCODE_AUTH_CONTENT']
 
 /**
  * A structured chat's OpenCode reports through the chat, never through Orca's terminal status
  * plugin. Restores the user's own `OPENCODE_CONFIG_DIR` over the overlay a terminal pane would have
  * (dropping it when none was recorded, or when it is the retired shared plugin directory), and drops
- * every Orca OpenCode and data-account variable. Runs after the account is applied. Returns
- * the keys the child must not inherit.
+ * Orca OpenCode variables. Returns the keys the child must not inherit.
  */
 export function scrubOpenCodeAcpEnvironment(
   env: Record<string, string>,
@@ -44,12 +42,6 @@ export function scrubOpenCodeAcpEnvironment(
     removed.push('OPENCODE_CONFIG_DIR')
   } else {
     env.OPENCODE_CONFIG_DIR = view.OPENCODE_CONFIG_DIR
-  }
-  // The launch environment decides these; one it leaves unset must not come from Orca's overlay.
-  for (const key of ACCOUNT_ENV_KEYS) {
-    if (env[key] === undefined) {
-      removed.push(key)
-    }
   }
   for (const key of new Set([...Object.keys(env), ...Object.keys(inherited)])) {
     if (ORCA_ENV_PREFIXES.some((prefix) => key.startsWith(prefix))) {

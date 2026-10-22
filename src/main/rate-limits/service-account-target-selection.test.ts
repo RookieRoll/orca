@@ -11,8 +11,7 @@ import {
 } from './rate-limit-service-test-harness'
 
 vi.mock('./claude-fetcher', () => ({
-  fetchClaudeRateLimits: vi.fn(),
-  fetchManagedAccountUsage: vi.fn()
+  fetchClaudeRateLimits: vi.fn()
 }))
 
 vi.mock('./codex-fetcher', () => ({
@@ -398,7 +397,7 @@ describe('RateLimitService', () => {
       wslDistro: target?.wslDistro ?? null,
       wslLinuxConfigDir: target?.runtime === 'wsl' ? '/home/jin/.claude' : null,
       envPatch: target?.runtime === 'wsl' ? { CLAUDE_CONFIG_DIR: '/home/jin/.claude' } : {},
-      provenance: target?.runtime === 'wsl' ? 'managed:wsl-account:wsl:Ubuntu' : 'system'
+      provenance: target?.runtime === 'wsl' ? 'wsl:Ubuntu:system' : 'system'
     }))
     service.setClaudeAuthPreparationResolver(resolver)
     service.setClaudeFetchTarget({ runtime: 'wsl', wslDistro: 'Ubuntu' })
@@ -572,41 +571,6 @@ describe('RateLimitService', () => {
 
     expect(service.getState().inactiveCodexAccounts).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ accountId: 'account-empty' })])
-    )
-  })
-
-  it('does not cache host Claude usage under an outgoing WSL account', async () => {
-    const service = new RateLimitService()
-    service.setInactiveClaudeAccountsResolver(() => [{ id: 'wsl-account-1' }])
-    service.setClaudeAuthPreparationResolver(async (target) => ({
-      configDir:
-        target?.runtime === 'wsl'
-          ? '\\\\wsl.localhost\\Ubuntu\\home\\jin\\.claude'
-          : 'C:\\Users\\jin\\.claude',
-      runtime: target?.runtime ?? 'host',
-      wslDistro: target?.wslDistro ?? null,
-      wslLinuxConfigDir: target?.runtime === 'wsl' ? '/home/jin/.claude' : null,
-      envPatch: {},
-      provenance: target?.runtime === 'wsl' ? 'managed:wsl-account-1:wsl:Ubuntu' : 'system'
-    }))
-
-    vi.mocked(fetchClaudeRateLimits)
-      .mockResolvedValueOnce(okProvider('claude', 20, Date.now()))
-      .mockResolvedValueOnce(okProvider('claude', 40, Date.now()))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-
-    await service.refresh()
-    await service.refreshForClaudeAccountChange('wsl-account-1', {
-      runtime: 'wsl',
-      wslDistro: 'Ubuntu'
-    })
-
-    expect(fetchClaudeRateLimits).toHaveBeenLastCalledWith(
-      expect.objectContaining({ allowPtyFallback: true, allowUsagePanelSupplement: true })
-    )
-
-    expect(service.getState().inactiveClaudeAccounts).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ accountId: 'wsl-account-1' })])
     )
   })
 

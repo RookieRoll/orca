@@ -143,7 +143,6 @@ vi.mock('../runtime/orca-runtime', () => ({
       return { rekeyWorkerTerminalResourcePaneKey: state.rekeyWorkerTerminalResourcePaneKey }
     }
     rehydrateClientHostedBrowserPages() {}
-    restoreHostAccountLaunchEnv() {}
     async refreshRestoredOrchestrationAuthority() {}
     async reconcileLegacyWorkerTerminals() {
       state.onStartupStep?.('reconcile')

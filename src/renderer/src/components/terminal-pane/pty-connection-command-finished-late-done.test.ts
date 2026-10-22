@@ -25,14 +25,12 @@ const {
   scheduleRuntimeGraphSync,
   shouldSeedCacheTimerOnInitialTitle,
   toastInfo,
-  notifyCodexPaneBoundForStaleSweep
 } = vi.hoisted(() => ({
   resetAndRefreshAllTerminalWebglAtlases: vi.fn(),
   scheduleTerminalWebglAtlasRecovery: vi.fn(),
   scheduleRuntimeGraphSync: vi.fn(),
   shouldSeedCacheTimerOnInitialTitle: vi.fn(() => false),
   toastInfo: vi.fn(),
-  notifyCodexPaneBoundForStaleSweep: vi.fn()
 }))
 
 let mockStoreState: StoreState
@@ -80,9 +78,6 @@ vi.mock('sonner', () => ({
   }
 }))
 
-vi.mock('@/lib/codex-stale-pane-sweep', () => ({
-  notifyCodexPaneBoundForStaleSweep
-}))
 
 // Why: useCallback must pass through; no test here renders React.
 vi.mock('react', async (importOriginal) => {

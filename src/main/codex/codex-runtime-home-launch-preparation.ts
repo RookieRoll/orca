@@ -21,12 +21,7 @@ export function createCodexRuntimeHomeLaunchPreparation(deps: {
     if (!runtimeHome) {
       throw new Error('Codex runtime home service is not initialized')
     }
-    // Why: a ManagedCodexHomeTemporarilyUnavailableError must escape uncaught —
-    // the fallbacks below all key off `null`, which means "system default", so
-    // swallowing the refusal would launch the wrong account (#STA-4422).
-    const runtimeHomePath = await runtimeHome.prepareForCodexLaunchAsync(target, launchEnv, {
-      unavailableManagedHomePath: launchContext?.unavailableManagedHomePath
-    })
+    const runtimeHomePath = await runtimeHome.prepareForCodexLaunchAsync(target, launchEnv)
     const launchesCodex = launchContext?.launchesCodex === true
     if (runtimeHomePath === null && target?.runtime !== 'wsl') {
       // Why only a Codex launch waits: the pane spawn already schedules the reconcile, which

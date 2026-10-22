@@ -13,14 +13,8 @@ vi.mock('./runtime-rpc-client', () => ({
 }))
 
 const local = {
-  minimaxCredentials: {
-    getStatus: vi.fn(),
-    saveApiKey: vi.fn(),
-    clearApiKey: vi.fn(),
-    saveCookie: vi.fn(),
-    clearCookie: vi.fn()
-  },
-  zcodePlanCredentials: { getStatus: vi.fn(), saveApiKey: vi.fn(), clearApiKey: vi.fn() }
+  minimaxCredentials: { getStatus: vi.fn() },
+  zcodePlanCredentials: { getStatus: vi.fn() }
 }
 const host = { kind: 'environment' as const, environmentId: 'server-a' }
 
@@ -31,51 +25,49 @@ beforeEach(() => {
   vi.stubGlobal('window', { api: local })
 })
 
-describe('usage credential routing', () => {
-  it('keeps this computer’s keys on the local IPC', async () => {
-    await callMiniMaxCredentials({ kind: 'local' }, 'saveApiKey', 'key-a')
-    await callZcodePlanCredentials({ kind: 'local' }, 'clearApiKey')
+describe('usage credential status routing', () => {
+  it('reads this computer’s status through local IPC', async () => {
+    await callMiniMaxCredentials({ kind: 'local' })
+    await callZcodePlanCredentials({ kind: 'local' })
 
-    expect(local.minimaxCredentials.saveApiKey).toHaveBeenCalledWith('key-a')
-    expect(local.zcodePlanCredentials.clearApiKey).toHaveBeenCalledOnce()
+    expect(local.minimaxCredentials.getStatus).toHaveBeenCalledOnce()
+    expect(local.zcodePlanCredentials.getStatus).toHaveBeenCalledOnce()
     expect(callRuntimeRpc).not.toHaveBeenCalled()
   })
 
-  it.each([
-    ['saveApiKey', 'accounts.minimaxSaveApiKey', { apiKey: 'key-a' }],
-    ['saveCookie', 'accounts.minimaxSaveSessionCookie', { cookie: 'key-a' }],
-    ['clearCookie', 'accounts.minimaxClearSessionCookie', undefined],
-    ['getStatus', 'accounts.minimaxCredentialsStatus', undefined]
-  ] as const)('sends MiniMax %s to the selected host only', async (action, method, params) => {
-    await callMiniMaxCredentials(host, action, 'key-a')
-
-    expect(callRuntimeRpc).toHaveBeenCalledWith(host, method, params, { timeoutMs: 20_000 })
-    expect(local.minimaxCredentials[action]).not.toHaveBeenCalled()
-  })
-
-  it('sends the GLM key to the selected host only', async () => {
-    await callZcodePlanCredentials(host, 'saveApiKey', 'key-b')
+  it('reads MiniMax status from the selected host', async () => {
+    await callMiniMaxCredentials(host)
 
     expect(callRuntimeRpc).toHaveBeenCalledWith(
       host,
-      'accounts.zcodePlanSaveApiKey',
-      { apiKey: 'key-b' },
+      'accounts.minimaxCredentialsStatus',
+      undefined,
       { timeoutMs: 20_000 }
     )
-    expect(local.zcodePlanCredentials.saveApiKey).not.toHaveBeenCalled()
   })
 
-  it('refuses an older host before anything is sent, and never saves locally instead', async () => {
+  it('reads Zcode status from the selected host', async () => {
+    await callZcodePlanCredentials(host)
+
+    expect(callRuntimeRpc).toHaveBeenCalledWith(
+      host,
+      'accounts.zcodePlanCredentialsStatus',
+      undefined,
+      { timeoutMs: 20_000 }
+    )
+  })
+
+  it('does not fall back to local status when the host lacks the status capability', async () => {
     vi.mocked(runtimeEnvironmentSupportsCapability).mockResolvedValue(false)
 
-    await expect(callMiniMaxCredentials(host, 'saveApiKey', 'key-a')).rejects.toBeInstanceOf(
+    await expect(callMiniMaxCredentials(host)).rejects.toBeInstanceOf(
       UsageCredentialsHostOutdatedError
     )
     expect(callRuntimeRpc).not.toHaveBeenCalled()
-    expect(local.minimaxCredentials.saveApiKey).not.toHaveBeenCalled()
+    expect(local.minimaxCredentials.getStatus).not.toHaveBeenCalled()
   })
 
-  it('reads a method_not_found answer as an older host', async () => {
+  it('treats a method_not_found response as an unsupported status API', async () => {
     vi.mocked(callRuntimeRpc).mockRejectedValue(
       new RuntimeRpcCallError({
         id: 'a',
@@ -85,7 +77,7 @@ describe('usage credential routing', () => {
       })
     )
 
-    await expect(callZcodePlanCredentials(host, 'getStatus')).rejects.toBeInstanceOf(
+    await expect(callZcodePlanCredentials(host)).rejects.toBeInstanceOf(
       UsageCredentialsHostOutdatedError
     )
   })
@@ -93,6 +85,6 @@ describe('usage credential routing', () => {
   it('passes an unreachable host’s error through so callers show it as unverifiable', async () => {
     vi.mocked(runtimeEnvironmentSupportsCapability).mockRejectedValue(new Error('timed out'))
 
-    await expect(callMiniMaxCredentials(host, 'getStatus')).rejects.toThrow('timed out')
+    await expect(callMiniMaxCredentials(host)).rejects.toThrow('timed out')
   })
 })

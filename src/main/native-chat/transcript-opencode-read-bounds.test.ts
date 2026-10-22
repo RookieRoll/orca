@@ -5,8 +5,6 @@ import {
   readOpenCodeNativeChatTranscriptTail
 } from './transcript-opencode'
 
-vi.mock('../managed-data-accounts/service', () => ({ getManagedDataAccountService: vi.fn() }))
-
 describe('OpenCode full native read bounds', () => {
   it('counts reasoning, answer and image bytes cumulatively across pages', async () => {
     let calls = 0

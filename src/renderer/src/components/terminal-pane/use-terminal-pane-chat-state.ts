@@ -30,8 +30,6 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
     worktreeId
   } = controller
   const {
-    clearCodexRestartNotice,
-    consumePendingPaneAccountRestart,
     setTabCanExpandPane,
     setTabLayout,
     setTabPaneExpanded,
@@ -252,8 +250,6 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
     setTabPaneExpanded,
     setTabCanExpandPane,
     suppressPtyExit,
-    consumePendingPaneAccountRestart,
-    clearCodexRestartNotice,
     unifiedTabId,
     isChatViewMode,
     effectiveChatViewMode,

@@ -27,7 +27,7 @@
 | B0 | 环境、清单映射与基线 | 本地环境事实记录，136 删除 ID 校验通过；环境未验证不得写通过 |
 | B1 | C17 终端主题导入 | 删除入口/解析并确认保留主题功能无回归 |
 | B2 | 语音、宠物、遥测与上传/更新 | VOC、U10、U11、U06/U07、B2-PET已提交；U10本机导出与本地诊断保留；PET定向回归未运行 |
-| B3 | 账号/用量与平台集成 | 删除 F01–F11 与 J 删除项；保留系统凭据保护基础设施（F12）、Jira（J16）和 Git 基础能力 |
+| B3 | 账号/用量与平台集成 | 先完成 B3-ACCOUNT（F01–F07），再完成独立 B3-USAGE（F08–F11），最后按 B3-PLATFORM 清理 J 删除项；保留 F12 凭据保护、Jira（J16）、Git 基础能力及 DEP07 本地工作活动统计 |
 | B4 | 远程、WSL、移动与中继 | B2-UPLOAD（U10）、B2-TELEMETRY（U11）、B4-CLIENT、B4-REMOTE-CLIENT、B2-UPDATER（U06/U07）及 B2-PET（T05/T06）已提交；其余按总体依赖推进：B4-REMOTE-HOST → B5-ISOLATION → B4-REMOTE-SHARED 清理消费者和共享实现；B4-SERVICES 与三个 B4-DEVICE-TOOLS 子项依各自依赖交付。保留本地 daemon、工作区、PTY |
 | B5 | 分享、组织、Profile 与跨主机隔离 | 删除 O08–O13、U01–U04 等；O02 本机执行保留 |
 | B6 | Agent 适配裁剪 | 删除 W02/W04/W05/W08–W40 专用适配；Codex/Pi/Claude/OpenCode 保留 |
@@ -39,17 +39,17 @@
 |---|---|---|---|---|---|---|---|
 | C17 | Warp 及主题文件导入 | B1 | 完成 | c17_cleanup / cleanup_tracker(review) | B0 | `src/main/warp-themes/`、settings IPC/preload、设置 renderer、locale/build metadata（具体路径见提交） | 独立完整 diff 审查通过：删除链/worker 构建入口/locale 无残余 Warp-YAML importer 符号；Ghostty IPC/preload/UI、主题 picker、自定义颜色编辑保留；`terminal-custom-themes.ts` 和测试保留历史 `source: 'warp'` 兼容。`git diff --check`、残余符号检索、10个 JSON Node 解析通过（执行者报告）；6个定向 Vitest 文件118/118通过（Node 24，无 preload shim）。Changed-code quality gate通过、0 findings，但只覆盖新增行的4个文件，不代表所有删除行均经 lint。全量 Node TC 因12 GiB机器资源压力中止、结果未知；Web/CLI TC未运行，定向TC也未运行；此项为纯删除并经有界审查验收，类型检查覆盖限制如上，不得表述为全量TC通过。 |
 | D02 | Agent 安装与配置引导 | B2 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F01 | Claude 多账号管理 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F02 | Codex 多账号管理 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F03 | 运行中账号热切换 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F04 | 其他提供商账号管理 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F05 | API Key 与提供商凭据 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F06 | Agent 配置目录与隔离 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F07 | Codex 配置同步与服务设置 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F08 | 当前账号用量 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F09 | 配额重置与限流提示 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F10 | 用量汇总面板 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F11 | 会话使用统计与估算成本 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
+| F01 | Claude 多账号管理 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 已盘点，按托管账号闭包移除；保留 Claude CLI 自有登录态和标准 home。 |
+| F02 | Codex 多账号管理 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 已盘点，按托管账号闭包移除；保留 Codex CLI 自有登录态和标准 home。 |
+| F03 | 运行中账号热切换 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 随应用托管账号切换移除；保留正常 Agent session 启动、发现与恢复。 |
+| F04 | 其他提供商账号管理 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 移除应用托管的其他 provider 账号；保留 CLI 自有认证。 |
+| F05 | API Key 与提供商凭据 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 移除应用托管 provider API key/凭据入口；保留 OS keychain/safeStorage 与 Git/GitHub/SSH 认证。 |
+| F06 | Agent 配置目录与隔离 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 移除 profile/config root 选择和隔离；将启动/恢复解析收敛至 CLI 标准 home，不删除 session discovery/resume。 |
+| F07 | Codex 配置同步与服务设置 | B3-ACCOUNT | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B0；B7 | 移除托管同步/服务配置 UI 和合同；保留 Codex CLI 自有设置与登录。 |
+| F08 | 当前账号用量 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；与账号删除分开交付，不提前裁用量扫描/性能合同。 |
+| F09 | 配额重置与限流提示 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；需区分 provider quota 与保留 Agent CLI 自己输出的运行错误。 |
+| F10 | 用量汇总面板 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；保留 DEP07 本地工作活动统计。 |
+| F11 | 会话使用统计与估算成本 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；删除账号用量及成本估算，不删除 DEP07 本地工作活动统计。 |
 | F12 | 系统凭据保护 | B3 | 保留（基础设施范围已裁定） | cleanup_tracker | B3账号删除的消费者边界 | `safeStorage`/OS keychain、Git/GitHub/SSH认证及剩余Agent CLI自有登录态保留；本项不删除底层凭据保护。 |
 | H11 | 公开产物发布 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | H12 | 产物列表、搜索与预览 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -219,8 +219,12 @@
 | B2-PET | T05–T06 桌面宠物及导入管理 | 完成（有界静态审核；回归未运行） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/types）；validation_setup（package/config/lock与唯一测试runner） | B0；B2-UPDATER | 移除专属 UI/API/后台行为。已核 `codex-pet-sprite-defaults.ts` 仅由pet bundle/URL路径消费，未发现通用Codex动画复用；pet renderer、存储导入API、shared settings/UI state/RPC字段和3个sprite已按引用闭包移除；AgentCombobox OpenCode SVG/no-img合同保留。RPC catalog check/Oxc 28存活TS/TSX/locale JSON/static timing parse/diff-check与删模块引用扫描通过。free RAM为1.89GiB，因此PET测试、TC、build及官方全库locale AST scan均未运行；六locale与runtime-required只执行精确宠物专属key剥离并以JSON.parse/retired-key scan校验，不宣称全locale catalog scan通过。 |
 | B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 已提交（8d670ba；静态审查完成，回归未跑） | cleanup_tracker（renderer UI）；graphify_build（backend/shared） | B0 | renderer已移除 feedback 菜单/表单与图片、prefill、drop、draft/store闭包；诊断UI仅保留本机collect/open/discard；崩溃报告移除身份/发送/上传错误，仅保留本地查看、脱敏Copy、Dismiss。UI与backend静态复核完成；六种locale及runtime catalog同步/校验通过，Oxc解析38个存活TS-family文件0错误、0空文件。配置侧 release-javascript-artifact 两文件属于本任务，独立审查通过。回归因当时可用内存2.21 GiB未启动；提交`8d670ba3847272597c13ff407d6ee41d2c030be9`已推送至`cleanup/function-pruning`；前置REMOTE-CLIENT提交`7b8fe8743dc537ea7c5221b189875700b94470fc`也已推送。U11随后由`ced880f7fb0928d85d889b27576677d14bf4c752`提交并推送。临时bundle/TTL不是用户Save As导出。 |
 | B2-TELEMETRY | U11 遥测采集/发送清理 | 已提交（ced880f；有界静态审查完成，回归未跑） | cleanup_tracker（renderer、`.github`、renderer locale、tracker）；graphify_build（main/shared/preload/types/electron.vite）；validation_setup（package/config/lock、独立UI/CI审查） | B0；B2-VOC、B2-UPLOAD | 产品遥测发送、首启同意及Privacy遥测开关已移除；本地诊断collect/open/discard保留。四个release workflow已去PostHog secret/env并改用build-identity verifier，YAML/needs/callers经静态复核通过；构建identity/source/version/package-manager guards保留。Main侧保留本地hang/churn观察、crash breadcrumb、NDJSON/bundle、usage扫描/cache与Stats/Memory/Diagnostics；只去产品遥测、consent/cohort/install-id及token usage报告。AgentLaunchContext、terminal split教育来源和本地 workspace/daemon/PTY/SSH行为保留，workspace-create analytics-only source不再经IPC/RPC。Renderer和混合测试行为合同经独立静态审查；GitHub IPC suite保留viewer/star结果/error传播；纯telemetry suite移除，有价值daemon本地证据用例迁移。独立hunk审查发现并修复了`persistence-ui-state.test.ts`里被误删的两个本地合同（feature-tip IDs去重、feature interaction计数递增）；旧bucket数据剥离与本地交互历史持久化另有覆盖。六locale及runtime-required官方同步/JSON parse通过，16,573 refs核验；既有缺译es177、fr/ja/ko/zh各167项；旧privacy consent/DNT/匿名发送文案和韩语override已清，隐私政策保留。提交`ced880f7fb0928d85d889b27576677d14bf4c752`已推送至`cleanup/function-pruning`。main/shared/preload/types最终独立审查完成；75个删除源模块、0残余引用/mock、0语法解析错误。U11测试、lint/changed-code gate、typecheck、build、E2E及Codex/Pi集成均未运行。 |
+| B1-C17 | C17 Warp/YAML importer 删除及保留主题功能复核 | 完成（有界验收） | c17_cleanup（实现）；cleanup_tracker（独立审核/Git） | B0 | 追踪行 C17 已完成；独立 diff 审查、定向测试和限界验证记录见 C17。 |
 | IDENTITY-LITE | 将应用与产品身份全新调整为 `orca-lite` | 待执行（仅计划） | 待分配 | U06/U07；B7-COMMON | 先盘点 package/app display name、electron-builder `productName`、安装器与可执行文件名、窗口标题、公开文档、CLI命令、app ID、userData、deep-link/protocol及本地pipe/socket命名，再按清单统一建立全新 `orca-lite` 身份；不保留旧应用身份别名、数据迁移或旧协议兼容层。禁止全局盲替换`orca`，保留第三方`@orca`包名和历史/业务标识；不改仓库目录/GitHub远程仓库URL。建议在主体裁剪完成后、B7最终构建/发布回归前执行。 |
 | B2-UPDATER | U06/U07 自动更新、下载安装与更新推荐清理 | 完成（有界静态审核） | cleanup_tracker（renderer/CI/docs/tracker）；graphify_build（main/preload/shared/types/native CLI）；validation_setup（package/config/lock及独立CI审查） | B0；B2-VOC/B2-UPLOAD/B2-TELEMETRY已完成代码清理 | 删除桌面与remote-control自动check/download/install、Squirrel自动更新补丁、AppImage自动替换与预发布/本地构建切换入口；保留当前版本/build identity、人工发布安装包、Orcad本地bundle一致性、Electron普通退出/重启/session恢复及serve监督/信号转发/ready。CLI保留暂时缺少可执行文件时的hold、普通失败重试及异步preflight期间停止屏障；无生产writer的desktop-install park协调链已删除。`publishAutoUpdate:false`下electron-builder仍嵌入静态`app-update.yml`，但不存在runtime updater SDK/reader/check/download/install消费者；不做可能影响签名/target时序的afterpack/aftersign过滤。Homebrew和公开安装/设置/session恢复文档已改为人工下载安装。validation独立CI/UI/配置静态检查通过；源代码Oxc语法解析157个存活变更TS/TSX文件零诊断，关键删除模块/符号无活动引用，`git diff --check`通过；测试、typecheck、build、E2E未运行。 |
+| B3-ACCOUNT | F01–F07 应用托管 Agent 账号、Profile、热切换、provider API key 与配置隔离 | 进行中 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types/source tests）；validation_setup（config/package/lock与唯一测试runner） | B0 | 删除应用托管账号/配置管理消费者，保留 Claude/Codex CLI 自有登录和标准 home、普通 session discovery/resume、Git/GitHub/SSH 认证及 OS keychain/safeStorage；不得删除 DEP07 本地工作活动统计。首个独立 renderer 闭包已移除 OpenCode/Devin 托管 profile 列表及 listData/selectData/removeData 调用；其余账号/凭据控件仍在收敛中。账号清理完成后再开始 B3-USAGE。 |
+| B3-USAGE | F08–F11 provider quota、账号用量、汇总与成本估算 | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types/source tests）；validation_setup（config/package/lock与唯一测试runner） | B3-ACCOUNT；B0 | 独立删除账号用量、额度/重置提示和成本估算；保留 DEP07 本地工作活动统计。共享性能/JSONL工具仅在证明无非账号用途后移除。 |
+| B3-PLATFORM | H11–H13 公开产物链及 J01–J15/J17–J18 平台集成删除项 | 待执行 | 待分配 | B0；B3-ACCOUNT | 清理对应公开产物发布/管理与第三方平台产品闭包；保留 Jira J16 和普通 Git/GitHub/SSH 认证基础设施。共享 GitHub client 按残余消费者决定，不能整模块删除。 |
 | B5-PROFILE | U01–U04 本地 Profile/云账号/组织/切换裁剪 | 待执行 | 待分配 | B0 | 去除组织/云 Profile 流程并确认仍需保留的本地配置归属；共享设置/store 由协调者串行分配。 |
 | B5-SHARE | P05–P07 私有 Skills 分发/版本/WSL目标清理 | 待执行 | 待分配 | B0；B4-WSL 完成后清理 WSL 目标残余 | 保留本地 Skills/MCP/插件能力；删除私有分发、安装源、版本回滚和 WSL 目标专属流程。 |
 | B5-ISOLATION | O08–O13 Cloud VM、recipe、资源管理及 Docker 隔离裁剪 | 待执行 | 待分配 | B0 | 去除远程/云/Docker 专属环境，保留 O02 本机隔离及普通本地进程执行；复核共享执行器。完成后才能清理与这些环境共用的远程 runtime/protocol（B4-REMOTE-SHARED）。 |
@@ -234,6 +238,7 @@
 | B4-DEVICE-IOS | R01–R03 iOS 模拟器设备、画面/输入与辅助功能树 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除 iOS 模拟器发现/接入、画面与输入、辅助功能树相关代码；实施前盘点精确代码入口。 |
 | B4-DEVICE-ANDROID | R04–R08 Android SDK/AVD、画面/输入、应用权限与日志/UI 树 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除 Android SDK/设备发现、AVD、画面流/输入、应用权限操作及日志/UI 树相关代码；实施前盘点精确代码入口。 |
 | B4-DEVICE-AGENT | R09 模拟器 Agent 工具与技能 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除模拟器 Agent 工具与技能入口；实施前盘点其与保留 Codex/Pi Agent registry 的边界。 |
+| B6-AGENT | W02/W04/W05/W08–W40 非保留 Agent 专用适配 | 待执行 | 待分配 | B0；B3-ACCOUNT | 删除不保留 Agent 的专用适配/管理入口；保留 W01/W03/W06/W07 及本地真实验证 Codex/Pi。共享 Agent registry、CLI 自有 auth、session discovery/resume 需按 consumer 拆分。 |
 | B7-COMMON | 公共依赖/构建/类型/IPC/快捷键/i18n/默认后台/测试清理 | 待执行 | 待分配 | B1–B6 所有代码包完成 | 独立清理确认无保留用途的死代码/依赖；锁文件只由指定者改；运行对应类型、构建、合同与回归证据。 |
 
 ### B5 跨功能边界单列

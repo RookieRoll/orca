@@ -1,4 +1,3 @@
-import { claudeProfileTranscriptDirs } from '../claude-usage/transcript-file-discovery'
 import { existsSync } from 'node:fs'
 import { Worker } from 'node:worker_threads'
 import { currentWorkerEntryLayout, resolveWorkerThreadEntryPath } from '../worker-thread-entry-path'
@@ -59,16 +58,7 @@ export function scanClaudeUsageFilesViaWorker(
   sessions: ClaudeUsageSession[]
   dailyAggregates: ClaudeUsageDailyAggregate[]
 }> {
-  return scanClaudeUsageOnWorker(
-    (body) =>
-      getSharedClient().scan(
-        body.providerId === 'claude'
-          ? { ...body, profileDirs: claudeProfileTranscriptDirs() }
-          : body
-      ),
-    worktrees,
-    sourceCache
-  )
+  return scanClaudeUsageOnWorker((body) => getSharedClient().scan(body), worktrees, sourceCache)
 }
 
 /**

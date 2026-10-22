@@ -28,11 +28,7 @@ export const PAIRED_DESKTOP_METHODS = [
   'ui.recordFeatureInteraction',
   'ui.set',
   // The desktop's accounts pane, Linear and project pickers target its active runtime, not a workspace's host.
-  'accounts.consumeCodexResetCredit',
   'accounts.list',
-  'accounts.selectClaude',
-  'accounts.selectCodex',
-  'accounts.selectCodexForTarget',
   'accounts.subscribe',
   'accounts.unsubscribe',
   // Jira credentials and issue mutations remain desktop-only.

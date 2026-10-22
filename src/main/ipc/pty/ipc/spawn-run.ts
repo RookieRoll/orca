@@ -1,5 +1,4 @@
 import { parsePaneKey } from '../../../../shared/stable-pane-id'
-import { codexReattachedHomeRouteField } from '../host-env/codex-home'
 import type { PaneSpawnOperation } from '../pane/pane-spawn-operation'
 import {
   rejectPaneSpawnReservation,
@@ -173,8 +172,7 @@ export async function runPtyIpcSpawn(deps: PtySpawnIpcDeps, args: PtySpawnIpcArg
         codexHomePath: null,
         reattached: true,
         startedAt: ctx.codexHomeLaunchStartedAt,
-        startedSequence: ctx.codexHomeLaunchStartedSequence,
-        ...codexReattachedHomeRouteField(ctx.reattachedCodexHomeRoutes, adopted.result.id, true)
+        startedSequence: ctx.codexHomeLaunchStartedSequence
       })
       endPaneAgentLaunch(ctx, { started: true })
       return adopted.result

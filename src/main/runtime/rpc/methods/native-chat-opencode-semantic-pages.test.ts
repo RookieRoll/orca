@@ -15,7 +15,6 @@ const state: { path: string; watcher: SubscribeNativeChatTranscriptArgs | null }
     watcher: null
   })
 )
-vi.mock('../../../managed-data-accounts/service', () => ({ getManagedDataAccountService: vi.fn() }))
 vi.mock('../../../native-chat/transcript-watch', () => ({
   readNativeChatTranscriptTail: (args: {
     sessionId: string

@@ -145,13 +145,6 @@ export type RateLimitRuntimeTarget = {
   wslDistro: string | null
 }
 
-export type InactiveAccountUsage = {
-  accountId: string
-  rateLimits: ProviderRateLimits | null
-  updatedAt: number
-  isFetching: boolean
-}
-
 export type GrokAccountStatus = {
   signedIn: boolean
   email: string | null
@@ -219,6 +212,4 @@ export type RateLimitState = {
   zcodePlanApiKeyConfigured?: boolean
   claudeTarget: RateLimitRuntimeTarget
   codexTarget: RateLimitRuntimeTarget
-  inactiveClaudeAccounts: InactiveAccountUsage[]
-  inactiveCodexAccounts: InactiveAccountUsage[]
 }

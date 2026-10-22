@@ -6,11 +6,6 @@ import { startCodexSessionBackfillInBackground } from '../codex/codex-session-ba
 import { startCodexSessionIndexHealInBackground } from '../codex/codex-session-index-heal'
 import { startCodexStateDbBackfillRecoveryInBackground } from '../codex/codex-state-db-backfill-recovery'
 import { getOrcaManagedCodexHomePath } from '../codex/codex-home-paths'
-import {
-  hasOpenCodeGoApiKey,
-  readOpenCodeGoApiKey,
-  saveOpenCodeGoApiKey
-} from '../opencode/opencode-go-api-key-store'
 import { agentHookServer } from '../agent-hooks/server'
 import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { browserManager } from '../browser/browser-manager'
@@ -21,12 +16,6 @@ import { mainProcessState as state } from './main-process-state'
 
 // Settings that change which account or binary a new chat's agent runs under.
 const MODEL_CATALOG_ACCOUNT_SETTINGS = [
-  'activeCodexManagedAccountId',
-  'activeCodexManagedAccountIdsByRuntime',
-  'codexManagedAccounts',
-  'activeClaudeManagedAccountId',
-  'activeClaudeManagedAccountIdsByRuntime',
-  'claudeManagedAccounts',
   'agentDefaultEnv',
   'agentCmdOverrides'
 ] as const
@@ -55,14 +44,12 @@ export function initializeMainProcessAccountServices(): void {
     startIndexHeal: startCodexSessionIndexHealInBackground
   })
   const services = createProviderAccountServices(store, {
-    codexAccountLifecycle: { onHostSystemDefaultSelected: state.codexSessionMigration.requestRun },
     setClaudeStatusLineListener: (listener) => agentHookServer.setClaudeStatusLineListener(listener)
   })
   state.rateLimits = services.rateLimits
   state.codexRuntimeHome = services.codexRuntimeHome
-  state.codexAccounts = services.codexAccounts
+  state.codexResetCredits = services.codexResetCredits
   state.claudeRuntimeAuth = services.claudeRuntimeAuth
-  state.claudeAccounts = services.claudeAccounts
   void startCodexStateDbBackfillRecoveryInBackground(getOrcaManagedCodexHomePath())
   // Why: migrate historical shared-home sessions after startup; compatibility
   // launches re-arm the non-destructive pass for new rollouts (#4444, #8612, #12480).
@@ -77,11 +64,6 @@ export function initializeMainProcessAccountServices(): void {
     if (MODEL_CATALOG_ACCOUNT_SETTINGS.some((key) => key in updates)) {
       prewarmStructuredAgentModelCatalogs()
     }
-  })
-  store.migrateLegacyOpenCodeGoApiKey({
-    has: hasOpenCodeGoApiKey,
-    read: readOpenCodeGoApiKey,
-    save: saveOpenCodeGoApiKey
   })
   state.keybindings = new KeybindingService({
     homePath: app.getPath('home'),

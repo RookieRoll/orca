@@ -5,7 +5,6 @@ import { Switch } from '../ui/switch'
 import { GeminiIcon, OpenCodeGoIcon } from '../status-bar/icons'
 import { SearchableSetting } from './SearchableSetting'
 import type { AccountsPaneSectionModel } from './accounts-pane-types'
-import { OpenCodeGoCredentials } from './accounts-pane-opencode-credentials'
 import { DebouncedSettingsTextInput } from './DebouncedSettingsTextInput'
 
 export function renderGeminiAccountsSection(model: AccountsPaneSectionModel): React.JSX.Element {
@@ -95,71 +94,6 @@ export function renderOpenCodeAccountsSection(model: AccountsPaneSectionModel): 
           )}
         </p>
       </div>
-
-      <OpenCodeGoCredentials onSaved={() => recordOpenCodeSettingEdit('apiKey')} />
-
-      <SearchableSetting
-        title={translate(
-          'auto.components.settings.AccountsPane.36223200ac',
-          'OpenCode Go Session Cookie'
-        )}
-        description={translate(
-          'auto.components.settings.AccountsPane.0335bd31d5',
-          'Paste the full opencode.ai Cookie header, including __Host-console_session, for rate limit fetching.'
-        )}
-        keywords={['opencode', 'cookie', 'session', 'console', 'rate limit', 'status bar']}
-        className="space-y-2"
-      >
-        <Label>
-          {translate(
-            'auto.components.settings.AccountsPane.67e3c33670',
-            'OpenCode Go session cookie'
-          )}
-        </Label>
-        <div className="flex gap-2">
-          <DebouncedSettingsTextInput
-            type="password"
-            value={settings.opencodeSessionCookie}
-            onEdit={() => recordOpenCodeSettingEdit('cookie')}
-            commit={(opencodeSessionCookie) => updateSettings({ opencodeSessionCookie })}
-            placeholder={translate(
-              'auto.components.settings.AccountsPane.37b4b4a3f7',
-              'auth=…; __Host-console_session=…'
-            )}
-            spellCheck={false}
-            className="flex-1 text-xs"
-          />
-          {settings.opencodeSessionCookie && (
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() => {
-                recordFeatureInteraction('usage-tracking')
-                updateSettings({ opencodeSessionCookie: '' })
-              }}
-              className="h-7 shrink-0 text-xs text-muted-foreground hover:text-foreground"
-            >
-              {translate('auto.components.settings.AccountsPane.b398b834c9', 'Clear')}
-            </Button>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {translate(
-            'auto.components.settings.AccountsPane.62ab430f94',
-            "Paste the full Cookie header from your browser's DevTools → Network → any opencode.ai request, including __Host-console_session (e.g."
-          )}{' '}
-          <code className="text-xs">
-            {translate(
-              'auto.components.settings.AccountsPane.37b4b4a3f7',
-              'auth=…; __Host-console_session=…'
-            )}
-          </code>
-          {translate(
-            'auto.components.settings.AccountsPane.d5267cce63',
-            '). The auth cookie still covers workspace discovery; auth alone is not enough for usage. OpenCode Go auth is web-based and shared across Windows and WSL terminals.'
-          )}
-        </p>
-      </SearchableSetting>
 
       <SearchableSetting
         title={translate(

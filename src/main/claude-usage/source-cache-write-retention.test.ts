@@ -59,7 +59,6 @@ async function scanAndPersist(previous: ClaudeUsageLoadedSourceCache) {
     [],
     previous.sources,
     undefined,
-    [],
     previous.verifiedSources
   )
   await persistClaudeUsageSourceCache(ref(), result.processedFiles, previous)
@@ -74,7 +73,7 @@ beforeEach(async () => {
   discovered.paths = [owner, fork]
   await writeFile(owner, contents(100))
   await writeFile(fork, contents(100))
-  const initial = await scanClaudeUsageFiles([], [], undefined, [])
+  const initial = await scanClaudeUsageFiles([], [])
   expect(initial.processedFiles[1].hasDeferredClaims).toBe(true)
   await writeClaudeUsageSourceCache(ref(), initial.processedFiles)
 })
@@ -166,7 +165,7 @@ it('does not skip a write for cloned files with unchanged values', async () => {
 it('retains verified tiny files whose source envelope protects their complete rollups', async () => {
   await writeFile(owner, row(100))
   await writeFile(fork, row(100))
-  const initial = await scanClaudeUsageFiles([], [], undefined, [])
+  const initial = await scanClaudeUsageFiles([], [])
   expect(initial.processedFiles.every((file) => file.parseResumeState === null)).toBe(true)
   await writeClaudeUsageSourceCache(ref(), initial.processedFiles)
   const previous = await readClaudeUsageSourceCache(ref())
@@ -225,7 +224,7 @@ it('writes changed attribution after an incompatible fingerprint starts cold', a
   ]
   const write = vi.spyOn(sourceCacheWriter, 'writeUsageSourceCacheData')
 
-  const result = await scanClaudeUsageFiles(worktrees, previous.sources, undefined, [])
+  const result = await scanClaudeUsageFiles(worktrees, previous.sources)
   await persistClaudeUsageSourceCache(sourceRef, result.processedFiles, previous)
 
   expect(previous.sources).toEqual([])

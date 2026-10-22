@@ -4,11 +4,8 @@ import { AGENT_LAUNCH_PANE_REFUSED_CODE } from '../../../../shared/agent-launch-
 import { agentLaunchPaneLiveness } from '../pane/agent-launch-pane-evidence'
 import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import type { PtySpawnResult } from '../../../providers/pty-provider-contract'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
 import { createPtySpawnTiming } from '../../pty-spawn-timing'
 import { allocatePtyLifecycleSequence } from '../host-env/types'
-import { snapshotCodexPaneHomeRoutes } from '../host-env/codex-home'
-import { getAppPtyId } from '../provider/registry'
 import {
   makePaneSpawnReservationKey,
   pendingRuntimePaneCreatesByOwnerKey
@@ -70,32 +67,6 @@ export async function beginPtyIpcSpawn(
     ? allocatePtyLifecycleSequence()
     : undefined
   const initialPaneKey = resolveEarlyPaneKey(args)
-  const initialStablePanePtyId = (() => {
-    try {
-      return !args.connectionId && initialPaneKey
-        ? excludeReplacedPaneOwner(
-            resolveStablePaneOwner(
-              ctx.deps.runtime,
-              ctx.deps.store,
-              initialPaneKey,
-              args.worktreeId,
-              args.connectionId
-            ),
-            ctx.replacedPaneOwner
-          )?.ptyId
-        : undefined
-    } catch {
-      return undefined
-    }
-  })()
-  ctx.reattachedCodexHomeRoutes = !args.connectionId
-    ? new Map(
-        snapshotCodexPaneHomeRoutes([
-          initialStablePanePtyId,
-          args.sessionId ? getAppPtyId(args.connectionId, args.sessionId) : undefined
-        ])
-      )
-    : new Map<string, CodexPaneHomeRoute | null>()
   ctx.spawnTiming = createPtySpawnTiming()
   ctx.cwd = ctx.deps.resolvePtySpawnStartupCwd(args.worktreeId, args.cwd)
 

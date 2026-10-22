@@ -1,21 +1,19 @@
+import { resolveLocalAccountRuntimeTarget } from '../../shared/local-account-runtime'
 import type { GlobalSettings } from '../../shared/global-settings-types'
-import {
-  getClaudeWslSelectionKey,
-  normalizeClaudeRuntimeSelection,
-  type ClaudeAccountSelectionTarget
-} from '../claude-accounts/runtime-selection'
-import { getInitialAccountRateLimitTarget } from './initial-account-rate-limit-target'
+import type { ClaudeAccountSelectionTarget } from '../claude-accounts/runtime-selection'
 
 export function getInitialClaudeRateLimitTarget(
   settings: GlobalSettings,
   platform: NodeJS.Platform = process.platform
 ): ClaudeAccountSelectionTarget {
-  return getInitialAccountRateLimitTarget(
-    settings,
-    {
-      getWslSelectionKey: getClaudeWslSelectionKey,
-      normalizeRuntimeSelection: normalizeClaudeRuntimeSelection
-    },
-    platform
-  )
+  if (
+    settings.localAccountRuntime === 'host' ||
+    (settings.localAccountRuntime === 'wsl' && platform !== 'win32')
+  ) {
+    return { runtime: 'host' }
+  }
+  const target = resolveLocalAccountRuntimeTarget(settings, platform)
+  return target.runtime === 'wsl'
+    ? { runtime: 'wsl', wslDistro: target.wslDistro }
+    : { runtime: 'host' }
 }

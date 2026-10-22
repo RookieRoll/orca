@@ -230,11 +230,6 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
 
   // Why: the shown accounts are the owning host's; without a scope Settings opens on the default host.
   const hostScope = getUsageOwnerHostScope(remoteOwner)
-  const handleManageAccounts = (): void => {
-    setUsageMenuOpen(false)
-    openSettingsTarget({ pane: 'accounts', repoId: null, hostScope })
-    openSettingsPage()
-  }
   const handleUsageDetails = (): void => {
     setUsageMenuOpen(false)
     openSettingsTarget({ pane: 'stats', repoId: null })
@@ -242,8 +237,7 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
   }
   const handleOpenProviderAccounts = (provider: ProviderRateLimits['provider']): void => {
     const sectionId = getUsageProviderAccountsSectionId(provider)
-    // Why: a placeholder for a CLI-owned provider still leads to the host's accounts.
-    if (!sectionId && !remoteOwner) {
+    if (!sectionId) {
       return
     }
     setUsageMenuOpen(false)
@@ -256,7 +250,7 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
     openSettingsPage()
   }
   const canSignInFromUsageRow = (provider: ProviderRateLimits['provider']): boolean =>
-    usageRowSignInOpensSettings(provider, settings)
+    usageRowSignInOpensSettings(provider)
   const handleUsageMenuOpenChange = (nextOpen: boolean): void => {
     if (nextOpen) {
       usageMenuFocusHandoff.reset()
@@ -276,7 +270,6 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
     detectedAgentIds,
     floatingTerminalActionLabel,
     floatingTerminalShortcut,
-    handleManageAccounts,
     handleOpenProviderAccounts,
     handleRefresh,
     handleUsageDetails,

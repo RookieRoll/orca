@@ -5,25 +5,18 @@ const mocks = vi.hoisted(() => ({
   handle: vi.fn(),
   hasKey: vi.fn(() => false),
   protection: vi.fn<() => 'sealed' | 'plaintext' | null>(() => null),
-  hasCli: vi.fn(() => false),
-  save: vi.fn(),
-  clear: vi.fn()
+  hasCli: vi.fn(() => false)
 }))
 vi.mock('electron', () => ({ ipcMain: { handle: mocks.handle } }))
 vi.mock('../zcode/zcode-plan-api-key-store', () => ({
   hasZcodePlanApiKey: mocks.hasKey,
   getZcodePlanApiKeyProtection: mocks.protection,
-  saveZcodePlanApiKey: mocks.save,
-  clearZcodePlanApiKey: mocks.clear,
   API_KEY_ENVELOPE_PREFIX: 'zcode:',
   getZcodePlanApiKeyPath: () => 'zcode-key-path'
 }))
 // The files are mocked away; readability has its own coverage in the RPC test.
 vi.mock('../credentials/saved-credential-readability', () => ({
-  savedCredentialUnreadable: () => undefined,
-  refuseCredentialSealedElsewhere: () => {
-    throw new Error('unused')
-  }
+  savedCredentialUnreadable: () => undefined
 }))
 vi.mock('../rate-limits/zcode-usage-fetcher', () => ({ hasZcodeCliPlanCredentials: mocks.hasCli }))
 
@@ -41,7 +34,7 @@ describe('GLM credential IPC', () => {
     mocks.hasKey.mockReturnValue(false)
     mocks.hasCli.mockReturnValue(false)
     mocks.protection.mockReturnValue(null)
-    registerZcodePlanCredentialsHandlers(null)
+    registerZcodePlanCredentialsHandlers()
   })
 
   it('returns only presence and protection without exposing the key', () => {
@@ -52,28 +45,6 @@ describe('GLM credential IPC', () => {
       apiKeyConfigured: true,
       zcodeCliConfigured: true,
       apiKeyProtection: 'sealed',
-      apiKeyUnreadable: undefined
-    })
-  })
-
-  it('validates an untyped IPC key before persistence', () => {
-    expect(() => handler('zcodePlanCredentials:saveApiKey')(null, 42)).toThrow('must be a string')
-    expect(mocks.save).not.toHaveBeenCalled()
-  })
-
-  it('saves and removes keys while returning status only', () => {
-    mocks.save.mockImplementationOnce(() => mocks.hasKey.mockReturnValue(true))
-    mocks.clear.mockImplementationOnce(() => mocks.hasKey.mockReturnValue(false))
-    expect(handler('zcodePlanCredentials:saveApiKey')(null, 'synthetic-key')).toEqual({
-      apiKeyConfigured: true,
-      zcodeCliConfigured: false,
-      apiKeyProtection: null,
-      apiKeyUnreadable: undefined
-    })
-    expect(handler('zcodePlanCredentials:clearApiKey')()).toEqual({
-      apiKeyConfigured: false,
-      zcodeCliConfigured: false,
-      apiKeyProtection: null,
       apiKeyUnreadable: undefined
     })
   })

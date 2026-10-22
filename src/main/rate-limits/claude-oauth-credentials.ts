@@ -5,8 +5,8 @@ import { z } from 'zod'
 import { isDefinitiveAbsence } from '../../shared/definitive-filesystem-absence'
 import { readActiveClaudeKeychainCredentialsStrict } from '../claude-accounts/keychain'
 import type { ClaudeRuntimeAuthPreparation } from '../claude-accounts/runtime-auth/runtime-auth-types'
-import { readUserClaudeConfigDir } from '../claude-accounts/claude-profile-paths'
-import { getClaudeProfileRouter } from '../claude-accounts/claude-profile-installed-router'
+import { readUserClaudeConfigDir } from '../claude-accounts/runtime-paths'
+import { getClaudeCliHomeResolver } from '../claude-accounts/claude-cli-home-resolver'
 
 export type ClaudeOAuthCredentialSource =
   | 'scoped-keychain'
@@ -129,7 +129,7 @@ export function resolveClaudeOAuthCredentialReadOptions(
     // Why the user's own folder, login shell first: Claude names System default's item from it.
     keychainConfigDir:
       accountDir ??
-      getClaudeProfileRouter()?.userConfigDir() ??
+      getClaudeCliHomeResolver()?.userConfigDir() ??
       readUserClaudeConfigDir(process.env),
     // An unsuffixed lookup is exclusively System default, never a fallback from an account.
     unsuffixedKeychainFallback: !accountDir

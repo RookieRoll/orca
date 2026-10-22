@@ -29,10 +29,7 @@ const {
   registerAiVaultHandlersMock,
   registerAiVaultSearchHandlersMock,
   registerOrcaProfileHandlersMock,
-  registerCodexAccountHandlersMock,
   registerAgentHookHandlersMock,
-  registerClaudeAccountHandlersMock,
-  registerOpenCodeGoCredentialsHandlersMock,
   registerMiniMaxCredentialsHandlersMock,
   registerZcodePlanCredentialsHandlersMock,
   registerGrokAccountHandlersMock,
@@ -52,7 +49,6 @@ const {
   registerGitLabHandlersMock,
   registerHostedReviewHandlersMock,
   registerExportHandlersMock,
-  registerCodexConfigSyncHandlersMock,
   registerOnboardingHandlersMock,
   registerDashboardPopoutHandlersMock,
   registerWorkspaceSpaceWindowHandlersMock,
@@ -95,10 +91,7 @@ const {
   registerAiVaultHandlersMock: vi.fn(),
   registerAiVaultSearchHandlersMock: vi.fn(),
   registerOrcaProfileHandlersMock: vi.fn(),
-  registerCodexAccountHandlersMock: vi.fn(),
   registerAgentHookHandlersMock: vi.fn(),
-  registerClaudeAccountHandlersMock: vi.fn(),
-  registerOpenCodeGoCredentialsHandlersMock: vi.fn(),
   registerMiniMaxCredentialsHandlersMock: vi.fn(),
   registerZcodePlanCredentialsHandlersMock: vi.fn(),
   registerGrokAccountHandlersMock: vi.fn(),
@@ -118,7 +111,6 @@ const {
   registerGitLabHandlersMock: vi.fn(),
   registerHostedReviewHandlersMock: vi.fn(),
   registerExportHandlersMock: vi.fn(),
-  registerCodexConfigSyncHandlersMock: vi.fn(),
   registerOnboardingHandlersMock: vi.fn(),
   registerDashboardPopoutHandlersMock: vi.fn(),
   registerWorkspaceSpaceWindowHandlersMock: vi.fn(),
@@ -147,10 +139,6 @@ vi.mock('../../shared/runtime-environment-store', () => ({
 
 vi.mock('../runtime-environments/runtime-environment-transport-routing', () => ({
   callRuntimeEnvironment: callRuntimeEnvironmentMock
-}))
-
-vi.mock('../codex-config-sync', () => ({
-  registerCodexConfigSyncHandlers: registerCodexConfigSyncHandlersMock
 }))
 
 vi.mock('../onboarding', () => ({
@@ -315,20 +303,8 @@ vi.mock('../orca-profiles', () => ({
   registerOrcaProfileHandlers: registerOrcaProfileHandlersMock
 }))
 
-vi.mock('../codex-accounts', () => ({
-  registerCodexAccountHandlers: registerCodexAccountHandlersMock
-}))
-
 vi.mock('../agent-hooks', () => ({
   registerAgentHookHandlers: registerAgentHookHandlersMock
-}))
-
-vi.mock('../claude-accounts', () => ({
-  registerClaudeAccountHandlers: registerClaudeAccountHandlersMock
-}))
-
-vi.mock('../opencode-go-credentials', () => ({
-  registerOpenCodeGoCredentialsHandlers: registerOpenCodeGoCredentialsHandlersMock
 }))
 
 vi.mock('../minimax-credentials', () => ({
@@ -443,10 +419,7 @@ describe('registerCoreHandlers', () => {
     registerEphemeralVmHandlersMock.mockReset()
     registerAiVaultHandlersMock.mockReset()
     registerOrcaProfileHandlersMock.mockReset()
-    registerCodexAccountHandlersMock.mockReset()
     registerAgentHookHandlersMock.mockReset()
-    registerClaudeAccountHandlersMock.mockReset()
-    registerOpenCodeGoCredentialsHandlersMock.mockReset()
     registerMiniMaxCredentialsHandlersMock.mockReset()
     registerZcodePlanCredentialsHandlersMock.mockReset()
     registerClipboardHandlersMock.mockReset()
@@ -490,8 +463,7 @@ describe('registerCoreHandlers', () => {
     const codexUsage = { marker: 'codexUsage' }
     const openCodeUsage = { marker: 'openCodeUsage' }
     const museUsage = { marker: 'museUsage' }
-    const codexAccounts = { marker: 'codexAccounts', runtimeHomeService: { marker: 'runtimeHome' } }
-    const claudeAccounts = { marker: 'claudeAccounts' }
+    const codexResetCredits = { marker: 'codexResetCredits' }
     const rateLimits = { marker: 'rateLimits' }
     const agentAwakeService = { marker: 'agentAwakeService' }
     const onBeforeRelaunch = vi.fn()
@@ -506,8 +478,7 @@ describe('registerCoreHandlers', () => {
       openCodeUsage as never,
       // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: registration only forwards this marker to the mocked usage registrar.
       museUsage as never,
-      codexAccounts as never,
-      claudeAccounts as never,
+      codexResetCredits as never,
       rateLimits as never,
       null,
       undefined,
@@ -543,23 +514,14 @@ describe('registerCoreHandlers', () => {
     registeredRelaunchExit = registerAppHandlersMock.mock.calls[0]?.[1]?.onBeforeRelaunchExit
     await registeredRelaunchExit?.()
     expect(runtime.closeNotificationDismissals).toHaveBeenCalledOnce()
-    expect(registerCodexAccountHandlersMock).toHaveBeenCalledWith(
-      codexAccounts,
-      expect.any(Function)
-    )
     expect(registerAgentHookHandlersMock).toHaveBeenCalledWith(runtime, {
       getPtyIdForPaneKey: expect.any(Function)
     })
-    expect(registerCodexConfigSyncHandlersMock).toHaveBeenCalledWith(
-      codexAccounts.runtimeHomeService
-    )
-    expect(registerClaudeAccountHandlersMock).toHaveBeenCalledWith(claudeAccounts)
-    expect(registerOpenCodeGoCredentialsHandlersMock).toHaveBeenCalledWith(rateLimits)
     expect(registerMiniMaxCredentialsHandlersMock).toHaveBeenCalledWith(rateLimits)
     expect(registerZcodePlanCredentialsHandlersMock).toHaveBeenCalledWith(rateLimits)
     expect(registerGrokAccountHandlersMock).toHaveBeenCalled()
     expect(registerCursorAccountHandlersMock).toHaveBeenCalled()
-    expect(registerRateLimitHandlersMock).toHaveBeenCalledWith(rateLimits, codexAccounts)
+    expect(registerRateLimitHandlersMock).toHaveBeenCalledWith(rateLimits, codexResetCredits)
     expect(registerGitHubHandlersMock).toHaveBeenCalledWith(store, stats)
     expect(registerLinearHandlersMock).toHaveBeenCalled()
     expect(registerJiraHandlersMock).toHaveBeenCalled()
@@ -725,8 +687,7 @@ describe('registerCoreHandlers', () => {
     const codexUsage2 = { marker: 'codexUsage2' }
     const openCodeUsage2 = { marker: 'openCodeUsage2' }
     const museUsage2 = { marker: 'museUsage2' }
-    const codexAccounts2 = { marker: 'codexAccounts2' }
-    const claudeAccounts2 = { marker: 'claudeAccounts2' }
+    const codexResetCredits2 = { marker: 'codexResetCredits2' }
     const rateLimits2 = { marker: 'rateLimits2' }
 
     registerCoreHandlers(
@@ -738,8 +699,7 @@ describe('registerCoreHandlers', () => {
       openCodeUsage2 as never,
       // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: registration only forwards this marker to the mocked usage registrar.
       museUsage2 as never,
-      codexAccounts2 as never,
-      claudeAccounts2 as never,
+      codexResetCredits2 as never,
       rateLimits2 as never,
       42
     )

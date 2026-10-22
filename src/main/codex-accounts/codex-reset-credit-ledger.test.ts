@@ -74,38 +74,6 @@ describe('async reset-credit ledger', () => {
     expect(ledger.getUnresolvedKey(attempt.accountScopeKey)).toBeUndefined()
   })
 
-  it('waits for queued writes before removing an account and retains other accounts', async () => {
-    const { ledger, store, barrier } = setup()
-    const first = ledger.createFresh('first', scope('account-1'))
-    const second = ledger.createFresh('second', scope('account-2'))
-    await ledger.markProviderPending('first', first)
-    const gate = Promise.withResolvers<void>()
-    barrier.mockImplementationOnce(() => gate.promise)
-    const pendingSecond = ledger.markProviderPending('second', second)
-    const removed = ledger.discardForRemovedAccount('account-1')
-    await vi.waitFor(() => expect(barrier).toHaveBeenCalledTimes(2))
-    expect(ledger.get('first')).toBe(first)
-
-    gate.resolve()
-    await Promise.all([pendingSecond, removed])
-    expect(store.getCodexResetCreditAttemptLedger().attempts).toMatchObject([
-      { idempotencyKey: 'second', state: 'providerPending' }
-    ])
-    expect(ledger.get('first')).toBeUndefined()
-    expect(ledger.getUnresolvedKey(first.accountScopeKey)).toBeUndefined()
-    expect(ledger.get('second')).toBe(second)
-  })
-
-  it('retains the removed account guard when its async durability barrier fails', async () => {
-    const { ledger, barrier } = setup()
-    const attempt = ledger.createFresh('first', scope('account-1'))
-    await ledger.markProviderPending('first', attempt)
-    barrier.mockRejectedValueOnce(new Error('disk full'))
-    await expect(ledger.discardForRemovedAccount('account-1')).rejects.toThrow('disk full')
-    expect(ledger.get('first')).toBe(attempt)
-    expect(ledger.getUnresolvedKey(attempt.accountScopeKey)).toBe('first')
-  })
-
   it('fails queued and future mutations closed when a commit outcome is unknown', async () => {
     const { ledger, store, barrier } = setup()
     const attempt = ledger.createFresh('first', scope('account-1'))
@@ -124,8 +92,5 @@ describe('async reset-credit ledger', () => {
     expect(ledger.get('first')).toBe(attempt)
     expect(ledger.findAttemptFor('other', attempt.scopeKey, 'none')?.idempotencyKey).toBe('first')
     expect(store.replaceCodexResetCreditAttemptLedgerAndFlush).toHaveBeenCalledOnce()
-    await expect(ledger.discardForRemovedAccount('account-1')).rejects.toThrow(
-      'durability is unknown'
-    )
   })
 })

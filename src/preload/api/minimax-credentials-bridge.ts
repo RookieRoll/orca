@@ -4,13 +4,5 @@ import type { MiniMaxCredentialsStatus } from '../../shared/minimax-credentials-
 
 export const minimaxCredentialsApi = {
   getStatus: (): Promise<MiniMaxCredentialsStatus> =>
-    ipcRenderer.invoke('minimaxCredentials:getStatus'),
-  saveCookie: (cookie: string): Promise<MiniMaxCredentialsStatus> =>
-    ipcRenderer.invoke('minimaxCredentials:saveCookie', cookie),
-  clearCookie: (): Promise<MiniMaxCredentialsStatus> =>
-    ipcRenderer.invoke('minimaxCredentials:clearCookie'),
-  saveApiKey: (key: string): Promise<MiniMaxCredentialsStatus> =>
-    ipcRenderer.invoke('minimaxCredentials:saveApiKey', key),
-  clearApiKey: (): Promise<MiniMaxCredentialsStatus> =>
-    ipcRenderer.invoke('minimaxCredentials:clearApiKey')
+    ipcRenderer.invoke('minimaxCredentials:getStatus')
 } satisfies PreloadApi['minimaxCredentials']

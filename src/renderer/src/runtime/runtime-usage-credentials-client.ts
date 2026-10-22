@@ -7,10 +7,10 @@ import { RuntimeRpcCallError } from './runtime-rpc-result'
 
 const HOST_CREDENTIAL_TIMEOUT_MS = 20_000
 
-/** The selected host predates saving usage keys over RPC; nothing was stored anywhere. */
+/** The selected host predates the usage-credential status RPC. */
 export class UsageCredentialsHostOutdatedError extends Error {
   constructor() {
-    super('This host needs a newer Orca to save usage keys.')
+    super('This host cannot report usage credential status.')
     this.name = 'UsageCredentialsHostOutdatedError'
   }
 }
@@ -20,7 +20,7 @@ async function callHost<TResult>(
   method: string,
   params?: unknown
 ): Promise<TResult> {
-  // Why never local on refusal: the key belongs to the host whose poller reads it.
+  // Why never local on refusal: that would report the wrong host's status.
   if (
     !(await runtimeEnvironmentSupportsCapability(
       environmentId,
@@ -41,73 +41,20 @@ async function callHost<TResult>(
   }
 }
 
-export type MiniMaxCredentialAction =
-  | 'getStatus'
-  | 'saveApiKey'
-  | 'clearApiKey'
-  | 'saveCookie'
-  | 'clearCookie'
-
 export function callMiniMaxCredentials(
-  owner: RuntimeClientTarget,
-  action: MiniMaxCredentialAction,
-  value = ''
+  owner: RuntimeClientTarget
 ): Promise<MiniMaxCredentialsStatus> {
   if (owner.kind === 'local') {
-    const api = window.api.minimaxCredentials
-    switch (action) {
-      case 'getStatus':
-        return api.getStatus()
-      case 'saveApiKey':
-        return api.saveApiKey(value)
-      case 'clearApiKey':
-        return api.clearApiKey()
-      case 'saveCookie':
-        return api.saveCookie(value)
-      case 'clearCookie':
-        return api.clearCookie()
-    }
+    return window.api.minimaxCredentials.getStatus()
   }
-  const { environmentId } = owner
-  switch (action) {
-    case 'getStatus':
-      return callHost(environmentId, 'accounts.minimaxCredentialsStatus')
-    case 'saveApiKey':
-      return callHost(environmentId, 'accounts.minimaxSaveApiKey', { apiKey: value })
-    case 'clearApiKey':
-      return callHost(environmentId, 'accounts.minimaxClearApiKey')
-    case 'saveCookie':
-      return callHost(environmentId, 'accounts.minimaxSaveSessionCookie', { cookie: value })
-    case 'clearCookie':
-      return callHost(environmentId, 'accounts.minimaxClearSessionCookie')
-  }
+  return callHost(owner.environmentId, 'accounts.minimaxCredentialsStatus')
 }
 
-export type ZcodePlanCredentialAction = 'getStatus' | 'saveApiKey' | 'clearApiKey'
-
 export function callZcodePlanCredentials(
-  owner: RuntimeClientTarget,
-  action: ZcodePlanCredentialAction,
-  value = ''
+  owner: RuntimeClientTarget
 ): Promise<ZcodePlanCredentialsStatus> {
   if (owner.kind === 'local') {
-    const api = window.api.zcodePlanCredentials
-    switch (action) {
-      case 'getStatus':
-        return api.getStatus()
-      case 'saveApiKey':
-        return api.saveApiKey(value)
-      case 'clearApiKey':
-        return api.clearApiKey()
-    }
+    return window.api.zcodePlanCredentials.getStatus()
   }
-  const { environmentId } = owner
-  switch (action) {
-    case 'getStatus':
-      return callHost(environmentId, 'accounts.zcodePlanCredentialsStatus')
-    case 'saveApiKey':
-      return callHost(environmentId, 'accounts.zcodePlanSaveApiKey', { apiKey: value })
-    case 'clearApiKey':
-      return callHost(environmentId, 'accounts.zcodePlanClearApiKey')
-  }
+  return callHost(owner.environmentId, 'accounts.zcodePlanCredentialsStatus')
 }

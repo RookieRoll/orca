@@ -54,9 +54,6 @@ function createCodexAdapter(context: StructuredAgentAdapterContext): StructuredA
       resolveWorkspacePath: deps.resolveWorkspacePath,
       resolveEnvironment: () => context.environment.resolveAgentEnvironment('codex'),
       refreshEnvironmentAfterMiss: context.environment.refreshAfterMissingProgram,
-      ...(deps.prepareCodexCatalogProbeHome
-        ? { prepareHome: deps.prepareCodexCatalogProbeHome }
-        : {}),
       ...(deps.resolveCodexCommand ? { resolveCommand: deps.resolveCodexCommand } : {})
     }),
     resolveLaunch: withSupportedCodexCli(

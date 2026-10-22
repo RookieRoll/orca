@@ -128,7 +128,6 @@ describe('Cursor compact usage headline', () => {
           onOpenProvider={() => {}}
           onSignIn={() => {}}
           canSignIn={() => false}
-          onManageAccounts={() => {}}
           onUsageDetails={() => {}}
         />
       )

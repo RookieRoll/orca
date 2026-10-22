@@ -76,7 +76,7 @@ function apiFailureResult(
   }
   if (outcome.kind === 'unauthorized') {
     return emptyResult(
-      'The OpenCode Go API key was rejected. Run /connect in OpenCode, or replace the key in Settings.',
+      'The OpenCode Go API key was rejected. Reconnect with OpenCode or update its configured credential.',
       'error',
       { source: 'web', credentialSource, failureKind: 'stale-token' }
     )
@@ -116,7 +116,7 @@ export async function fetchOpenCodeGoUsage(
   const hasCookie = Boolean(normalizeCookieInput(input.cookie))
   if (apiKeyResolution.status === 'credential-database-unreadable' && !hasCookie) {
     return emptyResult(
-      "Could not read OpenCode's credential database, so OPENCODE_API_KEY was not used; it may be a Zen key. Add your OpenCode Go key in Settings, or retry.",
+      "Could not read OpenCode's credential database, so OPENCODE_API_KEY was not used; it may be a Zen key. Check OpenCode's credential setup, or retry.",
       'error',
       { failureKind: 'usage-unavailable' }
     )

@@ -32,7 +32,6 @@ export type CodexAtRestSkillsDeps = CodexStructuredInvocationDeps & {
   resolveLaunchArgs: () => Promise<string[]> | string[]
   resolveWorkspacePath: (workspaceId: string) => Promise<string>
   /** The sync a launch runs on this home first, so the probe reads what a launch would. */
-  prepareHome?: (home: string) => void
   now?: () => number
   /** Test seams. */
   runSession?: typeof runCodexAppServerSession
@@ -103,7 +102,6 @@ async function probeCodexSkills(
   if (!isCurrent()) {
     return { commands: undefined, fromAgent: false }
   }
-  deps.prepareHome?.(accountHomePath)
   const now = deps.now ?? Date.now
   const sleep = deps.sleep ?? sleepFor
   const spawnedAt = now()

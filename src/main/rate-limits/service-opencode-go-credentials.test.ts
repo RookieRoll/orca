@@ -14,8 +14,7 @@ import {
 } from './rate-limit-service-test-harness'
 
 vi.mock('./claude-fetcher', () => ({
-  fetchClaudeRateLimits: vi.fn(),
-  fetchManagedAccountUsage: vi.fn()
+  fetchClaudeRateLimits: vi.fn()
 }))
 
 vi.mock('./codex-fetcher', () => ({
@@ -57,7 +56,7 @@ vi.mock('../minimax/minimax-cookie-store', () => ({
 }))
 
 const DECRYPT_ERROR =
-  'OpenCode Go API key could not be decrypted. Re-enter or clear the key in Settings.'
+  'OpenCode Go API key could not be decrypted. Refresh OpenCode credentials and retry.'
 
 function serviceWithCookie(apiKeyResolver: () => string | null): RateLimitService {
   const service = new RateLimitService()

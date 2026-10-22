@@ -3,7 +3,6 @@ import {
   CreateAgentSessionParams,
   EnsureAgentSessionParams
 } from '../../shared/rpc-contract/agent-session-params'
-import { HostAccountLaunchEnvParams } from '../../shared/host-account-launch-env'
 import { OrcaRuntimeService } from './orca-runtime'
 import type { TerminalCreateOptions } from './runtime-terminal-contracts'
 
@@ -99,26 +98,6 @@ describe('agent-session creates with a desktop-prepared accountEnv', () => {
       agent: 'codex'
     })
     expect(planned[0]?.env).toMatchObject({ CODEX_HOME: '/stale' })
-  })
-
-  // The account the user picked wins over a per-agent env override in Settings, as on the host
-  // planner's other launches.
-  it('puts the host-selected account over Settings agent env', async () => {
-    const runtime = createRuntime()
-    runtime.setHostAccountLaunchEnv(
-      HostAccountLaunchEnvParams.parse({
-        wslDistro: 'Ubuntu',
-        claude: {},
-        terminal: { CODEX_HOME: ACCOUNT_ENV.CODEX_HOME }
-      })
-    )
-    const { planned } = planCreates(runtime)
-    await runtime.createAgentSession({
-      clientOperationId: operationId(),
-      worktree: 'id:worktree-1',
-      agent: 'codex'
-    })
-    expect(planned[0]?.env).toMatchObject({ KEEP: '1', CODEX_HOME: ACCOUNT_ENV.CODEX_HOME })
   })
 
   it('carries it through a resumed (restored or sleeping) agent', async () => {

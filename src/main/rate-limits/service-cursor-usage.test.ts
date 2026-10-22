@@ -8,8 +8,7 @@ import { fetchCodexRateLimits } from './codex-fetcher'
 import { okProvider, resetRateLimitProviderMocks } from './rate-limit-service-test-harness'
 
 vi.mock('./claude-fetcher', () => ({
-  fetchClaudeRateLimits: vi.fn(),
-  fetchManagedAccountUsage: vi.fn()
+  fetchClaudeRateLimits: vi.fn()
 }))
 
 vi.mock('./codex-fetcher', () => ({

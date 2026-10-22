@@ -24,10 +24,6 @@ import {
   sweepPersistedUnattachedTerminalRows
 } from '../restoring-sessions/tab-terminal-pane-binding-repair'
 import { scheduleSave } from './write-scheduling'
-import {
-  migrateLegacyOpenCodeGoApiKey,
-  type OpenCodeGoApiKeyTarget
-} from './legacy-opencode-go-api-key-migration'
 import { enqueuePrimaryStateOperation, writeToDiskAsync } from './primary-state-writes'
 import type { ProfileStateDatabaseQuarantine } from '../profile-state/profile-state-database-quarantine'
 import { writeVersionedProfileStateExport } from '../profile-state/legacy-json/profile-state-versioned-export'
@@ -170,13 +166,6 @@ export class Store {
       ) {
         scheduleSave(this.domains.scheduling)
       }
-    }
-  }
-
-  /** Moves the #22551 settings-slot OpenCode Go key into `target`; it stays on disk until that succeeds. */
-  migrateLegacyOpenCodeGoApiKey(target: OpenCodeGoApiKeyTarget): void {
-    if (migrateLegacyOpenCodeGoApiKey(this.runtime.protectedSecrets, target)) {
-      scheduleSave(this.domains.scheduling)
     }
   }
 

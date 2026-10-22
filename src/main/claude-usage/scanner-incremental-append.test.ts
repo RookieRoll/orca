@@ -16,10 +16,6 @@ vi.mock('node:os', async () => ({
   homedir: homedirMock
 }))
 
-vi.mock('../claude-accounts/claude-profile-installed-router', () => ({
-  claudeProfileHistoryDirs: () => []
-}))
-
 vi.mock('node:fs', async () => {
   const actual = await vi.importActual<typeof NodeFs>('node:fs')
   return {
@@ -134,14 +130,14 @@ describe('Claude usage append scans', () => {
     const prefix = prefixRecords()
     await writeFile(transcriptPath, prefix)
     const { scanClaudeUsageFiles } = await import('./scanner')
-    const first = await scanClaudeUsageFiles([], [], undefined, [])
+    const first = await scanClaudeUsageFiles([], [])
     const appended = usageRecord(80)
     await appendFile(transcriptPath, appended)
     streamReads.length = 0
 
-    const second = await scanClaudeUsageFiles([], first.processedFiles, undefined, [])
+    const second = await scanClaudeUsageFiles([], first.processedFiles)
     const appendBytes = streamedBytes()
-    const cold = await scanClaudeUsageFiles([], [], undefined, [])
+    const cold = await scanClaudeUsageFiles([], [])
 
     expect(second.sessions).toEqual(cold.sessions)
     expect(second.dailyAggregates).toEqual(cold.dailyAggregates)
@@ -153,11 +149,11 @@ describe('Claude usage append scans', () => {
   it('updates a previously counted assistant row with its later token maxima', async () => {
     await writeFile(transcriptPath, prefixRecords())
     const { scanClaudeUsageFiles } = await import('./scanner')
-    const first = await scanClaudeUsageFiles([], [], undefined, [])
+    const first = await scanClaudeUsageFiles([], [])
     await appendFile(transcriptPath, usageRecord(3, 250, 40) + usageRecord(80))
 
-    const second = await scanClaudeUsageFiles([], first.processedFiles, undefined, [])
-    const cold = await scanClaudeUsageFiles([], [], undefined, [])
+    const second = await scanClaudeUsageFiles([], first.processedFiles)
+    const cold = await scanClaudeUsageFiles([], [])
 
     expect(second.sessions).toEqual(cold.sessions)
     expect(second.dailyAggregates).toEqual(cold.dailyAggregates)
