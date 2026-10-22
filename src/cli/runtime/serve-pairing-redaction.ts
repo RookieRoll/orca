@@ -1,5 +1,5 @@
 import type { ProcessSpec } from '@orca/process-host/process-spec'
-import type { superviseForegroundServe } from './serve-update-supervisor'
+import type { ChildProcessHandle } from '@orca/process-host/process-spec'
 import { createInterface } from 'node:readline'
 
 export const PAIRING_HIDDEN_LINE =
@@ -58,7 +58,7 @@ export function shouldRedactSupervisedStdout(
 
 let stdoutErrorsIgnored = false
 
-export type ServeSpawnChild = Parameters<typeof superviseForegroundServe>[0]['spawnChild']
+export type ServeSpawnChild = (spec: ProcessSpec) => ChildProcessHandle
 
 /** Pipes the child's stdout through the redactor; stdio slots other than stdout are kept. */
 export function redactingSpawn(spawn: ServeSpawnChild): ServeSpawnChild {

@@ -183,7 +183,7 @@ it('stops at the shared deadline and removes the staging copy', async () => {
   expect(await readdir(copies)).toEqual([])
 })
 
-it('copies the app behind a symbolic link rather than retaining a link to the updater path', async () => {
+it('copies the app behind a symbolic link rather than retaining a link to the replaced app path', async () => {
   const alias = join(root, 'Linked.app')
   await symlink(source, alias, 'junction')
   inspectMock.mockResolvedValue({

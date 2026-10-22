@@ -1,7 +1,8 @@
 /** Pure rendering of the per-user service units `orca serve service install` writes. */
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
-import { SERVE_LAUNCHD_LABEL_PREFIX } from '../../shared/serve-bundle-coordination'
+
+const SERVE_LAUNCHD_LABEL_PREFIX = 'com.stablyai.orca.serve'
 
 export type ServeServiceManager = 'launchd' | 'systemd'
 

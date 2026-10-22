@@ -5,12 +5,10 @@ type FakeWindow = { isDestroyed: () => boolean; close: () => void }
 const popout = vi.hoisted((): { window: FakeWindow | null } => ({ window: null }))
 
 vi.mock('electron', () => ({ app: { quit: electron.quit } }))
-vi.mock('../updater', () => ({ checkForUpdatesFromMenu: vi.fn(), isQuittingForUpdate: vi.fn() }))
 vi.mock('../tray/system-tray', () => ({
   createSystemTray: vi.fn(),
   setMacMenuBarIconVisible: vi.fn()
 }))
-vi.mock('../window/attach-main-window-services', () => ({ ensureAutoUpdaterConfigured: vi.fn() }))
 vi.mock('../window/focus-existing-window', () => ({
   focusExistingMainWindow: vi.fn(),
   safelyRevealWindow: vi.fn()

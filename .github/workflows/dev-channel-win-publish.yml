@@ -54,13 +54,13 @@ jobs:
           name: dev-channel-windows-${{ inputs.tag }}
           path: staged-windows
 
-      - name: Validate staged Windows artifacts
+      - name: Validate staged Windows installer
         shell: bash
         run: |
           set -euo pipefail
-          for required in orca-windows-setup.exe orca-windows-setup.exe.blockmap latest.yml; do
+          for required in orca-windows-setup.exe; do
             if [[ ! -s "staged-windows/$required" ]]; then
-              echo "::error::Missing or empty staged Windows artifact: $required"
+              echo "::error::Missing or empty staged Windows installer: $required"
               exit 1
             fi
           done
@@ -107,26 +107,26 @@ jobs:
             exit 1
           fi
 
-      - name: Publish Windows artifacts
+      - name: Publish Windows installer
         uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           max_attempts: 2
           retry_wait_seconds: 10
-          command: gh release upload "$TAG" staged-windows/orca-windows-setup.exe staged-windows/orca-windows-setup.exe.blockmap staged-windows/latest.yml --clobber --repo "stablyai/orca-$CHANNEL"
+          command: gh release upload "$TAG" staged-windows/orca-windows-setup.exe --clobber --repo "stablyai/orca-$CHANNEL"
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
 
-      - name: Verify Windows update manifest published
+      - name: Verify Windows installer published
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
         run: |
           set -euo pipefail
           assets="$(gh release view "$TAG" --repo "stablyai/orca-$CHANNEL" --json assets --jq '.assets[].name')"
-          for required in latest.yml orca-windows-setup.exe orca-windows-setup.exe.blockmap; do
+          for required in orca-windows-setup.exe; do
             if ! grep -qx "$required" <<<"$assets"; then
-              echo "::error::$TAG is missing $required; Windows could not install this build."
+              echo "::error::$TAG is missing the Windows installer $required."
               exit 1
             fi
           done

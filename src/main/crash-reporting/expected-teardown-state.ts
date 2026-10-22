@@ -41,18 +41,15 @@ function isRecentSystemSessionEnd(): boolean {
 
 export function resolveExpectedTeardownScope({
   isQuitting,
-  isQuittingForUpdate,
   isExpectedRendererReload,
   includeSystemSessionEnd = true
 }: {
   isQuitting: boolean
-  isQuittingForUpdate: boolean
   isExpectedRendererReload: boolean
   includeSystemSessionEnd?: boolean
 }): ExpectedTeardownScope {
   if (
     isQuitting ||
-    isQuittingForUpdate ||
     (includeSystemSessionEnd && isRecentSystemSessionEnd())
   ) {
     return 'app-shutdown'

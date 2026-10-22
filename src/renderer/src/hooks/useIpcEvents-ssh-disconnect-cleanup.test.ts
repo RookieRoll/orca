@@ -31,7 +31,6 @@ describe('useIpcEvents updater integration', () => {
       current: null
     }
     const storeState = {
-      setUpdateStatus: vi.fn(),
       fetchRepos: vi.fn(),
       fetchWorktrees: vi.fn(),
       setActiveView: vi.fn(),

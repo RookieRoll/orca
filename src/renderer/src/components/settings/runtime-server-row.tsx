@@ -6,8 +6,6 @@ import {
 } from '../../../../shared/runtime-environments'
 import type { SshTarget } from '../../../../shared/ssh-types'
 import type { ManagedOrcadPreloadApi } from '../../../../preload/api/managed-orcad-api'
-import type { RemoteServerUpdateEntry } from '@/runtime/remote-server-update-coordinator'
-import type { UpdateCheckOptions } from '../../../../shared/update-status-types'
 import { getRuntimeServerProblemLine, getRuntimeServerRoute } from './runtime-server-row-meta'
 import { translate } from '@/i18n/i18n'
 import { cn } from '@/lib/utils'
@@ -16,10 +14,8 @@ import { Button } from '../ui/button'
 import type { RuntimeHostDetails } from './runtime-environment-host-details'
 import {
   formatRuntimeEndpointAddress,
-  getRuntimeServerAvailableUpdateText,
   getRuntimeServerStatusIndicator,
-  getRuntimeServerVersionText,
-  isRemoteServerUpdateInFlight
+  getRuntimeServerVersionText
 } from './runtime-server-row-presentation'
 import { RuntimeRepairDialog } from './RuntimeRepairDialog'
 import { RuntimeServerRowDetails } from './runtime-server-row-details'
@@ -53,8 +49,6 @@ type RuntimeServerRowProps = {
   duplicateOfNames?: readonly string[]
   details: RuntimeHostDetails | undefined
   isActive: boolean
-  remoteUpdate: RemoteServerUpdateEntry | undefined
-  remoteServerUpdatesRunning: boolean
   connecting: boolean
   switching: boolean
   disconnecting: boolean
@@ -64,12 +58,10 @@ type RuntimeServerRowProps = {
   sshAccessApi?: Pick<ManagedOrcadPreloadApi, 'linkSshAccess' | 'unlinkSshAccess'> | null
   sshTargets?: SshTarget[]
   managed?: ManagedServerLifecycle | null
-  onOpenUpdate: () => void
   onDisconnect: (environment: PublicKnownRuntimeEnvironment) => void
   onConnect: (environment: PublicKnownRuntimeEnvironment) => void
   onRemove: (environment: PublicKnownRuntimeEnvironment) => void
   onMakeDefault?: (environment: PublicKnownRuntimeEnvironment) => void
-  onCheckForUpdates?: (options: UpdateCheckOptions) => void
   onChanged?: () => void
   /** Re-reads SSH hosts; the route dialog lists them. */
   onRefreshSshTargets?: () => void
@@ -83,8 +75,6 @@ export function RuntimeServerRow({
   duplicateOfNames = NO_DUPLICATES,
   details,
   isActive,
-  remoteUpdate,
-  remoteServerUpdatesRunning,
   connecting,
   switching,
   disconnecting,
@@ -93,12 +83,10 @@ export function RuntimeServerRow({
   sshAccessApi = null,
   sshTargets = NO_SSH_TARGETS,
   managed = null,
-  onOpenUpdate,
   onDisconnect,
   onConnect,
   onRemove,
   onMakeDefault,
-  onCheckForUpdates,
   onChanged,
   onRefreshSshTargets,
   onRecheck,
@@ -112,7 +100,6 @@ export function RuntimeServerRow({
   const repairable = row.repairRoute === 'access-link'
   // Why: the revoked host rejects this token on every Connect; Re-pair is the only way back.
   const canConnect = !(row.accessRevoked && repairable)
-  const updateActionable = remoteUpdate?.phase === 'available' || remoteUpdate?.phase === 'failed'
   const deployment = getOrcadSshDeployment(environment)
   const sshAccess = environment.sshAccess
   const pendingSshAccess = environment.pendingSshAccessOperation
@@ -121,21 +108,19 @@ export function RuntimeServerRow({
   const needsRecheck =
     row.connectionState === 'runtime-unavailable' ||
     row.connectionState === 'workspace-window-closed'
-  const primary: 'managed' | 'repair' | 'update' | 'connect' | 'retry' | 'recheck' | null =
+  const primary: 'managed' | 'repair' | 'connect' | 'retry' | 'recheck' | null =
     managed && managedServerHasPrimaryAction(managed)
       ? 'managed'
       : row.accessRevoked && repairable
         ? 'repair'
-        : updateActionable
-          ? 'update'
-          : // Why: the first probe hasn't answered yet; Connect would race it.
-            !row.isReachable && canConnect && row.connectionState !== 'checking'
-            ? row.probeFailed
-              ? 'retry'
-              : 'connect'
-            : needsRecheck && onRecheck
-              ? 'recheck'
-              : null
+        : // Why: the first probe hasn't answered yet; Connect would race it.
+          !row.isReachable && canConnect && row.connectionState !== 'checking'
+          ? row.probeFailed
+            ? 'retry'
+            : 'connect'
+          : needsRecheck && onRecheck
+            ? 'recheck'
+            : null
 
   const status: ServerRowStatus = getRuntimeServerStatusIndicator({
     connectionState: row.connectionState,
@@ -144,7 +129,6 @@ export function RuntimeServerRow({
     probeFailed: row.probeFailed,
     connecting,
     disconnecting,
-    remoteUpdate,
     managedNotRunning: Boolean(managed?.status && !managed.status.activeVersion)
   })
 
@@ -157,7 +141,6 @@ export function RuntimeServerRow({
   const problemLine = getRuntimeServerProblemLine({
     environment,
     row,
-    remoteUpdate,
     managedStatusError: managed?.statusError ?? null,
     managedSummary: managed ? getManagedServerSummary(managed) : null,
     address,
@@ -165,10 +148,8 @@ export function RuntimeServerRow({
   })
 
   const versionText = getRuntimeServerVersionText(
-    remoteUpdate,
     managed?.status?.activeVersion ?? row.descriptorStatus?.appVersion
   )
-  const availableText = getRuntimeServerAvailableUpdateText(remoteUpdate)
   const infoParts = [sshRoute ?? address, versionText].filter((part): part is string =>
     Boolean(part)
   )
@@ -187,14 +168,6 @@ export function RuntimeServerRow({
           </span>
         ))
       )}
-      {!problemLine && availableText ? (
-        <span className="flex shrink-0 items-center gap-1 text-status-warning">
-          <span aria-hidden className="text-muted-foreground">
-            ·
-          </span>
-          {availableText}
-        </span>
-      ) : null}
       {problemLine ? (
         <>
           <span aria-hidden>·</span>
@@ -217,16 +190,6 @@ export function RuntimeServerRow({
       >
         <Link2 />
         {translate('auto.components.settings.RuntimeEnvironmentsPane.repair', 'Re-pair…')}
-      </Button>
-    ) : primary === 'update' ? (
-      <Button
-        type="button"
-        variant="outline"
-        size="xs"
-        onClick={onOpenUpdate}
-        disabled={remoteServerUpdatesRunning || isRemoteServerUpdateInFlight(remoteUpdate)}
-      >
-        {translate('auto.components.settings.RuntimeEnvironmentsPane.updateServer', 'Update')}
       </Button>
     ) : primary === 'recheck' ? (
       <Button type="button" variant="ghost" size="xs" onClick={onRecheck} disabled={rechecking}>
@@ -265,7 +228,6 @@ export function RuntimeServerRow({
           <RuntimeServerRowDetails
             endpoint={endpoint}
             details={row.effectiveDetails}
-            remoteUpdate={remoteUpdate}
             problem={row.problem ?? problemLine?.text ?? null}
             sshRoute={sshRoute}
             unreachable={row.probeFailed}
@@ -306,7 +268,6 @@ export function RuntimeServerRow({
         primaryAction={primaryAction}
         menuItems={
           <RuntimeServerRowMenuItems
-            showUpdate={updateActionable && primary !== 'update'}
             showConnect={
               !row.isReachable && canConnect && primary !== 'connect' && primary !== 'retry'
             }
@@ -318,11 +279,9 @@ export function RuntimeServerRow({
             isBusy={isBusy}
             connectDisabled={row.connectionState === 'checking'}
             managedItems={managed ? <ManagedServerMenuItems lifecycle={managed} /> : null}
-            onUpdate={onOpenUpdate}
             onConnect={() => onConnect(environment)}
             onDisconnect={() => onDisconnect(environment)}
             onMakeDefault={() => onMakeDefault?.(environment)}
-            onCheckForUpdates={onCheckForUpdates}
             onSshAccess={() => {
               onRefreshSshTargets?.()
               setSshDialogOpen(true)

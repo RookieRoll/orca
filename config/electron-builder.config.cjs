@@ -61,11 +61,8 @@ const {
   verifyAppImageNodeRuntimeServesPty
 } = require('./scripts/appimage-node-runtime.cjs')
 const { signWindowsUninstallerViaSignPath } = require('./scripts/windows-uninstaller-signing.cjs')
-const { buildMacShipItScheduling } = require('./scripts/macos-shipit-scheduling.cjs')
-
-// Why: dev-channel builds must carry the *release* identity — same bundle id,
-// Developer ID signature, and notarization ticket — or Squirrel.Mac refuses to
-// swap them over an installed Orca and macOS treats each build as a new app.
+// Keep dev-channel builds on the release app identity so macOS preserves the
+// app's privacy grants across manual upgrades.
 const isMacHourly = process.env.ORCA_MAC_HOURLY === '1'
 const isMacDaily = process.env.ORCA_MAC_DAILY === '1'
 const isMacAdhoc = process.env.ORCA_MAC_ADHOC === '1'
@@ -416,8 +413,6 @@ module.exports = {
         context.packager.appInfo.productFilename
       )
       const architecture = macSliceArch(context.arch, 'local-build compatibility')
-      const schedulingAddon = buildMacShipItScheduling(resourcesDir, architecture)
-      await signMacStandaloneHelper(schedulingAddon, 'ShipIt scheduling', context.packager)
       const version = context.packager.appInfo.version
       let commit = process.env.ORCA_BUILD_COMMIT || process.env.GITHUB_SHA || 'unknown'
       if (commit === 'unknown') {
@@ -521,28 +516,15 @@ module.exports = {
   },
   win: {
     executableName: 'Orca',
-    // Why: Windows installers are signed after electron-builder packaging by
-    // SignPath, so the packager cannot infer the updater publisherName.
-    //
-    // Why dev channels drop it instead: they ship unsigned, because SignPath's
-    // approval waits are budgeted in hours and cannot fit an hourly cadence.
-    // electron-updater Authenticode-verifies every installer it downloads
-    // against the publisherName baked into the *installed* app's app-update.yml
-    // (NsisUpdater.verifySignature), and skips verification entirely when that
-    // name is absent. An unsigned build that still claimed 'SignPath Foundation'
-    // would therefore reject its own channel's next build — and its way back to
-    // stable with it. Dropping it is what makes dev→dev and dev→stable work.
     // Why a sign hook on a build that does not sign: it is the only moment
     // electron-builder exposes the NSIS uninstaller (built in its own makensis
     // pass, embedded, then deleted). The hook signs nothing — it relays the file
     // to and from the CI SignPath request, and is inert when the relay env vars
-    // are unset, so local and dev builds are unaffected. publisherName stays on
-    // its existing channel split above.
+    // are unset, so local and dev builds are unaffected.
     signtoolOptions: {
       sign: signWindowsUninstallerViaSignPath,
       ...(isWinDevChannel ? {} : { publisherName: 'SignPath Foundation' })
     },
-    ...(isWinDevChannel ? { verifyUpdateCodeSignature: false } : {}),
     extraResources: [
       ...commonExtraResources,
       ...windowsRuntimeResources,
@@ -780,6 +762,7 @@ module.exports = {
   npmRebuild: true,
   publish: {
     provider: 'github',
+    publishAutoUpdate: false,
     owner: 'stablyai',
     repo: devChannelRepo ?? 'orca',
     // Why draft on the main repo: `--publish always` otherwise creates a

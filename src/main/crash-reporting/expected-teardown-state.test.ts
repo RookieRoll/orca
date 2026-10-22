@@ -169,14 +169,7 @@ describe('expected teardown state', () => {
     ).toBe(false)
   })
 
-  it('preserves existing update and renderer-reload scopes', () => {
-    expect(
-      resolveExpectedTeardownScope({
-        isQuitting: false,
-        isQuittingForUpdate: true,
-        isExpectedRendererReload: false
-      })
-    ).toBe('app-shutdown')
+  it('preserves renderer-reload scope', () => {
     expect(
       resolveExpectedTeardownScope({
         isQuitting: false,

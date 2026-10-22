@@ -52,16 +52,14 @@ describe('Windows dev-channel artifact staging', () => {
     }
   })
 
-  it('passes exactly the installer, blockmap, and update manifest within the same run', () => {
+  it('stages exactly the manually distributed installer', () => {
     const upload = buildSteps.find((step) => step.uses?.startsWith('actions/upload-artifact@'))
     const download = publishSteps.find((step) =>
       step.uses?.startsWith('actions/download-artifact@')
     )
     expect(upload.if).toBe('inputs.stage_only')
     expect(upload.with.path.trim().split('\n')).toEqual([
-      'dist/orca-windows-setup.exe',
-      'dist/orca-windows-setup.exe.blockmap',
-      'dist/latest.yml'
+      'dist/orca-windows-setup.exe'
     ])
     expect(upload.with['if-no-files-found']).toBe('error')
     expect(download.with).toEqual({
@@ -79,11 +77,7 @@ describe('Windows dev-channel artifact staging', () => {
     const attempt = mkdtempSync(join(directory, 'files-'))
     mkdirSync(join(attempt, folder))
     expect((await runScript(step.run, { cwd: attempt })).code).toBe(1)
-    for (const file of [
-      'orca-windows-setup.exe',
-      'orca-windows-setup.exe.blockmap',
-      'latest.yml'
-    ]) {
+    for (const file of ['orca-windows-setup.exe']) {
       writeFileSync(join(attempt, folder, file), '')
       expect((await runScript(step.run, { cwd: attempt })).code).toBe(1)
       writeFileSync(join(attempt, folder, file), 'artifact')

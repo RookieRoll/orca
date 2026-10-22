@@ -73,7 +73,6 @@ export * from './task-source-runtime-capabilities'
 export * from './terminal-runtime-capabilities'
 export * from './workspace-ports-runtime-capabilities'
 export * from './worktree-runtime-capabilities'
-export { REMOTE_SERVER_UPDATE_CAPABILITY } from './remote-server-update'
 export { TERMINAL_QUICK_COMMANDS_RUNTIME_CAPABILITY } from './terminal-quick-command-capabilities'
 export {
   AUTOMATION_LIST_HOST_SCOPE_RUNTIME_CAPABILITY,

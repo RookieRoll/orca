@@ -47,7 +47,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
         getState: () => ({
           fetchRepos: vi.fn(),
           fetchWorktrees,
-          setUpdateStatus: vi.fn(),
           activeModal: null,
           closeModal: vi.fn(),
           openModal: vi.fn(),
@@ -327,7 +326,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           worktreesByRepo: {},
           purgeWorktreeTerminalState: vi.fn(),
           removeWorkspaceSpaceWorktrees: vi.fn(),
-          setUpdateStatus: vi.fn(),
           activeModal: null,
           closeModal: vi.fn(),
           openModal: vi.fn(),

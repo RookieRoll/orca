@@ -1,53 +1,25 @@
 import { existsSync, statSync } from 'node:fs'
-import { dirname } from 'node:path'
-import { isShipItRunningForBundle, listProcessCommands } from '../../shared/shipit-process-listing'
 
 export type ServeInstallEvidence =
   | { kind: 'clear' }
   | {
       kind: 'hold'
-      reason: 'bundle-missing' | 'installer-running' | 'installer-unknown' | 'install-park'
+      reason: 'bundle-missing'
     }
 
 export const SERVE_INSTALL_HOLD_REASON_TEXT: Record<
   Extract<ServeInstallEvidence, { kind: 'hold' }>['reason'],
   string
 > = {
-  'bundle-missing': 'the Orca executable is missing, likely mid-install',
-  'installer-running': "macOS's updater (ShipIt) is replacing this Orca app",
-  'installer-unknown':
-    "could not check whether macOS's updater (ShipIt) is replacing this Orca app",
-  'install-park': 'the Orca desktop app paused this server to install an update'
+  'bundle-missing': 'the Orca executable is missing, likely mid-install'
 }
-
-type ListProcesses = () => Promise<string | null>
 
 /**
  * Whether a supervised serve may spawn from `executable` right now. Never spawn from a bundle an
  * installer is swapping: the child would run half-old, half-new code or be killed mid-start.
  */
-export async function readServeInstallEvidence(
-  executable: string,
-  options: { platform?: NodeJS.Platform; listProcesses?: ListProcesses } = {}
-): Promise<ServeInstallEvidence> {
-  const platform = options.platform ?? process.platform
-  const bundlePath = platform === 'darwin' ? macBundlePathOf(executable) : null
-  // Why ShipIt first: mid-swap the executable is briefly missing, and that must not look like removal.
-  if (bundlePath) {
-    const listing = await (options.listProcesses ?? listProcessCommands)()
-    if (listing === null) {
-      return { kind: 'hold', reason: 'installer-unknown' }
-    }
-    if (isShipItRunningForBundle(listing, bundlePath)) {
-      return { kind: 'hold', reason: 'installer-running' }
-    }
-  }
+export async function readServeInstallEvidence(executable: string): Promise<ServeInstallEvidence> {
   return existsSync(executable) ? { kind: 'clear' } : { kind: 'hold', reason: 'bundle-missing' }
-}
-
-function macBundlePathOf(executable: string): string | null {
-  const bundle = dirname(dirname(dirname(executable)))
-  return bundle.endsWith('.app') ? bundle : null
 }
 
 /**

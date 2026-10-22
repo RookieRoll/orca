@@ -56,7 +56,6 @@ export type FocusTerminalListenerPayload = {
 
 /** Store surface useIpcEvents reads while surfacing a terminal create. */
 export type TerminalCreateSurfacingStore = {
-  setUpdateStatus: SpyMock
   createTab: Mock<
     (
       worktreeId: string,

@@ -9,7 +9,7 @@ name: Adhoc macOS + Windows Dev Build
 #   - No tests, no lint, no e2e. PR CI and release-cut remain the gates. The one
 #     exception is the orcad template: like release-cut, it is merged from the
 #     node-server lanes that build and qualify each SSH target's slot.
-#   - macOS is signed and notarized so TCC grants survive updates.
+#   - macOS is signed and notarized so TCC grants survive replacement installs.
 #   - Windows is unsigned; the published release notes explain the one-time
 #     SmartScreen/manual-install requirement.
 #
@@ -197,8 +197,8 @@ jobs:
           done
           # Why git tags, not GitHub releases: unpublishing a buggy cut deletes the
           # GitHub release and leaves the tag, which still owns that number.
-          # Releases-only let adhoc sit on a number already taken, so the updater
-          # would not install it. Empty on failure — the script then falls back
+          # Releases-only let adhoc sit on a number already taken. Empty on
+          # failure — the script then falls back
           # to package.json.
           published="$(GH_TOKEN="$MAIN_REPO_TOKEN" gh api \
             "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v" \
@@ -496,15 +496,12 @@ jobs:
           Built from [\`stablyai/orca@$short_sha\`](https://github.com/stablyai/orca/commit/$SHA), cut by @$ACTOR.
 
           **Unlanded and unvetted.** This is somebody's branch, not main. No tests
-          ran. The macOS build is signed and notarized like a release, so it installs
-          through Orca's in-app updater and opens without a Gatekeeper prompt — but the
-          branch may never merge, and this build is deleted after $ADHOC_RETAIN_DAYS days.
+          ran. The macOS build is signed and notarized like a release, so it opens
+          without a Gatekeeper prompt — but the branch may never merge, and this
+          build is deleted after $ADHOC_RETAIN_DAYS days.
 
-          **Windows builds are unsigned.** They install and update normally once you
-          are on one, but a signed Stable or RC build cannot install one through the
-          in-app updater — download \`orca-windows-setup.exe\` below and run it once
-          (SmartScreen will warn about an unknown publisher). Every later switch,
-          including back to Stable, works in-app from there."
+          **Windows builds are unsigned.** Download \`orca-windows-setup.exe\` below
+          and run it manually; SmartScreen will warn about an unknown publisher."
           echo "tag=$TAG" >>"$GITHUB_OUTPUT"
 
       - name: Publish adhoc macOS artifacts
@@ -534,10 +531,7 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      # Why: the updater resolves a tag, then fetches latest-mac.yml from it. A
-      # release missing that manifest is a tag the picker offers and the download
-      # 404s on, so fail loudly instead of leaving a broken entry.
-      - name: Verify update manifest published
+      - name: Verify macOS archive published
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
@@ -549,14 +543,8 @@ jobs:
           echo "$assets"
           # Why exit 1 without deleting here: the release is still a draft, so it is
           # already invisible to users, and the failure handler below owns cleanup.
-          for required in latest-mac.yml; do
-            if ! grep -qx "$required" <<<"$assets"; then
-              echo "::error::Adhoc draft $TAG is missing $required; the updater could not install it."
-              exit 1
-            fi
-          done
           if ! grep -q '\.zip$' <<<"$assets"; then
-            echo "::error::Adhoc draft $TAG has no ZIP artifact for the updater to download."
+            echo "::error::Adhoc draft $TAG has no ZIP archive for manual download."
             exit 1
           fi
 

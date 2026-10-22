@@ -15,19 +15,11 @@ import {
   SERVE_INSTALL_HOLD_REASON_TEXT,
   type ServeInstallEvidence
 } from './serve-install-hold'
-import {
-  currentServeChild,
-  requestSupervisedServeStop,
-  resetSupervisedServeStop
-} from './serve-supervised-stop'
-import type { ServeBundlePark } from '../../shared/serve-bundle-park'
-import { createSupervisedParkWatch } from './serve-supervised-park-watch'
-import type { AppImageBuildState } from './serve-appimage-update'
 
 export const SERVE_INSTALL_HOLD_POLL_MS = 2_000
 /** A hold this long is reported as stuck; it still never times out into a spawn. */
 export const SERVE_INSTALL_HOLD_STUCK_MS = 30 * 60_000
-/** A version-specific executable this long gone was removed by an update, not swapped by one. */
+/** A version-specific executable this long gone was removed, not temporarily missing. */
 export const SERVE_EXECUTABLE_MISSING_EXIT_MS = 2 * 60_000
 
 type StopListener = () => void
@@ -38,8 +30,8 @@ export type SupervisedServeOptions = {
   /** Part of the build identity: the app archive changes with every release. */
   appRoot?: string
   force: boolean
-  /** One full serve attempt: preflight, spawn, and the existing update-aware wait. */
-  runOnce: () => Promise<number>
+  /** One full serve attempt: preflight, spawn, and the existing child wait. */
+  runOnce: (signal: AbortSignal) => Promise<number>
   readInstallEvidence?: (executable: string) => Promise<ServeInstallEvidence>
   buildIdentity?: (executable: string) => string
   readBrake?: (userDataPath: string) => ServeSupervisorBrake | null
@@ -50,18 +42,6 @@ export type SupervisedServeOptions = {
   setTimer?: (callback: () => void, ms: number) => () => void
   onStopSignal?: (listener: StopListener) => () => void
   log?: (line: string) => void
-  /** The desktop-install park protocol; null when this supervisor does not take part. */
-  park?: ServeBundlePark | null
-  currentChild?: typeof currentServeChild
-  setRepeating?: (callback: () => void, ms: number) => () => void
-  /** The AppImage this build was unpacked from, checked before each start; null elsewhere. */
-  appImageUpdate?: SupervisedAppImageUpdate | null
-}
-
-export type SupervisedAppImageUpdate = {
-  inspect: () => AppImageBuildState
-  /** Re-execs into the new build and never returns; otherwise resolves with why it could not. */
-  restart: (isStopped: () => boolean) => Promise<string>
 }
 
 export function getServeSuperviseValidationError(input: {
@@ -99,11 +79,6 @@ function defaultSetTimer(callback: () => void, ms: number): () => void {
   return () => clearTimeout(timer)
 }
 
-function defaultSetRepeating(callback: () => void, ms: number): () => void {
-  const timer = setInterval(callback, ms)
-  return () => clearInterval(timer)
-}
-
 async function settle(run: () => Promise<number>): Promise<PromiseSettledResult<number>> {
   try {
     return { status: 'fulfilled', value: await run() }
@@ -139,27 +114,16 @@ export async function superviseServeService(options: SupervisedServeOptions): Pr
     log(`[serve] Not starting: ${gaveUp.reason} ${SERVE_GAVE_UP_ADVICE}`)
     return 0
   }
-  // Why the AppImage check: a replaced AppImage is a new build, which a give-up must not block.
-  if (
-    record?.gaveUp &&
-    record.build === identify(options.executable) &&
-    (options.appImageUpdate?.inspect() ?? 'current') === 'current'
-  ) {
+  if (record?.gaveUp && record.build === identify(options.executable)) {
     return refuseGaveUp(record.gaveUp)
   }
 
-  const parkWatch = options.park
-    ? createSupervisedParkWatch(options.park, {
-        currentChild: options.currentChild ?? currentServeChild,
-        setRepeating: options.setRepeating ?? defaultSetRepeating,
-        now
-      })
-    : null
   let stopped = false
+  const stopController = new AbortController()
   let wake: (() => void) | null = null
   const removeStopListener = (options.onStopSignal ?? defaultOnStopSignal)(() => {
     stopped = true
-    requestSupervisedServeStop()
+    stopController.abort()
     wake?.()
   })
   const sleep = (ms: number): Promise<void> =>
@@ -179,38 +143,13 @@ export async function superviseServeService(options: SupervisedServeOptions): Pr
       }
     })
 
-  const awaitClearToSpawn = async (): Promise<boolean> => {
-    const since = now()
-    while (!stopped) {
-      const evidence: ServeInstallEvidence = parkWatch?.idle()
-        ? { kind: 'hold', reason: 'install-park' }
-        : await readEvidence(options.executable)
-      if (evidence.kind === 'clear') {
-        return !stopped
-      }
-      if (
-        evidence.reason === 'bundle-missing' &&
-        now() - since >= SERVE_EXECUTABLE_MISSING_EXIT_MS
-      ) {
-        // The outer loop sees the same hold and hands the restart to the service manager.
-        return false
-      }
-      await sleep(SERVE_INSTALL_HOLD_POLL_MS)
-    }
-    return false
-  }
-  resetSupervisedServeStop(awaitClearToSpawn, () => options.park?.holds() ?? false)
-
-  let appImageUpdate = options.appImageUpdate ?? null
   try {
     let standbyAttempt = 0
     const hold: { current: { reason: string; since: number; reportedStuck: boolean } | null } = {
       current: null
     }
     while (!stopped) {
-      const evidence: ServeInstallEvidence = parkWatch?.idle()
-        ? { kind: 'hold', reason: 'install-park' }
-        : await readEvidence(options.executable)
+      const evidence: ServeInstallEvidence = await readEvidence(options.executable)
       if (stopped) {
         break
       }
@@ -240,33 +179,14 @@ export async function superviseServeService(options: SupervisedServeOptions): Pr
         continue
       }
       hold.current = null
-      const appImage = appImageUpdate?.inspect() ?? 'current'
-      if (appImage === 'settling') {
-        // Why: the AppImage file is still being written; starting either build now would be wrong.
-        await sleep(SERVE_INSTALL_HOLD_POLL_MS)
-        continue
-      }
-      if (appImage === 'superseded' && appImageUpdate) {
-        const reason = await appImageUpdate.restart(() => stopped)
-        // One attempt per supervisor: a failed restart keeps serving the running build.
-        appImageUpdate = null
-        log(`[serve] Kept the running build: ${reason}.`)
-        continue
-      }
       record = brakeForBuild(record, identify(options.executable))
       if (record.gaveUp) {
         return refuseGaveUp(record.gaveUp)
       }
 
-      const attempt = parkWatch
-        ? await parkWatch.during(options.runOnce)
-        : { parked: false, settled: await settle(options.runOnce) }
+      const attempt = { settled: await settle(() => options.runOnce(stopController.signal)) }
       if (stopped) {
         break
-      }
-      if (attempt.parked) {
-        // Why not a failure: the desktop stopped this server to install an update.
-        continue
       }
       let failure: string
       if (attempt.settled.status === 'fulfilled') {
@@ -304,7 +224,5 @@ export async function superviseServeService(options: SupervisedServeOptions): Pr
     return 0
   } finally {
     removeStopListener()
-    resetSupervisedServeStop()
-    parkWatch?.close()
   }
 }

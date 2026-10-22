@@ -12,7 +12,6 @@ import type {
 } from '../../../../shared/runtime-host-status'
 import type { PublicKnownRuntimeEnvironment } from '../../../../shared/runtime-environments'
 import type { RuntimeStatus } from '../../../../shared/runtime-types'
-import type { RemoteServerUpdateEntry } from '@/runtime/remote-server-update-coordinator'
 import { useAppStore } from '@/store'
 import { TooltipProvider } from '../ui/tooltip'
 import { RuntimeServerRow } from './runtime-server-row'
@@ -79,10 +78,7 @@ function setEntry(entry: RuntimeEnvironmentStatus): void {
   useAppStore.setState({ runtimeStatusByEnvironmentId: new Map([[ENVIRONMENT_ID, entry]]) })
 }
 
-function renderRow(
-  remoteUpdate?: RemoteServerUpdateEntry,
-  duplicateOfNames: readonly string[] = []
-): void {
+function renderRow(duplicateOfNames: readonly string[] = []): void {
   render(
     <TooltipProvider>
       <RuntimeServerRow
@@ -90,14 +86,11 @@ function renderRow(
         duplicateOfNames={duplicateOfNames}
         details={undefined}
         isActive={false}
-        remoteUpdate={remoteUpdate}
-        remoteServerUpdatesRunning={false}
         connecting={false}
         switching={false}
         disconnecting={false}
         removing={false}
         isBusy={false}
-        onOpenUpdate={vi.fn()}
         onDisconnect={vi.fn()}
         onConnect={vi.fn()}
         onRemove={vi.fn()}
@@ -168,14 +161,11 @@ it('shows one status for an unreachable host instead of a stack of signals', () 
           error: 'Timed out waiting for the remote Orca runtime.'
         }}
         isActive={false}
-        remoteUpdate={undefined}
-        remoteServerUpdatesRunning={false}
         connecting={false}
         switching={false}
         disconnecting={false}
         removing={false}
         isBusy={false}
-        onOpenUpdate={vi.fn()}
         onDisconnect={vi.fn()}
         onConnect={vi.fn()}
         onRemove={vi.fn()}

@@ -143,12 +143,6 @@ packageExtensions:
   electron-vite:
     peerDependencies:
       electron: '*'
-  electron-updater:
-    peerDependencies:
-      electron: '*'
-    peerDependenciesMeta:
-      electron:
-        optional: true
   mermaid:
     dependencies:
       '@iconify/types': ^2.0.0

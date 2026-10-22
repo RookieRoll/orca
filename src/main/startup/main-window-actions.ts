@@ -1,15 +1,12 @@
 import { app, clipboard, dialog, type BrowserWindow, type Tray, type WebContents } from 'electron'
 import { isNativeBrowserPopupWindow } from '../browser/native-browser-popup-windows'
-import type { UpdateCheckOptions } from '../../shared/update-status-types'
 import { recordCrashBreadcrumb } from '../crash-reporting/crash-breadcrumb-store'
 import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
-import { checkForUpdatesFromMenu, isQuittingForUpdate } from '../updater'
 import {
   createSystemTray,
   setMacMenuBarIconVisible,
   type SystemTrayOptions
 } from '../tray/system-tray'
-import { ensureAutoUpdaterConfigured } from '../window/attach-main-window-services'
 import { focusExistingMainWindow, safelyRevealWindow } from '../window/focus-existing-window'
 import { mainProcessState as state } from './main-process-state'
 import { getDashboardPopoutWindow } from '../window/dashboard-popout-window'
@@ -50,9 +47,7 @@ export function showMainWindowFromTray(): void {
     safelyRevealWindow(state.mainWindow)
     return
   }
-  if (!isQuittingForUpdate()) {
-    openWindow()
-  }
+  openWindow()
 }
 
 export function openSettingsFromSystemMenu(): void {
@@ -69,7 +64,7 @@ export function openSettingsFromSystemMenu(): void {
 /**
  * A user Quit (menu, tray, renderer-recovery prompt). Under `orca serve` the process is the
  * server its paired clients use, so a user Quit only closes the desktop windows (#15537);
- * signals, supervisor stops and update installs still quit through app.quit().
+ * signals and supervisor stops still quit through app.quit().
  */
 export function quitFromUserCommand(): void {
   if (state.isServeMode) {
@@ -95,11 +90,6 @@ export function quitFromSystemTray(): void {
   quitFromUserCommand()
 }
 
-export function runUserInitiatedUpdateCheck(options?: UpdateCheckOptions): void {
-  ensureAutoUpdaterConfigured()
-  checkForUpdatesFromMenu(options)
-}
-
 export function getSystemTrayOptions(): SystemTrayOptions | null {
   const store = state.store
   if (!store) {
@@ -111,10 +101,6 @@ export function getSystemTrayOptions(): SystemTrayOptions | null {
     devInstanceLabel: state.devInstanceIdentity?.devLabel ?? null,
     onOpen: showMainWindowFromTray,
     onOpenSettings: openSettingsFromSystemMenu,
-    onCheckForUpdates: () => {
-      showMainWindowFromTray()
-      runUserInitiatedUpdateCheck()
-    },
     onQuit: quitFromSystemTray
   }
 }

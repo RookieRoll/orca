@@ -1,8 +1,7 @@
 name: Daily macOS Dev Build
 
-# Why: gives developers a signed macOS build of main once a day that the in-app
-# updater can install directly, without waiting for an RC cut — less noise than
-# hourly.
+# Why: gives developers a signed macOS build of main once a day, without waiting
+# for an RC cut — less noise than hourly.
 #
 # Schedule is a single UTC cron (GH Actions has no timezone-aware schedules).
 # 18:15 UTC is late morning Pacific year-round (10:15am PST / 11:15am PDT). Minute
@@ -16,15 +15,14 @@ name: Daily macOS Dev Build
 #   - PR CI and release-cut remain the gates that matter.
 #   - Signed AND notarized, exactly like a release. The notary round trip is the
 #     one slow step kept: macOS anchors a notarized app's TCC grants on identifier
-#     + team rather than on its cdhash, so those grants survive an update. Without
+#     + team rather than on its cdhash, so those grants survive replacement installs. Without
 #     a ticket every daily reads as a new client and silently loses file access
 #     under Documents/Desktop/Downloads.
 #
 # Artifacts publish to stablyai/orca-daily, never to stablyai/orca: the main
-# repo's releases atom feed exposes only its 10 newest entries, so high-volume
-# dev tags would evict every stable/RC entry and break updates for real users.
-# Separate from orca-hourly so someone riding main's hourlies never sees the
-# sparse daily series mixed into that list.
+# repo's releases are reserved for stable releases; high-volume development
+# tags would bury stable releases. Separate from orca-hourly so the two
+# development cadences remain easy to distinguish.
 #
 # GITHUB_TOKEN is scoped to this repo and cannot publish there, so writes use the
 # same GitHub App as hourly (installed on orca-daily with Contents: Read and
@@ -259,7 +257,7 @@ jobs:
             --jq '.[].name // empty')"
           # Why git tags, not GitHub releases: unpublishing a buggy cut deletes the
           # GitHub release and leaves the tag. That dragged hourlies backwards so
-          # electron-updater stopped offering them; dailies would do the same. A
+          # release history would otherwise move backwards. A
           # separate token because GH_TOKEN above is the App's, scoped to the
           # daily repo. Empty on failure — the script then falls back to
           # package.json, which is stale but never wrong enough to fail a build.
@@ -344,14 +342,11 @@ jobs:
           Built from [\`stablyai/orca@$short_sha\`](https://github.com/stablyai/orca/commit/$SHA).
 
           **Unvetted.** No tests ran. The macOS build is signed and notarized like a
-          release, so it installs through Orca's in-app updater and opens from a manual
-          download without a Gatekeeper prompt — but nothing here has been reviewed.
+          release, so it opens from a manual download without a Gatekeeper prompt —
+          but nothing here has been reviewed.
 
-          **Windows builds are unsigned.** They install and update normally once you
-          are on one, but a signed Stable or RC build cannot install one through the
-          in-app updater — download \`orca-windows-setup.exe\` below and run it once
-          (SmartScreen will warn about an unknown publisher). Every later switch,
-          including back to Stable, works in-app from there.
+          **Windows builds are unsigned.** Download \`orca-windows-setup.exe\` below
+          and run it manually; SmartScreen will warn about an unknown publisher.
           EOF
           # Why create it up front: electron-builder then uploads into a known tag
           # rather than inferring one from package.json.
@@ -418,10 +413,7 @@ jobs:
           owner: stablyai
           repositories: orca-daily
 
-      # Why: the updater resolves a tag, then fetches latest-mac.yml from it. A
-      # release missing that manifest is a tag the picker offers and the download
-      # 404s on, so fail loudly instead of leaving a broken entry.
-      - name: Verify update manifest published
+      - name: Verify macOS archive published
         if: steps.freshness.outputs.should_build == 'true'
         shell: bash
         env:
@@ -432,18 +424,8 @@ jobs:
           assets="$(gh release view "$TAG" --repo "$DAILY_REPO" --json assets --jq '.assets[].name')"
           echo "Published assets:"
           echo "$assets"
-          # Why exit 1 without deleting here: the release is still a draft, so it is
-          # already invisible to users, and the failure handler below owns cleanup.
-          # Deleting inline under `set -e` would also let the delete's exit code
-          # preempt this explicit failure.
-          for required in latest-mac.yml; do
-            if ! grep -qx "$required" <<<"$assets"; then
-              echo "::error::Daily draft $TAG is missing $required; the updater could not install it."
-              exit 1
-            fi
-          done
           if ! grep -q '\.zip$' <<<"$assets"; then
-            echo "::error::Daily draft $TAG has no ZIP artifact for the updater to download."
+            echo "::error::Daily draft $TAG has no ZIP archive for manual download."
             exit 1
           fi
 

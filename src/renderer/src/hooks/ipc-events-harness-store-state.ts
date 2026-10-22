@@ -36,7 +36,6 @@ export function createHarnessStoreState(
     setTabLayout: vi.fn(),
     setTabBarOrder: vi.fn(),
     clearTabPtyId: vi.fn(),
-    setUpdateStatus: vi.fn(),
     fetchRepos: vi.fn(),
     fetchWorktrees: vi.fn(),
     closeModal: vi.fn(),

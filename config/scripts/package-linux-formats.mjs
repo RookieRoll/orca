@@ -127,7 +127,7 @@ export async function packageLinuxFormats({
     mkdirSync(metadataDirectory)
     for (const { format, formatOutput, artifact } of completed) {
       renameSync(join(formatOutput, artifact), join(outputDirectory, artifact))
-      // Update manifests and builder diagnostics have overlapping names across formats.
+      // Builder diagnostics have overlapping names across formats.
       renameSync(formatOutput, join(metadataDirectory, format))
     }
     console.log(

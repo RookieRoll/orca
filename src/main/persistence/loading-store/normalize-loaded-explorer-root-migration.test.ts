@@ -43,3 +43,39 @@ it.each([undefined, false, null, 1, 'true', {}, true])(
     expect(markNeedsSave).not.toHaveBeenCalled()
   }
 )
+
+it('strips retired updater preferences from an existing profile without resetting other UI state', () => {
+  const defaults = getDefaultPersistedState(homedir())
+  const onboarding = defaults.onboarding!
+  const parsed = JSON.parse(
+    JSON.stringify({
+      ...defaults,
+      ui: {
+        ...defaults.ui,
+        sidebarWidth: 317,
+        dismissedUpdateVersion: '1.2.3',
+        lastUpdateCheckAt: 1_700_000_000_000,
+        releaseChannelOverride: 'rc',
+        pendingUpdateNudgeId: 'nudge-1',
+        dismissedUpdateNudgeId: 'nudge-2',
+        updateReassuranceSeen: true
+      }
+    })
+  )
+  const markNeedsSave = vi.fn()
+
+  const ui = normalizeLoadedUiState(parsed, defaults, onboarding, false, false, markNeedsSave)
+
+  expect(ui.sidebarWidth).toBe(317)
+  for (const field of [
+    'dismissedUpdateVersion',
+    'lastUpdateCheckAt',
+    'releaseChannelOverride',
+    'pendingUpdateNudgeId',
+    'dismissedUpdateNudgeId',
+    'updateReassuranceSeen'
+  ]) {
+    expect(ui).not.toHaveProperty(field)
+  }
+  expect(markNeedsSave).toHaveBeenCalled()
+})

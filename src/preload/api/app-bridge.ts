@@ -22,6 +22,7 @@ export const appApi = {
     return () => ipcRenderer.removeListener('app:profileStateSaveDelayChanged', listener)
   },
   getIdentity: (): Promise<AppIdentity> => ipcRenderer.invoke('app:getIdentity'),
+  getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
   getWindowsAdministratorStatus: (): Promise<boolean | null> =>
     ipcRenderer.invoke('app:getWindowsAdministratorStatus'),
   restartAsAdministrator: (): Promise<void> =>

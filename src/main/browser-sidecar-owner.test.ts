@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { BROWSER_SIDECAR_OWNER_ENV } from '../shared/browser-sidecar-lifetime'
-import { installServeSupervisorDisconnectQuit } from './serve-update-handoff'
+import { installServeSupervisorDisconnectQuit } from './serve-supervisor-lifecycle'
 
 const { quit } = vi.hoisted(() => ({ quit: vi.fn() }))
 vi.mock('./startup/process-quit-request', () => ({ quitProcess: quit }))

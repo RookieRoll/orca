@@ -30,12 +30,12 @@ import { inspectProcessLiveness, mergeProcessLivenessVerdict } from './daemon-pr
 
 /**
  * Relocate the terminal daemon's process image out of the app install dir into LOCAL userData so it
- * survives Windows auto-updates: the NSIS installer deletes the old install and force-kills every process
+ * survives Windows app replacement: the NSIS installer deletes the old install and force-kills every process
  * imaged under it, which would otherwise kill the daemon and its live terminals. The relocated exe is a
  * run-as-node Orca.exe copy (not node.exe) so there's no console flash and asar still resolves. Fail-open:
  * any failure returns null and the caller forks the install-dir host (pre-relocation behavior).
  *
- * What escapes the updater is the PATH, not the file name: electron-builder's kill sweep selects
+ * What escapes the installed-app replacement is the PATH, not the file name: electron-builder's kill sweep selects
  * processes whose image path sits under $INSTDIR, which is why the exe is copied verbatim rather
  * than renamed.
  */
@@ -72,7 +72,7 @@ function currentBuildFingerprint(
     })
     return sourceFingerprint
   }
-  // Once this process observed its build, an updater removing source files cannot select another same-version build.
+  // Once this process observed its build, replacement removing source files cannot select another same-version build.
   const observed = observedBuilds.get(key)
   return observed?.entrySourcePath === sources.entrySourcePath ? observed.fingerprint : null
 }
@@ -88,13 +88,13 @@ function resolveEntrySourcePath(resourcesPath: string, observedEntryPath?: strin
     return direct
   }
   const nested = join(unpackedRoot, 'out', 'main', 'daemon-entry.js')
-  // Preserve the observed layout only when neither live entry survives the updater.
+  // Preserve the observed layout only when neither live entry survives replacement.
   return existsSync(nested) ? nested : (observedEntryPath ?? nested)
 }
 
 /**
  * Whether this process is a packaged ELECTRON app on win32 — the only shape relocation
- * addresses, because what it escapes is the NSIS updater's kill zone.
+ * addresses, because what it escapes is the NSIS installer kill zone.
  *
  * Why asar and not isPackaged alone: orcad answers isPackaged() true (it is a shipped build,
  * not a dev checkout) while having no asar, no resourcesPath and no NSIS installer. Asking

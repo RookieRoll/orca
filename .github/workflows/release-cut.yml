@@ -10,9 +10,7 @@ name: Cut Release
 #   2. Read the latest stable release from GitHub.
 #   3. Compute the next version from `kind` (rc | patch | minor | major).
 #   4. For stable kinds, REFUSE if the new version is <= the latest stable.
-#      This is the only guard electron-updater actually needs — it compares
-#      semver within a channel, so a regressing "latest" is the one thing
-#      that breaks auto-update for fresh installs.
+#      This keeps published release versions monotonic within the stable line.
 #   5. Write package.json, commit (detached), tag, push tag.
 #   6. If ref was the tip of origin/main, try to fast-forward its version;
 #      a pull-request-only rule leaves main unchanged and still pushes the tag.
@@ -536,7 +534,7 @@ jobs:
           # version's bump commit is on the ref being cut, which a hotfix cut
           # from an older RC ref does not carry. An explicit version lets a
           # human assert the exact target (e.g. leapfrog to 1.4.155); the
-          # updater-safety gate and tag-collision recovery below still apply.
+          # version-ordering gate and tag-collision recovery below still apply.
           new=""
           if [[ -n "${EXPLICIT_VERSION:-}" ]]; then
             explicit="${EXPLICIT_VERSION#v}"
@@ -568,7 +566,7 @@ jobs:
             if [[ "$explicit" == *-rc.*.* ]]; then
               require_valid_version_suffix "${explicit##*.}"
             fi
-            # Same updater-safety gate the kind path enforces: stable line must
+            # Same version-ordering gate the kind path enforces: stable line must
             # strictly increase over the latest published stable (prerelease
             # identifiers ignored for the comparison).
             if ! semver_gt "$explicit" "$latest_stable"; then
@@ -648,7 +646,7 @@ jobs:
               ;;
             patch|minor|major)
               new="$(bump "$latest_stable" "$KIND")"
-              # Updater-safety gate: stable must strictly increase.
+              # Version-ordering gate: stable must strictly increase.
               if ! semver_gt "$new" "$latest_stable"; then
                 echo "::error::Refusing to cut $KIND $new: not greater than latest stable $latest_stable." >&2
                 exit 1
@@ -2043,32 +2041,7 @@ jobs:
           }
 
           Copy-Item -Path $signedInstaller.FullName -Destination 'dist/orca-windows-setup.exe' -Force
-          node config/scripts/generate-windows-blockmap.mjs 'dist/orca-windows-setup.exe' 'dist/orca-windows-setup.exe.blockmap'
-          if ($LASTEXITCODE -ne 0) { throw "blockmap generation failed with exit code $LASTEXITCODE" }
-
-          $installer = Get-Item 'dist/orca-windows-setup.exe'
-          $blockmap = Get-Item 'dist/orca-windows-setup.exe.blockmap'
-          $stream = [System.IO.File]::OpenRead($installer.FullName)
-          try {
-            $sha512 = [System.Security.Cryptography.SHA512]::Create()
-            $hash = [Convert]::ToBase64String($sha512.ComputeHash($stream))
-          } finally {
-            if ($null -ne $sha512) {
-              $sha512.Dispose()
-            }
-            $stream.Dispose()
-          }
-
-          $latestYml = Get-Content -Path 'dist/latest.yml' -Raw
-          $latestYml = [regex]::Replace($latestYml, '(?m)^(\s*)sha512: .+$', {
-            param($match)
-            "$($match.Groups[1].Value)sha512: $hash"
-          })
-          $latestYml = $latestYml -replace '(?m)^    size: \d+$', "    size: $($installer.Length)"
-          $latestYml = $latestYml -replace '(?m)^    blockMapSize: \d+$', "    blockMapSize: $($blockmap.Length)"
-          Set-Content -Path 'dist/latest.yml' -Value $latestYml -NoNewline
-
-          Get-Item 'dist/orca-windows-setup.exe', 'dist/orca-windows-setup.exe.blockmap', 'dist/latest.yml'
+          Get-Item 'dist/orca-windows-setup.exe'
 
       - name: Verify signed Windows installer
         if: matrix.platform == 'win' && github.run_attempt == 1
@@ -2300,7 +2273,7 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           retry_wait_seconds: 30
-          command: gh release upload "${{ needs.cut.outputs.tag }}" "dist/orca-windows-setup.exe" "dist/orca-windows-setup.exe.blockmap" "dist/latest.yml" --clobber --repo "${{ github.repository }}"
+          command: gh release upload "${{ needs.cut.outputs.tag }}" "dist/orca-windows-setup.exe" --clobber --repo "${{ github.repository }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -2463,8 +2436,8 @@ jobs:
 
       - name: Verify release assets complete
         # Why: publish-release is the only intended draft -> published
-        # transition. Refuse to un-draft until every updater manifest and
-        # referenced installer asset is present on GitHub.
+        # transition. Refuse to un-draft until every required manual installer
+        # asset is present on GitHub.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.cut.outputs.tag }}

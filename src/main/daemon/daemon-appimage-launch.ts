@@ -96,7 +96,7 @@ function buildBootstrap(launch: AppImageDaemonLaunch): string {
   return [
     `const {join}=require('path')`,
     `const v=require(join(process.env.APPDIR,${JSON.stringify(launch.appPathInAppDir)},'package.json')).version`,
-    // Why: the file at $APPIMAGE may already be a different release (manual replace, updater).
+    // Why: the file at $APPIMAGE may already be a different release after manual replacement.
     `if(v!==${version}){console.error('[daemon] AppImage is '+v+', expected '+${version});process.exit(1)}`,
     `const e=join(process.env.APPDIR,${JSON.stringify(launch.entryPathInAppDir)})`,
     `process.argv.splice(1,0,e)`,

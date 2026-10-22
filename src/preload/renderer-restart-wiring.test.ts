@@ -3,12 +3,10 @@ import { EventEmitter } from 'node:events'
 import { ORCA_RENDERER_UNLOAD_PREVENTED_EVENT } from '../shared/renderer-shutdown-events'
 import {
   ORCA_APP_RESTART_ABORTED_EVENT,
-  ORCA_APP_RESTART_STARTED_EVENT,
-  ORCA_UPDATER_QUIT_AND_INSTALL_STARTED_EVENT
-} from '../shared/updater-renderer-events'
+  ORCA_APP_RESTART_STARTED_EVENT
+} from '../shared/app-restart-events'
 import {
   prepareAndInvokeAppRestart,
-  prepareAndInvokeUpdaterInstall,
   registerRendererRestartIpcRelays
 } from './renderer-restart-wiring'
 
@@ -20,9 +18,8 @@ function restartIpc(eventTarget: EventTarget) {
     sendSync: vi.fn(),
     sendToHost: vi.fn()
   })
-  const relay = { handleStatus: vi.fn(), abort: vi.fn() }
-  registerRendererRestartIpcRelays(ipcRenderer, eventTarget, relay)
-  return { ipcRenderer, ...relay }
+  registerRendererRestartIpcRelays(ipcRenderer, eventTarget)
+  return { ipcRenderer }
 }
 
 describe('renderer restart wiring', () => {
@@ -122,61 +119,4 @@ describe('renderer restart wiring', () => {
     expect(remove.mock.calls).toEqual(add.mock.calls)
   })
 
-  it('relays updater status, aborted installs, and prevented unload events', () => {
-    const eventTarget = new EventTarget()
-    const unloadPrevented = vi.fn()
-    const restartAborted = vi.fn()
-    const { ipcRenderer, handleStatus, abort } = restartIpc(eventTarget)
-    eventTarget.addEventListener(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT, unloadPrevented)
-    eventTarget.addEventListener(ORCA_APP_RESTART_ABORTED_EVENT, restartAborted)
-    ipcRenderer.emit('updater:status', {}, { state: 'error', message: 'install failed' })
-    // Why: main abandons an install without any status when its verdict outlived the cycle.
-    ipcRenderer.emit('updater:quitAndInstallAborted')
-    ipcRenderer.emit('window:unload-prevented')
-
-    expect(ipcRenderer.eventNames()).toHaveLength(4)
-    expect(handleStatus).toHaveBeenCalledWith({ state: 'error', message: 'install failed' })
-    expect(abort).toHaveBeenCalledTimes(1)
-    expect(unloadPrevented).toHaveBeenCalledTimes(1)
-    expect(restartAborted).toHaveBeenCalledTimes(1)
-  })
-
-  it('marks preparation before invoking main and aborts on IPC failure', async () => {
-    const eventTarget = new EventTarget()
-    const calls: string[] = []
-    eventTarget.addEventListener(ORCA_UPDATER_QUIT_AND_INSTALL_STARTED_EVENT, () => {
-      calls.push('prepared')
-    })
-    const relay = {
-      markPrepared: () => calls.push('marked'),
-      abort: () => calls.push('aborted')
-    }
-    const invoke = vi.fn(async () => {
-      calls.push('invoked')
-      throw new Error('IPC failed')
-    })
-
-    await expect(
-      prepareAndInvokeUpdaterInstall(eventTarget, relay, invoke, async () => {
-        calls.push('checkpoint-flushed')
-      })
-    ).rejects.toThrow('IPC failed')
-
-    expect(calls).toEqual(['prepared', 'checkpoint-flushed', 'marked', 'invoked', 'aborted'])
-  })
-
-  it('never installs the update when the shutdown checkpoint fails to persist', async () => {
-    const eventTarget = new EventTarget()
-    const invoke = vi.fn(() => Promise.resolve())
-    const relay = { markPrepared: vi.fn(), abort: vi.fn() }
-
-    await expect(
-      prepareAndInvokeUpdaterInstall(eventTarget, relay, invoke, () =>
-        Promise.reject(new Error('Failed to persist renderer state before unload.'))
-      )
-    ).rejects.toThrow('Failed to persist renderer state before unload.')
-
-    expect(invoke).not.toHaveBeenCalled()
-    expect(relay.markPrepared).not.toHaveBeenCalled()
-  })
 })

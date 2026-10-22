@@ -53,7 +53,7 @@ jobs:
         with:
           native-runtime: node
 
-      # Same key inputs as win-update-survival-e2e: a harness-only edit skips the installer build.
+      # A harness-only edit skips the installer build.
       - name: Cache branch installer
         id: cache-installer
         uses: actions/cache/restore@v4

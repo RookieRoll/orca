@@ -9,7 +9,7 @@ import { constants, readFileSync, rmSync, statSync } from 'node:fs'
 import { cp, mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { cloneMacTree } from '../../main/macos-tree-clone'
-import { isProcessAlive } from '../../shared/serve-bundle-coordination'
+import { isProcessAlive } from '../../shared/process-liveness'
 
 /** Set on the re-run supervisor: the app root its own `__dirname` no longer points at. */
 export const SERVE_SUPERVISOR_APP_ROOT_ENV = 'ORCA_SERVE_SUPERVISOR_APP_ROOT'

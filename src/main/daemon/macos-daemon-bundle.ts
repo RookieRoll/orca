@@ -19,7 +19,7 @@ export type MacDaemonBundle = {
   entryPath: string
 }
 
-/** Private signed copies the updater never touches. */
+/** Private signed copies retained across app replacement. */
 export function getMacDaemonBundleRoot(userDataPath: string): string {
   return join(userDataPath, 'daemon-host', 'macos')
 }

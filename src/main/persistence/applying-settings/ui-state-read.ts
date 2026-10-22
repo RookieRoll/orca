@@ -31,14 +31,14 @@ import {
   normalizeShowDotfilesByWorktree,
   normalizeSortBy
 } from './ui-selection-normalization'
-import { stripMainOwnedTelemetryMarkerFromUI } from './ui-interaction-merge'
+import { stripRetiredMainOwnedUIFields } from './ui-interaction-merge'
 
 /** Returns normalized UI state with the authoritative active view and without the main-owned telemetry marker. */
 export function getPersistedUI(
   state: PersistedState,
   activeView: PersistedState['ui']['activeView']
 ): PersistedState['ui'] {
-  const uiState = stripMainOwnedTelemetryMarkerFromUI(state.ui)
+  const uiState = stripRetiredMainOwnedUIFields(state.ui)
   return {
     ...getDefaultUIState(),
     ...uiState,

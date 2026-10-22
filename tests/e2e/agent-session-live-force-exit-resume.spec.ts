@@ -122,7 +122,7 @@ function stripPersistedPtyOwnership(userDataDir: string): void {
         tab.ptyId = null
       }
     }
-    // Why: this models the updater/crash artifact from #6370: the UI tab and
+    // Why: this models the interrupted-restart/crash artifact from #6370: the UI tab and
     // live resume record survive, but no pane has the old stable leaf key or
     // daemon session to own resume.
     session.terminalLayoutsByTabId = {}

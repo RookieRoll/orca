@@ -33,8 +33,7 @@ if gh api "repos/$ADHOC_REPO" --jq '.full_name' >/dev/null 2>&1; then
   echo "$ADHOC_REPO already exists."
 else
   echo "Creating $ADHOC_REPO..."
-  # Why public: the in-app updater fetches release assets unauthenticated, exactly
-  # as it does for orca-hourly. A private repo would 404 for every client.
+  # Why public: users need unauthenticated access to manually download release assets.
   #
   # Why the features are off: this repo holds releases and nothing else. Leaving
   # issues open invites bug reports against a branch build in a repo nobody

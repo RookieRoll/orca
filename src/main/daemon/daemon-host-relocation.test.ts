@@ -138,7 +138,7 @@ describe('buildDaemonHostManifest', () => {
     })
     const byDest = new Map(ops.map((op) => [op.destRel, op]))
     // The host exe keeps the source basename: a verbatim, signature-preserving copy with no
-    // image-name mismatch. What escapes the updater's sweep is the path, not the name.
+    // image-name mismatch. What escapes the installer's sweep is the path, not the name.
     expect(byDest.get('Orca.exe')?.kind).toBe('file')
     const exeOp = ops.find((op) => op.sourcePath === 'C:\\app\\Orca.exe')
     expect(exeOp?.destRel).toBe('Orca.exe')
@@ -348,7 +348,7 @@ describe('materializeRelocatedDaemonHost', () => {
 
   it('does nothing for a packaged host with no asar root (orcad on win32)', () => {
     // orcad answers isPackaged() true — it is a shipped build — but it is plain Node: no
-    // asar, no resourcesPath, and no NSIS updater to escape. Relocation staging a copy of
+    // asar, no resourcesPath, and no NSIS installer to escape. Relocation staging a copy of
     // an Electron tree that is not there is the isPackaged-honesty defect, and it would
     // silently produce a null host on a path whose failures are meant to be visible.
     hostApp.appPath = join(installDir, 'resources', 'app')

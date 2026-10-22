@@ -1,26 +1,10 @@
 import { translate } from '@/i18n/i18n'
 import { isConnectedRuntimeHostState } from '@/runtime/runtime-host-connection-state'
-import type {
-  RemoteServerUpdateEntry,
-  RemoteServerUpdatePhase
-} from '@/runtime/remote-server-update-coordinator'
 import {
   getRuntimeServerConnectionLabel,
   type RuntimeServerConnectionState
 } from './runtime-environment-host-details'
-import { getRemoteServerUpdatePhaseLabel } from './RemoteServerUpdateStatus'
 import type { ServerRowStatus } from './runtime-server-list-row'
-
-const UPDATING_PHASES: ReadonlySet<RemoteServerUpdatePhase> = new Set([
-  'queued',
-  'checking-update',
-  'downloading',
-  'restarting'
-])
-
-export function isRemoteServerUpdateInFlight(entry: RemoteServerUpdateEntry | undefined): boolean {
-  return entry !== undefined && UPDATING_PHASES.has(entry.phase)
-}
 
 export type RuntimeServerStatusInput = {
   connectionState: RuntimeServerConnectionState
@@ -30,7 +14,6 @@ export type RuntimeServerStatusInput = {
   probeFailed: boolean
   connecting: boolean
   disconnecting: boolean
-  remoteUpdate: RemoteServerUpdateEntry | undefined
   /** A managed server whose loaded status has no active version. */
   managedNotRunning?: boolean
 }
@@ -45,13 +28,6 @@ export function getRuntimeServerStatusIndicator(input: RuntimeServerStatusInput)
         'Access revoked'
       ),
       tone: 'destructive'
-    }
-  }
-  if (input.remoteUpdate && isRemoteServerUpdateInFlight(input.remoteUpdate)) {
-    return {
-      label: getRemoteServerUpdatePhaseLabel(input.remoteUpdate.phase),
-      tone: 'muted',
-      busy: true
     }
   }
   if (input.connecting) {
@@ -105,28 +81,14 @@ export function getRuntimeServerStatusIndicator(input: RuntimeServerStatusInput)
 
 /** The version part of the meta line; null when no version was ever verified. */
 export function getRuntimeServerVersionText(
-  entry: RemoteServerUpdateEntry | undefined,
   lastKnownVersion: string | null | undefined
 ): string | null {
-  const version = entry?.currentVersion?.trim() || lastKnownVersion?.trim()
+  const version = lastKnownVersion?.trim()
   return version
     ? translate('auto.components.settings.serverList.version', 'v{{version}}', {
         version
       })
     : null
-}
-
-export function getRuntimeServerAvailableUpdateText(
-  entry: RemoteServerUpdateEntry | undefined
-): string | null {
-  if (entry?.phase !== 'available') {
-    return null
-  }
-  return entry.targetVersion
-    ? translate('auto.components.settings.serverList.updateAvailable', 'v{{version}} available', {
-        version: entry.targetVersion
-      })
-    : translate('auto.components.settings.RemoteServerUpdateStatus.available', 'Update available')
 }
 
 /** host:port of a ws:// endpoint; the raw string when it isn't a URL. */

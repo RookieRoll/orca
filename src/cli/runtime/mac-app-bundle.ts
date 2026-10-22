@@ -1,0 +1,11 @@
+import { dirname } from 'node:path'
+
+export function getMacAppBundlePath(executable: string): string | null {
+  if (process.platform !== 'darwin') {
+    return null
+  }
+  const macOsDir = dirname(executable)
+  const contentsDir = dirname(macOsDir)
+  const appBundlePath = dirname(contentsDir)
+  return appBundlePath.endsWith('.app') ? appBundlePath : null
+}

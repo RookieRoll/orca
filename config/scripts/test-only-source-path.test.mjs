@@ -30,7 +30,7 @@ describe('isTestOnlySourcePath', () => {
       'src/shared/relay-runtime-self-test-report.ts',
       'src/main/ssh/ssh-relay-runtime-self-test.ts',
       'src/main/ipc/local-network-connection-test.ts',
-      'src/main/updater/latest-release.ts',
+      'src/main/managed-server/lifecycle/orcad-managed-auto-update.ts',
       'src/renderer/src/components/browser-pane/fixture-picker.tsx',
       'src/renderer/src/components/settings/fixtures-panel.tsx',
       'src/main/contest/entry.ts'

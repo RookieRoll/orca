@@ -304,9 +304,7 @@ jobs:
           New-Item -ItemType Directory -Path signed-windows -Force
           Expand-Archive -Path signed-windows.zip -DestinationPath signed-windows -Force
 
-      # Why: signing changes installer bytes, so the updater metadata must be
-      # regenerated exactly like the release job's staging step does.
-      - name: Stage signed Windows installer and regenerate updater metadata
+      - name: Stage signed Windows installer
         shell: pwsh
         run: |
           $signedInstaller = Get-ChildItem -Path signed-windows -Recurse -File -Filter 'orca-windows-setup.exe' | Select-Object -First 1
@@ -314,27 +312,6 @@ jobs:
             throw 'Signed Windows installer was not returned by SignPath.'
           }
           Copy-Item -Path $signedInstaller.FullName -Destination 'dist/orca-windows-setup.exe' -Force
-          node config/scripts/generate-windows-blockmap.mjs 'dist/orca-windows-setup.exe' 'dist/orca-windows-setup.exe.blockmap'
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-          $installer = Get-Item 'dist/orca-windows-setup.exe'
-          $blockmap = Get-Item 'dist/orca-windows-setup.exe.blockmap'
-          $stream = [System.IO.File]::OpenRead($installer.FullName)
-          try {
-            $sha512 = [System.Security.Cryptography.SHA512]::Create()
-            $hash = [Convert]::ToBase64String($sha512.ComputeHash($stream))
-          } finally {
-            if ($null -ne $sha512) { $sha512.Dispose() }
-            $stream.Dispose()
-          }
-          $latestYml = Get-Content -Path 'dist/latest.yml' -Raw
-          $latestYml = [regex]::Replace($latestYml, '(?m)^(\s*)sha512: .+$', {
-            param($match)
-            "$($match.Groups[1].Value)sha512: $hash"
-          })
-          $latestYml = $latestYml -replace '(?m)^    size: \d+$', "    size: $($installer.Length)"
-          $latestYml = $latestYml -replace '(?m)^    blockMapSize: \d+$', "    blockMapSize: $($blockmap.Length)"
-          Set-Content -Path 'dist/latest.yml' -Value $latestYml -NoNewline
 
       # Why: this is the pass/fail heart of the rehearsal — the same evidence
       # check that will later gate releases (see PR #7170). Test certificates
@@ -558,6 +535,4 @@ jobs:
             signing-evidence.txt
             inner-signing-list.txt
             dist/orca-windows-setup.exe
-            dist/orca-windows-setup.exe.blockmap
-            dist/latest.yml
           retention-days: 7

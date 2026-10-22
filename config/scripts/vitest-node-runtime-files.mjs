@@ -81,7 +81,6 @@ export const NODE_RUNTIME_INCLUDE = [
   'src/main/pty/posix-pty-process-groups.integration.test.ts',
   'src/shared/ephemeral-vm-recipe-output-capture.test.ts',
   'src/main/gitlab/gitlab-known-host-retirement.test.ts',
-  'src/main/window/main-window-updater-deferred-setup.test.ts',
   'src/renderer/src/lib/pane-manager/pane-dom-focus-class-sync-lifecycle.test.ts',
   'src/renderer/src/components/terminal-pane/terminal-pane-host-state-memo.test.ts',
   'src/renderer/src/components/automations/use-automation-runs-dashboard-payload.test.tsx',

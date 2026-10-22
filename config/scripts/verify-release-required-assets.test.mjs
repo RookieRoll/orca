@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  extractManifestAssetNames,
   getRequiredReleaseAssetNames,
   verifyRequiredReleaseAssets
 } from './verify-release-required-assets.mjs'
@@ -10,8 +9,7 @@ function jsonResponse(body) {
     ok: true,
     status: 200,
     statusText: 'OK',
-    json: vi.fn(async () => body),
-    text: vi.fn(async () => (typeof body === 'string' ? body : JSON.stringify(body)))
+    json: vi.fn(async () => body)
   }
 }
 
@@ -34,102 +32,59 @@ afterEach(() => {
 })
 
 describe('getRequiredReleaseAssetNames', () => {
-  it('includes both mac updater ZIP names for the tag version', () => {
-    expect(getRequiredReleaseAssetNames('v1.4.27')).toEqual(
-      expect.arrayContaining([
-        'Orca-1.4.27-mac.zip',
-        'Orca-1.4.27-mac.zip.blockmap',
-        'Orca-1.4.27-arm64-mac.zip',
-        'Orca-1.4.27-arm64-mac.zip.blockmap'
-      ])
-    )
-  })
-
-  it('includes x64 and arm64 Linux assets', () => {
-    expect(getRequiredReleaseAssetNames('v1.4.27')).toEqual(
-      expect.arrayContaining([
-        'latest-linux-arm64.yml',
-        'orca-linux.AppImage',
-        'orca-linux-arm64.AppImage',
-        'orca-ide_1.4.27_amd64.deb',
-        'orca-ide_1.4.27_arm64.deb',
-        'orca-ide-1.4.27.x86_64.rpm',
-        'orca-ide-1.4.27.aarch64.rpm'
-      ])
-    )
-  })
-})
-
-describe('extractManifestAssetNames', () => {
-  it('extracts relative and absolute manifest asset names', () => {
-    expect(
-      extractManifestAssetNames(
-        [
-          'files:',
-          '  - url: Orca-1.4.27-arm64-mac.zip',
-          '  - url: https://example.com/downloads/orca-windows-setup.exe',
-          'path: orca-linux.AppImage'
-        ].join('\n')
-      )
-    ).toEqual(['Orca-1.4.27-arm64-mac.zip', 'orca-windows-setup.exe', 'orca-linux.AppImage'])
+  it('requires every manually distributed installer for the tagged version', () => {
+    expect(getRequiredReleaseAssetNames('v1.4.27')).toEqual([
+      'orca-linux.AppImage',
+      'orca-linux-arm64.AppImage',
+      'orca-ide_1.4.27_amd64.deb',
+      'orca-ide_1.4.27_arm64.deb',
+      'orca-ide-1.4.27.x86_64.rpm',
+      'orca-ide-1.4.27.aarch64.rpm',
+      'orca-windows-setup.exe',
+      'Orca-1.4.27-mac.zip',
+      'Orca-1.4.27-arm64-mac.zip',
+      'orca-macos-x64.dmg',
+      'orca-macos-arm64.dmg'
+    ])
   })
 })
 
 describe('verifyRequiredReleaseAssets', () => {
-  it('fails when a manifest-referenced asset has not been uploaded', async () => {
+  it('checks installer assets without fetching updater metadata', async () => {
     const tag = 'v1.4.27'
     const required = getRequiredReleaseAssetNames(tag)
-    const assets = required.filter((name) => name !== 'Orca-1.4.27-arm64-mac.zip')
-    const release = releaseWithAssets(tag, assets)
-    const latestMacAsset = release.assets.find((asset) => asset.name === 'latest-mac.yml')
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse([release]))
-      .mockResolvedValueOnce(
-        jsonResponse(
-          [
-            'version: 1.4.27',
-            'files:',
-            '  - url: Orca-1.4.27-arm64-mac.zip',
-            '    sha512: test',
-            'path: Orca-1.4.27-arm64-mac.zip'
-          ].join('\n')
-        )
-      )
-      .mockResolvedValue(jsonResponse('version: 1.4.27\n'))
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse([releaseWithAssets(tag, required)]))
     vi.stubGlobal('fetch', fetchMock)
 
-    await expect(
-      verifyRequiredReleaseAssets({ repo: 'stablyai/orca', tag, token: 'token' })
-    ).rejects.toThrow('Missing: Orca-1.4.27-arm64-mac.zip')
-    expect(latestMacAsset).toBeTruthy()
+    const result = await verifyRequiredReleaseAssets({ repo: 'stablyai/orca', tag, token: 'token' })
+
+    expect(result.checked).toEqual(required.slice().sort())
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      'https://api.github.com/repos/stablyai/orca/releases?per_page=100'
+    )
   })
 
-  it('checks assets referenced by the Linux arm64 updater manifest', async () => {
+  it('rejects a release while a required installer is missing', async () => {
     const tag = 'v1.4.27'
     const required = getRequiredReleaseAssetNames(tag)
-    const release = releaseWithAssets(tag, required)
-    const arm64Manifest = release.assets.find((asset) => asset.name === 'latest-linux-arm64.yml')
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse([release]))
-      .mockResolvedValueOnce(jsonResponse('version: 1.4.27\n'))
-      .mockResolvedValueOnce(
-        jsonResponse(
-          [
-            'version: 1.4.27',
-            'files:',
-            '  - url: orca-linux-arm64.AppImage.blockmap',
-            'path: orca-linux-arm64.AppImage'
-          ].join('\n')
-        )
-      )
-      .mockResolvedValue(jsonResponse('version: 1.4.27\n'))
-    vi.stubGlobal('fetch', fetchMock)
+    const assets = required.filter((name) => name !== 'orca-windows-setup.exe')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse([releaseWithAssets(tag, assets)])))
 
     await expect(
       verifyRequiredReleaseAssets({ repo: 'stablyai/orca', tag, token: 'token' })
-    ).rejects.toThrow('Missing: orca-linux-arm64.AppImage.blockmap')
-    expect(arm64Manifest).toBeTruthy()
+    ).rejects.toThrow('Missing: orca-windows-setup.exe')
+  })
+
+  it('rejects empty or unfinished installer uploads', async () => {
+    const tag = 'v1.4.27'
+    const assets = releaseWithAssets(tag, getRequiredReleaseAssetNames(tag))
+    assets.assets.find((asset) => asset.name === 'orca-linux.AppImage').size = 0
+    assets.assets.find((asset) => asset.name === 'orca-windows-setup.exe').state = 'new'
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse([assets])))
+
+    await expect(
+      verifyRequiredReleaseAssets({ repo: 'stablyai/orca', tag, token: 'token' })
+    ).rejects.toThrow('Not uploaded: orca-windows-setup.exe:new\nEmpty: orca-linux.AppImage')
   })
 })

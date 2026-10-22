@@ -12,8 +12,7 @@ import {
   type ServeRuntimeSelection
 } from '../../shared/orcad-local-serve-selection'
 import { waitForRecipeJson } from './serve-recipe-json'
-import { superviseForegroundServe } from './serve-update-supervisor'
-import { isSupervisedSpawnHeld } from './serve-supervised-stop'
+import { superviseForegroundServe } from './serve-foreground-child-supervisor'
 import { redactingSpawn, shouldRedactSupervisedStdout } from './serve-pairing-redaction'
 import { orcadServeArgs, type ServeOrcaAppArgs } from '../../shared/orcad-serve-argv'
 
@@ -26,19 +25,9 @@ export async function resolveLocalServeRuntime(
     executable: string
     appRoot: string
     userDataPath: string
-    usesMacUpdateHandoff: boolean
   },
   run: typeof runProcess = runProcess
 ): Promise<ServeRuntimeSelection> {
-  // Why: only packaged macOS serve can take a remote app update, through Electron's updater and
-  // this CLI's supervisor; orcad has no updater, so switching would drop that.
-  if (options.usesMacUpdateHandoff) {
-    return {
-      kind: 'electron',
-      reason:
-        'packaged macOS serve stays on Electron so paired clients can still update it (orcad has no app updater)'
-    }
-  }
   const entry = join(options.appRoot, 'out', 'main', `${ORCAD_LOCAL_SERVE_SELECTION_ENTRY}.js`)
   try {
     const result = await run({
@@ -88,18 +77,9 @@ export function serveWithOrcad(
   const spawnChild = shouldRedactSupervisedStdout(args.supervise === true)
     ? redactingSpawn(spawnProcess)
     : spawnProcess
-  if (isSupervisedSpawnHeld()) {
-    return Promise.resolve(0)
-  }
   const child = spawnChild(spec)
   if (args.recipeJson) {
     return waitForRecipeJson(child)
   }
-  return superviseForegroundServe({
-    spec,
-    spawnChild,
-    child,
-    handoffPath: null,
-    expectedHandoff: null
-  })
+  return superviseForegroundServe(child)
 }

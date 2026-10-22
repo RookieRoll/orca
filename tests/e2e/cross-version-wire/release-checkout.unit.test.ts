@@ -296,7 +296,6 @@ describe('release checkout materialization', () => {
     const checkout = await materializeReleaseCheckout('v1.4.190', { cacheRoot })
     const protocol = await importReleaseCheckoutModule(checkout, '/src/shared/protocol-version.ts')
 
-    expect(protocol.REMOTE_SERVER_UPDATE_CAPABILITY).toBe('updater.remote-control.v1')
     expect(relative(cacheRoot, checkout.root)).not.toMatch(/^\.\./)
   }, 180_000)
 

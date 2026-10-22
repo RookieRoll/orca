@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import { classifyRemotePairingHostname } from '../../../../shared/remote-pairing-address'
-import type { RemoteServerUpdateEntry } from '@/runtime/remote-server-update-coordinator'
 import { translate } from '@/i18n/i18n'
 import { Button } from '../ui/button'
 import {
@@ -10,12 +9,10 @@ import {
   getRuntimeCapabilitiesSummary,
   type RuntimeHostDetails
 } from './runtime-environment-host-details'
-import { getRemoteServerManualUpdateHelp } from './RemoteServerUpdateStatus'
 
 type RuntimeServerRowDetailsProps = {
   endpoint: string | null
   details: RuntimeHostDetails | undefined
-  remoteUpdate: RemoteServerUpdateEntry | undefined
   /** The raw error, shown as-is for copying; the lead sentence explains it. */
   problem: string | null
   sshRoute: string | null
@@ -40,7 +37,6 @@ function endpointKind(
 export function RuntimeServerRowDetails({
   endpoint,
   details,
-  remoteUpdate,
   problem,
   sshRoute,
   unreachable,
@@ -50,20 +46,14 @@ export function RuntimeServerRowDetails({
   const [errorOpen, setErrorOpen] = useState(false)
   const runtimeStatus = details?.runtimeStatus ?? null
   const hostModelSummary = getHostModelCapabilitySummary(runtimeStatus)
-  const updateError = remoteUpdate?.phase === 'failed' ? remoteUpdate.error : null
-  const rawError = [problem, updateError].filter(Boolean).join('\n')
+  const rawError = problem ?? ''
   const kind = unreachable ? endpointKind(endpoint) : null
   const lead = unreachable
     ? translate(
         'auto.components.settings.serverList.unreachableLead',
         'Orca couldn’t reach this server.'
       )
-    : updateError
-      ? translate(
-          'auto.components.settings.serverList.updateFailedLead',
-          'The last update didn’t finish.'
-        )
-      : null
+    : null
   return (
     <div className="space-y-2 rounded-md border border-border bg-muted/30 px-3 py-2.5 text-xs">
       {lead ? <p className="text-foreground">{lead}</p> : null}
@@ -85,9 +75,6 @@ export function RuntimeServerRowDetails({
                 )}`
               : ''}
         </p>
-      ) : null}
-      {remoteUpdate?.phase === 'manual' ? (
-        <p className="text-muted-foreground">{getRemoteServerManualUpdateHelp(remoteUpdate)}</p>
       ) : null}
       <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-muted-foreground">
         <dt>{translate('auto.components.settings.serverList.address', 'Address')}</dt>

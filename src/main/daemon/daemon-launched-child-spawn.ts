@@ -118,7 +118,7 @@ export function spawnDaemonChildProcess(
       ...childOptions,
       modulePath: forkEntryPath,
       args: scriptArgs,
-      // Why: run the byte-identical relocated Orca.exe so the image path sits outside the updater's kill zone.
+      // Why: run the byte-identical relocated Orca.exe so the image path stays available during installer replacement.
       ...(relocatedExecPath ? { execPath: relocatedExecPath } : {}),
       env: daemonEnv
     })

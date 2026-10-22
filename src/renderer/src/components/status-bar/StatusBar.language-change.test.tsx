@@ -15,12 +15,8 @@ vi.mock('./use-status-bar-controller', () => ({
   })
 }))
 vi.mock('./CaffeinateStatusSegment', () => ({ CaffeinateStatusSegment: () => null }))
-vi.mock('./RemoteServerUpdateStatusSegment', () => ({
-  RemoteServerUpdateStatusSegment: () => null
-}))
 vi.mock('./SkillUpdateStatusSegment', () => ({ SkillUpdateStatusSegment: () => null }))
 vi.mock('./NativeChatResumeStatusSegment', () => ({ NativeChatResumeStatusSegment: () => null }))
-vi.mock('./UpdateStatusSegment', () => ({ UpdateStatusSegment: () => null }))
 vi.mock('./StatusBarVisibilityMenu', () => ({ StatusBarVisibilityMenu: () => null }))
 
 import { StatusBar } from './StatusBar'

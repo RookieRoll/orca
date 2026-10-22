@@ -72,8 +72,8 @@ function downloadPublished(gh, repo, tag) {
 }
 
 /**
- * Puts `text` on the channel's release for its engine, as a prerelease that never becomes Latest
- * (the app updater follows Latest). `gh` is injectable so the sequence is testable.
+ * Puts `text` on the channel's release for its engine as a prerelease, not the public Latest.
+ * `gh` is injectable so the sequence is testable.
  */
 export function publishAgentStateRules({ repo, channel, text, target, gh = runGh }) {
   const candidate = JSON.parse(text)

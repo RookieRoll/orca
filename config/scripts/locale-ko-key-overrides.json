@@ -509,12 +509,6 @@
   "auto.components.Terminal.e57db40c11": {
     "ko": "{{value0}} 실행 명령을 만들 수 없습니다."
   },
-  "auto.components.UpdateCard.ccd8b0a793": {
-    "ko": "마지막 업데이트 이후 추가됨"
-  },
-  "auto.components.UpdateCard.f58b5c57a6": {
-    "ko": "새 소식:"
-  },
   "auto.components.WorktreeJumpPalette.1628fd7dfa": {
     "ko": "활성 워크트리, 설정, 작업 또는 열린 탭이 없습니다."
   },
@@ -2263,9 +2257,6 @@
   },
   "auto.components.settings.GeneralSupportSection.964acc6bb4": {
     "ko": "스타"
-  },
-  "auto.components.settings.GeneralUpdateSettingsSection.90eb7309d7": {
-    "ko": "사용 불가"
   },
   "auto.components.settings.GeneralWorkspaceSettingsSection.5567191a6e": {
     "ko": "찾아보기"
@@ -5228,15 +5219,6 @@
   "auto.components.settings.GeneralEditorSettingsSection.collapseUnchangedTitle": {
     "ko": "변경되지 않은 영역 접기"
   },
-  "auto.components.settings.GeneralUpdateSettingsSection.8311da27ba": {
-    "ko": "업데이트가 준비되었습니다. \"업데이트 다운로드\"를 클릭하여 다운로드하세요."
-  },
-  "auto.components.settings.GeneralUpdateSettingsSection.42717918f4": {
-    "ko": "업데이트 다운로드 ("
-  },
-  "auto.components.settings.GeneralUpdateSettingsSection.e3b9d21c07": {
-    "ko": "업데이트가 준비되었습니다. 시스템 패키지 관리자를 통해 Orca를 업데이트하세요. Orca 자체적으로는 이번 릴리스를 설치할 수 없습니다."
-  },
   "auto.components.settings.GeneralWorkspaceSettingsSection.bf46474e33": {
     "ko": "공유 아티팩트를 삭제하기 전에 확인창을 표시합니다. 삭제하면 공개 링크가 있는 사람도 더 이상 접근할 수 없습니다."
   },
@@ -5272,72 +5254,6 @@
   },
   "auto.components.settings.general.search.running_terminal": {
     "ko": "실행 중"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.serverCount": {
-    "ko": "페어링된 서버 {{value0}}개"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.availableCount": {
-    "ko": "{{value0}}개 업데이트 가능"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.currentCount": {
-    "ko": "{{value0}}개 최신 상태"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.manualCount": {
-    "ko": "{{value0}}개 수동 업데이트"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.offlineCount": {
-    "ko": "{{value0}}개 오프라인"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.title": {
-    "ko": "원격 Orca 서버"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.description": {
-    "ko": "이 클라이언트에서 페어링된 Orca 서버를 확인하고 업데이트합니다."
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.updating": {
-    "ko": "서버 업데이트 중…"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.reviewServers": {
-    "ko": "서버 업데이트 확인"
-  },
-  "auto.components.settings.GeneralRemoteServerUpdates.serverCountOne": {
-    "ko": "페어링된 서버 1개"
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.versionUnavailable": {
-    "ko": "버전 확인 불가"
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.restartingHelp": {
-    "ko": "새 버전으로 교체된 서버가 다시 연결되기를 기다리는 중입니다."
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.retry": {
-    "ko": "다시 시도"
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.update": {
-    "ko": "이 서버 업데이트"
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.title": {
-    "ko": "원격 Orca 서버 업데이트"
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.description": {
-    "ko": "페어링된 서버를 확인하고, 지원되는 설치본을 이 Orca 클라이언트에서 업데이트합니다."
-  },
-  "auto.components.settings.RemoteServerUpdateDialog.restartWarning": {
-    "ko": "업데이트하면 이 서버들이 다시 시작됩니다. {{value0}} 및 {{value1}}의 연결이 잠시 끊길 수 있습니다."
-  },
-  "auto.components.settings.RemoteServerUpdateStatus.serviceManagerHelp": {
-    "ko": "서버 호스트에서 Orca를 업데이트하세요. .deb 또는 .rpm으로 설치했다면 시스템 패키지 관리자를, 그 외에는 Orca를 시작하는 서비스 관리자를 사용하세요."
-  },
-  "auto.components.settings.ReleaseChannelSection.channelAriaLabel": {
-    "ko": "업데이트 채널"
-  },
-  "auto.components.settings.ReleaseChannelSection.hourlyWarning": {
-    "ko": "Hourly 빌드는 테스트 게이트 없이 main 브랜치에서 바로 배포되며, Windows 빌드는 서명되지 않습니다. 안정적인 빌드를 준비해 두세요."
-  },
-  "auto.components.settings.ReleaseChannelSection.dailyWarning": {
-    "ko": "Daily 빌드는 테스트 게이트 없이 main 브랜치에서 바로 배포되며, Windows 빌드는 서명되지 않습니다. 안정적인 빌드를 준비해 두세요."
-  },
-  "auto.components.settings.ReleaseChannelSection.adhocWarning": {
-    "ko": "Adhoc 빌드는 아직 병합되지 않은 브랜치에서 만들어지며, Windows 빌드는 서명되지 않습니다. 빌드를 만든 사람이 관리를 중단할 수 있으니 안정적인 빌드를 준비해 두세요."
   },
   "auto.components.settings.AccountsPane.codexConfigSyncMissingSource": {
     "ko": "{{value0}} 파일이 없어 Codex가 마지막으로 동기화된 설정을 계속 사용합니다. 동기화를 재개하려면 해당 파일을 복원하세요."

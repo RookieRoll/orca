@@ -46,10 +46,7 @@ describe('dev channel base version', () => {
     expect(resolveDevChannelBaseVersion('1.4.197', ['v1.4.201', 'v1.4.202'])).toBe('1.4.203')
   })
 
-  // 2026-09-14: v1.4.202's GitHub release was deleted for a bug after hourlies
-  // had already shipped as 1.4.203. Without the channel tags as a floor, the
-  // next hourlies would have been 1.4.202-hourly, which electron-updater will
-  // not install over 1.4.203-hourly.
+  // Keep channel versions monotonic even when a stable GitHub release is deleted.
   it('does not drop below an already-published channel version', () => {
     expect(
       resolveDevChannelBaseVersion('1.4.197', [

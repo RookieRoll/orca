@@ -49,7 +49,16 @@ export function mergeFeatureTipSeenIds(
   return [...new Set([...normalizeFeatureTipIds(current), ...normalizeFeatureTipIds(incoming)])]
 }
 
-export function stripMainOwnedTelemetryMarkerFromUI(
+export const RETIRED_UPDATER_UI_FIELDS = [
+  'dismissedUpdateVersion',
+  'lastUpdateCheckAt',
+  'releaseChannelOverride',
+  'pendingUpdateNudgeId',
+  'dismissedUpdateNudgeId',
+  'updateReassuranceSeen'
+] as const
+
+export function stripRetiredMainOwnedUIFields(
   value: Partial<PersistedState['ui']> | undefined
 ): Partial<PersistedState['ui']> {
   if (!value || typeof value !== 'object') {
@@ -61,6 +70,9 @@ export function stripMainOwnedTelemetryMarkerFromUI(
     featureInteractionTelemetryBuckets?: unknown
   }
   void _reserved
+  for (const field of RETIRED_UPDATER_UI_FIELDS) {
+    Reflect.deleteProperty(ui, field)
+  }
   return ui
 }
 

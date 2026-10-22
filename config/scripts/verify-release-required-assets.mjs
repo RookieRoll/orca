@@ -7,10 +7,6 @@ const API_VERSION = '2022-11-28'
 export function getRequiredReleaseAssetNames(tag) {
   const version = tag.replace(/^v/i, '')
   return [
-    'latest-linux.yml',
-    'latest-linux-arm64.yml',
-    'latest-mac.yml',
-    'latest.yml',
     'orca-linux.AppImage',
     'orca-linux-arm64.AppImage',
     `orca-ide_${version}_amd64.deb`,
@@ -18,33 +14,11 @@ export function getRequiredReleaseAssetNames(tag) {
     `orca-ide-${version}.x86_64.rpm`,
     `orca-ide-${version}.aarch64.rpm`,
     'orca-windows-setup.exe',
-    'orca-windows-setup.exe.blockmap',
     `Orca-${version}-mac.zip`,
-    `Orca-${version}-mac.zip.blockmap`,
     `Orca-${version}-arm64-mac.zip`,
-    `Orca-${version}-arm64-mac.zip.blockmap`,
     'orca-macos-x64.dmg',
-    'orca-macos-x64.dmg.blockmap',
-    'orca-macos-arm64.dmg',
-    'orca-macos-arm64.dmg.blockmap'
+    'orca-macos-arm64.dmg'
   ]
-}
-
-export function extractManifestAssetNames(manifestText) {
-  const names = new Set()
-  for (const line of manifestText.split(/\r?\n/)) {
-    const match = line.match(/^\s*(?:-\s*)?(?:url|path):\s*['"]?([^'"]+)['"]?\s*$/)
-    if (!match) {
-      continue
-    }
-    const value = match[1].trim()
-    try {
-      names.add(new URL(value).pathname.split('/').findLast(Boolean) ?? value)
-    } catch {
-      names.add(value.split('/').findLast(Boolean) ?? value)
-    }
-  }
-  return [...names]
 }
 
 async function githubFetch(url, token, accept = 'application/vnd.github+json') {
@@ -76,45 +50,17 @@ async function fetchRelease(repo, tag, token) {
   return release
 }
 
-async function fetchAssetText(repo, asset, token) {
-  const res = await githubFetch(
-    `https://api.github.com/repos/${repo}/releases/assets/${asset.id}`,
-    token,
-    'application/octet-stream'
-  )
-  return res.text()
-}
-
 export async function verifyRequiredReleaseAssets({ repo, tag, token }) {
   const release = await fetchRelease(repo, tag, token)
   const assetsByName = new Map(release.assets.map((asset) => [asset.name, asset]))
-
-  const requiredNames = new Set(getRequiredReleaseAssetNames(tag))
-  const manifestNames = [
-    'latest-linux.yml',
-    'latest-linux-arm64.yml',
-    'latest-mac.yml',
-    'latest.yml'
-  ]
-
-  for (const manifestName of manifestNames) {
-    const manifestAsset = assetsByName.get(manifestName)
-    if (!manifestAsset) {
-      continue
-    }
-    const manifestText = await fetchAssetText(repo, manifestAsset, token)
-    for (const referencedName of extractManifestAssetNames(manifestText)) {
-      requiredNames.add(referencedName)
-    }
-  }
-
-  const missing = [...requiredNames].filter((name) => !assetsByName.has(name)).sort()
-  const notUploaded = [...requiredNames]
+  const requiredNames = getRequiredReleaseAssetNames(tag)
+  const missing = requiredNames.filter((name) => !assetsByName.has(name)).sort()
+  const notUploaded = requiredNames
     .map((name) => assetsByName.get(name))
     .filter((asset) => asset && asset.state && asset.state !== 'uploaded')
     .map((asset) => `${asset.name}:${asset.state}`)
     .sort()
-  const empty = [...requiredNames]
+  const empty = requiredNames
     .map((name) => assetsByName.get(name))
     .filter((asset) => asset && asset.size === 0)
     .map((asset) => asset.name)
@@ -123,7 +69,7 @@ export async function verifyRequiredReleaseAssets({ repo, tag, token }) {
   if (missing.length > 0 || notUploaded.length > 0 || empty.length > 0) {
     throw new Error(
       [
-        `Release ${tag} is missing required assets.`,
+        `Release ${tag} is missing required installer assets.`,
         missing.length > 0 ? `Missing: ${missing.join(', ')}` : null,
         notUploaded.length > 0 ? `Not uploaded: ${notUploaded.join(', ')}` : null,
         empty.length > 0 ? `Empty: ${empty.join(', ')}` : null
@@ -152,7 +98,7 @@ async function main() {
   }
   const repo = process.env.GITHUB_REPOSITORY || 'stablyai/orca'
   const result = await verifyRequiredReleaseAssets({ repo, tag, token })
-  console.log(`Verified ${result.checked.length} required release assets for ${repo}@${tag}`)
+  console.log(`Verified ${result.checked.length} required installer assets for ${repo}@${tag}`)
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

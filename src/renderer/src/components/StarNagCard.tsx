@@ -11,7 +11,7 @@ type StarNagMode = 'gh' | 'web'
 /**
  * Persistent "star Orca on GitHub" notification card.
  *
- * Rendered at the bottom-right of the app (alongside UpdateCard). It is
+ * Rendered at the bottom-right of the app. It is
  * intentionally non-auto-dismissing: the user must either click Star, defer,
  * confirm an existing star, or close the card. Nonterminal exits set a
  * persisted cooldown in the main process.

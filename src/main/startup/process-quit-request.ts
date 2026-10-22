@@ -1,6 +1,6 @@
 import { app } from 'electron'
 
-// Sticky: will-quit's second pass and a deferred updater quit re-enter before-quit.
+// Sticky: will-quit's second pass re-enters before-quit.
 let processQuitRequested = false
 
 /**

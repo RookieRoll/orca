@@ -270,7 +270,5 @@ jobs:
           path: |
             dist/*.dmg
             dist/*.zip
-            dist/*.blockmap
-            dist/*.yml
           if-no-files-found: error
           retention-days: 7

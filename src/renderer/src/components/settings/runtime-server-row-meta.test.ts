@@ -16,7 +16,6 @@ describe('runtime server problem line', () => {
       getRuntimeServerProblemLine({
         environment: { lastUsedAt: now - 3 * 86_400_000 },
         row: quietRow,
-        remoteUpdate: undefined,
         managedStatusError: null,
         managedSummary: null,
         address: '100.88.12.5:6768',
@@ -30,7 +29,6 @@ describe('runtime server problem line', () => {
       getRuntimeServerProblemLine({
         environment: { lastUsedAt: null },
         row: quietRow,
-        remoteUpdate: undefined,
         managedStatusError: null,
         managedSummary: null,
         address: '100.88.12.5:6768'
@@ -45,7 +43,6 @@ describe('a server paired twice', () => {
       getRuntimeServerProblemLine({
         environment: { lastUsedAt: null },
         row: quietRow,
-        remoteUpdate: undefined,
         managedStatusError: null,
         managedSummary: null,
         address: '100.88.12.5:6768',

@@ -1,7 +1,6 @@
 import { ArrowUpRight, ChevronDown, Cloud, Link2, Plus, TerminalSquare } from 'lucide-react'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
-import { LoadingSpinner } from '../LoadingSpinner'
 import { Button } from '../ui/button'
 import { ButtonGroup } from '../ui/button-group'
 import {
@@ -41,50 +40,18 @@ function AddServerMenuItem({
   )
 }
 
-/** Section-header actions for Remote Orca Servers: update-all and the Add server split button. */
+/** Section-header actions for Remote Orca Servers. */
 export function RuntimeServersHeaderActions({
   canGeneratePairingUrl
 }: {
   canGeneratePairingUrl: boolean
 }): React.JSX.Element {
   const { setDialog } = useRuntimeServersPage()
-  const remoteServerUpdates = useAppStore((state) => state.remoteServerUpdates)
-  const remoteServerUpdatesChecking = useAppStore((state) => state.remoteServerUpdatesChecking)
-  const remoteServerUpdatesRunning = useAppStore((state) => state.remoteServerUpdatesRunning)
   const openSettingsTarget = useAppStore((state) => state.openSettingsTarget)
-  const setRemoteServerUpdateDialogOpen = useAppStore(
-    (state) => state.setRemoteServerUpdateDialogOpen
-  )
   const canInstall = getManagedOrcadApi() !== undefined
-  let availableCount = 0
-  for (const entry of remoteServerUpdates.values()) {
-    if (entry.phase === 'available') {
-      availableCount += 1
-    }
-  }
 
   return (
-    <div data-settings-section="remote-server-updates" className="flex items-center gap-2">
-      {/* Why ≥2: a single update is one click on its own row. */}
-      {remoteServerUpdatesRunning || availableCount >= 2 ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={remoteServerUpdatesChecking && remoteServerUpdates.size === 0}
-          onClick={() => setRemoteServerUpdateDialogOpen(true)}
-        >
-          {remoteServerUpdatesRunning ? <LoadingSpinner className="size-3.5" /> : null}
-          {remoteServerUpdatesRunning
-            ? translate(
-                'auto.components.settings.RuntimeEnvironmentsPane.updatingServers',
-                'Updating servers…'
-              )
-            : translate('auto.components.settings.serverList.updateAll', 'Update all ({{count}})', {
-                count: availableCount
-              })}
-        </Button>
-      ) : null}
+    <div className="flex items-center gap-2">
       <ButtonGroup>
         <Button type="button" variant="outline" size="sm" onClick={() => setDialog('add')}>
           <Plus />

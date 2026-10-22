@@ -104,7 +104,7 @@ export function installMainWindowStateLifecycle(args: {
   mainWindow.on('resize', saveBounds)
   mainWindow.on('move', saveBounds)
 
-  // Why: the auto-updater calls removeAllListeners('close') before quitting, so latch on app 'before-quit' too to freeze bounds during teardown.
+  // Why: other teardown hooks may remove close listeners before the app emits before-quit.
   const freezeBoundsOnQuit = (event?: Event): void => {
     if (event?.defaultPrevented) {
       return

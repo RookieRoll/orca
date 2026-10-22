@@ -28,7 +28,7 @@ const CLIENT_NAME = 'STA-4150 client-hosted double restart'
 const RECONNECT_GRACE_OVERSHOOT_MS = 20_000
 
 /**
- * Both authorities restart at once — the field case a fleet auto-update produces.
+ * Both authorities restart at once, as in a coordinated fleet-wide restart.
  *
  * The single-restart specs each leave one side holding the evidence: a client quit leaves the
  * runtime holding the page record, and a runtime restart leaves the client holding the live guest

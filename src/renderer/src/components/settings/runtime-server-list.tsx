@@ -5,8 +5,6 @@ import {
   type PublicKnownRuntimeEnvironment
 } from '../../../../shared/runtime-environments'
 import type { ManagedOrcadPreloadApi } from '../../../../preload/api/managed-orcad-api'
-import type { RemoteServerUpdateEntry } from '@/runtime/remote-server-update-coordinator'
-import type { UpdateCheckOptions } from '../../../../shared/update-status-types'
 import { translate } from '@/i18n/i18n'
 import { duplicatePairedServerNames } from '@/lib/duplicate-paired-servers'
 import { LoadingSpinner } from '../LoadingSpinner'
@@ -36,20 +34,16 @@ type RuntimeServerListProps = {
   environments: PublicKnownRuntimeEnvironment[]
   detailsByEnvironmentId: Record<string, RuntimeHostDetails>
   activeRuntimeEnvironmentId: string | null | undefined
-  remoteServerUpdates: Map<string, RemoteServerUpdateEntry>
-  remoteServerUpdatesRunning: boolean
   connectingId: string | null
   switchingValue: string | null
   disconnectingId: string | null
   removingId: string | null
   isBusy: boolean
   managedCatalog: ManagedServerCatalog
-  onOpenUpdate: () => void
   onConnect: (environment: PublicKnownRuntimeEnvironment) => void
   onDisconnect: (environment: PublicKnownRuntimeEnvironment) => void
   onRemove: (environment: PublicKnownRuntimeEnvironment) => void
   onMakeDefault: (environment: PublicKnownRuntimeEnvironment) => void
-  onCheckForUpdates: (options: UpdateCheckOptions) => void
   onRecheck: () => void
   rechecking: boolean
   onChanged: () => void
@@ -60,20 +54,16 @@ export function RuntimeServerList({
   environments,
   detailsByEnvironmentId,
   activeRuntimeEnvironmentId,
-  remoteServerUpdates,
-  remoteServerUpdatesRunning,
   connectingId,
   switchingValue,
   disconnectingId,
   removingId,
   isBusy,
   managedCatalog,
-  onOpenUpdate,
   onConnect,
   onDisconnect,
   onRemove,
   onMakeDefault,
-  onCheckForUpdates,
   onRecheck,
   rechecking,
   onChanged
@@ -113,8 +103,6 @@ export function RuntimeServerList({
           duplicateOfNames: duplicatePairedServerNames(environments, environment.id),
           details: detailsByEnvironmentId[environment.id],
           isActive: activeRuntimeEnvironmentId === environment.id,
-          remoteUpdate: remoteServerUpdates.get(environment.id),
-          remoteServerUpdatesRunning,
           connecting: connectingId === environment.id,
           switching: switchingValue === environment.id,
           disconnecting: disconnectingId === environment.id,
@@ -122,12 +110,10 @@ export function RuntimeServerList({
           isBusy,
           sshAccessApi: api ?? null,
           sshTargets: targets,
-          onOpenUpdate,
           onConnect,
           onDisconnect,
           onRemove,
           onMakeDefault,
-          onCheckForUpdates,
           onRefreshSshTargets: () => void reload().catch(() => {}),
           onRecheck,
           rechecking

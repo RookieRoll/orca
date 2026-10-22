@@ -75,6 +75,7 @@ vi.mock('electron', () => ({
   app: {
     exit: appExitMock,
     getAppPath: vi.fn(() => '/test/app'),
+    getVersion: vi.fn(() => '1.2.3'),
     isPackaged: false,
     quit: appQuitMock,
     relaunch: appRelaunchMock
@@ -189,6 +190,12 @@ describe('registerAppHandlers', () => {
       undefined
     )
     expect(registerMacKeyboardLayoutChangeNotificationsMock).toHaveBeenCalledOnce()
+  })
+
+  it('exposes the installed application version through the app API', () => {
+    registerAppHandlers({} as never)
+
+    expect(handlers.get('app:getVersion')?.(null)).toBe('1.2.3')
   })
 
   it('checkpoints before scheduling the native administrator restart and quits normally', async () => {

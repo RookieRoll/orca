@@ -93,9 +93,8 @@ describe('electron-builder mac channel config', () => {
     )
   })
 
-  // Why adhoc carries the identical mac identity to hourly: it installs over a
-  // real Orca through the same updater path, so the same signing and the same TCC
-  // argument apply. Only the destination repo differs.
+  // Why adhoc carries the identical mac identity to hourly: both are Orca packages
+  // with the same signing and TCC requirements. Only the destination repo differs.
   it('builds adhoc artifacts with the release identity and its own repo', () => {
     withAdhocEnv((config) => {
       expect(config.appId).toBe('com.stablyai.orca')

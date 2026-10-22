@@ -44,7 +44,6 @@ function emitPackage(args) {
   writeFileSync(join(app, 'resources/package-type'), format)
   mkdirSync(output, { recursive: true })
   writeFileSync(join(output, `orca.${format}`), format)
-  writeFileSync(join(output, 'latest-linux.yml'), format)
   return { format, app, output }
 }
 
@@ -73,7 +72,7 @@ it('preserves configured hooks, architecture, names, and PR compression with exa
 })
 
 describe('independent Linux package formats', () => {
-  it('starts all formats before awaiting completion and isolates metadata writes', async () => {
+  it('starts all formats before awaiting completion and isolates package writes', async () => {
     if (process.platform !== 'win32') {
       symlinkSync('resources/package-type', join(preparedDirectory, 'marker-link'))
     }
@@ -116,12 +115,6 @@ describe('independent Linux package formats', () => {
     )
     for (const format of targets) {
       expect(readFileSync(join(outputDirectory, `orca.${format}`), 'utf8')).toBe(format)
-      expect(
-        readFileSync(
-          join(outputDirectory, 'linux-package-formats', format, 'latest-linux.yml'),
-          'utf8'
-        )
-      ).toBe(format)
     }
     expect(
       readdirSync(outputDirectory).some((name) => name.startsWith('.linux-package-formats-'))

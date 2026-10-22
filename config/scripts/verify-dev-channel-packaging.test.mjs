@@ -34,23 +34,22 @@ afterEach(() => {
 })
 
 describe('electron-builder dev-channel identity', () => {
-  it('keeps the SignPath publisherName on stable Windows builds', () => {
+  it('keeps the SignPath signing publisher on stable Windows builds', () => {
     const config = loadConfigWithEnv({})
 
     expect(config.win.signtoolOptions.publisherName).toBe('SignPath Foundation')
-    expect(config.win.verifyUpdateCodeSignature).toBeUndefined()
+    expect(config.win.signtoolOptions.sign).toBeTypeOf('function')
     expect(config.publish.repo).toBe('orca')
     expect(config.publish.releaseType).toBe('draft')
+    expect(config.publish.publishAutoUpdate).toBe(false)
   })
 
-  // The whole point of the change: an unsigned build that advertised a
-  // publisherName would Authenticode-verify — and reject — every installer it
-  // ever downloaded, including its own way back to stable.
-  it('drops the publisherName and disables update signature checks on Windows dev builds', () => {
+  it('keeps Windows dev-channel signing settings unsigned', () => {
     const config = loadConfigWithEnv(WIN_ADHOC_ENV)
 
     expect(config.win.signtoolOptions?.publisherName).toBeUndefined()
-    expect(config.win.verifyUpdateCodeSignature).toBe(false)
+    expect(config.win.signtoolOptions.sign).toBeTypeOf('function')
+    expect(config.publish.publishAutoUpdate).toBe(false)
   })
 
   it.each([
@@ -89,8 +88,7 @@ describe('electron-builder dev-channel identity', () => {
 describe('collectDevChannelPackagingProblems', () => {
   const goodWinConfig = {
     publish: { repo: 'orca-adhoc', releaseType: 'prerelease' },
-    extraMetadata: { version: '1.4.178-adhoc.20260819010203' },
-    win: { verifyUpdateCodeSignature: false }
+    extraMetadata: { version: '1.4.178-adhoc.20260819010203' }
   }
   const env = { ORCA_ADHOC_BUILD_VERSION: '1.4.178-adhoc.20260819010203' }
 
@@ -119,21 +117,6 @@ describe('collectDevChannelPackagingProblems', () => {
     expect(problems.join('\n')).toContain('rebase it onto a main that does')
   })
 
-  it('rejects a Windows dev build that still advertises a publisherName', () => {
-    const problems = collectDevChannelPackagingProblems({
-      channel: 'adhoc',
-      platform: 'win32',
-      config: {
-        ...goodWinConfig,
-        win: { signtoolOptions: { publisherName: 'SignPath Foundation' } }
-      },
-      env
-    })
-
-    expect(problems.join('\n')).toContain('verifyUpdateCodeSignature must be false')
-    expect(problems.join('\n')).toContain('publisherName is set to "SignPath Foundation"')
-  })
-
   it('rejects a build packaging a version other than the tag the workflow created', () => {
     const problems = collectDevChannelPackagingProblems({
       channel: 'adhoc',
@@ -145,8 +128,7 @@ describe('collectDevChannelPackagingProblems', () => {
     expect(problems.join('\n')).toContain('but the workflow computed')
   })
 
-  // macOS builds are signed, so the Windows-only assertions must not fire there.
-  it('does not apply Windows signature rules to a mac dev build', () => {
+  it('does not require Windows-only config on a mac dev build', () => {
     expect(
       collectDevChannelPackagingProblems({
         channel: 'adhoc',

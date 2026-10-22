@@ -40,7 +40,6 @@ const {
   registerCursorAccountHandlersMock,
   registerClipboardHandlersMock,
   setTrustedClipboardRendererWebContentsIdMock,
-  registerUpdaterHandlersMock,
   registerRateLimitHandlersMock,
   registerBrowserHandlersMock,
   setAgentBrowserBridgeRefMock,
@@ -108,7 +107,6 @@ const {
   registerCursorAccountHandlersMock: vi.fn(),
   registerClipboardHandlersMock: vi.fn(),
   setTrustedClipboardRendererWebContentsIdMock: vi.fn(),
-  registerUpdaterHandlersMock: vi.fn(),
   registerRateLimitHandlersMock: vi.fn(),
   registerBrowserHandlersMock: vi.fn(),
   setAgentBrowserBridgeRefMock: vi.fn(),
@@ -355,10 +353,6 @@ vi.mock('../cursor-accounts', () => ({
   registerCursorAccountHandlers: registerCursorAccountHandlersMock
 }))
 
-vi.mock('../../window/attach-main-window-services', () => ({
-  registerUpdaterHandlers: registerUpdaterHandlersMock
-}))
-
 vi.mock('../../window/clipboard-ipc-handlers', () => ({
   registerClipboardHandlers: registerClipboardHandlersMock,
   setTrustedClipboardRendererWebContentsId: setTrustedClipboardRendererWebContentsIdMock
@@ -464,7 +458,6 @@ describe('registerCoreHandlers', () => {
     registerZcodePlanCredentialsHandlersMock.mockReset()
     registerClipboardHandlersMock.mockReset()
     setTrustedClipboardRendererWebContentsIdMock.mockReset()
-    registerUpdaterHandlersMock.mockReset()
     registerRateLimitHandlersMock.mockReset()
     registerBrowserHandlersMock.mockReset()
     setAgentBrowserBridgeRefMock.mockReset()
@@ -624,7 +617,6 @@ describe('registerCoreHandlers', () => {
     expect(registerClipboardHandlersMock).toHaveBeenCalledWith(store, {
       localChatAttachmentStore: expect.any(Function)
     })
-    expect(registerUpdaterHandlersMock).toHaveBeenCalled()
     expect(setTrustedBrowserRendererWebContentsIdMock).toHaveBeenCalledWith(null)
     expect(setTrustedClipboardRendererWebContentsIdMock).toHaveBeenCalledWith(null)
     expect(setTrustedUIRendererWebContentsIdMock).toHaveBeenCalledWith(null)

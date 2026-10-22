@@ -123,10 +123,7 @@ describe('nextHourlyBuildNumber', () => {
 })
 
 describe('getHourlyBuildIdentity', () => {
-  // 2026-09-14: v1.4.202's GitHub release was deleted for a bug after hourlies
-  // had climbed to 1.4.203. Passing the leftover tag and the already-shipped
-  // hourly keeps the next build on 1.4.203 so electron-updater will still
-  // install it.
+  // Keep hourly versions monotonic when a stable GitHub release is deleted.
   it('stays on the already-shipped hourly base after a buggy main release is unpublished', () => {
     const identity = getHourlyBuildIdentity(new Date('2026-09-14T20:00:00Z'), {
       packageVersion: '1.4.201',

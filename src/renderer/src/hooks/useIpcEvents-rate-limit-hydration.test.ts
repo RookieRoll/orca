@@ -54,7 +54,6 @@ describe('useIpcEvents rate-limit hydration', () => {
       useAppStore: {
         subscribe: vi.fn(() => () => {}),
         getState: () => ({
-          setUpdateStatus: vi.fn(),
           fetchRepos: vi.fn(),
           fetchWorktrees: vi.fn(),
           setActiveView: vi.fn(),

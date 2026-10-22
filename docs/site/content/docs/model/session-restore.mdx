@@ -28,7 +28,8 @@ Session restore runs on every launch. The cases divide by whether the **daemon**
 **Daemon survives → agents keep running:**
 
 - **Cmd-Q** — the normal way to quit. Agents keep working in the background.
-- **Auto-updater relaunch** — Orca restarts to install an update; agents are unaffected.
+- **Application replacement** — after installing a newer app version, Orca can reattach to sessions
+  held by the background daemon.
 - **App crash** — if Orca itself crashes, the daemon keeps your sessions alive for warm reattach on next launch.
 
 **Daemon dies → agents are gone, layout still restores:**

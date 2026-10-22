@@ -15,7 +15,7 @@ vi.mock('./serve-electron-preflight', () => ({
   preflightElectronServe: preflightMock,
   recordElectronServeStartupAbort: recordAbortMock
 }))
-vi.mock('./serve-update-supervisor', async (importOriginal) => ({
+vi.mock('./serve-foreground-child-supervisor', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   superviseForegroundServe: superviseMock
 }))

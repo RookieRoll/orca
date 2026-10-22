@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { getAppEnvironment } from '../../../shared/app-environment'
 import { readFetchResponseTextWithinLimit } from '../../../shared/fetch-response-body'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
-import { getVersionChannel, MAIN_RELEASE_REPO } from '../../../shared/release-channel'
+import { getVersionChannel, MAIN_RELEASE_REPO } from '../../../shared/app-version-channel'
 import { getMainHttpClient } from '../../network/http-client'
 import { writePluginFileAtomically } from '../../plugins/plugin-atomic-file-write'
 import {

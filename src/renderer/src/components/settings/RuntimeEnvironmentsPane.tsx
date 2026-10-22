@@ -57,12 +57,6 @@ export function RuntimeEnvironmentsPane({
   const { dialog, setDialog } = useRuntimeServersPage()
   const [pendingSwitchValue, setPendingSwitchValue] = useState<string | null>(null)
   const [pendingRemove, setPendingRemove] = useState<PublicKnownRuntimeEnvironment | null>(null)
-  const remoteServerUpdates = useAppStore((state) => state.remoteServerUpdates)
-  const remoteServerUpdatesRunning = useAppStore((state) => state.remoteServerUpdatesRunning)
-  const refreshRemoteServerUpdates = useAppStore((state) => state.refreshRemoteServerUpdates)
-  const setRemoteServerUpdateDialogOpen = useAppStore(
-    (state) => state.setRemoteServerUpdateDialogOpen
-  )
   const consumedAddServerIntentSignalRef = useRef(0)
   const {
     environments,
@@ -129,10 +123,6 @@ export function RuntimeEnvironmentsPane({
     connectEnvironment
   })
 
-  const environmentIdsKey = environments.map((environment) => environment.id).join('\n')
-  useEffect(() => {
-    void refreshRemoteServerUpdates()
-  }, [environmentIdsKey, refreshRemoteServerUpdates])
   useEffect(() => {
     if (
       !addServerIntentSignal ||
@@ -218,15 +208,12 @@ export function RuntimeEnvironmentsPane({
         environments={environments}
         detailsByEnvironmentId={detailsByEnvironmentId}
         activeRuntimeEnvironmentId={settings.activeRuntimeEnvironmentId}
-        remoteServerUpdates={remoteServerUpdates}
-        remoteServerUpdatesRunning={remoteServerUpdatesRunning}
         connectingId={connectingId}
         switchingValue={switchingValue}
         disconnectingId={disconnectingId}
         removingId={removingId}
         isBusy={isBusy}
         managedCatalog={managedCatalog}
-        onOpenUpdate={() => setRemoteServerUpdateDialogOpen(true)}
         onConnect={(environment) => void connectEnvironment(environment)}
         onDisconnect={(environment) => void disconnectEnvironment(environment)}
         onRemove={(environment) => {
@@ -234,10 +221,6 @@ export function RuntimeEnvironmentsPane({
           setPendingRemove(environment)
         }}
         onMakeDefault={(environment) => requestSwitch(environment.id)}
-        onCheckForUpdates={(options) => {
-          setRemoteServerUpdateDialogOpen(true)
-          void refreshRemoteServerUpdates(options)
-        }}
         onRecheck={() => void loadEnvironments()}
         rechecking={isLoading}
         onChanged={reloadAll}

@@ -151,7 +151,7 @@ All stable kinds (`patch`, `minor`, `major`) are computed off the latest _stable
 
 **Safety guarantees:**
 
-- Stable releases are refused if the new version isn't strictly greater than the latest published stable. This is the only rule `electron-updater` actually needs — it compares semver within the `latest` channel, so a regressing stable is the one thing that breaks auto-update for fresh installs.
+- Stable releases are refused if the new version isn't strictly greater than the latest published stable, keeping published versions in increasing order for manual installer upgrades.
 - Complete RC draft releases created by the release workflow are published before cutting a new tag only when the draft tag was built from the current release ref. Stale drafts are skipped so fixes cut a fresh RC instead of exposing old artifacts.
 - If the latest RC tag exists but is still draft-only or missing its GitHub Release, the workflow resumes that tag only when it was built from the current release ref. Otherwise the next RC number is cut.
 - RC numbering also considers release commits on `main`, so deleting a stale tag does not let a later cut reuse the same RC number.

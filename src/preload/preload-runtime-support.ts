@@ -2,8 +2,6 @@ import { ipcRenderer } from 'electron'
 import { createBrowserClientPageRendererRequests } from './browser-client-page-renderer-requests'
 import { createBrowserFindSubscriptions } from './browser-find-subscriptions'
 import { registerRendererRestartIpcRelays } from './renderer-restart-wiring'
-import { createUpdaterQuitAbortRelay } from '../shared/renderer-restart-preparation'
-import { ORCA_UPDATER_QUIT_AND_INSTALL_ABORTED_EVENT } from '../shared/updater-renderer-events'
 /** Joins the synchronous unload checkpoint with its durable renderer write. */
 export async function awaitBeforeUnloadCheckpoint(): Promise<void> {
   const result = (await ipcRenderer.invoke('app:await-before-unload-checkpoint')) as {
@@ -48,9 +46,4 @@ export function installBrowserFindListener(): void {
   browserFindListenerInstalled = true
 }
 
-export const updaterQuitAbortRelay = createUpdaterQuitAbortRelay(
-  window,
-  ORCA_UPDATER_QUIT_AND_INSTALL_ABORTED_EVENT
-)
-
-registerRendererRestartIpcRelays(ipcRenderer, window, updaterQuitAbortRelay)
+registerRendererRestartIpcRelays(ipcRenderer, window)

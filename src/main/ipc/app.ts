@@ -142,6 +142,8 @@ export function registerAppHandlers(store: Store, options: RegisterAppHandlersOp
     }
   })
 
+  ipcMain.handle('app:getVersion', (): string => app.getVersion())
+
   // Why: these probes spawn wsl.exe/pwsh.exe; the sync variants would block the main event
   // loop — every PTY message, window IPC and watchdog beat — for up to 5s per renderer read.
   ipcMain.handle('wsl:isAvailable', (): Promise<boolean> => isWslAvailableAsync())

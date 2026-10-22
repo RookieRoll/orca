@@ -9,7 +9,7 @@ import { dirname, join, win32 as winPath } from 'node:path'
 /**
  * The host exe keeps the app exe's own file name, so the relocated image is a byte-for-byte,
  * name-included copy of a signed binary — nothing for EDR to read as a renamed image (MITRE T1036).
- * Survival comes from the path (see daemon-host-relocation.ts). The one name-sensitive updater path is the
+ * Survival comes from the path (see daemon-host-relocation.ts). The one name-sensitive installer path is the
  * no-PowerShell `taskkill /IM` fallback, where the daemon is killed and terminals cold-restore —
  * the documented pre-relocation outcome, not a failure.
  */

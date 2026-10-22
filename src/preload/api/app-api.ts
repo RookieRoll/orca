@@ -19,6 +19,7 @@ export type AppApi = {
   onProfileStateSaveDelayChanged: (callback: (delayed: boolean) => void) => () => void
   /** Returns the app identity currently exposed to native chrome and the titlebar. */
   getIdentity: () => Promise<AppIdentity>
+  getVersion: () => Promise<string>
   /** Local Windows desktop elevation; null when unavailable. Does not describe remote hosts. */
   getWindowsAdministratorStatus: () => Promise<boolean | null>
   /** Restarts the installed Windows desktop with administrator approval and replaces its local terminal host. */

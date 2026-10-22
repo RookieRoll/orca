@@ -29,7 +29,6 @@ describe('useIpcEvents browser tab create routing', () => {
         | null
     } = { current: null }
     const state = {
-      setUpdateStatus: vi.fn(),
       fetchRepos: vi.fn(),
       fetchWorktrees: vi.fn(),
       setActiveView: vi.fn(),

@@ -151,11 +151,6 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
       expect(registrationOrder).toContain(subscribe)
       expect(registrationOrder.indexOf(read)).toBeGreaterThan(registrationOrder.indexOf(subscribe))
     }
-    // The updater intentionally requests its initial snapshot before subscribing.
-    expect(groupOrder(['updater.getStatus', 'updater.onStatus'])).toEqual([
-      'updater.getStatus',
-      'updater.onStatus'
-    ])
     expect(
       [...listeners.values()].every((records) => records.filter((item) => item.active).length === 1)
     ).toBe(true)

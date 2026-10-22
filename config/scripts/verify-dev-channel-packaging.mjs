@@ -59,23 +59,6 @@ export function collectDevChannelPackagingProblems({ channel, platform, config, 
     )
   }
 
-  if (platform === 'win32') {
-    // The one that silently breaks updates rather than failing the build: a dev
-    // build that advertises a publisherName can never install its own channel's
-    // next build, because electron-updater verifies against the name baked into
-    // the installed app.
-    if (config.win?.verifyUpdateCodeSignature !== false) {
-      problems.push(
-        'win.verifyUpdateCodeSignature must be false for unsigned dev builds, or electron-updater will Authenticode-verify every installer this build downloads and reject all of them.'
-      )
-    }
-    if (config.win?.signtoolOptions?.publisherName != null) {
-      problems.push(
-        `win.signtoolOptions.publisherName is set to "${config.win.signtoolOptions.publisherName}" on an unsigned dev build; it must be absent.`
-      )
-    }
-  }
-
   return problems
 }
 

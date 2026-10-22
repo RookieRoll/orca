@@ -3,7 +3,6 @@ import { getOrcadSshDeployment } from '../../../../shared/runtime-environments'
 import type { SshTarget } from '../../../../shared/ssh-types'
 import { translate } from '@/i18n/i18n'
 import { formatUiRelativeTime } from '@/i18n/relative-time-format'
-import type { RemoteServerUpdateEntry } from '@/runtime/remote-server-update-coordinator'
 import type { RuntimeServerRowState } from './runtime-server-row-state'
 
 export type RuntimeServerProblemLine = { text: string; destructive: boolean }
@@ -45,7 +44,6 @@ export function getRuntimeServerRoute(
 export function getRuntimeServerProblemLine({
   environment,
   row,
-  remoteUpdate,
   managedStatusError,
   managedSummary,
   address,
@@ -57,7 +55,6 @@ export function getRuntimeServerProblemLine({
     RuntimeServerRowState,
     'accessRevoked' | 'problem' | 'probeFailed' | 'compatibilityBlocked'
   >
-  remoteUpdate: RemoteServerUpdateEntry | undefined
   managedStatusError: string | null
   managedSummary: string | null
   address: string | null
@@ -85,12 +82,6 @@ export function getRuntimeServerProblemLine({
   if (managedSummary) {
     return { text: managedSummary, destructive: false }
   }
-  if (remoteUpdate?.phase === 'failed') {
-    return {
-      text: translate('auto.components.settings.RemoteServerUpdateStatus.failed', 'Update failed'),
-      destructive: true
-    }
-  }
   if (row.probeFailed) {
     const when = environment.lastUsedAt
       ? translate('auto.components.settings.serverList.lastSeen', 'Last seen {{when}}', {
@@ -102,15 +93,6 @@ export function getRuntimeServerProblemLine({
   }
   if (row.problem) {
     return { text: row.problem, destructive: row.compatibilityBlocked }
-  }
-  if (remoteUpdate?.phase === 'manual') {
-    return {
-      text: translate(
-        'auto.components.settings.serverList.manualUpdate',
-        'Update Orca on the server host'
-      ),
-      destructive: false
-    }
   }
   return null
 }

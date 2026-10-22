@@ -67,7 +67,7 @@ describe('paired runtime clients', () => {
     expect(errorCode(response)).not.toBe('forbidden')
   })
 
-  it.each(['settings.update', 'accounts.selectClaude', 'skills.install', 'updater.check'])(
+  it.each(['settings.update', 'accounts.selectClaude', 'skills.install'])(
     'keep the remote UI surface: %s',
     async (method) => {
       const response = await dispatchAs(PAIRED, method, {})

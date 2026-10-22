@@ -1,7 +1,5 @@
 import {
-  ArrowUpCircle,
   Info,
-  RefreshCw,
   Server,
   ServerOff,
   Star,
@@ -9,12 +7,9 @@ import {
   Waypoints
 } from 'lucide-react'
 import { translate } from '@/i18n/i18n'
-import { getUpdateCheckClickOptions, getUpdateCheckHint } from '@/lib/update-check-click-options'
-import type { UpdateCheckOptions } from '../../../../shared/update-status-types'
 import { DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu'
 
 type RuntimeServerRowMenuProps = {
-  showUpdate: boolean
   showConnect: boolean
   showDisconnect: boolean
   showMakeDefault: boolean
@@ -26,11 +21,9 @@ type RuntimeServerRowMenuProps = {
   connectDisabled: boolean
   /** Managed-server lifecycle items, placed between setup and removal. */
   managedItems?: React.ReactNode
-  onUpdate: () => void
   onConnect: () => void
   onDisconnect: () => void
   onMakeDefault: () => void
-  onCheckForUpdates?: (options: UpdateCheckOptions) => void
   onSshAccess: () => void
   onToggleDetails: () => void
   onRemove: () => void
@@ -38,7 +31,6 @@ type RuntimeServerRowMenuProps = {
 
 /** Order: state change → preference → setup → destructive. */
 export function RuntimeServerRowMenuItems({
-  showUpdate,
   showConnect,
   showDisconnect,
   showMakeDefault,
@@ -48,23 +40,15 @@ export function RuntimeServerRowMenuItems({
   isBusy,
   connectDisabled,
   managedItems,
-  onUpdate,
   onConnect,
   onDisconnect,
   onMakeDefault,
-  onCheckForUpdates,
   onSshAccess,
   onToggleDetails,
   onRemove
 }: RuntimeServerRowMenuProps): React.JSX.Element {
   return (
     <>
-      {showUpdate ? (
-        <DropdownMenuItem onSelect={onUpdate}>
-          <ArrowUpCircle />
-          {translate('auto.components.settings.serverList.updateMenu', 'Update…')}
-        </DropdownMenuItem>
-      ) : null}
       {showDisconnect ? (
         <DropdownMenuItem disabled={actionBusy} onSelect={onDisconnect}>
           <ServerOff />
@@ -90,15 +74,6 @@ export function RuntimeServerRowMenuItems({
           {sshAccessLinked
             ? translate('auto.components.settings.serverList.sshAccessLinked', 'SSH route…')
             : translate('auto.components.settings.serverList.sshAccess', 'Connect through SSH…')}
-        </DropdownMenuItem>
-      ) : null}
-      {onCheckForUpdates ? (
-        <DropdownMenuItem
-          title={getUpdateCheckHint()}
-          onClick={(event) => onCheckForUpdates(getUpdateCheckClickOptions(event))}
-        >
-          <RefreshCw />
-          {translate('auto.components.settings.serverList.checkForUpdates', 'Check for updates')}
         </DropdownMenuItem>
       ) : null}
       <DropdownMenuItem onSelect={onToggleDetails}>

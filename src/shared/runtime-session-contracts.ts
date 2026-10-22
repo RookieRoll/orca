@@ -1,6 +1,5 @@
 import type { MobileProjectSectionCatalog } from './mobile-project-sections-contract'
 import type { AgentStatusOrchestrationContext } from './agent-status-types'
-import type { RemoteServerUpdateSupport } from './remote-server-update'
 import type { RemoteRuntimeSharedConnectionDiagnostics } from './remote-runtime-shared-control-types'
 import type { RuntimeHostConnectionState } from './runtime-host-connection-state'
 import type { RuntimeCapability } from './protocol-version'
@@ -91,7 +90,6 @@ export type RuntimeStatus = {
    */
   degradations?: RuntimeDegradation[]
   appVersion?: string
-  remoteUpdateSupport?: RemoteServerUpdateSupport
   remoteControl?: RemoteRuntimeSharedConnectionDiagnostics | null
   hostPlatform?: NodeJS.Platform
   /** Optional display name reported by the answering runtime. */
@@ -127,7 +125,6 @@ export type CliStatusResult = {
     connectionState?: RuntimeHostConnectionState
     runtimeId: string | null
     appVersion?: string
-    remoteUpdateSupport?: RemoteServerUpdateSupport
     capabilities?: RuntimeCapability[]
     degradations?: RuntimeDegradation[]
   }

@@ -160,7 +160,6 @@ const PUBLISHED_RUNTIME_CAPABILITIES = [
   'terminal.quick-commands.long-prompts.v1',
   'terminal.quick-commands.v1',
   'terminal.spawn-intent.v1',
-  'updater.remote-control.v1',
   'workspace-ports.host-scoped.v1',
   'workspace-ports.v1',
   'workspace-run-context.v1',

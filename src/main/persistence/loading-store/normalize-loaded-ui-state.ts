@@ -14,7 +14,10 @@ import {
   normalizeShowDotfilesByWorktree,
   normalizeSortBy
 } from '../applying-settings/ui-selection-normalization'
-import { stripMainOwnedTelemetryMarkerFromUI } from '../applying-settings/ui-interaction-merge'
+import {
+  RETIRED_UPDATER_UI_FIELDS,
+  stripRetiredMainOwnedUIFields
+} from '../applying-settings/ui-interaction-merge'
 import {
   readDeprecatedExperimentFlag,
   resolveSetupGuideSidebarDismissedOnLoad
@@ -37,6 +40,9 @@ export function normalizeLoadedUiState(
     parsed.worktreeMeta ?? {}
   )
   if (parsed.ui?._explorerDisplayRootMigrated !== true) {
+    markNeedsSave()
+  }
+  if (RETIRED_UPDATER_UI_FIELDS.some((field) => Object.hasOwn(parsed.ui ?? {}, field))) {
     markNeedsSave()
   }
   const rawSort = parsed.ui?.sortBy
@@ -202,7 +208,7 @@ export function normalizeLoadedUiState(
     worktreeCardProperties: getWorktreeCardModeProperties(
       loadedCompactWorktreeCards ? 'Compact' : 'Default'
     ),
-    ...stripMainOwnedTelemetryMarkerFromUI(parsed.ui),
+    ...stripRetiredMainOwnedUIFields(parsed.ui),
     // Why: migrate once from the retired Appearance setting only when no explicit chrome preference exists yet.
     rightSidebarOpen,
     rightSidebarTab: normalizeRightSidebarTab(parsed.ui?.rightSidebarTab),

@@ -43,7 +43,7 @@ import {
   mergeContextualTourSeenIds,
   mergeFeatureTipSeenIds,
   mergeFeatureInteractions,
-  stripMainOwnedTelemetryMarkerFromUI
+  stripRetiredMainOwnedUIFields
 } from './ui-interaction-merge'
 
 export type UIUpdateOperations = {
@@ -67,7 +67,7 @@ export function updatePersistedUI(
   if (clearsProtectedSecret) {
     operations.removeRetainedBlob(PROTECTED_SECRET_SLOT.browserKagiSessionLink)
   }
-  const sanitizedUpdates = stripMainOwnedTelemetryMarkerFromUI(updates)
+  const sanitizedUpdates = stripRetiredMainOwnedUIFields(updates)
   const { activeView, ...durableUpdates } = sanitizedUpdates
   const activeViewChanged = operations.setActiveView(activeView)
   if (Object.keys(durableUpdates).length === 0) {
@@ -78,7 +78,7 @@ export function updatePersistedUI(
   }
   const currentUI = {
     ...getDefaultUIState(),
-    ...stripMainOwnedTelemetryMarkerFromUI(operations.state.ui)
+    ...stripRetiredMainOwnedUIFields(operations.state.ui)
   }
   const previousUI = {
     ...operations.getUI(),

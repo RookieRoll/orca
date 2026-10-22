@@ -1,4 +1,3 @@
-import { isQuittingForUpdate } from '../updater'
 import { quitFromUserCommand } from './main-window-actions'
 import { quitProcess } from './process-quit-request'
 import { installServeNativeQuitGuard } from './serve-native-quit-guard'
@@ -14,7 +13,6 @@ export function installServeQuitHandling(): void {
   registerServeSignalHandlers(process, quitProcess)
   installServeNativeQuitGuard({
     platform: process.platform,
-    isQuittingForUpdate,
     closeDesktopWindows: quitFromUserCommand
   })
 }

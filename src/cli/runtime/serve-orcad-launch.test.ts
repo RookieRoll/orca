@@ -19,8 +19,7 @@ function answering(stdout: string, code = 0): RunProcess {
 const options = {
   executable: '/Applications/Orca.app/Contents/MacOS/Orca',
   appRoot: '/Applications/Orca.app/Contents/Resources/app.asar',
-  userDataPath: '/Users/u/Library/Application Support/orca',
-  usesMacUpdateHandoff: false
+  userDataPath: '/Users/u/Library/Application Support/orca'
 }
 
 describe('orca serve asking the app which host to run', () => {
@@ -47,17 +46,6 @@ describe('orca serve asking the app which host to run', () => {
         stdio: ['ignore', 'pipe', 'inherit']
       })
     )
-  })
-
-  it('keeps packaged macOS on Electron without starting the app to ask', async () => {
-    const run = answering('')
-    expect(await resolveLocalServeRuntime({ ...options, usesMacUpdateHandoff: true }, run)).toEqual(
-      {
-        kind: 'electron',
-        reason: expect.stringContaining('packaged macOS')
-      }
-    )
-    expect(run).not.toHaveBeenCalled()
   })
 
   it('serves on Electron, and says why, when the app gives no answer', async () => {

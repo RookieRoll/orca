@@ -1,12 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('electron', () => ({ app: { quit: vi.fn() } }))
-vi.mock('../updater', () => ({ checkForUpdatesFromMenu: vi.fn(), isQuittingForUpdate: vi.fn() }))
 vi.mock('../tray/system-tray', () => ({
   createSystemTray: vi.fn(),
   setMacMenuBarIconVisible: vi.fn()
 }))
-vi.mock('../window/attach-main-window-services', () => ({ ensureAutoUpdaterConfigured: vi.fn() }))
 vi.mock('../window/focus-existing-window', () => ({
   focusExistingMainWindow: vi.fn(),
   safelyRevealWindow: vi.fn()
