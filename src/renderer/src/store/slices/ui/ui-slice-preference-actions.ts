@@ -11,14 +11,6 @@ import {
   normalizeWorktreeCardProperties
 } from '../../../../../shared/constants'
 import {
-  DEFAULT_USAGE_PERCENTAGE_DISPLAY,
-  normalizeUsagePercentageDisplay
-} from '../../../../../shared/usage-percentage-display'
-import {
-  DEFAULT_STATUS_BAR_USAGE_MODE,
-  normalizeStatusBarUsageMode
-} from '../../../../../shared/status-bar-usage-mode'
-import {
   normalizeExecutionHostOrder,
   normalizeExecutionHostScope,
   normalizeVisibleExecutionHostIds
@@ -246,33 +238,5 @@ export function createUiPreferenceActions(set: UISliceSet, get: UISliceGet): Par
       window.api.ui.set({ statusBarVisible: v }).catch(console.error)
       set({ statusBarVisible: v })
     },
-    usagePercentageDisplay: DEFAULT_USAGE_PERCENTAGE_DISPLAY,
-    setUsagePercentageDisplay: (display) => {
-      const normalized = normalizeUsagePercentageDisplay(display)
-      // Why: changing the control is the discovery path, so permanently dismiss the one-time change notice.
-      window.api.ui
-        .set({
-          usagePercentageDisplay: normalized,
-          usagePercentageDisplayChangeNoticeDismissed: true
-        })
-        .catch(console.error)
-      set({
-        usagePercentageDisplay: normalized,
-        usagePercentageDisplayChangeNoticeDismissed: true
-      })
-    },
-    statusBarUsageMode: DEFAULT_STATUS_BAR_USAGE_MODE,
-    setStatusBarUsageMode: (mode) => {
-      const normalized = normalizeStatusBarUsageMode(mode)
-      // Why: choosing either mode discovers the selector; old hosts never arm the new notice.
-      const updates = {
-        statusBarUsageMode: normalized,
-        ...(!get().statusBarCompactChangeNoticeDismissed
-          ? { statusBarCompactChangeNoticeDismissed: true }
-          : {})
-      }
-      window.api.ui.set(updates).catch(console.error)
-      set(updates)
-    }
   }
 }

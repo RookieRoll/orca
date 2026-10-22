@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useLayoutEffect, useState } from 'react'
+import { useState } from 'react'
 import { AppWindow, PanelLeft, TerminalSquare } from 'lucide-react'
 
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
@@ -10,7 +10,6 @@ import { AppearanceWindowSidebarSection } from './AppearanceWindowSidebarSection
 import { SearchableSetting } from './SearchableSetting'
 import { matchesSettingsSearch, normalizeSettingsSearchQuery } from './settings-search'
 import { useAppStore } from '../../store'
-import { USAGE_PERCENTAGE_DISPLAY_SETTING_ID } from './appearance-usage-percentage-search'
 import {
   getAppIconEntries,
   getAppearancePaneSearchEntries,
@@ -70,10 +69,6 @@ export function AppearancePane({
   ghostty
 }: AppearancePaneProps): React.JSX.Element {
   const searchQuery = useAppStore((state) => state.settingsSearchQuery)
-  const appearanceAccordionDeepLink = useAppStore((state) => state.appearanceAccordionDeepLink)
-  const clearAppearanceAccordionDeepLink = useAppStore(
-    (state) => state.clearAppearanceAccordionDeepLink
-  )
   const isSearching = normalizeSettingsSearchQuery(searchQuery).length > 0
   const isDesktopWindows = getRendererAppPlatform() === 'win32'
   const isDesktopMac = getRendererAppPlatform() === 'darwin'
@@ -84,32 +79,6 @@ export function AppearancePane({
     () => new Set(ALL_APPEARANCE_SECTIONS)
   )
 
-  // Why: nested deep links (e.g. Usage percentages) land under Window & Sidebar;
-  // expand that section before Settings scrolls so the row is actually visible.
-  useLayoutEffect(() => {
-    if (!appearanceAccordionDeepLink) {
-      return
-    }
-    setOpenSections((current) => {
-      if (current.has(appearanceAccordionDeepLink)) {
-        return current
-      }
-      const next = new Set(current)
-      next.add(appearanceAccordionDeepLink)
-      return next
-    })
-    clearAppearanceAccordionDeepLink()
-    // Why: expand is layout-synchronous; scroll on the next frame so the target
-    // has non-zero height when Settings (or this fallback) scrolls.
-    const frameId = requestAnimationFrame(() => {
-      document
-        .getElementById(USAGE_PERCENTAGE_DISPLAY_SETTING_ID)
-        ?.scrollIntoView({ block: 'nearest' })
-    })
-    return () => {
-      cancelAnimationFrame(frameId)
-    }
-  }, [appearanceAccordionDeepLink, clearAppearanceAccordionDeepLink])
   const interfaceTitle = translate(
     'auto.components.settings.AppearancePane.interfaceTitle',
     'Interface'

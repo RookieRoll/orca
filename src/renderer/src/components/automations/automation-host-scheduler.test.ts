@@ -373,8 +373,7 @@ describe('automation host scheduler legacy path', () => {
     ])
     const row = cache.get(selfRef(RUNTIME_AUTHORITY))?.data[0]
     expect(row?.owner).toBeNull()
-    expect(row?.usageKnown).toBe(false)
-    expect(row?.usageSummary).toBeNull()
+    expect(row?.lastRunSummary).toBeNull()
   })
 
   it('records an incompatible host without sending anything', async () => {

@@ -18,7 +18,7 @@ function row(
     key,
     hostLabel,
     catalogRef,
-    usageSummary: null,
+    lastRunSummary: null,
     automation: {
       id: key,
       name: `Automation ${key}`,

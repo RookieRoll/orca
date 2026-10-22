@@ -13,7 +13,7 @@
  */
 
 import type { Automation } from './automations-types'
-import type { AutomationUsageSummary } from './automation-usage-summary'
+import type { AutomationLastRunSummary } from './automation-last-run-summary'
 import type { FolderWorkspaceHost } from './folder-workspace-execution-host'
 import { getAutomationRunRepoId } from './automation-run-identity'
 import { parseExecutionHostId } from './execution-host'
@@ -38,7 +38,7 @@ export type AutomationListItemSelector =
 export type AutomationListItem = {
   automationId: string
   selector: AutomationListItemSelector
-  usageSummary?: AutomationUsageSummary | null
+  lastRunSummary?: AutomationLastRunSummary | null
 }
 
 export type AutomationListResult = {
@@ -81,7 +81,7 @@ export type AutomationProjectionContext = {
   workspaceHost?: (automation: Automation) => AutomationWorkspaceHost
   /** Registration a generation was allocated to; omitted leaves a re-pin unproven. */
   sshTargetIdForGeneration?: (generation: number) => string | undefined
-  usageSummary?: (automationId: string) => AutomationUsageSummary | null
+  lastRunSummary?: (automationId: string) => AutomationLastRunSummary | null
 }
 
 function orphan(issue: string): AutomationListItemSelector {
@@ -257,10 +257,9 @@ export function projectAutomationList(
       selector
     })
   }
-  // Keep usage lookups after projection, matching the previous staged pipeline's ordering.
-  if (context.usageSummary) {
+  if (context.lastRunSummary) {
     for (const item of items) {
-      item.usageSummary = context.usageSummary(item.automationId)
+      item.lastRunSummary = context.lastRunSummary(item.automationId)
     }
   }
   return {

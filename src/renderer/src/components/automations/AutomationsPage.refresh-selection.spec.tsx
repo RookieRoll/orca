@@ -51,26 +51,20 @@ describe('AutomationsPage refresh', () => {
     }
   })
 
-  it('reads row usage from the authority projection rather than from runs', async () => {
-    const usageSummary = {
-      knownRuns: 2,
-      unavailableRuns: 0,
-      inputTokens: 900,
-      outputTokens: 300,
-      cacheTokens: 0,
-      reasoningOutputTokens: 34,
-      totalTokens: 1234,
-      estimatedCostUsd: 0.5
+  it('reads last-run status and time from the authority projection', async () => {
+    const lastRunSummary = {
+      status: 'completed' as const,
+      at: 1_234
     }
     api.automations.listScoped.mockResolvedValue({
       automations: [makeAutomation({ id: 'a-1' })],
-      items: [{ automationId: 'a-1', selector: { kind: 'self' }, usageSummary }],
+      items: [{ automationId: 'a-1', selector: { kind: 'self' }, lastRunSummary }],
       orphanCount: 0
     })
 
     await renderPage()
 
-    expect(listedRows()[0]?.usageSummary).toEqual(usageSummary)
+    expect(listedRows()[0]?.lastRunSummary).toEqual(lastRunSummary)
   })
 
   it('does not re-list through the active runtime just because one is selected', async () => {

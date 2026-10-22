@@ -2,8 +2,6 @@
  * The AutomationService a runtime host executes schedules with. Shared by Electron startup and
  * orcad so both hosts dispatch through the same headless path.
  */
-import type { ClaudeUsageStore } from '../claude-usage/store'
-import type { CodexUsageStore } from '../codex-usage/store'
 import type { Store } from '../persistence'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import { AutomationService } from './service'
@@ -21,12 +19,10 @@ const MAX_REMEMBERED_LAUNCHES = 256
 export function createRuntimeAutomationService(input: {
   store: Store
   runtime: OrcaRuntimeService
-  claudeUsage?: ClaudeUsageStore
-  codexUsage?: CodexUsageStore
   /** A server process: it executes remote_host_service-owned schedules and dispatches headlessly. */
   headless: boolean
 }): AutomationService {
-  const { store, runtime, claudeUsage, codexUsage } = input
+  const { store, runtime } = input
   // The handle each headless launch returned, so its watcher never depends on a pane-key lookup.
   const launchedHandles = new Map<string, string>()
   const observer = createRuntimeAutomationRunTerminalObserver(runtime, {
@@ -37,8 +33,6 @@ export function createRuntimeAutomationService(input: {
       )
   })
   const service = new AutomationService(store, {
-    claudeUsage,
-    codexUsage,
     terminalObserver: {
       ...observer,
       // This host's own launch handle first: it names the run's terminal without a lookup.

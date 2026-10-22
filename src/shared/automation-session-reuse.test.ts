@@ -20,7 +20,6 @@ function run(overrides: Partial<AutomationRun>): AutomationRun {
     terminalPtyId: 'pty-1',
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: createdAt,
     dispatchedAt: createdAt,

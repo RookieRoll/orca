@@ -161,7 +161,6 @@ function fixtureAutomationRun(): AutomationRun {
       truncated: false
     },
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: 20,
     dispatchedAt: 20,

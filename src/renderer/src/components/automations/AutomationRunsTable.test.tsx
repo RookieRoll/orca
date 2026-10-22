@@ -22,7 +22,7 @@ function entries(
     automation,
     catalogRef: { authority: { kind: 'desktop' }, selector: { kind: 'self' } },
     hostLabel: overrides.hostLabel ?? 'Local Mac',
-    usageSummary: null
+    lastRunSummary: null
   } as const
   return Array.from({ length: count }, (_, index) => ({
     key: `row:run-${index}`,

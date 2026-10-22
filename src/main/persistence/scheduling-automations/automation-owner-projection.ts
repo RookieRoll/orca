@@ -1,4 +1,4 @@
-import type { Automation, AutomationRun } from '../../../shared/automations-types'
+import type { Automation } from '../../../shared/automations-types'
 import type { PersistedState } from '../../../shared/persisted-state-types'
 import {
   automationCapturedHostIssue as resolveAutomationCapturedHostIssue,
@@ -32,7 +32,7 @@ import {
   resolveAutomationWorkspaceSshTargetId,
   type AutomationWorkspaceSshPin
 } from '../../../shared/automation-workspace-pin'
-import { summarizeAutomationRunUsage } from '../../../shared/automation-usage-summary'
+import { summarizeAutomationLastRun } from '../../../shared/automation-last-run-summary'
 import type { FolderWorkspaceHostState } from '../../../shared/folder-workspace-execution-host'
 
 export type AutomationStorageAuthority = 'desktop' | 'runtime'
@@ -51,7 +51,7 @@ export function sshTargetGenerationForConnection(
   return sanitizeSshTargetGeneration(target?.generation)
 }
 
-function automationUsageSummaries(state: PersistedState) {
+function automationLastRunSummaries(state: PersistedState) {
   const runsByAutomation = new Map<string, AutomationRun[]>()
   for (const run of state.automationRuns ?? []) {
     const runs = runsByAutomation.get(run.automationId)
@@ -61,7 +61,7 @@ function automationUsageSummaries(state: PersistedState) {
       runsByAutomation.set(run.automationId, [run])
     }
   }
-  return new Map([...runsByAutomation].map(([id, runs]) => [id, summarizeAutomationRunUsage(runs)]))
+  return new Map([...runsByAutomation].map(([id, runs]) => [id, summarizeAutomationLastRun(runs)]))
 }
 
 function folderWorkspaceHostState(state: PersistedState): FolderWorkspaceHostState {
@@ -103,9 +103,9 @@ export function automationWorkspaceSshPin(
 export function automationProjectionContext(
   state: PersistedState,
   storageAuthority: AutomationStorageAuthority,
-  withUsage: boolean
+  withLastRunSummary: boolean
 ): AutomationProjectionContext {
-  const usage = withUsage ? automationUsageSummaries(state) : null
+  const summaries = withLastRunSummary ? automationLastRunSummaries(state) : null
   const reposById = new Map(state.repos.map((repo) => [repo.id, repo]))
   const targetIdByGeneration = new Map(
     (state.sshTargets ?? []).flatMap((target) =>
@@ -122,7 +122,7 @@ export function automationProjectionContext(
     },
     workspaceHost: (automation) =>
       resolveAutomationWorkspaceHost(folderWorkspaceHostState(state), automation.workspaceId),
-    ...(usage ? { usageSummary: (id: string) => usage.get(id) ?? null } : {})
+    ...(summaries ? { lastRunSummary: (id: string) => summaries.get(id) ?? null } : {})
   }
 }
 

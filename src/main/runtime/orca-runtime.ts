@@ -326,7 +326,6 @@ export type {
   RuntimeTerminalAgentStatusEvent
 } from './runtime-terminal-contracts'
 export type { MessageWaitResult } from './runtime-message-waiters'
-export type { AccountsSnapshot } from './runtime-account-controller'
 export type {
   MobileNotificationDispatchEvent,
   MobileNotificationDismissEvent,

@@ -44,11 +44,17 @@ function touchAutomation(state: PersistedState, automationId: string, now: numbe
   )
 }
 
+function withoutRetiredUsage(run: AutomationRun): AutomationRun {
+  const normalized = { ...run }
+  Reflect.deleteProperty(normalized, 'usage')
+  return normalized
+}
+
 function sortedAutomationRuns(state: PersistedState, automationId?: string): AutomationRun[] {
   const runs = state.automationRuns ?? []
   return [...(automationId ? runs.filter((run) => run.automationId === automationId) : runs)]
     .map((run) => ({
-      ...run,
+      ...withoutRetiredUsage(run),
       precheckResult: normalizeAutomationPrecheckResult(run.precheckResult)
     }))
     .sort(compareAutomationRunsNewestFirst)
@@ -103,7 +109,6 @@ export function createAutomationRun(
     terminalPtyId: null,
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: null,
     dispatchedAt: null,
@@ -176,7 +181,7 @@ export function updateAutomationRun(
     ? normalizeAutomationRunWorkspaceDisplayName(result.workspaceDisplayName ?? null)
     : null
   const updated: AutomationRun = {
-    ...current,
+    ...withoutRetiredUsage(current),
     status: result.status,
     workspaceId,
     workspaceDisplayName:
@@ -198,12 +203,12 @@ export function updateAutomationRun(
     precheckResult: Object.hasOwn(result, 'precheckResult')
       ? normalizeAutomationPrecheckResult(result.precheckResult)
       : normalizeAutomationPrecheckResult(current.precheckResult),
-    usage: Object.hasOwn(result, 'usage') ? (result.usage ?? null) : (current.usage ?? null),
     error: result.error ?? null,
     startedAt: current.startedAt ?? now,
     dispatchedAt:
       result.status === 'dispatched' ? (result.dispatchedAt ?? now) : current.dispatchedAt
   }
+  Reflect.deleteProperty(updated, 'usage')
   // Replaced, not patched in place: the list projection caches on array identity.
   operations.state.automationRuns = operations.state.automationRuns.map((run) =>
     run.id === result.runId ? updated : run

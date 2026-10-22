@@ -1,26 +1,20 @@
 import type React from 'react'
 
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
-import type { StatusBarItem } from '../../../../shared/ui-chrome-types'
-import type { FeatureInteractionId } from '../../../../shared/feature-interaction-catalog'
 import { SearchableSetting } from './SearchableSetting'
 import { AppearanceAdvancedDisclosure } from './AppearanceAdvancedDisclosure'
 import { useAppStore } from '../../store'
 import {
   SettingsRow,
-  SettingsSegmentedControl,
   SettingsSubsectionHeader,
   SettingsSwitchRow
 } from './SettingsFormControls'
-import { useAvailableStatusBarToggles } from '../status-bar/use-available-status-bar-toggles'
 import {
   getLayoutEntries,
   getFollowSymlinkedDirectoriesEntry,
   getSidebarEntries,
-  getStatusBarToggles,
-  getUsagePercentageDisplayEntry
+  getStatusBarToggles
 } from './appearance-search'
-import { USAGE_PERCENTAGE_DISPLAY_SETTING_ID } from './appearance-usage-percentage-search'
 import { LeftSidebarAppearanceSetting } from './LeftSidebarAppearanceSetting'
 import {
   getLeftSidebarAppearanceEntry,
@@ -36,31 +30,6 @@ type AppearanceWindowSidebarSectionProps = {
   forceVisiblePrimary?: boolean
 }
 
-function recordStatusBarToggleInteraction(
-  id: StatusBarItem,
-  recordFeatureInteraction: (feature: FeatureInteractionId) => void
-): void {
-  if (id === 'resource-usage') {
-    recordFeatureInteraction('resource-manager')
-  } else if (id === 'ports') {
-    recordFeatureInteraction('ports')
-  } else if (id === 'ssh') {
-    recordFeatureInteraction('ssh')
-  } else if (
-    id === 'claude' ||
-    id === 'codex' ||
-    id === 'gemini' ||
-    id === 'opencode-go' ||
-    id === 'kimi' ||
-    id === 'antigravity' ||
-    id === 'minimax' ||
-    id === 'grok' ||
-    id === 'cursor'
-  ) {
-    recordFeatureInteraction('usage-tracking')
-  }
-}
-
 export function AppearanceWindowSidebarSection({
   settings,
   updateSettings,
@@ -70,12 +39,9 @@ export function AppearanceWindowSidebarSection({
   const isSearching = normalizeSettingsSearchQuery(searchQuery).length > 0
   const statusBarItems = useAppStore((state) => state.statusBarItems)
   const toggleStatusBarItem = useAppStore((state) => state.toggleStatusBarItem)
-  const usagePercentageDisplay = useAppStore((state) => state.usagePercentageDisplay)
-  const setUsagePercentageDisplay = useAppStore((state) => state.setUsagePercentageDisplay)
   const recordFeatureInteraction = useAppStore((state) => state.recordFeatureInteraction)
   const setWorktreeCardMode = useAppStore((state) => state.setWorktreeCardMode)
-  const visibleStatusBarToggles = useAvailableStatusBarToggles(getStatusBarToggles())
-  const usagePercentageDisplayEntry = getUsagePercentageDisplayEntry()
+  const visibleStatusBarToggles = getStatusBarToggles()
   const leftSidebarAppearanceEntry = getLeftSidebarAppearanceEntry()
   const sidebarEntries = getSidebarEntries()
   const workspaceCardLayoutEntry = getWorkspaceCardLayoutEntry()
@@ -95,9 +61,7 @@ export function AppearanceWindowSidebarSection({
     description: statusBarDescription,
     keywords: statusBarKeywords
   })
-  const statusBarControlMatches =
-    matchesSettingsSearch(searchQuery, usagePercentageDisplayEntry) ||
-    visibleStatusBarToggles.some((toggle) =>
+  const statusBarControlMatches = visibleStatusBarToggles.some((toggle) =>
       matchesSettingsSearch(searchQuery, {
         title: toggle.title,
         description: toggle.description,
@@ -135,41 +99,6 @@ export function AppearanceWindowSidebarSection({
           <SettingsRow label={statusBarTitle} description={statusBarDescription} control={null} />
           {showStatusBarControls ? (
             <div className="ml-4 divide-y divide-border/40 border-t border-border/40">
-              <SearchableSetting
-                id={USAGE_PERCENTAGE_DISPLAY_SETTING_ID}
-                title={usagePercentageDisplayEntry.title}
-                description={usagePercentageDisplayEntry.description}
-                keywords={usagePercentageDisplayEntry.keywords}
-              >
-                <SettingsRow
-                  label={usagePercentageDisplayEntry.title}
-                  description={usagePercentageDisplayEntry.description}
-                  control={
-                    <SettingsSegmentedControl
-                      ariaLabel={usagePercentageDisplayEntry.title}
-                      value={usagePercentageDisplay}
-                      onChange={setUsagePercentageDisplay}
-                      options={[
-                        {
-                          value: 'used',
-                          label: translate(
-                            'auto.components.settings.AppearanceWindowSidebarSection.usagePercentageDisplayUsed',
-                            'Used'
-                          )
-                        },
-                        {
-                          value: 'remaining',
-                          label: translate(
-                            'auto.components.settings.AppearanceWindowSidebarSection.usagePercentageDisplayRemaining',
-                            'Remaining'
-                          )
-                        }
-                      ]}
-                    />
-                  }
-                />
-              </SearchableSetting>
-
               {visibleStatusBarToggles.map((toggle) => {
                 const enabled = statusBarItems.includes(toggle.id)
                 return (
@@ -184,7 +113,13 @@ export function AppearanceWindowSidebarSection({
                       description={toggle.toggleDescription}
                       checked={enabled}
                       onChange={() => {
-                        recordStatusBarToggleInteraction(toggle.id, recordFeatureInteraction)
+                        if (toggle.id === 'resource-usage') {
+                          recordFeatureInteraction('resource-manager')
+                        } else if (toggle.id === 'ports') {
+                          recordFeatureInteraction('ports')
+                        } else if (toggle.id === 'ssh') {
+                          recordFeatureInteraction('ssh')
+                        }
                         toggleStatusBarItem(toggle.id)
                       }}
                       ariaLabel={toggle.title}

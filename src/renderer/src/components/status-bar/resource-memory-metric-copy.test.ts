@@ -45,7 +45,7 @@ describe('commit pressure tone', () => {
     expect(getCommitPressureToneClass({ privateMemory: 4 * 1024 ** 3, hostTotalMemory })).toBeNull()
   })
 
-  it('warns at the same 60/80 thresholds the host usage bars already use', () => {
+  it('warns at 60% and 80% of physical RAM', () => {
     expect(getCommitPressureToneClass({ privateMemory: 10 * 1024 ** 3, hostTotalMemory })).toBe(
       'text-yellow-500'
     )

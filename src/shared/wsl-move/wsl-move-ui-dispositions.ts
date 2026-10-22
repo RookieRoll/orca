@@ -115,8 +115,6 @@ export const UI_STATE_GLOBAL_FIELDS = [
   'syncTaskStatusFromWorkspaceBoard',
   'statusBarItems',
   'statusBarVisible',
-  'usagePercentageDisplay',
-  'statusBarUsageMode',
   'dismissedUnexpectedSignoutVersion',
   'notificationPermissionRequested',
   'setupGuideSidebarDismissed',
@@ -127,9 +125,6 @@ export const UI_STATE_GLOBAL_FIELDS = [
   'mobileEmulatorTabIntroDismissed',
   'mobileEmulatorAgentSetupDismissed',
   'projectOrderManualDefaultNoticeDismissed',
-  'usagePercentageDisplayChangeNoticeDismissed',
-  'statusBarCompactChangeNoticeDismissed',
-  'usageEmptyStateDismissed',
   'codexTerminalServerIsolationNoticeSeen',
   'codexSharedSettingsNoticeSeen',
   'claudeDiffPanelNoticeSeen',
@@ -153,24 +148,18 @@ export const UI_STATE_GLOBAL_FIELDS = [
   'contextualToursAutoEligible',
   'osc52ClipboardDefaultOnNoticePending',
   // One-shot migration flags.
-  '_antigravityStatusBarDefaultAdded',
-  '_cursorStatusBarDefaultAdded',
   '_expandedWorktreeCardPropertiesDefaulted',
   '_explorerDisplayRootMigrated',
-  '_grokStatusBarDefaultAdded',
   '_hostWorktreeCardPropertyDefaulted',
   '_inlineAgentsDefaultedForAllUsers',
   '_inlineAgentsDefaultedForExperiment',
   '_jiraIssueWorktreeCardPropertyDefaulted',
-  '_kimiStatusBarDefaultAdded',
-  '_minimaxStatusBarDefaultAdded',
   '_portsStatusBarDefaultAdded',
   '_sortBySmartMigrated',
   '_workspaceStatusesDefaultOrderMigrated',
   '_workspaceStatusesDefaultVisualsMigrated',
   '_workspaceStatusesDefaultWorkflowMigrated',
   '_workspaceStatusesReorderedDefaultRepaired',
-  '_zcodeStatusBarDefaultAdded'
 ] as const satisfies readonly (keyof PersistedUIState)[]
 
 // Why: an unclassified UI field is exactly the kind of per-worktree state a move would strand.

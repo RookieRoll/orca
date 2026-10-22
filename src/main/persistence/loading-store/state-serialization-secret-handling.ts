@@ -256,10 +256,6 @@ export class StateSerializationSecretHandlingOperations {
   private buildSettingsToSave(encrypt: (slot: string, plaintext: string) => string) {
     return {
       ...stripRetiredGlobalSettings(this.runtime.state.settings),
-      opencodeSessionCookie: encrypt(
-        PROTECTED_SECRET_SLOT.opencodeSessionCookie,
-        this.runtime.state.settings.opencodeSessionCookie
-      ),
       httpProxyUrl: encrypt(
         PROTECTED_SECRET_SLOT.httpProxyUrl,
         this.runtime.state.settings.httpProxyUrl ?? ''

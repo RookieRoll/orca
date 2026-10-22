@@ -1,11 +1,6 @@
-/**
- * Run and usage writes are the highest-frequency events in the system, so they
- * carry the host they belong to: an unscoped one refetches every host in the
- * catalog.
- */
+/** Run writes carry the host they belong to; an unscoped event refetches every host. */
 import { describe, expect, it, vi } from 'vitest'
 import { createAutomationRunWriter } from './automation-run-writer'
-import { collectAutomationRunUsage } from './run-usage-collection'
 import { buildProfileStateCutoverFixture } from '../persistence/profile-state-cutover-fixture'
 import type { Store } from '../persistence'
 
@@ -67,24 +62,9 @@ describe('automation run writer publications', () => {
 
   it('resolves the host from the written run, which is all a dispatch result names', async () => {
     const { writer, publish, automationChangeSelector } = writerWith(SSH_SELECTOR)
-    await writer.updateRun({ runId: 'run-1', status: 'completed', usage: null })
+    await writer.updateRun({ runId: 'run-1', status: 'completed' })
     expect(automationChangeSelector).toHaveBeenCalledWith('auto-1')
     expect(publish).toHaveBeenCalledWith({ reason: 'run', selector: SSH_SELECTOR })
-  })
-
-  it('keeps the usage reason on a usage-bearing write', async () => {
-    const { writer, publish } = writerWith({ kind: 'self' })
-    await writer.updateRun({
-      runId: 'run-1',
-      status: 'completed',
-      usage: await collectAutomationRunUsage({
-        automation,
-        run,
-        claudeUsage: null,
-        codexUsage: null
-      })
-    })
-    expect(publish).toHaveBeenCalledWith({ reason: 'usage', selector: { kind: 'self' } })
   })
 
   // Over-broad beats silent: a subscriber must still hear that something changed.

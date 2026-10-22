@@ -2,15 +2,9 @@ import type { BrowserWindow, Tray } from 'electron'
 import { app } from 'electron'
 import type { Store } from '../persistence'
 import type { StatsCollector } from '../stats/collector'
-import type { ClaudeUsageStore } from '../claude-usage/store'
-import type { CodexUsageStore } from '../codex-usage/store'
-import type { OpenCodeUsageStore } from '../opencode-usage/store'
-import type { MuseUsageStore } from '../muse-usage/store'
-import type { CodexResetCreditCoordinator } from '../codex-accounts/codex-reset-credit-coordinator'
 import type { CodexRuntimeHomeService } from '../codex-accounts/runtime-home-service'
 import type { ClaudeRuntimeAuthService } from '../claude-accounts/runtime-auth-service'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
-import type { RateLimitService } from '../rate-limits/service'
 import type { OrcaRuntimeRpcServer } from '../runtime/runtime-rpc'
 import type { DesktopRelayService } from '../runtime/mobile-cloud-relay/desktop-relay-service'
 import type { DesktopRelayServiceInstaller } from '../runtime/mobile-cloud-relay/desktop-relay-service-installer'
@@ -72,17 +66,10 @@ export const mainProcessState = {
   profileStateStartup: createInitialProfileStateStartup(),
   profileStateAdmission: createInitialProfileStateAdmission(),
   stats: null as StatsCollector | null,
-  claudeUsage: null as ClaudeUsageStore | null,
-  codexUsage: null as CodexUsageStore | null,
-  openCodeUsage: null as OpenCodeUsageStore | null,
-  // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: widens the null slot to the store type assigned by main-process-observers.
-  museUsage: null as MuseUsageStore | null,
-  codexResetCredits: null as CodexResetCreditCoordinator | null,
   codexRuntimeHome: null as CodexRuntimeHomeService | null,
   codexSessionMigration: null as ReturnType<typeof createCodexSessionMigrationScheduler> | null,
   claudeRuntimeAuth: null as ClaudeRuntimeAuthService | null,
   runtime: null as OrcaRuntimeService | null,
-  rateLimits: null as RateLimitService | null,
   runtimeRpc: null as OrcaRuntimeRpcServer | null,
   serveReadinessPublisher: new ServeReadinessPublisher(),
   desktopRelayService: null as DesktopRelayService | null,

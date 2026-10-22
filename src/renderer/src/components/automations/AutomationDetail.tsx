@@ -4,15 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getAgentCatalog, AgentIcon } from '@/lib/agent-catalog'
-import type { Automation, AutomationRun } from '../../../../shared/automations-types'
+import type { Automation } from '../../../../shared/automations-types'
 import { formatUiAutomationSchedule } from './automation-schedule-label'
 import { formatAutomationPrecheckTimeout } from '../../../../shared/automation-precheck'
 import { formatAutomationDateTimeWithRelative } from './automation-page-parts'
-import {
-  formatAutomationCost,
-  formatAutomationTokens,
-  summarizeAutomationRunUsage
-} from './automation-usage-model'
 import type { AutomationTargetAvailability } from './automation-target-availability'
 import type { AutomationHostCatalogEntry } from './automation-host-catalog-types'
 import { getAutomationHostDetailDisplay } from './automation-host-detail-display'
@@ -22,7 +17,6 @@ import { AutomationPromptDisclosure } from './AutomationPromptDisclosure'
 
 type AutomationDetailProps = {
   automation: Automation | null
-  runs: AutomationRun[]
   projectName: string
   workspaceName: string
   projectDefaultBaseRef: string | null
@@ -101,7 +95,6 @@ function ToolbarIconButton({
 
 export function AutomationDetail({
   automation,
-  runs,
   projectName,
   workspaceName,
   projectDefaultBaseRef,
@@ -124,13 +117,6 @@ export function AutomationDetail({
       </div>
     )
   }
-  const usageSummary = summarizeAutomationRunUsage(runs)
-  const usageCoverage =
-    usageSummary.knownRuns > 0
-      ? `${usageSummary.knownRuns}/${runs.length} runs`
-      : usageSummary.unavailableRuns > 0
-        ? 'Unavailable'
-        : 'No runs'
   const agentLabel =
     getAgentCatalog().find((agent) => agent.id === automation.agentId)?.label ?? automation.agentId
   const runLocationLabel =
@@ -305,27 +291,10 @@ export function AutomationDetail({
         ) : null}
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-5 rounded-md border border-border/50 bg-muted/20 px-4 py-3 shadow-sm">
-        <DetailMetric
-          label={translate('auto.components.automations.AutomationDetail.a7c312430d', 'Last run')}
-          value={formatAutomationDateTimeWithRelative(automation.lastRunAt, now)}
-        />
-        <DetailMetric
-          label={translate('auto.components.automations.AutomationDetail.401f40ae79', 'Est. spend')}
-          value={formatAutomationCost(usageSummary.estimatedCostUsd)}
-        />
-        <DetailMetric
-          label={translate('auto.components.automations.AutomationDetail.449fc83bf7', 'Tokens')}
-          value={formatAutomationTokens(usageSummary.totalTokens)}
-        />
-        <DetailMetric
-          label={translate(
-            'auto.components.automations.AutomationDetail.a1d52c2189',
-            'Usage coverage'
-          )}
-          value={usageCoverage}
-        />
-      </div>
+      <DetailMetric
+        label={translate('auto.components.automations.AutomationDetail.a7c312430d', 'Last run')}
+        value={formatAutomationDateTimeWithRelative(automation.lastRunAt, now)}
+      />
 
       <AutomationPromptDisclosure
         key={`${automation.id}:${automation.prompt}`}

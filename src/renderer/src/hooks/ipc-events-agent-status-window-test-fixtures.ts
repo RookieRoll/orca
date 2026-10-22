@@ -105,10 +105,6 @@ export function buildWindowApi(args: {
         onNavigationUpdate: () => () => {},
         onActivateView: () => () => {}
       },
-      rateLimits: {
-        get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-        onUpdate: () => () => {}
-      },
       runtime: {
         getTerminalFitOverrides: () => Promise.resolve([]),
         getTerminalDrivers: () => Promise.resolve([]),

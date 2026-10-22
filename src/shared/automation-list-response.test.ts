@@ -133,15 +133,21 @@ describe('validateAutomationListResponse', () => {
     expect(result.ok && result.invalidRows).toBe(4)
   })
 
-  it('keeps a row whose usage summary is unusable but blanks the summary', () => {
+  it('keeps a row whose last-run summary is unusable but blanks the summary', () => {
     const result = validateAutomationListResponse(
       response({
         automations: [{ id: 'a1' }],
-        items: [{ automationId: 'a1', selector: { kind: 'self' }, usageSummary: { knownRuns: 1 } }]
+        items: [
+          {
+            automationId: 'a1',
+            selector: { kind: 'self' },
+            lastRunSummary: { status: 'unknown', at: 1 }
+          }
+        ]
       }),
       SELF
     )
-    expect(result.ok && result.result.items[0]?.usageSummary).toBeNull()
+    expect(result.ok && result.result.items[0]?.lastRunSummary).toBeNull()
     expect(result.ok && result.invalidRows).toBe(0)
   })
 })

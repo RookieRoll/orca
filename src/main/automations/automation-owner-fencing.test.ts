@@ -145,7 +145,7 @@ describe('scoped automation list', () => {
     const result = store.listAutomationsForScope({ selector: { kind: 'self' } })
     expect(result.automations.map((entry) => entry.id)).toEqual(['local-1'])
     expect(result.items).toEqual([
-      { automationId: 'local-1', selector: { kind: 'self' }, usageSummary: null }
+      { automationId: 'local-1', selector: { kind: 'self' } }
     ])
     expect(result.orphanCount).toBe(1)
   })

@@ -4,8 +4,6 @@ import type { WorkspaceCleanupUIState } from './workspace-cleanup'
 import type { FeatureTipId } from './feature-tips'
 import type { ContextualTourId } from './contextual-tours'
 import type { FeatureInteractionState } from './feature-interactions'
-import type { UsagePercentageDisplay } from './usage-percentage-display'
-import type { StatusBarUsageMode } from './status-bar-usage-mode'
 import type { PersistedTrustedOrcaHooks } from './orca-yaml-hook-types'
 import type {
   ActivityGroupBy,
@@ -119,24 +117,8 @@ export type PersistedUIState = {
   _workspaceStatusesDefaultVisualsMigrated?: boolean
   /** One-shot migration flag for adding the default-on Ports status item. */
   _portsStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Kimi status item. */
-  _kimiStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on MiniMax status item. */
-  _minimaxStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Antigravity status item. */
-  _antigravityStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Grok status item. */
-  _grokStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Cursor status item. */
-  _cursorStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on ZCode status item. */
-  _zcodeStatusBarDefaultAdded?: boolean
   statusBarItems: StatusBarItem[]
   statusBarVisible: boolean
-  /** Why: this is client-side presentation, not a provider/account or execution-host setting. */
-  usagePercentageDisplay?: UsagePercentageDisplay
-  /** Client-side footer presentation; verbose preserves the pre-roster all-window default. */
-  statusBarUsageMode?: StatusBarUsageMode
   /** Version when the sign-out notice was seen or dismissed; any value suppresses future appearances. */
   dismissedUnexpectedSignoutVersion?: string | null
   /** Whether Orca already tried triggering the macOS notification permission dialog; prevents re-firing every launch. */
@@ -165,12 +147,6 @@ export type PersistedUIState = {
   mobileEmulatorAgentSetupDismissed?: boolean
   /** One-shot rollout notice for manual project ordering default; absent or true keeps the sidebar callout hidden. */
   projectOrderManualDefaultNoticeDismissed?: boolean
-  /** One-shot notice that usage meters show percent used, not remaining; absent resolves on load (new profiles dismissed, upgraded see it once). */
-  usagePercentageDisplayChangeNoticeDismissed?: boolean
-  /** One-time Compact notice; load decides eligibility before filling missing preferences. */
-  statusBarCompactChangeNoticeDismissed?: boolean
-  /** User-hidden empty-state usage CTA; permanently hides the "Connect AI accounts" prompt even if providers are later disconnected. */
-  usageEmptyStateDismissed?: boolean
   /** One-shot toast announcing per-terminal Codex servers; set when shown, so absent means not yet seen. */
   codexTerminalServerIsolationNoticeSeen?: boolean
   /** Windows one-shot toast for Codex moving onto ~/.codex; set when shown, so absent means not yet seen. */

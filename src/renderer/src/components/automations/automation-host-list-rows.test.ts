@@ -73,8 +73,7 @@ function row(id: string, owner: AutomationHostRow['owner'], name = id): Automati
     automation: automation(id, name),
     owner,
     selector: owner ? { kind: 'self' } : { kind: 'orphan', issue: 'missing_repo' },
-    usageSummary: null,
-    usageKnown: false
+    lastRunSummary: null,
   }
 }
 

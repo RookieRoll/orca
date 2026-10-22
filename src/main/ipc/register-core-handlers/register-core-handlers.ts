@@ -9,7 +9,6 @@ import type { StatsCollector } from '../../stats/collector'
 import { registerFilesystemHandlers } from '../filesystem'
 import type { CommitMessageAgentEnvironmentResolvers } from '../../text-generation/commit-message-agent-environment'
 import { registerFilesystemWatcherHandlers } from '../filesystem-watcher-handlers'
-import { registerUsageProviderHandlers } from '../usage-provider-handlers'
 import { registerGitHubHandlers } from '../github'
 import { registerGitLabHandlers } from '../gitlab'
 import { registerHostedReviewHandlers } from '../hosted-review'
@@ -21,7 +20,6 @@ import { registerCrashReportingHandlers } from '../crash-reporting'
 import { registerExportHandlers } from '../export'
 import { registerStatsHandlers } from '../stats'
 import { registerMemoryHandlers } from '../memory'
-import { registerRateLimitHandlers } from '../rate-limits'
 import { registerRuntimeHandlers } from '../runtime'
 import {
   invalidateRuntimeEnvironmentTransport,
@@ -62,21 +60,11 @@ import { registerTerminalRenderDesyncEvidenceHandler } from '../terminal-render-
 import { registerOrcaProfileHandlers } from '../orca-profiles'
 import { registerAgentHookHandlers } from '../agent-hooks'
 import { getPtyIdForPaneKey } from '../pty/pane/key-state'
-import { registerMiniMaxCredentialsHandlers } from '../minimax-credentials'
-import { registerZcodePlanCredentialsHandlers } from '../zcode-plan-credentials'
-import { registerGrokAccountHandlers } from '../grok-accounts'
-import { registerCursorAccountHandlers } from '../cursor-accounts'
 import {
   registerClipboardHandlers,
   setTrustedClipboardRendererWebContentsId
 } from '../../window/clipboard-ipc-handlers'
 import { isDashboardPopoutRenderer } from '../../window/dashboard-popout-window'
-import type { ClaudeUsageStore } from '../../claude-usage/store'
-import type { CodexUsageStore } from '../../codex-usage/store'
-import type { OpenCodeUsageStore } from '../../opencode-usage/store'
-import type { MuseUsageStore } from '../../muse-usage/store'
-import type { RateLimitService } from '../../rate-limits/service'
-import type { CodexResetCreditCoordinator } from '../../codex-accounts/codex-reset-credit-coordinator'
 import type { AutomationService } from '../../automations/service'
 import type { AgentAwakeService } from '../../agent-awake-service'
 import type { CrashReportStore } from '../../crash-reporting/crash-report-store'
@@ -128,12 +116,6 @@ export function registerCoreHandlers(
   store: Store,
   runtime: OrcaRuntimeService,
   stats: StatsCollector,
-  claudeUsage: ClaudeUsageStore,
-  codexUsage: CodexUsageStore,
-  openCodeUsage: OpenCodeUsageStore,
-  museUsage: MuseUsageStore,
-  codexResetCredits: CodexResetCreditCoordinator,
-  rateLimits: RateLimitService,
   mainWindowWebContentsId: number | null = null,
   automations?: AutomationService,
   commitMessageAgentEnv?: CommitMessageAgentEnvironmentResolvers,
@@ -172,13 +154,7 @@ export function registerCoreHandlers(
   })
   registerCliHandlers()
   registerPreflightHandlers()
-  registerUsageProviderHandlers({ claudeUsage, codexUsage, openCodeUsage, museUsage })
   registerAgentHookHandlers(runtime, { getPtyIdForPaneKey })
-  registerMiniMaxCredentialsHandlers()
-  registerZcodePlanCredentialsHandlers()
-  registerGrokAccountHandlers()
-  registerCursorAccountHandlers()
-  registerRateLimitHandlers(rateLimits, codexResetCredits)
   registerGitHubHandlers(store, stats)
   registerGitLabHandlers(store)
   registerHostedReviewHandlers(store, stats)

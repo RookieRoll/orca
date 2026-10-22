@@ -67,7 +67,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           activeTabType: 'terminal',
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
-          setRateLimitsFromPush: vi.fn(),
           setSshConnectionState: vi.fn(),
           setSshTargetLabels: vi.fn(),
           setPortForwards: vi.fn(),
@@ -196,10 +195,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           onNavigationUpdate: () => () => {},
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
-        },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
         },
         ssh: {
           listTargets: () => Promise.resolve([]),
@@ -341,7 +336,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           activeTabType: 'terminal',
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
-          setRateLimitsFromPush: vi.fn(),
           setSshConnectionState: vi.fn(),
           setSshTargetLabels: vi.fn(),
           setPortForwards: vi.fn(),
@@ -465,10 +459,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           onNavigationUpdate: () => () => {},
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
-        },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
         },
         ssh: {
           listTargets: () => Promise.resolve([]),

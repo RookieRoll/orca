@@ -1,6 +1,5 @@
 import type { ProcessMemoryMetric } from '../../../../shared/process-stats-types'
 import { translate } from '@/i18n/i18n'
-import { usageTextColorClass } from './usage-roster-formatting'
 
 export type ResourceMemoryMetricCopy = {
   columnLabel: string
@@ -40,11 +39,20 @@ export function getResourceCommitMetricCopy(): Omit<ResourceMemoryMetricCopy, 'c
   }
 }
 
+function commitPressureTextColorClass(percent: number): string {
+  if (percent >= 80) {
+    return 'text-red-500'
+  }
+  if (percent >= 60) {
+    return 'text-yellow-500'
+  }
+  return 'text-foreground'
+}
+
 /**
  * Warning tint once *Orca's own* tracked commit grows large against physical
- * RAM, on the same 60/80 bands as the host usage bars. Deliberately not a
- * host-wide paging predictor: that needs the host's commit charge and commit
- * limit, which this snapshot does not carry (#16211).
+ * RAM. This is not a host-wide paging predictor: that needs the host's commit
+ * charge and commit limit, which this snapshot does not carry (#16211).
  *
  * Null both when the share is unremarkable and when the snapshot has no commit
  * figure at all — silence is the honest answer for an unmeasured host.
@@ -61,6 +69,6 @@ export function getCommitPressureToneClass(args: {
     return null
   }
   // Uncapped on purpose: commit past 100% of RAM is the loudest case, not an error.
-  const tone = usageTextColorClass((privateMemory / hostTotalMemory) * 100)
+  const tone = commitPressureTextColorClass((privateMemory / hostTotalMemory) * 100)
   return tone === 'text-foreground' ? null : tone
 }

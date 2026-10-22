@@ -3,14 +3,12 @@ import { Loader2 } from 'lucide-react'
 import { translate } from '@/i18n/i18n'
 import { AgentIcon } from '@/lib/agent-catalog'
 import { callAntigravityAccounts } from '@/runtime/runtime-antigravity-accounts-client'
-import { callRuntimeRpc } from '@/runtime/runtime-rpc-client'
 import { useManagedRuntimeInstall } from '@/runtime/use-managed-runtime-install'
 import type { RuntimeClientTarget } from '../../../../shared/runtime-client-target'
 import type {
   AntigravityAccountState,
   AntigravityAccountTarget
 } from '../../../../shared/antigravity-account-types'
-import type { ProviderRateLimits, RateLimitState } from '../../../../shared/rate-limit-types'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { ManagedRuntimeInstallRow } from '../managed-runtime/ManagedRuntimeInstallRow'
@@ -32,16 +30,6 @@ export function AntigravityAccountsSection({
   label: string
 }): React.JSX.Element {
   const [state, setState] = useState<AntigravityAccountState | null>(null)
-  const [usageSnapshot, setUsageSnapshot] = useState<{
-    subject: string
-    authMethod: string
-    limits: ProviderRateLimits | null
-  } | null>(null)
-  const current = state?.currentAccount
-  const usage =
-    current?.subject === usageSnapshot?.subject && current?.authMethod === usageSnapshot?.authMethod
-      ? usageSnapshot?.limits
-      : null
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const pending = useRef(false)
@@ -86,7 +74,7 @@ export function AntigravityAccountsSection({
   }, [ownerKind, environmentId, runtime, wslDistro])
 
   async function run(
-    action: 'List' | 'AddCurrent' | 'Select' | 'Remove' | 'Usage',
+    action: 'List' | 'AddCurrent' | 'Select' | 'Remove',
     accountId?: string
   ) {
     if (pending.current) {
@@ -96,40 +84,9 @@ export function AntigravityAccountsSection({
     setBusy(true)
     setError(null)
     try {
-      if (action === 'Usage') {
-        setUsageSnapshot(null)
-        const before = await callAntigravityAccounts(owner, target, 'List')
-        const snapshot = await callRuntimeRpc<{ rateLimits: RateLimitState }>(
-          owner,
-          'accounts.list',
-          { refreshUsage: true }
-        )
-        const after = await callAntigravityAccounts(owner, target, 'List')
-        if (mounted.current) {
-          setState(after)
-        }
-        if (
-          !before.currentAccount?.subject ||
-          before.currentAccount.subject !== after.currentAccount?.subject ||
-          before.currentAccount.authMethod !== after.currentAccount.authMethod
-        ) {
-          throw new Error('The native account changed while reading usage. Refresh usage again.')
-        }
-        if (mounted.current) {
-          setUsageSnapshot({
-            subject: before.currentAccount.subject,
-            authMethod: before.currentAccount.authMethod,
-            limits: snapshot.rateLimits.antigravity
-          })
-        }
-      } else {
-        if (action === 'Select') {
-          setUsageSnapshot(null)
-        }
-        const next = await callAntigravityAccounts(owner, target, action, accountId)
-        if (mounted.current) {
-          setState(next)
-        }
+      const next = await callAntigravityAccounts(owner, target, action, accountId)
+      if (mounted.current) {
+        setState(next)
       }
     } catch (cause) {
       if (action === 'Select' || action === 'Remove' || action === 'AddCurrent') {
@@ -219,14 +176,6 @@ export function AntigravityAccountsSection({
             <Button variant="outline" size="sm" disabled={busy} onClick={() => void run('List')}>
               {translate('accounts.antigravity.refresh', 'Refresh accounts')}
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={busy || !state.currentAccount || target.runtime === 'wsl'}
-              onClick={() => void run('Usage')}
-            >
-              {translate('accounts.antigravity.usage', 'Refresh usage')}
-            </Button>
             {busy && (
               <Loader2
                 className="size-4 animate-spin"
@@ -234,19 +183,6 @@ export function AntigravityAccountsSection({
               />
             )}
           </div>
-          {usage && (
-            <p className="text-xs text-muted-foreground">
-              {usage.error ??
-                translate(
-                  'accounts.antigravity.usageReading',
-                  'Session: {{session}} · Weekly: {{weekly}}',
-                  {
-                    session: usage.session ? `${Math.round(usage.session.usedPercent)}%` : '—',
-                    weekly: usage.weekly ? `${Math.round(usage.weekly.usedPercent)}%` : '—'
-                  }
-                )}
-            </p>
-          )}
           {state.accounts.map((account) => (
             <div
               key={account.id}

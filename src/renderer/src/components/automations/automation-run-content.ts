@@ -13,5 +13,5 @@ export function getAutomationRunContent(run: AutomationRun): string {
       return output
     }
   }
-  return run.error ?? run.usage?.unavailableMessage ?? 'No output content available.'
+  return run.error ?? 'No output content available.'
 }

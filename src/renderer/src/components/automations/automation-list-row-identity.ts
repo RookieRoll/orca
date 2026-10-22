@@ -15,7 +15,7 @@
  */
 
 import type { Automation } from '../../../../shared/automations-types'
-import type { AutomationUsageSummary } from '../../../../shared/automation-usage-summary'
+import type { AutomationLastRunSummary } from '../../../../shared/automation-last-run-summary'
 import { getAutomationRunRepoId } from '../../../../shared/automation-run-identity'
 import type { StableAutomationCatalogRef } from '../../../../shared/automation-owner-ref'
 import {
@@ -38,7 +38,7 @@ export type AutomationListRow = {
   /** The host this row actually came from; empty for unscoped legacy rows. */
   hostLabel: string
   /** What the owning authority reported; null means unknown, never zero. */
-  usageSummary: AutomationUsageSummary | null
+  lastRunSummary: AutomationLastRunSummary | null
 }
 
 const ROW_KEY_NAMESPACE = 'row'
@@ -70,7 +70,7 @@ export function unscopedAutomationListRows(
     automation,
     catalogRef: null,
     hostLabel: '',
-    usageSummary: null
+    lastRunSummary: null
   }))
 }
 

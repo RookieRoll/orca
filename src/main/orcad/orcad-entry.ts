@@ -212,9 +212,6 @@ async function startOrcadRuntime(
   const { createOrcadAccountServices } = await import('./orcad-account-services')
   const accountLaunch = createOrcadAccountServices({
     store: profileStore,
-    setClaudeStatusLineListener: (listener) =>
-      agentHookServer.setClaudeStatusLineListener(listener),
-    registerCleanup,
     clientCodexHomes: codexAccountHomes
   })
 

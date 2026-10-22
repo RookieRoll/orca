@@ -2,7 +2,7 @@
  * Turns an authority's answer into cache rows.
  *
  * Scoped rows keep the owner they were fetched under so every later action can
- * fence on it. Legacy rows keep no owner and no usage: the old response proves
+ * fence on it. Legacy rows keep no owner and no last-run summary: the old response proves
  * neither, and the design forbids compensating with run-history downloads.
  */
 
@@ -51,14 +51,12 @@ export function toScopedAutomationHostRows(
     if (!item) {
       continue
     }
-    const usageSummary = item.usageSummary ?? null
+    const lastRunSummary = item.lastRunSummary ?? null
     rows.push({
       automation,
       owner: ownerForItem(authority, item),
       selector: item.selector,
-      usageSummary,
-      // An absent or unreadable projection reads as unavailable rather than as zero usage.
-      usageKnown: usageSummary !== null
+      lastRunSummary
     })
   }
   return rows
@@ -102,8 +100,7 @@ export function partitionLegacyAutomationHostRows(
           automation: row.automation,
           owner: null,
           selector: row.selector,
-          usageSummary: null,
-          usageKnown: false
+          lastRunSummary: null
         }))
     )
   }

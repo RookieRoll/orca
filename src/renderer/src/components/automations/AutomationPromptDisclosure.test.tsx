@@ -185,7 +185,6 @@ describe('AutomationPromptDisclosure', () => {
     const { rerender } = render(
       <AutomationDetail
         automation={makeAutomation(1)}
-        runs={[]}
         projectName="Synthetic project"
         workspaceName="Synthetic workspace"
         projectDefaultBaseRef={null}
@@ -202,7 +201,6 @@ describe('AutomationPromptDisclosure', () => {
     rerender(
       <AutomationDetail
         automation={makeAutomation(2)}
-        runs={[]}
         projectName="Synthetic project"
         workspaceName="Synthetic workspace"
         projectDefaultBaseRef={null}
@@ -218,7 +216,6 @@ describe('AutomationPromptDisclosure', () => {
     rerender(
       <AutomationDetail
         automation={makeAutomation(3, 'Synthetic replacement prompt.')}
-        runs={[]}
         projectName="Synthetic project"
         workspaceName="Synthetic workspace"
         projectDefaultBaseRef={null}

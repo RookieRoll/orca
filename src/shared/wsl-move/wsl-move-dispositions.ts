@@ -95,7 +95,6 @@ export const PERSISTED_STATE_DISPOSITIONS = {
   orcadMigrationEvictedReceipts: notApplicableDisposition(67, 'Mover-owned.'),
   orcadMigrationStagedCatalogs: notApplicableDisposition(68, 'Mover-owned.'),
   onboarding: notApplicableDisposition(62),
-  codexResetCreditAttemptLedger: notApplicableDisposition(62),
   nativeChatUpgradeTipAudience: notApplicableDisposition(62)
 } as const satisfies Record<keyof PersistedState, WslMoveFieldDisposition>
 

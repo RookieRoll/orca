@@ -40,7 +40,6 @@ jobs:
               ['pnpm-verification-pilot', 'ci-pnpm-verification-pilot.yml'],
               ['win-orcad-serve-switch-e2e', 'win-orcad-serve-switch-e2e.yml'],
               ['pi-provider-runtime', 'pi-provider-runtime.yml'],
-              ['coding-plan-contract', 'zcode-credential-contract.yml', '-credentials'],
               ['release-javascript-comparison', 'release-javascript-benchmark.yml'],
               ['ci-cache-warmup-platforms', 'ci-cache-warmup-platforms.yml'],
               ['pi-owner-runtime', 'pi-owner-runtime.yml'],

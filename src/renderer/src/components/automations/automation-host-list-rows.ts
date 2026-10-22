@@ -141,7 +141,7 @@ export function resolveAutomationHostListRows(
         automation: row.automation,
         catalogRef: entry.stableRef,
         hostLabel: entry.label,
-        usageSummary: row.usageSummary ?? null
+        lastRunSummary: row.lastRunSummary
       }
       capturedRows.push({ rowKey: listRow.key, row })
       rows.push(listRow)

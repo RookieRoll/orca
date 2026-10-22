@@ -65,6 +65,13 @@ type RetiredGlobalSettings = {
   experimentalManagedServers?: unknown
   // The retired provider credential must not enter settings or remote snapshots.
   opencodeGoApiKey?: unknown
+  opencodeSessionCookie?: unknown
+  opencodeWorkspaceId?: unknown
+  minimaxGroupId?: unknown
+  minimaxUsageModels?: unknown
+  minimaxEndpoint?: unknown
+  zcodePlanSite?: unknown
+  geminiCliOAuthEnabled?: unknown
   experimentalStructuredNativeChat?: unknown
   openAgentTabsInChatByDefault?: unknown
   voice?: unknown
@@ -90,6 +97,13 @@ export function stripRetiredGlobalSettings(
     showAgentsSidebar: _legacyShowAgentsSidebar,
     experimentalManagedServers: _retiredManagedServersExperiment,
     opencodeGoApiKey: _legacyOpenCodeGoApiKey,
+    opencodeSessionCookie: _retiredOpenCodeSessionCookie,
+    opencodeWorkspaceId: _retiredOpenCodeWorkspaceId,
+    minimaxGroupId: _retiredMiniMaxGroupId,
+    minimaxUsageModels: _retiredMiniMaxUsageModels,
+    minimaxEndpoint: _retiredMiniMaxEndpoint,
+    zcodePlanSite: _retiredZcodePlanSite,
+    geminiCliOAuthEnabled: _retiredGeminiCliOAuthEnabled,
     experimentalStructuredNativeChat: _legacyStructuredNativeChat,
     openAgentTabsInChatByDefault: _legacyChatDefaultView,
     voice: _retiredVoiceSettings,
@@ -111,6 +125,13 @@ export function stripRetiredGlobalSettings(
   void _legacyShowAgentsSidebar
   void _retiredManagedServersExperiment
   void _legacyOpenCodeGoApiKey
+  void _retiredOpenCodeSessionCookie
+  void _retiredOpenCodeWorkspaceId
+  void _retiredMiniMaxGroupId
+  void _retiredMiniMaxUsageModels
+  void _retiredMiniMaxEndpoint
+  void _retiredZcodePlanSite
+  void _retiredGeminiCliOAuthEnabled
   void _legacyStructuredNativeChat
   void _legacyChatDefaultView
   void _retiredVoiceSettings

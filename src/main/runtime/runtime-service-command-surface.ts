@@ -44,12 +44,6 @@ export type RuntimeServiceCommandSurface = {
   setAccountServices: RuntimeAccountController['setServices']
   setCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['setCommitMessageAgentEnvironment']
   getCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['getCommitMessageAgentEnvironment']
-  getAccountsSnapshot: RuntimeAccountController['getSnapshot']
-  getUsageRateLimits: RuntimeAccountController['usageRateLimits']
-  requireUsageRateLimits: RuntimeAccountController['requireUsageRateLimits']
-  refreshAccountsForMobile: RuntimeAccountController['refreshForMobile']
-  refreshAccountsForMobileSubscriber: RuntimeAccountController['refreshForMobileSubscriber']
-  onAccountsChanged: RuntimeAccountController['onChanged']
   getAllBrowserDrivers: RuntimeBrowserDriverController['getAll']
   reclaimBrowserForDesktop: RuntimeBrowserDriverController['reclaimForDesktop']
   notifyMessageArrived(handle: string, messageType?: string): void
@@ -122,12 +116,6 @@ export function installRuntimeServiceCommandSurface(
       accounts.setCommitMessageAgentEnvironment.bind(accounts),
     getCommitMessageAgentEnvironmentResolvers:
       accounts.getCommitMessageAgentEnvironment.bind(accounts),
-    getAccountsSnapshot: accounts.getSnapshot.bind(accounts),
-    getUsageRateLimits: accounts.usageRateLimits.bind(accounts),
-    requireUsageRateLimits: accounts.requireUsageRateLimits.bind(accounts),
-    refreshAccountsForMobile: accounts.refreshForMobile.bind(accounts),
-    refreshAccountsForMobileSubscriber: accounts.refreshForMobileSubscriber.bind(accounts),
-    onAccountsChanged: accounts.onChanged.bind(accounts),
     getAllBrowserDrivers: browsers.getAll.bind(browsers),
     reclaimBrowserForDesktop: browsers.reclaimForDesktop.bind(browsers),
     waitForMessage: waiters.wait.bind(waiters),

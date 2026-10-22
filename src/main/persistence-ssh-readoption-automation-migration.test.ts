@@ -95,7 +95,6 @@ function makeRun(): AutomationRun {
     terminalPtyId: null,
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: NOW,
     dispatchedAt: NOW,

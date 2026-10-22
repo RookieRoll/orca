@@ -14,10 +14,7 @@ import {
   PROTECTED_SECRET_SLOT,
   sshPtyOwnerLeaseSecretSlot
 } from '../../protected-secret-persistence'
-import {
-  isLegacyOpenCodeSessionCookie,
-  isLegacySshPtyOwnerLease
-} from '../leasing-ssh-ptys/secret-validation'
+import { isLegacySshPtyOwnerLease } from '../leasing-ssh-ptys/secret-validation'
 import { readGithubCacheSnapshot } from './user-data-path'
 import {
   gcStaleWorktreeMeta,
@@ -109,14 +106,8 @@ export class LoadedStateParsingOperations {
         // Why: decide from the profile as saved, before defaults or migrations can touch Chat UI.
         nativeChatUpgradeTipAudience = this.cohorts.captureNativeChatUpgradeTipAudience(parsed)
         // Why: secrets are stored encrypted via safeStorage; decrypt at the load boundary so the app sees plaintext.
-        if (parsed.settings?.opencodeSessionCookie) {
-          parsed.settings.opencodeSessionCookie = this.runtime.protectedSecrets.decrypt(
-            PROTECTED_SECRET_SLOT.opencodeSessionCookie,
-            parsed.settings.opencodeSessionCookie,
-            isLegacyOpenCodeSessionCookie
-          )
-        }
         if (parsed.settings) {
+          Reflect.deleteProperty(parsed.settings, 'opencodeSessionCookie')
           Reflect.deleteProperty(parsed.settings, 'opencodeGoApiKey')
         }
         if (parsed.settings?.httpProxyUrl) {

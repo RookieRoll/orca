@@ -167,10 +167,6 @@ export function buildTerminalCreateWindow(args: {
         onActivateView: () => () => {},
         onPaneFocus: () => () => {}
       },
-      rateLimits: {
-        get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-        onUpdate: () => () => {}
-      },
       runtime: {
         getTerminalFitOverrides: () => Promise.resolve([]),
         getTerminalDrivers: () => Promise.resolve([]),

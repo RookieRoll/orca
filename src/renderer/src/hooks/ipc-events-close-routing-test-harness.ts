@@ -93,7 +93,6 @@ export async function useIpcEventsForCloseRouting({
         activeTabType: 'browser',
         editorFontZoomLevel: 0,
         setEditorFontZoomLevel: vi.fn(),
-        setRateLimitsFromPush: vi.fn(),
         setSshConnectionState: vi.fn(),
         setSshTargetLabels: vi.fn(),
         setPortForwards: vi.fn(),
@@ -274,10 +273,6 @@ export async function useIpcEventsForCloseRouting({
         onNavigationUpdate: () => () => {},
         onActivateView: () => () => {},
         onPaneFocus: () => () => {}
-      },
-      rateLimits: {
-        get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-        onUpdate: () => () => {}
       },
       ssh: {
         listTargets: () => Promise.resolve([]),

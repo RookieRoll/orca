@@ -47,7 +47,6 @@ describe('useIpcEvents browser tab create routing', () => {
       activeTabType: 'terminal',
       editorFontZoomLevel: 0,
       setEditorFontZoomLevel: vi.fn(),
-      setRateLimitsFromPush: vi.fn(),
       setSshConnectionState: vi.fn(),
       setSshTargetLabels: vi.fn(),
       setPortForwards: vi.fn(),
@@ -224,10 +223,6 @@ describe('useIpcEvents browser tab create routing', () => {
             return () => {}
           },
           onPaneFocus: () => () => {}
-        },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
         },
         ssh: {
           listTargets: () => Promise.resolve([]),

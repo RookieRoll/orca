@@ -12,15 +12,12 @@ import {
   type AutomationPrecheckResult,
   type AutomationRun
 } from '../../shared/automations-types'
-import type { ClaudeUsageStore } from '../claude-usage/store'
-import type { CodexUsageStore } from '../codex-usage/store'
 import { failedPrecheckResult, runAutomationPrecheck } from './precheck-runner'
 import {
   captureLegacyRunTarget,
   resolveAutomationRunTarget,
   type AutomationRunTargetResult
 } from './run-target-resolution'
-import { writeAutomationRunUsage } from './run-usage-collection'
 import type { HeadlessAutomationDispatcher } from './headless-dispatch'
 import { runKeyedSerializedOperation } from '../cli/keyed-promise-queue'
 import { clearAutomationDispatchTokens } from './dispatch-tokens'
@@ -54,8 +51,6 @@ export class AutomationService {
   private evaluating = false
   private stopped = false
   private dispatchGeneration = 0
-  private readonly claudeUsage: ClaudeUsageStore | null
-  private readonly codexUsage: CodexUsageStore | null
   private readonly allowRemoteHostScheduling: boolean
   private readonly headlessDispatcher: HeadlessAutomationDispatcher | null
   private readonly automationLanes = new Map<string, Promise<void>>()
@@ -73,8 +68,6 @@ export class AutomationService {
     store: Store,
     opts: {
       tickMs?: number
-      claudeUsage?: ClaudeUsageStore
-      codexUsage?: CodexUsageStore
       allowRemoteHostScheduling?: boolean
       headlessDispatcher?: HeadlessAutomationDispatcher
       terminalObserver?: AutomationRunTerminalObserver
@@ -83,8 +76,6 @@ export class AutomationService {
   ) {
     this.store = store
     this.tickMs = opts.tickMs ?? DEFAULT_TICK_MS
-    this.claudeUsage = opts.claudeUsage ?? null
-    this.codexUsage = opts.codexUsage ?? null
     this.allowRemoteHostScheduling = opts.allowRemoteHostScheduling ?? false
     this.headlessDispatcher = opts.headlessDispatcher ?? null
     this.publish = opts.onAutomationsChanged ?? null
@@ -209,20 +200,7 @@ export class AutomationService {
       return run
     }
     this.completionWatcher?.forget(run.id)
-    // Why: the renderer's mark-completed effect can re-fire for the same run
-    // before refresh() flips its status snapshot off 'dispatched'. Re-running
-    // collectRunUsage advances the attribution window and can rewrite an
-    // already-collected 'known' usage to 'unavailable'/'ambiguous_session'.
-    if (run.usage) {
-      return run
-    }
-    return await writeAutomationRunUsage({
-      store: this.store,
-      runs: this.runs,
-      run,
-      claudeUsage: this.claudeUsage,
-      codexUsage: this.codexUsage
-    })
+    return run
   }
 
   private async evaluateDueRuns(): Promise<void> {

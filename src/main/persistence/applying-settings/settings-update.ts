@@ -275,9 +275,6 @@ export function updateSettings(
       ...sanitizedUpdates.notifications
     }),
   }
-  if ('opencodeSessionCookie' in updates && !updates.opencodeSessionCookie) {
-    operations.removeRetainedBlob(PROTECTED_SECRET_SLOT.opencodeSessionCookie)
-  }
   if ('httpProxyUrl' in updates && !updates.httpProxyUrl) {
     operations.removeRetainedBlob(PROTECTED_SECRET_SLOT.httpProxyUrl)
   }

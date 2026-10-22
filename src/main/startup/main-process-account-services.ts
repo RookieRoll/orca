@@ -6,7 +6,6 @@ import { startCodexSessionBackfillInBackground } from '../codex/codex-session-ba
 import { startCodexSessionIndexHealInBackground } from '../codex/codex-session-index-heal'
 import { startCodexStateDbBackfillRecoveryInBackground } from '../codex/codex-state-db-backfill-recovery'
 import { getOrcaManagedCodexHomePath } from '../codex/codex-home-paths'
-import { agentHookServer } from '../agent-hooks/server'
 import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { browserManager } from '../browser/browser-manager'
 import { prewarmStructuredAgentModelCatalogs } from '../runtime/structured-agent-model-catalog-wiring'
@@ -22,14 +21,8 @@ const MODEL_CATALOG_ACCOUNT_SETTINGS = [
 
 export function initializeMainProcessAccountServices(): void {
   const store = state.store
-  if (
-    !store ||
-    !state.claudeUsage ||
-    !state.codexUsage ||
-    !state.openCodeUsage ||
-    !state.museUsage
-  ) {
-    throw new Error('Usage stores must be initialized before account services')
+  if (!store) {
+    throw new Error('Store must be initialized before account services')
   }
   state.codexSessionMigration = createCodexSessionMigrationScheduler({
     isEligible: () =>
@@ -43,12 +36,8 @@ export function initializeMainProcessAccountServices(): void {
     startBackfill: startCodexSessionBackfillInBackground,
     startIndexHeal: startCodexSessionIndexHealInBackground
   })
-  const services = createProviderAccountServices(store, {
-    setClaudeStatusLineListener: (listener) => agentHookServer.setClaudeStatusLineListener(listener)
-  })
-  state.rateLimits = services.rateLimits
+  const services = createProviderAccountServices(store)
   state.codexRuntimeHome = services.codexRuntimeHome
-  state.codexResetCredits = services.codexResetCredits
   state.claudeRuntimeAuth = services.claudeRuntimeAuth
   void startCodexStateDbBackfillRecoveryInBackground(getOrcaManagedCodexHomePath())
   // Why: migrate historical shared-home sessions after startup; compatibility

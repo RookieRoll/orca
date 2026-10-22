@@ -808,7 +808,6 @@ describe('Store', () => {
       runId: run.id,
       status: 'completed',
       workspaceId: 'wt1',
-      usage: null,
       error: null
     })
 

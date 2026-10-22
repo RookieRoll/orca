@@ -20,7 +20,7 @@ export type WorkerEntryLayout = {
 /**
  * Resolve a built worker entry for one runtime layout.
  * @param layout - Packaged flag plus both candidate roots.
- * @param entryFileName - Built file name, e.g. `usage-scan-worker-entry.js`.
+ * @param entryFileName - Built worker entry file name.
  * @returns Path passed to `new Worker()`.
  */
 export function resolveWorkerThreadEntryPath(

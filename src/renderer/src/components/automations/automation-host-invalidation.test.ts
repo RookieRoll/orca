@@ -29,8 +29,7 @@ function row(id: string): AutomationHostRow {
     automation: { id } as Automation,
     owner: null,
     selector: { kind: 'self' },
-    usageSummary: null,
-    usageKnown: false
+    lastRunSummary: null,
   }
 }
 

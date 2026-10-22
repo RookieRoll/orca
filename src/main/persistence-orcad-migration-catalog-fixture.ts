@@ -114,7 +114,6 @@ export const DORMANT_AUTOMATION_RUN: AutomationRun = {
     truncated: false
   },
   precheckResult: null,
-  usage: null,
   error: null,
   startedAt: 1,
   dispatchedAt: 1,

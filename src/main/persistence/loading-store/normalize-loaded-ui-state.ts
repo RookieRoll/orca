@@ -1,12 +1,9 @@
-import { resolveStatusBarCompactChangeNoticeDismissed } from '../../../shared/status-bar-compact-change-notice'
 import { migrateExplorerDisplayRoots } from '../../../shared/file-explorer-display-root'
 import {
   getWorktreeCardModeProperties,
   isDefaultedCompactWorktreeCardProperties,
   normalizeWorktreeCardProperties
 } from '../../../shared/constants'
-import { isExistingPersistedProfile } from '../../../shared/project-order-manual-default-notice'
-import { resolveUsagePercentageDisplayChangeNoticeDismissed } from '../../../shared/usage-percentage-display-change-notice'
 import { normalizePersistedWorkspaceStatuses } from '../../../shared/workspace-statuses'
 import {
   normalizeRightSidebarExplorerView,
@@ -171,37 +168,6 @@ export function normalizeLoadedUiState(
   ) {
     markNeedsSave()
   }
-  // Why: only upgraded profiles still on the new default get the one-time usage-display notice; fresh profiles stay quiet.
-  const percentageNoticeDismissed = resolveUsagePercentageDisplayChangeNoticeDismissed({
-    rawDismissed: parsed.ui?.usagePercentageDisplayChangeNoticeDismissed,
-    rawUsagePercentageDisplay: parsed.ui?.usagePercentageDisplay,
-    isExistingProfile: isExistingPersistedProfile({
-      repoCount: parsed.repos?.length ?? 0,
-      onboardingClosedAt: normalizedOnboarding.closedAt,
-      ui: parsed.ui
-    })
-  })
-  const statusBarCompactChangeNoticeDismissed = resolveStatusBarCompactChangeNoticeDismissed({
-    rawDismissed: parsed.ui?.statusBarCompactChangeNoticeDismissed,
-    rawUsageMode: parsed.ui?.statusBarUsageMode,
-    isExistingProfile: isExistingPersistedProfile({
-      repoCount: parsed.repos?.length ?? 0,
-      onboardingClosedAt: normalizedOnboarding.closedAt,
-      ui: parsed.ui
-    })
-  })
-  if (parsed.ui?.statusBarCompactChangeNoticeDismissed !== statusBarCompactChangeNoticeDismissed) {
-    markNeedsSave()
-  }
-  // Why: one rollout card is enough; the Compact notice supersedes the older percentage notice.
-  const usagePercentageDisplayChangeNoticeDismissed =
-    percentageNoticeDismissed || !statusBarCompactChangeNoticeDismissed
-  if (
-    parsed.ui?.usagePercentageDisplayChangeNoticeDismissed !==
-    usagePercentageDisplayChangeNoticeDismissed
-  ) {
-    markNeedsSave()
-  }
   return {
     ...defaults.ui,
     // Why: missing card properties follow the persisted layout mode; explicit choices are preserved below.
@@ -216,8 +182,6 @@ export function normalizeLoadedUiState(
     // "Search tab, no explorer view" shape — the defaults spread above fills in 'files'.
     rightSidebarExplorerView,
     setupGuideSidebarDismissed,
-    usagePercentageDisplayChangeNoticeDismissed,
-    statusBarCompactChangeNoticeDismissed,
     setupGuideBrowserMilestoneMigrated:
       typeof parsed.ui?.setupGuideBrowserMilestoneMigrated === 'boolean'
         ? parsed.ui.setupGuideBrowserMilestoneMigrated

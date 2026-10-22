@@ -83,7 +83,6 @@ function installBeforeQuitHandler(): void {
     // session. `isQuitting` already vetoes new attempts; will-quit does the teardown.
     state.repoMaintenanceShutdown = awaitPackedRefsLockRelease()
     // Why: defer PTY cleanup to will-quit so the renderer captures scrollback before PTY-exit events unmount TerminalPane (dropping its capture callbacks).
-    state.rateLimits?.stop()
     // Why safe on a vetoed quit: background history GC is idempotent and re-scheduled next launch,
     // so abandoning the walk here only costs one deferred sweep, never a half-applied prune.
     cancelHistoryGc()
@@ -222,14 +221,6 @@ function installWillQuitHandler(): void {
     const sshShutdown = Promise.resolve(finalSaves).then((saves) => saves.sshShutdown)
     const storeFlush = Promise.resolve(finalSaves).then((saves) => saves.storeFlush)
     const watcherShutdown = Promise.resolve(finalSaves).then((saves) => saves.watcherShutdown)
-    // Why: usage-cache writes are queued off the main thread, so a quit right after setEnabled or a
-    // scan completion would drop the final snapshot. Captured before any await; joins the barrier below.
-    const usageCacheFlush = Promise.all([
-      state.claudeUsage?.flush(),
-      state.codexUsage?.flush(),
-      state.openCodeUsage?.flush(),
-      state.museUsage?.flush()
-    ]).then(() => {})
     disposeDesktopBrowserBridge()
     const browserClientHostShutdown = shutdownPairedRuntimeBrowserClientHosts()
     const skillUploadShutdown = state.runtime?.disposeSkillUploadSessions() ?? Promise.resolve()
@@ -276,7 +267,6 @@ function installWillQuitHandler(): void {
       { name: 'ref-maintenance', promise: refMaintenanceShutdown },
       { name: 'codex-backfill-recovery', promise: codexBackfillRecoveryShutdown },
       { name: 'structured-agent-session', promise: structuredAgentSessionShutdown },
-      { name: 'usage-cache', promise: usageCacheFlush },
       { name: 'notification-dismissals', promise: notificationDismissalClose },
       { name: 'stats', promise: statsFlush },
       { name: 'state', promise: storeFlush }

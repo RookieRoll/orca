@@ -57,19 +57,10 @@ import { gitApi } from './api/git-bridge'
 import { uiApi } from './api/ui-bridge'
 import { statsApi } from './api/stats-bridge'
 import { memoryApi } from './api/memory-bridge'
-import { claudeUsageApi } from './api/claude-usage-bridge'
-import { codexUsageApi } from './api/codex-usage-bridge'
-import { openCodeUsageApi } from './api/open-code-usage-bridge'
-import { museUsageApi } from './api/muse-usage-bridge'
 import { aiVaultApi } from './api/ai-vault-bridge'
 import { nativeChatApi } from './api/native-chat-bridge'
 import { runtimeApi } from './api/runtime-bridge'
 import { runtimeEnvironmentsApi } from './api/runtime-environments-bridge'
-import { rateLimitsApi } from './api/rate-limits-bridge'
-import { minimaxCredentialsApi } from './api/minimax-credentials-bridge'
-import { zcodePlanCredentialsApi } from './api/zcode-plan-credentials-bridge'
-import { grokAccountsApi } from './api/grok-accounts-bridge'
-import { cursorAccountsApi } from './api/cursor-accounts-bridge'
 import { sshApi } from './api/ssh-bridge'
 import { legacyRelayBridgeApi } from './api/legacy-relay-bridge-api'
 import { automationsApi } from './api/automations-bridge'
@@ -137,19 +128,10 @@ const api = {
   ui: uiApi,
   stats: statsApi,
   memory: memoryApi,
-  claudeUsage: claudeUsageApi,
-  codexUsage: codexUsageApi,
-  openCodeUsage: openCodeUsageApi,
-  museUsage: museUsageApi,
   aiVault: aiVaultApi,
   nativeChat: nativeChatApi,
   runtime: runtimeApi,
   runtimeEnvironments: runtimeEnvironmentsApi,
-  rateLimits: rateLimitsApi,
-  minimaxCredentials: minimaxCredentialsApi,
-  zcodePlanCredentials: zcodePlanCredentialsApi,
-  grokAccounts: grokAccountsApi,
-  cursorAccounts: cursorAccountsApi,
   ssh: sshApi,
   legacyRelayBridge: legacyRelayBridgeApi,
   automations: automationsApi,

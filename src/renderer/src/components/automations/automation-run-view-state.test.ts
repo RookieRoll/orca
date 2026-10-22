@@ -51,7 +51,6 @@ function makeRun(overrides: Partial<AutomationRun> = {}): AutomationRun {
     terminalPtyId: 'pty-1',
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: 1,
     dispatchedAt: 1,

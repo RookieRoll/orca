@@ -98,8 +98,7 @@ function hostRow(entry: AutomationHostCatalogEntry, name: string): AutomationHos
     } as Automation,
     owner: entry.owner,
     selector: { kind: 'self' },
-    usageSummary: null,
-    usageKnown: true
+    lastRunSummary: null,
   }
 }
 

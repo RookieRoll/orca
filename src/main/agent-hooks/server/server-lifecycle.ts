@@ -4,10 +4,6 @@ import { parsePaneKey } from '../../../shared/stable-pane-id'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { randomUUID } from 'node:crypto'
 
-import {
-  CLAUDE_STATUSLINE_PATHNAME,
-  parseClaudeStatusLineBody
-} from '../../../shared/claude-statusline-rate-limits'
 import { mergeAgentHookRequestHeaders } from '../../../shared/agent-hook-listener/hook-envelope'
 import { readRequestBody } from '../../../shared/agent-hook-listener/request-body'
 import { resolveHookSource } from '../../../shared/agent-hook-listener/source-routing'
@@ -109,15 +105,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerStatusHook
         await this.initializeStatusHookOwner()
         if (!isStatusCurrent()) {
           res.writeHead(404)
-          res.end()
-          return
-        }
-        if (pathname === CLAUDE_STATUSLINE_PATHNAME) {
-          const statusLineEvent = parseClaudeStatusLineBody(body)
-          if (statusLineEvent) {
-            this.onClaudeStatusLine?.(statusLineEvent)
-          }
-          res.writeHead(204)
           res.end()
           return
         }
@@ -257,7 +244,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerStatusHook
     this.rollbackTransportStart()
     this.env = 'production'
     this.onAgentStatus = null
-    this.onClaudeStatusLine = null
     this.clearStartupPromptClaims?.()
     this.clearStartupPromptClaims = null
     this.onStartupPromptClaim = null

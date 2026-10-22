@@ -1,44 +1,25 @@
-import { useRef } from 'react'
 import { useAppStore } from '../../store'
 import { translate } from '@/i18n/i18n'
 import {
-  getAccountsGeminiSearchEntries,
-  getAccountsCursorSearchEntries,
-  getAccountsGrokSearchEntries,
   getAccountsAntigravitySearchEntries,
-  getAccountsMiniMaxSearchEntries,
-  getAccountsOpencodeSearchEntries,
-  getAccountsPaneSearchEntries,
-  getAccountsZcodePlanSearchEntries
+  getAccountsPaneSearchEntries
 } from './accounts-search'
 import { SettingsSectionStack } from './SettingsSectionStack'
 import { matchesSettingsSearch } from './settings-search'
-import { GrokAccountsSection } from './GrokAccountsSection'
 import { AntigravityAccountsSection } from './AntigravityAccountsSection'
 import { runtimeTargetEnvironmentId } from '@/runtime/runtime-client-target'
-import { CursorAccountsSection } from './CursorAccountsSection'
-import { ZcodePlanAccountsSection } from './ZcodePlanAccountsSection'
-import type {
-  AccountsPaneProps,
-  AccountsPaneSectionModel
-} from './accounts-pane-types'
+import type { AccountsPaneProps } from './accounts-pane-types'
 import {
   EMPTY_WSL_DISTROS,
   getRuntimeSentenceLabel,
   getSelectedAccountRuntime
 } from './accounts-pane-runtime'
-import {
-  renderGeminiAccountsSection,
-  renderOpenCodeAccountsSection
-} from './accounts-pane-provider-setting-sections'
-import { MiniMaxAccountsSection } from './MiniMaxAccountsSection'
-import { useUsageHostSettings } from './use-usage-host-settings'
+import { ZcodeCliSetupSection } from './ZcodeCliSetupSection'
 
 export { getAccountsPaneSearchEntries }
 
 export function AccountsPane({
   settings,
-  updateSettings,
   hostScope,
   wslSupportedPlatform = false,
   wslAvailable = false,
@@ -47,10 +28,7 @@ export function AccountsPane({
   wslHostDistro = null
 }: AccountsPaneProps): React.JSX.Element {
   const searchQuery = useAppStore((s) => s.settingsSearchQuery)
-  const miniMaxRateLimits = useAppStore((s) => s.rateLimits.minimax)
-  const recordFeatureInteraction = useAppStore((s) => s.recordFeatureInteraction)
   const runtimeEnvironments = useAppStore((s) => s.runtimeEnvironments)
-  const recordedOpenCodeSettingEditsRef = useRef<Set<'workspaceId'>>(new Set())
   const localAccountRuntime = getSelectedAccountRuntime(
     settings,
     wslSupportedPlatform,
@@ -79,45 +57,7 @@ export function AccountsPane({
   const accountRuntimeSentenceLabel = isRemoteAccountScope
     ? accountRuntime.label
     : getRuntimeSentenceLabel(accountRuntime)
-  const localAccountRuntimeSentenceLabel = getRuntimeSentenceLabel(localAccountRuntime)
-  const recordOpenCodeSettingEdit = (field: 'workspaceId'): void => {
-    if (recordedOpenCodeSettingEditsRef.current.has(field)) {
-      return
-    }
-    recordedOpenCodeSettingEditsRef.current.add(field)
-    recordFeatureInteraction('usage-tracking')
-  }
-  // Why: MiniMax/GLM keys are read by the selected host's own usage poller, so they live there too.
-  const usageCredentialHost = { owner: accountOwner, label: remoteServerLabel }
-  const usageHostSettings = useUsageHostSettings(
-    accountOwner,
-    remoteServerLabel,
-    settings,
-    updateSettings
-  )
-
-  const model: AccountsPaneSectionModel = {
-    settings,
-    accountOwner,
-    updateSettings,
-    searchQuery,
-    recordFeatureInteraction,
-    wslSupportedPlatform,
-    wslAvailable,
-    wslDistros,
-    wslCapabilitiesLoading,
-    localAccountRuntime,
-    localAccountRuntimeSentenceLabel,
-    isRemoteAccountScope,
-    remoteServerName,
-    accountRuntime,
-    accountRuntimeSentenceLabel,
-    recordOpenCodeSettingEdit
-  }
   const visibleSections = [
-    matchesSettingsSearch(searchQuery, getAccountsGeminiSearchEntries())
-      ? renderGeminiAccountsSection(model)
-      : null,
     matchesSettingsSearch(searchQuery, getAccountsAntigravitySearchEntries()) ? (
       <AntigravityAccountsSection
         key={`antigravity:${accountOwnerKey}:${accountRuntime.runtime}:${accountRuntime.wslDistro ?? ''}`}
@@ -126,31 +66,7 @@ export function AccountsPane({
         label={accountRuntimeSentenceLabel}
       />
     ) : null,
-    matchesSettingsSearch(searchQuery, getAccountsOpencodeSearchEntries())
-      ? renderOpenCodeAccountsSection(model)
-      : null,
-    matchesSettingsSearch(searchQuery, getAccountsMiniMaxSearchEntries()) ? (
-      <MiniMaxAccountsSection
-        key={`minimax:${accountOwnerKey}`}
-        host={usageCredentialHost}
-        usageSettings={usageHostSettings}
-        miniMaxRateLimits={isRemoteAccountScope ? null : miniMaxRateLimits}
-        recordFeatureInteraction={recordFeatureInteraction}
-      />
-    ) : null,
-    matchesSettingsSearch(searchQuery, getAccountsGrokSearchEntries()) ? (
-      <GrokAccountsSection key="grok" />
-    ) : null,
-    matchesSettingsSearch(searchQuery, getAccountsCursorSearchEntries()) ? (
-      <CursorAccountsSection key="cursor" />
-    ) : null,
-    matchesSettingsSearch(searchQuery, getAccountsZcodePlanSearchEntries()) ? (
-      <ZcodePlanAccountsSection
-        key={`zcode:${accountOwnerKey}`}
-        host={usageCredentialHost}
-        usageSettings={usageHostSettings}
-      />
-    ) : null
+    <ZcodeCliSetupSection key="zcode-cli-setup" />
   ]
 
   return (

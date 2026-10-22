@@ -60,7 +60,6 @@ const run: AutomationRun = {
   terminalPtyId: 'pty-on-server-7',
   outputSnapshot: null,
   precheckResult: null,
-  usage: null,
   error: null,
   startedAt: 1,
   dispatchedAt: 1,

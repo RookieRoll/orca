@@ -1,81 +1,55 @@
 import { describe, expect, it } from 'vitest'
-import type { AutomationRun, AutomationRunUsage } from './automations-types'
-import { summarizeAutomationRunUsage } from './automation-usage-summary'
+import type { AutomationRun } from './automations-types'
+import { summarizeAutomationLastRun } from './automation-last-run-summary'
 
-const makeUsage = (overrides: Partial<AutomationRunUsage> = {}): AutomationRunUsage => ({
-  status: 'known',
-  provider: 'claude',
-  model: 'sonnet',
-  inputTokens: 10,
-  outputTokens: 5,
-  cacheReadTokens: 3,
-  cacheWriteTokens: 2,
-  reasoningOutputTokens: 1,
-  totalTokens: 21,
-  estimatedCostUsd: 0.25,
-  estimatedCostSource: 'api_equivalent',
-  providerSessionId: 'session-1',
-  attribution: 'provider_session_time_window',
-  collectedAt: 1,
-  unavailableReason: null,
-  unavailableMessage: null,
-  ...overrides
-})
+const makeRun = (overrides: Partial<AutomationRun> = {}): AutomationRun =>
+  ({
+    id: 'run-1',
+    automationId: 'a1',
+    title: 'Automation run',
+    scheduledFor: 0,
+    status: 'completed',
+    trigger: 'scheduled',
+    workspaceId: null,
+    sessionKind: 'terminal',
+    chatSessionId: null,
+    terminalSessionId: null,
+    terminalPaneKey: null,
+    terminalPtyId: null,
+    outputSnapshot: null,
+    precheckResult: null,
+    error: null,
+    startedAt: null,
+    dispatchedAt: null,
+    createdAt: 0,
+    ...overrides
+  })
 
-const makeRun = (usage: AutomationRunUsage | null): AutomationRun =>
-  ({ id: 'run-1', automationId: 'a1', usage }) as AutomationRun
+describe('summarizeAutomationLastRun', () => {
+  it('projects the newest retained run status and timestamp', () => {
+    expect(
+      summarizeAutomationLastRun([
+        makeRun({ createdAt: 1, status: 'completed', dispatchedAt: 11 }),
+        makeRun({ createdAt: 3, status: 'dispatch_failed', dispatchedAt: 33 }),
+        makeRun({ createdAt: 2, status: 'completed', dispatchedAt: 22 })
+      ])
+    ).toEqual({ status: 'dispatch_failed', at: 33 })
+  })
 
-describe('summarizeAutomationRunUsage', () => {
-  it('aggregates known runs and counts the rest as unavailable', () => {
-    const summary = summarizeAutomationRunUsage([
-      makeRun(makeUsage()),
-      makeRun(makeUsage({ estimatedCostUsd: null })),
-      makeRun(makeUsage({ status: 'unavailable' })),
-      makeRun(null)
-    ])
-
-    expect(summary).toEqual({
-      knownRuns: 2,
-      unavailableRuns: 2,
-      inputTokens: 20,
-      outputTokens: 10,
-      cacheTokens: 10,
-      reasoningOutputTokens: 2,
-      totalTokens: 42,
-      estimatedCostUsd: 0.25,
-      lastRunStatus: null,
-      lastRunAt: null
+  it('falls back through the newest run timestamps', () => {
+    expect(
+      summarizeAutomationLastRun([
+        makeRun({ createdAt: 1, status: 'completed', dispatchedAt: 11 }),
+        makeRun({ createdAt: 2, status: 'pending', startedAt: 22 })
+      ])
+    ).toEqual({ status: 'pending', at: 22 })
+    expect(summarizeAutomationLastRun([makeRun({ createdAt: 3, status: 'pending' })])).toEqual({
+      status: 'pending',
+      at: 3
     })
   })
 
-  it('reports an unknown cost rather than zero when no run has one', () => {
-    const summary = summarizeAutomationRunUsage([makeRun(makeUsage({ estimatedCostUsd: null }))])
-    expect(summary.estimatedCostUsd).toBeNull()
-    expect(summary.knownRuns).toBe(1)
-  })
-
-  it('summarizes an empty retained history without inventing usage', () => {
-    expect(summarizeAutomationRunUsage([])).toEqual({
-      knownRuns: 0,
-      unavailableRuns: 0,
-      inputTokens: 0,
-      outputTokens: 0,
-      cacheTokens: 0,
-      reasoningOutputTokens: 0,
-      totalTokens: 0,
-      estimatedCostUsd: null,
-      lastRunStatus: null,
-      lastRunAt: null
-    })
-  })
-
-  it('projects the newest retained run so list filters never fetch history', () => {
-    const summary = summarizeAutomationRunUsage([
-      { ...makeRun(makeUsage()), createdAt: 1, status: 'completed', dispatchedAt: 11 },
-      { ...makeRun(makeUsage()), createdAt: 3, status: 'dispatch_failed', dispatchedAt: 33 },
-      { ...makeRun(makeUsage()), createdAt: 2, status: 'completed', dispatchedAt: 22 }
-    ])
-    expect(summary.lastRunStatus).toBe('dispatch_failed')
-    expect(summary.lastRunAt).toBe(33)
+  it('returns an empty projection when there is no retained run', () => {
+    expect(summarizeAutomationLastRun([])).toEqual({ status: null, at: null })
   })
 })

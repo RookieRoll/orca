@@ -30,12 +30,6 @@ export function attachMainWindowCoreServices(
   const store = state.store
   const runtime = state.runtime
   const stats = state.stats
-  const claudeUsage = state.claudeUsage
-  const codexUsage = state.codexUsage
-  const openCodeUsage = state.openCodeUsage
-  const museUsage = state.museUsage
-  const codexResetCredits = state.codexResetCredits
-  const rateLimits = state.rateLimits
   const automations = state.automations
   const keybindings = state.keybindings
   const codexRuntimeHome = state.codexRuntimeHome
@@ -44,12 +38,6 @@ export function attachMainWindowCoreServices(
     !store ||
     !runtime ||
     !stats ||
-    !claudeUsage ||
-    !codexUsage ||
-    !openCodeUsage ||
-    !museUsage ||
-    !codexResetCredits ||
-    !rateLimits ||
     !automations ||
     !keybindings ||
     !codexRuntimeHome ||
@@ -61,12 +49,6 @@ export function attachMainWindowCoreServices(
     store,
     runtime,
     stats,
-    claudeUsage,
-    codexUsage,
-    openCodeUsage,
-    museUsage,
-    codexResetCredits,
-    rateLimits,
     window.webContents.id,
     automations,
     {
@@ -135,7 +117,4 @@ export function attachMainWindowCoreServices(
   )
   // Why: attach the durable renderer pull now, but launch the diagnostic process after first paint.
   initTccPromptNotice(window, { deferWatchUntilReadyToShow: true })
-  rateLimits.attach(window)
-  // Why: quota probes spawn CLIs and hit network, so don't fetch immediately and compete with first paint; show/focus listeners refresh later.
-  rateLimits.start({ fetchImmediately: false })
 }

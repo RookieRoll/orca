@@ -64,7 +64,6 @@ function run(overrides: Partial<AutomationRun> = {}): AutomationRun {
     terminalPtyId: null,
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: null,
     dispatchedAt: null,

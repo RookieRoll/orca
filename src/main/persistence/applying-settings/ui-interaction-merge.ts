@@ -69,6 +69,15 @@ const RETIRED_PET_UI_FIELDS = [
   'sidekickSize'
 ] as const
 
+const RETIRED_USAGE_STATUS_BAR_FIELDS = [
+  '_kimiStatusBarDefaultAdded',
+  '_minimaxStatusBarDefaultAdded',
+  '_antigravityStatusBarDefaultAdded',
+  '_grokStatusBarDefaultAdded',
+  '_cursorStatusBarDefaultAdded',
+  '_zcodeStatusBarDefaultAdded'
+] as const
+
 export function stripRetiredMainOwnedUIFields(
   value: Partial<PersistedState['ui']> | undefined
 ): Partial<PersistedState['ui']> {
@@ -85,6 +94,9 @@ export function stripRetiredMainOwnedUIFields(
     Reflect.deleteProperty(ui, field)
   }
   for (const field of RETIRED_PET_UI_FIELDS) {
+    Reflect.deleteProperty(ui, field)
+  }
+  for (const field of RETIRED_USAGE_STATUS_BAR_FIELDS) {
     Reflect.deleteProperty(ui, field)
   }
   return ui

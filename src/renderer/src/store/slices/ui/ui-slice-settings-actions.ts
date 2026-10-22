@@ -55,8 +55,5 @@ export function createUiSettingsActions(set: UISliceSet, get: UISliceGet): Parti
           settingsProjectSetupSelection: nextSetupSelections
         }
       }),
-    appearanceAccordionDeepLink: null,
-    setAppearanceAccordionDeepLink: (section) => set({ appearanceAccordionDeepLink: section }),
-    clearAppearanceAccordionDeepLink: () => set({ appearanceAccordionDeepLink: null })
   }
 }

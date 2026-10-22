@@ -25,11 +25,6 @@ export type UISliceContextual = {
     setupId?: string
   ) => void
   /** One-shot Appearance accordion to expand for nested Settings deep links (e.g. Usage percentages under Window & Sidebar). Cleared when Appearance consumes it. */
-  appearanceAccordionDeepLink: 'interface' | 'terminal' | 'window' | null
-  setAppearanceAccordionDeepLink: (
-    section: NonNullable<UISliceContextual['appearanceAccordionDeepLink']>
-  ) => void
-  clearAppearanceAccordionDeepLink: () => void
   activeModal:
     | 'none'
     | 'create-worktree'
@@ -118,12 +113,6 @@ export type UISliceContextual = {
   dismissMobileEmulatorAgentSetup: () => void
   projectOrderManualDefaultNoticeDismissed: boolean
   dismissProjectOrderManualDefaultNotice: () => void
-  usagePercentageDisplayChangeNoticeDismissed: boolean
-  dismissUsagePercentageDisplayChangeNotice: () => void
-  statusBarCompactChangeNoticeDismissed: boolean
-  dismissStatusBarCompactChangeNotice: () => void
-  usageEmptyStateDismissed: boolean
-  dismissUsageEmptyState: () => void
   codexTerminalServerIsolationNoticeSeen: boolean
   markCodexTerminalServerIsolationNoticeSeen: () => void
   codexSharedSettingsNoticeSeen: boolean

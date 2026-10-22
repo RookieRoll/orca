@@ -10,7 +10,6 @@ import { servesLocalWslMigrationSource } from '../orcad/orcad-migration-wsl-dest
 import { ORCAD_MIGRATION_LOCAL_WSL_SOURCE_RUNTIME_CAPABILITY } from '../../shared/orcad-runtime-capabilities'
 import { advertisedOrcadMigrationBlobCapabilities } from '../../shared/orcad-migration/orcad-migration-blob-transfer'
 import type { RuntimeCapability } from '../../shared/protocol-version'
-import { USAGE_CREDENTIALS_RUNTIME_CAPABILITY } from '../../shared/account-runtime-capabilities'
 import {
   BROWSER_CERTIFICATE_TRUST_RUNTIME_CAPABILITY,
   BROWSER_CLIENT_HOST_RUNTIME_CAPABILITY,
@@ -56,7 +55,6 @@ import { darkSwitchRuntimeCapabilities } from './dark-switch-runtime-capabilitie
 
 type RuntimeStatusHost = {
   getAvailableAuthoritativeWindow(): unknown
-  getUsageRateLimits(): unknown
   getRecordedTerminalSleepHandles(
     ptyIds: Iterable<string>,
     terminalHandlesByPtyId: Readonly<Record<string, readonly string[]>>
@@ -113,10 +111,7 @@ export abstract class OrcaRuntimeWithGetStatus extends OrcaRuntimeWithGetRuntime
         (process.env.ORCA_E2E_DISABLE_AUTHORITATIVE_SESSION_TABS_INVENTORY !== '1' ||
           capability !== SESSION_TABS_AUTHORITATIVE_INVENTORY_RUNTIME_CAPABILITY) &&
         (capability !== TERMINAL_PROMPT_DELIVERY_RUNTIME_CAPABILITY ||
-          supportsDurableTerminalPromptDelivery()) &&
-        // Why: only a host with its own usage poller reads keys saved through these methods.
-        (capability !== USAGE_CREDENTIALS_RUNTIME_CAPABILITY ||
-          statusHost.getUsageRateLimits() !== null)
+          supportsDurableTerminalPromptDelivery())
     )
     if (hasOffscreen || hasHeadlessCommands) {
       capabilities.push(BROWSER_HEADLESS_RUNTIME_CAPABILITY)

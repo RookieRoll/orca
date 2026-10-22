@@ -47,7 +47,6 @@ describe('useIpcEvents updater integration', () => {
       activeTabType: 'terminal',
       editorFontZoomLevel: 0,
       setEditorFontZoomLevel: vi.fn(),
-      setRateLimitsFromPush: vi.fn(),
       setSshConnectionState,
       setSshTargetLabels: vi.fn(),
       setSshTargetsMetadata,
@@ -201,10 +200,6 @@ describe('useIpcEvents updater integration', () => {
           onNavigationUpdate: () => () => {},
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
-        },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),

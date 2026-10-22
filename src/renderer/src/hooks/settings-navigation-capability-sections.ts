@@ -52,7 +52,7 @@ export function buildCapabilitySettingsSections({
       ),
       description: translate(
         'auto.hooks.useSettingsNavigationMetadata.b1c2f8b0ac',
-        'Optional account switching and usage setup for Claude, Codex, Gemini, OpenCode Go, MiniMax, and Grok.'
+        'Manage Antigravity accounts and configure ZCode CLI sign-in.'
       ),
       icon: UserCog,
       searchEntries: getAccountsPaneSearchEntries(),

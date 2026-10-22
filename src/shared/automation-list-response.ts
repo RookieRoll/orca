@@ -9,8 +9,8 @@
  * selector that does not match the request is never reclassified into Self.
  */
 
-import type { Automation } from './automations-types'
-import type { AutomationUsageSummary } from './automation-usage-summary'
+import type { Automation, AutomationRunStatus } from './automations-types'
+import type { AutomationLastRunSummary } from './automation-last-run-summary'
 import {
   automationSelectorMatchesScope,
   type AutomationListItem,
@@ -42,25 +42,38 @@ function parseAutomation(value: unknown): Automation | null {
     : null
 }
 
-const USAGE_SUMMARY_FIELDS = [
-  'knownRuns',
-  'unavailableRuns',
-  'inputTokens',
-  'outputTokens',
-  'cacheTokens',
-  'reasoningOutputTokens',
-  'totalTokens'
-] as const
+const AUTOMATION_RUN_STATUSES: readonly AutomationRunStatus[] = [
+  'pending',
+  'dispatching',
+  'dispatched',
+  'completed',
+  'skipped_precheck',
+  'skipped_missed',
+  'skipped_unavailable',
+  'skipped_needs_interactive_auth',
+  'dispatch_failed'
+]
 
-function parseUsageSummary(value: unknown): AutomationUsageSummary | null {
+function isAutomationRunStatus(value: unknown): value is AutomationRunStatus {
+  return (
+    typeof value === 'string' &&
+    AUTOMATION_RUN_STATUSES.some((status) => status === value)
+  )
+}
+
+function parseLastRunSummary(value: unknown): AutomationLastRunSummary | null {
   if (!isRecord(value)) {
     return null
   }
-  if (!USAGE_SUMMARY_FIELDS.every((field) => typeof value[field] === 'number')) {
+  const status = value.status
+  const at = value.at
+  if (
+    (status !== null && !isAutomationRunStatus(status)) ||
+    (at !== null && (typeof at !== 'number' || !Number.isFinite(at)))
+  ) {
     return null
   }
-  const cost = value.estimatedCostUsd
-  return cost === null || typeof cost === 'number' ? (value as AutomationUsageSummary) : null
+  return { status, at }
 }
 
 function parseSelector(value: unknown): AutomationListItemSelector | null {
@@ -114,7 +127,9 @@ function parseItems(raw: readonly unknown[]): ParsedItems {
     byId.set(automationId, {
       automationId,
       selector,
-      usageSummary: parseUsageSummary((entry as { usageSummary?: unknown }).usageSummary)
+      lastRunSummary: parseLastRunSummary(
+        (entry as { lastRunSummary?: unknown }).lastRunSummary
+      )
     })
   }
   return { byId, invalidRows }

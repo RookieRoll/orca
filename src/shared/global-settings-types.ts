@@ -28,7 +28,6 @@ import type { CtrlTabOrderMode } from './tab-types'
 import type { TerminalColorOverrides } from './terminal-color-overrides'
 import type { TerminalQuickCommand } from './terminal-quick-command-types'
 import type { TuiAgent } from './tui-agent'
-import type { ZcodePlanSite } from './zcode-plan-sites'
 import type {
   AgentDashboardMode,
   BranchPrefixStrategy,
@@ -45,7 +44,6 @@ import type { WorktreeVisibilityDefaults } from './repo-types'
 export type { WorktreeVisibilityDefaults } from './repo-types'
 
 /** MiniMax account region used to select the quota endpoint. */
-export type MiniMaxEndpoint = 'overseas' | 'cn'
 
 export type GlobalSettings = GlobalSettingsBase & {
   workspaceDir: string
@@ -390,20 +388,6 @@ export type GlobalSettings = GlobalSettingsBase & {
   /** Persisted Linear team selection (tasks view). Same nullable-array pattern as
    *  defaultRepoSelection: null = sticky-all, string[] = frozen subset of team IDs. */
   defaultLinearTeamSelection: string[] | null
-  /** Session cookie for OpenCode Go rate-limit fetching. Stored encrypted. */
-  opencodeSessionCookie: string
-  /** Optional OpenCode Go workspace ID override; when set, skips the workspaces lookup and fetches usage directly. */
-  opencodeWorkspaceId: string
-  /** Optional MiniMax group id. When empty, the usage fetcher extracts minimax_group_id_v2 from the cookie. */
-  minimaxGroupId: string
-  /** Comma-separated MiniMax model names to show in the status bar usage window. */
-  minimaxUsageModels: string
-  /** MiniMax account region; defaults to overseas for existing users. */
-  minimaxEndpoint: MiniMaxEndpoint
-  /** GLM Coding Plan site whose API key is saved in AI Provider Accounts; defaults to the international Z.AI console. */
-  zcodePlanSite?: ZcodePlanSite
-  /** Extract OAuth credentials from the local Gemini CLI for rate-limit fetching. Off by default (explicit opt-in). */
-  geminiCliOAuthEnabled: boolean
   /** Per-agent CLI command overrides. A missing key means use the catalog default binary name. */
   agentCmdOverrides: Partial<Record<TuiAgent, string>>
   /** Custom CODEX_HOME for Codex session-history discovery (defaults to ~/.codex).

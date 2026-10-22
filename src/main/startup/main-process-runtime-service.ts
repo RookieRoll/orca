@@ -166,8 +166,7 @@ export function initializeMainProcessRuntime(): OrcaRuntimeService {
 export function configureRuntimeServices(runtime: OrcaRuntimeService): void {
   const store = state.store
   const claudeRuntimeAuth = state.claudeRuntimeAuth
-  const rateLimits = state.rateLimits
-  if (!store || !claudeRuntimeAuth || !rateLimits) {
+  if (!store || !claudeRuntimeAuth) {
     throw new Error('Account services must be initialized before runtime wiring')
   }
   runtime.setArtifactService(
@@ -176,7 +175,7 @@ export function configureRuntimeServices(runtime: OrcaRuntimeService): void {
     )
   )
   runtime.setSkillCloudService(new SkillCloudService(app.getPath('userData')))
-  runtime.setAccountServices({ claudeRuntimeAuth, rateLimits })
+  runtime.setAccountServices({ claudeRuntimeAuth })
   runtime.setCommitMessageAgentEnvironmentResolvers({
     // Why: Codex hooks/auth live in Orca's managed runtime home even for the default path, so every launch must resolve CODEX_HOME via runtime-home.
     prepareForCodexLaunch: prepareCodexRuntimeHomeForLaunch,

@@ -1,19 +1,6 @@
-import type {
-  CursorAccountsApi,
-  GrokAccountsApi,
-  MinimaxCredentialsApi,
-  ZcodePlanCredentialsApi
-} from './api/agent-account-api'
 import type { HooksApi } from './api/agent-hook-api'
 import type { SkillsApi } from './api/agent-skill-api'
 import type { AgentAwakeApi, AgentStatusApi } from './api/agent-status-api'
-import type {
-  ClaudeUsageApi,
-  CodexUsageApi,
-  MuseUsageApi,
-  OpenCodeUsageApi,
-  RateLimitsApi
-} from './api/agent-usage-api'
 import type { AiVaultApi } from './api/ai-vault-api'
 import type { AppApi, E2EApi, PlatformApi } from './api/app-api'
 import type { AutomationsApi } from './api/automation-api'
@@ -117,10 +104,6 @@ export type PreloadApi = {
   docPreview: DocPreviewApi['docPreview']
   stats: StatsApi
   memory: MemoryApi
-  claudeUsage: ClaudeUsageApi
-  codexUsage: CodexUsageApi
-  openCodeUsage: OpenCodeUsageApi
-  museUsage: MuseUsageApi
   aiVault: AiVaultApi
   nativeChat: NativeChatApi
   fs: FilesystemApi['fs']
@@ -128,11 +111,6 @@ export type PreloadApi = {
   ui: Merged<UiCommandEventApi & UiWindowApi>
   runtime: RuntimeApi['runtime']
   runtimeEnvironments: RuntimeApi['runtimeEnvironments']
-  rateLimits: RateLimitsApi
-  minimaxCredentials: MinimaxCredentialsApi
-  zcodePlanCredentials: ZcodePlanCredentialsApi
-  grokAccounts: GrokAccountsApi
-  cursorAccounts: CursorAccountsApi
   ssh: SshApi
   /** COMPAT(legacy-relay-bridge): desktop-only, revisit 2027-01-15. */
   legacyRelayBridge?: LegacyRelayBridgeApi
@@ -146,12 +124,6 @@ export type PreloadApi = {
   mobile: MobileApi
 }
 
-export type {
-  ClaudeUsageApi,
-  CodexUsageApi,
-  MuseUsageApi,
-  OpenCodeUsageApi
-} from './api/agent-usage-api'
 export type { AiVaultApi } from './api/ai-vault-api'
 export type { AutomationsApi, ExternalAutomationManagerResult } from './api/automation-api'
 export type { AppApi } from './api/app-api'

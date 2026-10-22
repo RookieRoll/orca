@@ -5,6 +5,7 @@ import type {
   AutomationRunStatus,
   ExternalAutomationJob
 } from '../../../../shared/automations-types'
+import type { AutomationLastRunSummary } from '../../../../shared/automation-last-run-summary'
 import {
   formatAutomationDateTime,
   formatAutomationRelativeTime,
@@ -70,17 +71,17 @@ export function getToneForAutomationRunStatus(status: AutomationRunStatus): Auto
 
 /**
  * Last-run picture for a catalog row without any run-history fetch: the owning
- * authority projects its newest retained run into the usage summary, and a row
+ * authority projects its newest retained run into the last-run summary, and a row
  * from an older server falls back to the stored `lastRunAt` timestamp alone.
  */
 export function getAutomationRowLastRunSnapshot(row: {
   automation: Automation
-  usageSummary: { lastRunStatus?: AutomationRunStatus | null; lastRunAt?: number | null } | null
+  lastRunSummary: AutomationLastRunSummary | null
 }): AutomationLastRunSnapshot {
-  const status = row.usageSummary?.lastRunStatus
+  const status = row.lastRunSummary?.status
   if (status) {
     return {
-      at: row.usageSummary?.lastRunAt ?? row.automation.lastRunAt ?? null,
+      at: row.lastRunSummary?.at ?? row.automation.lastRunAt ?? null,
       tone: getToneForAutomationRunStatus(status),
       statusLabel: getAutomationRunStatusLabel(status)
     }

@@ -120,8 +120,7 @@ export const SQLITE_SCHEMA_FILE_DATABASES: Record<string, string> = {
   'src/main/ai-vault/session-scanner-opencode-sqlite-fixture.ts': 'test-fixture',
   'src/main/ai-vault/session-scanner-test-fixtures.ts': 'test-fixture',
   'src/main/browser/browser-cookie-import-test-database.ts': 'test-fixture',
-  'src/main/codex/codex-state-db-test-fixture.ts': 'test-fixture',
-  'src/main/opencode-usage/opencode-usage-sqlite-fixture.ts': 'test-fixture'
+  'src/main/codex/codex-state-db-test-fixture.ts': 'test-fixture'
 }
 
 const tables = (

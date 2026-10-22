@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { useAppStore } from '../../store'
 import { keybindingMatchesAction } from '../../../../shared/keybindings'
-import { resolveAppearanceAccordionDeepLink } from './appearance-usage-percentage-search'
 import { registerWindowCloseGuard } from '../window-close-request-coordinator'
 import { isIntentionalAppRestartInProgress } from '@/lib/app-restart-beforeunload'
 import { getShortcutPlatform } from '@/lib/shortcut-platform'
@@ -179,13 +178,6 @@ export function useSettingsPageEffects(
         ? (settingsNavigationTarget.sectionId ?? null)
         : null
     )
-    // Why: ensure Appearance's nested status-bar section is open before scrolling so the row is visible.
-    if (settingsNavigationTarget.pane === 'appearance') {
-      const accordion = resolveAppearanceAccordionDeepLink(settingsNavigationTarget.sectionId)
-      if (accordion) {
-        useAppStore.getState().setAppearanceAccordionDeepLink(accordion)
-      }
-    }
     if (settingsNavigationTarget.intent === 'add-quick-command') {
       setQuickCommandAddIntentSignal((signal) => signal + 1)
     } else if (settingsNavigationTarget.intent === 'add-ssh-host') {

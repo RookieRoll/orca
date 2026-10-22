@@ -70,10 +70,6 @@ import { initOrcaProfilePaths } from '../orca-profiles/profile-index-store'
 import { getProfileUserDataPath } from '../orca-profiles/profile-storage-paths'
 import { recoverPendingProfileProjectMoves } from '../orca-profiles/profile-project-move-intent'
 import { initStatsPath } from '../stats/collector'
-import { initClaudeUsagePath } from '../claude-usage/store'
-import { initCodexUsagePath } from '../codex-usage/store'
-import { initOpenCodeUsagePath } from '../opencode-usage/store'
-import { initMuseUsagePath } from '../muse-usage/store'
 import { registerDocPreviewSchemePrivileges } from '../browser/doc-preview-protocol'
 import { MEDIA_PREVIEW_CUSTOM_SCHEME } from '../media/media-preview-protocol'
 import { JIRA_IMAGE_CUSTOM_SCHEME } from '../jira/attachment-image-protocol'
@@ -332,10 +328,6 @@ function initializeMainProcessPreflight(options: MainProcessPreflightOptions): b
   )
   // Why: same timing as initDataPath — capture userData before app.setName changes it. See persistence.ts:20-28.
   initStatsPath()
-  initClaudeUsagePath()
-  initCodexUsagePath()
-  initOpenCodeUsagePath()
-  initMuseUsagePath()
   // Why: Electron freezes the privileged scheme table at ready, so the doc-preview
   // scheme must be declared here or its webview loses fetch/secure-origin privileges.
   registerDocPreviewSchemePrivileges([MEDIA_PREVIEW_CUSTOM_SCHEME, JIRA_IMAGE_CUSTOM_SCHEME])

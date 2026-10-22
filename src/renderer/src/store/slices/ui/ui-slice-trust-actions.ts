@@ -118,36 +118,6 @@ export function createUiTrustActions(set: UISliceSet, _get: UISliceGet): Partial
         window.api.ui.set({ projectOrderManualDefaultNoticeDismissed: true }).catch(console.error)
         return { projectOrderManualDefaultNoticeDismissed: true }
       }),
-    // Why: default true so pre-hydration / new sessions never flash the change notice before persistence resolves.
-    usagePercentageDisplayChangeNoticeDismissed: true,
-    dismissUsagePercentageDisplayChangeNotice: () =>
-      set((s) => {
-        if (s.usagePercentageDisplayChangeNoticeDismissed) {
-          return s
-        }
-        window.api.ui
-          .set({ usagePercentageDisplayChangeNoticeDismissed: true })
-          .catch(console.error)
-        return { usagePercentageDisplayChangeNoticeDismissed: true }
-      }),
-    statusBarCompactChangeNoticeDismissed: true,
-    dismissStatusBarCompactChangeNotice: () =>
-      set((s) => {
-        if (s.statusBarCompactChangeNoticeDismissed) {
-          return s
-        }
-        window.api.ui.set({ statusBarCompactChangeNoticeDismissed: true }).catch(console.error)
-        return { statusBarCompactChangeNoticeDismissed: true }
-      }),
-    usageEmptyStateDismissed: false,
-    dismissUsageEmptyState: () =>
-      set((s) => {
-        if (s.usageEmptyStateDismissed) {
-          return s
-        }
-        window.api.ui.set({ usageEmptyStateDismissed: true }).catch(console.error)
-        return { usageEmptyStateDismissed: true }
-      }),
     // Why default true: nothing may toast before hydration reads the persisted flag.
     codexTerminalServerIsolationNoticeSeen: true,
     markCodexTerminalServerIsolationNoticeSeen: () =>

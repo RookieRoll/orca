@@ -5,11 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Store } from '../persistence/loading-store/store'
 import { ProfileStateSqliteAuthority } from '../persistence/profile-state/profile-state-sqlite-authority'
 import { OrcaRuntimeService } from '../runtime/orca-runtime'
-import { eraseRpcMethods, isStreamingMethod } from '../runtime/rpc/core'
-import { ACCOUNT_METHODS } from '../runtime/rpc/methods/accounts'
 import { installFakeAppEnvironment } from '../../../config/scripts/vitest-host-ports-setup'
 import { createOrcadAccountServices } from './orcad-account-services'
-import { USAGE_CREDENTIALS_RUNTIME_CAPABILITY } from '../../shared/account-runtime-capabilities'
 import type { OrcadRuntimeCleanup } from './orcad-runtime-lifetime'
 
 const directories: string[] = []
@@ -81,37 +78,7 @@ function create(store: Store, isWslHost: boolean): ReturnType<typeof createOrcad
   })
 }
 
-function install(
-  runtime: OrcaRuntimeService,
-  store: Store,
-  isWslHost: boolean
-): ReturnType<typeof createOrcadAccountServices> {
-  const services = create(store, isWslHost)
-  services?.attachToRuntime(runtime)
-  return services
-}
-
-async function call(runtime: OrcaRuntimeService, name: string, params: unknown): Promise<unknown> {
-  const found = eraseRpcMethods(ACCOUNT_METHODS).find((candidate) => candidate.name === name)
-  if (!found || isStreamingMethod(found)) {
-    throw new Error(`Missing request method ${name}`)
-  }
-  return found.handler(found.params ? found.params.parse(params) : params, { runtime })
-}
-
 describe('orcad account services', () => {
-  it('publishes this host rate-limit usage to paired clients', async () => {
-    const { runtime, store } = createRuntime()
-    expect(install(runtime, store, false)).not.toBeNull()
-    // Saved MiniMax/GLM keys refresh this host's own usage poller.
-    expect(runtime.getUsageRateLimits()).not.toBeNull()
-    expect(runtime.getStatus().capabilities).toContain(USAGE_CREDENTIALS_RUNTIME_CAPABILITY)
-
-    await expect(call(runtime, 'accounts.list', { refreshUsage: false })).resolves.toMatchObject({
-      rateLimits: expect.any(Object)
-    })
-  })
-
   it('resolves structured Codex launches to a client-sent home, else the default CLI home', async () => {
     const { store } = createRuntime()
     const services = create(store, false)
@@ -147,15 +114,4 @@ describe('orcad account services', () => {
     await expect(resume({})).resolves.toMatchObject({ outcome: 'fresh' })
   })
 
-  it('leaves a WSL host to the desktop that owns its accounts', async () => {
-    const { runtime, store } = createRuntime()
-    expect(install(runtime, store, true)).toBeNull()
-    expect(runtime.getUsageRateLimits()).toBeNull()
-    // No poller here reads a saved key, so clients are not offered the methods that save one.
-    expect(runtime.getStatus().capabilities).not.toContain(USAGE_CREDENTIALS_RUNTIME_CAPABILITY)
-
-    await expect(call(runtime, 'accounts.list', { refreshUsage: false })).rejects.toThrow(
-      'Account services are not configured on this runtime'
-    )
-  })
 })

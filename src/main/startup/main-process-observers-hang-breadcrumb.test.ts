@@ -55,10 +55,6 @@ vi.mock('../stats/collector', () => ({ StatsCollector: class {} }))
 vi.mock('../stats/agent-session-transition-recorder', () => ({
   AgentSessionTransitionRecorder: class {}
 }))
-vi.mock('../claude-usage/store', () => ({ ClaudeUsageStore: class {} }))
-vi.mock('../codex-usage/store', () => ({ CodexUsageStore: class {} }))
-vi.mock('../opencode-usage/store', () => ({ OpenCodeUsageStore: class {} }))
-vi.mock('../muse-usage/store', () => ({ MuseUsageStore: class {} }))
 vi.mock('../repo-maintenance-idle-gate', () => ({
   installRepoMaintenanceIdleGate: () => () => {}
 }))

@@ -33,7 +33,7 @@ type DriverState = RuntimeTerminalDriverState
 export type RuntimeNotifier = {
   automationsChanged?(payload: {
     selector?: { kind: 'self' } | { kind: 'ssh'; targetId: string } | { kind: 'orphan' }
-    reason?: 'definition' | 'run' | 'usage'
+    reason?: 'definition' | 'run'
   }): void
   worktreesChanged(
     repoId: string,

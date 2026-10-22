@@ -13,7 +13,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AutomationRun } from '../../../../shared/automations-types'
 import { AutomationRunHistory } from './AutomationRunHistory'
-import { WORKSPACE_ID, makeRun, makeRunUsage, makeWorktree } from './automations-page-fixtures'
+import { WORKSPACE_ID, makeRun, makeWorktree } from './automations-page-fixtures'
 import { VIRTUALIZER_STUB_WINDOW_SIZE } from './virtualizer-test-stub'
 
 vi.mock('@tanstack/react-virtual', async () => {
@@ -352,27 +352,6 @@ describe('AutomationRunHistory row content', () => {
   function rows(): NodeListOf<HTMLButtonElement> {
     return container.querySelectorAll<HTMLButtonElement>('button[data-automation-run-id]')
   }
-
-  it('reports spend and tokens a host actually measured', () => {
-    renderHistory({
-      runs: [
-        makeRun({
-          usage: makeRunUsage({ estimatedCostUsd: 1.5, totalTokens: 12_345 })
-        })
-      ]
-    })
-
-    expect(rows()[0].textContent).toContain('$1.50')
-    expect(rows()[0].textContent).toContain('12k')
-  })
-
-  it('says n/a rather than zero when usage is unavailable', () => {
-    renderHistory({ runs: [makeRun({ usage: null })] })
-
-    // A run whose usage nobody could read has not been measured at $0.00.
-    expect(rows()[0].textContent).toContain('n/a')
-    expect(rows()[0].textContent).not.toContain('$0.00')
-  })
 
   it('names the workspace a run is still attached to', () => {
     renderHistory({

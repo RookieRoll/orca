@@ -182,7 +182,6 @@ export function AutomationsDetailPane({
           <TabsContent value="overview" className="scrollbar-sleek min-h-0 overflow-auto p-5">
             <AutomationDetail
               automation={selected}
-              runs={selectedRuns}
               projectName={selectedRepoDisplayName}
               projectDefaultBaseRef={selectedRepoDefaultBaseRef}
               workspaceName={selectedWorkspaceName}

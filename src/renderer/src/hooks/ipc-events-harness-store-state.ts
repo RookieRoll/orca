@@ -44,7 +44,6 @@ export function createHarnessStoreState(
     setIsFullScreen: vi.fn(),
     updateBrowserPageState: vi.fn(),
     setEditorFontZoomLevel: vi.fn(),
-    setRateLimitsFromPush: vi.fn(),
     setSshConnectionState: vi.fn(),
     setSshTargetLabels: vi.fn(),
     setSshTargetsMetadata: vi.fn(),

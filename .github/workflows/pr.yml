@@ -1297,7 +1297,6 @@ jobs:
           ORCA_REAL_WINDOWS_SKILL_TEST: '1'
         run: >-
           pnpm exec vitest run --config config/vitest.config.ts
-          src/main/zcode/zcode-plan-api-key-store-native-windows.test.ts
           config/scripts/rebuild-native-deps.test.mjs
           config/scripts/rebuild-native-deps-windows-process-tree.test.mjs
           config/scripts/rebuild-native-deps-node-pty.test.mjs
@@ -1335,7 +1334,6 @@ jobs:
           src/main/agent-hooks/windows-cmd-hook-command-unicode.test.ts
           src/main/agent-hooks/windows-batch-hook-launcher.test.ts
           src/main/agent-hooks/windows-powershell-hook-launcher.test.ts
-          src/main/claude/claude-status-line-windows.test.ts
           src/main/codex/windows-hook-command.test.ts
           src/main/codex/windows-hook-upgrade.test.ts
           src/main/codex/hook-service-managed-install.test.ts

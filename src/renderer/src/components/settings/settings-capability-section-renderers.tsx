@@ -60,7 +60,6 @@ export function renderAccountsSettingsSection(context: SettingsRenderContext): R
         // A WSL host's orcad has no account services; this desktop owns its distro's accounts.
         <AccountsPane
           settings={model.settings}
-          updateSettings={model.updateSettings}
           hostScope={LOCAL_SETTINGS_HOST_SCOPE}
           wslHostDistro={wslHostDistro}
           wslSupportedPlatform={terminal.localWslSupportedPlatform}
@@ -71,7 +70,6 @@ export function renderAccountsSettingsSection(context: SettingsRenderContext): R
       ) : (
         <AccountsPane
           settings={model.settings}
-          updateSettings={model.updateSettings}
           hostScope={model.settingsHostScope}
           wslSupportedPlatform={terminal.runtimeWslSupportedPlatform}
           wslAvailable={terminal.windowsTerminalCapabilities.wslAvailable}

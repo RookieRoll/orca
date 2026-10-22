@@ -9,7 +9,6 @@ export const NODE_RUNTIME_INCLUDE = [
   'src/main/ssh/legacy-relay/ssh-relay-endpoint-incumbent-shell.integration.test.ts',
   'src/main/ssh/ssh-remote-commands.test.ts',
   'src/packages/process-host/src/run-process.test.ts',
-  'tests/e2e/cursor-quota-transport.unit.test.ts',
   'tests/e2e/helpers/electron-process-shutdown.unit.test.ts',
   'src/main/ai-vault-search/session-search-index-writer.test.ts',
   'src/main/ai-vault/session-scanner-unlimited-dedup.test.ts',
@@ -55,7 +54,6 @@ export const NODE_RUNTIME_INCLUDE = [
   'src/main/plugins/plugin-worker-supervision.integration.test.ts',
   // Reconciliation loads the real native Parcel watcher; Bun can abort on Linux ARM.
   'src/main/plugins/plugin-service-reconciliation.test.ts',
-  'src/main/usage/usage-scan-worker-event-loop.test.ts',
   // Asserts Node's spawn-failure close signal and that a dead worker closes its children's pipes.
   'src/main/worker-thread-child-process/worker-thread-child-process.test.ts',
   'src/main/computer/macos-native-provider-client.test.ts',

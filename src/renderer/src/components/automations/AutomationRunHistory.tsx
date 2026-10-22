@@ -9,11 +9,6 @@ import {
   getAutomationRunStatusLabel,
   getAutomationRunStatusVariant
 } from './automation-page-parts'
-import {
-  formatAutomationCost,
-  formatAutomationTokens,
-  getAutomationUsageStatusLabel
-} from './automation-usage-model'
 import { automationRunOccurrenceLabel, isAutomationRunFolded } from './automation-run-occurrences'
 import { getAutomationRunWorkspaceDisplay } from './automation-run-workspace-display'
 import { AutomationOwnerConflictNotice } from './AutomationOwnerConflictNotice'
@@ -36,7 +31,7 @@ const RUN_ROW_OVERSCAN = 10
 const RUNS_VIEWPORT_INITIAL_RECT = { width: 1024, height: 600 }
 
 const RUN_ROW_GRID_CLASS =
-  'grid w-full grid-cols-[minmax(9rem,1fr)_minmax(10rem,1.1fr)_minmax(5rem,.55fr)_minmax(5rem,.55fr)_minmax(6rem,auto)] gap-3'
+  'grid w-full grid-cols-[minmax(9rem,1fr)_minmax(10rem,1.1fr)_minmax(6rem,auto)] gap-3'
 // Sticky inside the scroller so the header shares the rows' content width when a
 // classic scrollbar takes gutter space; opaque so scrolled rows don't bleed through.
 const RUN_ROW_HEADER_SURFACE_CLASS =
@@ -256,12 +251,6 @@ export function AutomationRunHistory({
               )}
             </div>
             <div>
-              {translate('auto.components.automations.AutomationRunHistory.86a248187e', 'Spend')}
-            </div>
-            <div>
-              {translate('auto.components.automations.AutomationRunHistory.13988187b3', 'Tokens')}
-            </div>
-            <div>
               {translate('auto.components.automations.AutomationRunHistory.9974a2b429', 'Status')}
             </div>
           </div>
@@ -282,7 +271,6 @@ export function AutomationRunHistory({
                 run,
                 worktree: runWorktree
               })
-              const usageLabel = getAutomationUsageStatusLabel(run.usage)
               const occurrenceLabel = automationRunOccurrenceLabel(run)
               return (
                 <div
@@ -331,31 +319,6 @@ export function AutomationRunHistory({
                       title={workspaceLabel.title}
                     >
                       {workspaceLabel.rowLabel}
-                    </div>
-                    <div
-                      className={
-                        run.usage?.status === 'known'
-                          ? 'text-sm tabular-nums'
-                          : 'text-sm text-muted-foreground'
-                      }
-                      title={usageLabel}
-                    >
-                      {formatAutomationCost(run.usage?.estimatedCostUsd)}
-                    </div>
-                    <div
-                      className={
-                        run.usage?.status === 'known'
-                          ? 'text-sm tabular-nums'
-                          : 'text-sm text-muted-foreground'
-                      }
-                      title={usageLabel}
-                    >
-                      {run.usage?.status === 'known'
-                        ? formatAutomationTokens(run.usage.totalTokens)
-                        : translate(
-                            'auto.components.automations.AutomationRunHistory.a00e38d1a3',
-                            'n/a'
-                          )}
                     </div>
                     <div className="flex justify-start">
                       <Badge variant={getAutomationRunStatusVariant(run.status)}>

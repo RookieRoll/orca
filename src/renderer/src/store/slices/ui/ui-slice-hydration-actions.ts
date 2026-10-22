@@ -31,8 +31,6 @@ import {
 import { clampMarkdownTocPanelWidth } from '../../../../../shared/markdown-toc-panel-width'
 import { clampCombinedDiffFileTreeWidth } from '../../../../../shared/combined-diff-file-tree-width'
 import { parsePersistedAutomationHostFilter } from '../../../../../shared/automation-host-filter'
-import { normalizeUsagePercentageDisplay } from '../../../../../shared/usage-percentage-display'
-import { normalizeStatusBarUsageMode } from '../../../../../shared/status-bar-usage-mode'
 import { normalizeBrowserPageZoomLevel } from '../../../../../shared/browser-page-zoom'
 import { normalizeKagiSessionLink } from '../../../../../shared/browser-url'
 import {
@@ -76,7 +74,7 @@ export function createUiHydrationActions(set: UISliceSet, _get: UISliceGet): Par
         const persistedAgentsFilterRepoIds = sanitizePersistedRepoIds(ui.agentsFilterRepoIds)
         // Migration: one-shot old-'recent'→'smart' runs in main (_sortBySmartMigrated), not here, so a deliberate 'recent' choice survives restart.
         const sortBy = ui.sortBy
-        const statusBarItemsWithGrok = hydrateStatusBarItems(ui)
+        const hydratedStatusBarItems = hydrateStatusBarItems(ui)
         const hydrated = {
           // Why: persisted widths may be stale/corrupt/hand-edited; clamp during hydration so invalid values can't break layout.
           sidebarWidth: sanitizePersistedSidebarWidth(
@@ -161,10 +159,8 @@ export function createUiHydrationActions(set: UISliceSet, _get: UISliceGet): Par
           workspaceBoardOpacity: clampWorkspaceBoardOpacity(ui.workspaceBoardOpacity),
           workspaceBoardColumnWidth: clampWorkspaceBoardColumnWidth(ui.workspaceBoardColumnWidth),
           syncTaskStatusFromWorkspaceBoard: ui.syncTaskStatusFromWorkspaceBoard === true,
-          statusBarItems: statusBarItemsWithGrok,
+          statusBarItems: hydratedStatusBarItems,
           statusBarVisible: ui.statusBarVisible ?? true,
-          usagePercentageDisplay: normalizeUsagePercentageDisplay(ui.usagePercentageDisplay),
-          statusBarUsageMode: normalizeStatusBarUsageMode(ui.statusBarUsageMode),
           ...hydrateUnexpectedSignoutDismissal(s, ui.dismissedUnexpectedSignoutVersion),
           osc52ClipboardDefaultOnNoticePending: ui.osc52ClipboardDefaultOnNoticePending === true,
           browserDefaultUrl: ui.browserDefaultUrl ?? null,
@@ -196,12 +192,6 @@ export function createUiHydrationActions(set: UISliceSet, _get: UISliceGet): Par
           mobileEmulatorAgentSetupDismissed: ui.mobileEmulatorAgentSetupDismissed === true,
           projectOrderManualDefaultNoticeDismissed:
             ui.projectOrderManualDefaultNoticeDismissed === true,
-          // Why: treat only explicit true as dismissed so a false from migration still surfaces.
-          usagePercentageDisplayChangeNoticeDismissed:
-            ui.usagePercentageDisplayChangeNoticeDismissed === true,
-          statusBarCompactChangeNoticeDismissed: ui.statusBarCompactChangeNoticeDismissed !== false,
-          // Why: default false so existing users still see the CTA; only explicit dismissal persists true.
-          usageEmptyStateDismissed: ui.usageEmptyStateDismissed === true,
           codexTerminalServerIsolationNoticeSeen:
             ui.codexTerminalServerIsolationNoticeSeen === true,
           codexSharedSettingsNoticeSeen: ui.codexSharedSettingsNoticeSeen === true,

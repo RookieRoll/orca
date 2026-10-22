@@ -18,14 +18,7 @@ import { createEditorSlice } from './editor'
 import { createStatsSlice } from './stats'
 import { createMemorySlice } from './memory'
 import { createWorkspaceSpaceSlice } from './workspace-space'
-import {
-  createClaudeUsageSlice,
-  createCodexUsageSlice,
-  createMuseUsageSlice,
-  createOpenCodeUsageSlice
-} from './usage-provider-slices'
 import { createBrowserSlice } from './browser'
-import { createRateLimitSlice } from './rate-limits'
 import { createSshSlice } from './ssh'
 import { createRuntimeEnvironmentSshSlice } from './runtime-environment-ssh'
 import { createWslHostsSlice } from './wsl-hosts'
@@ -78,12 +71,7 @@ export function createTestStore() {
     ...createStatsSlice(...a),
     ...createMemorySlice(...a),
     ...createWorkspaceSpaceSlice(...a),
-    ...createClaudeUsageSlice(...a),
-    ...createCodexUsageSlice(...a),
-    ...createOpenCodeUsageSlice(...a),
-    ...createMuseUsageSlice(...a),
     ...createBrowserSlice(...a),
-    ...createRateLimitSlice(...a),
     ...createSshSlice(...a),
     ...createRuntimeEnvironmentSshSlice(...a),
     ...createWslHostsSlice(...a),

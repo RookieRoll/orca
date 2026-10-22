@@ -104,7 +104,6 @@ function makeRun(overrides: Partial<AutomationRun> = {}): AutomationRun {
     terminalPtyId: null,
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: 'boom',
     startedAt: Date.now() - 8 * 60 * 60 * 1000,
     dispatchedAt: Date.now() - 8 * 60 * 60 * 1000,
@@ -122,7 +121,7 @@ function renderLocalRows(handlers: {
     key: 'row|local|automation-1',
     automation: makeAutomation(),
     hostLabel: 'Local',
-    usageSummary: null
+    lastRunSummary: null
   }
   return render(
     <AutomationListLocalRows

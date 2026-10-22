@@ -72,7 +72,6 @@ export function shouldRouteSubscriptionBySupport(method: string): boolean {
     method === 'runtime.clientEvents.subscribe' ||
     method === 'session.tabs.subscribe' ||
     method === 'session.tabs.subscribeAll' ||
-    method === 'accounts.subscribe' ||
     method === 'notifications.subscribe' ||
     method === 'files.watch'
   )

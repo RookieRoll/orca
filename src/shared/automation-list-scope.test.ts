@@ -180,25 +180,19 @@ describe('projectAutomationList', () => {
     expect(result.orphanCount).toBe(1)
   })
 
-  it('attaches bounded usage summaries when the authority supplies them', () => {
+  it('attaches the latest run status and time when the authority supplies them', () => {
     const result = projectAutomationList(records, {
       ...context(),
-      usageSummary: (id) =>
+      lastRunSummary: (id) =>
         id === 'local-1'
           ? {
-              knownRuns: 2,
-              unavailableRuns: 0,
-              inputTokens: 1,
-              outputTokens: 2,
-              cacheTokens: 0,
-              reasoningOutputTokens: 0,
-              totalTokens: 3,
-              estimatedCostUsd: null
+              status: 'completed',
+              at: 123
             }
           : null
     })
-    expect(result.items[0]?.usageSummary?.knownRuns).toBe(2)
-    expect(result.items[1]?.usageSummary).toBeNull()
+    expect(result.items[0]?.lastRunSummary).toEqual({ status: 'completed', at: 123 })
+    expect(result.items[1]?.lastRunSummary).toBeNull()
   })
 
   it('projects and scopes in one collection traversal', () => {
@@ -214,7 +208,7 @@ describe('projectAutomationList', () => {
         return Reflect.get(target, property, receiver)
       }
     })
-    const usageIds: string[] = []
+    const summaryIds: string[] = []
     const result = projectAutomationList(
       source,
       {
@@ -227,8 +221,8 @@ describe('projectAutomationList', () => {
           targetLookups.push(targetId)
           return targetId === 'ssh-1' ? 7 : undefined
         },
-        usageSummary: (id) => {
-          usageIds.push(id)
+        lastRunSummary: (id) => {
+          summaryIds.push(id)
           return null
         }
       },
@@ -242,7 +236,7 @@ describe('projectAutomationList', () => {
     expect(result.orphanCount).toBe(1)
     expect(repoLookups).toEqual(['repo-1'])
     expect(targetLookups).toEqual(['ssh-1', 'ssh-gone'])
-    expect(usageIds).toEqual(['local-1'])
+    expect(summaryIds).toEqual(['local-1'])
   })
 })
 

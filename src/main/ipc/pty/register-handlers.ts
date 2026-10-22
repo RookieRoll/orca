@@ -134,7 +134,6 @@ export function registerPtyHandlers(
   ipcMain.removeHandler('pty:isCodexOnSharedServer')
   ipcMain.removeHandler('pty:disableCodexSharedServerAutoStart')
   ipcMain.removeHandler('pty:stopCodexSharedServer')
-  ipcMain.removeHandler('pty:openedBeforeClaudeAccounts')
   ipcMain.removeHandler('pty:claudeDiffPanelMayAutoOpen')
   ipcMain.removeHandler('pty:readNewerDaemonHeldScreen')
   ipcMain.removeHandler('pty:reopenNewerDaemonTerminals')

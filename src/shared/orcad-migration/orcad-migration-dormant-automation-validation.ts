@@ -17,8 +17,7 @@ import {
 import {
   parseOutputSnapshot,
   parsePrecheck,
-  parsePrecheckResult,
-  parseUsage
+  parsePrecheckResult
 } from './orcad-migration-dormant-automation-fields'
 
 const FINAL_RUN_STATUSES = new Set<unknown>([
@@ -144,6 +143,9 @@ function isMigratedAutomation(value: unknown): value is Automation {
 
 function parseAutomationRun(value: unknown): AutomationRun {
   const copy = structuredClone(value)
+  if (copy && typeof copy === 'object') {
+    Reflect.deleteProperty(copy, 'usage')
+  }
   if (!isMigratedAutomationRun(copy)) {
     throw new Error('orcad_migration_dormant_automation_run_invalid')
   }
@@ -187,7 +189,6 @@ function isMigratedAutomationRun(value: unknown): value is AutomationRun {
   }
   parseOutputSnapshot(record.outputSnapshot)
   parsePrecheckResult(record.precheckResult)
-  parseUsage(record.usage)
   optionalFinite(record.startedAt, 'orcad_migration_dormant_automation_run_started_invalid', true)
   optionalFinite(
     record.dispatchedAt,

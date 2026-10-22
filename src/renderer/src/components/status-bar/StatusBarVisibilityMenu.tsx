@@ -6,10 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { AgentIcon } from '@/lib/agent-catalog'
-import { ClaudeIcon, GeminiIcon, MiniMaxIcon, OpenAIIcon, OpenCodeGoIcon } from './icons'
 import { translate } from '@/i18n/i18n'
-import { isStatusBarItemAvailable } from './status-bar-agent-gating'
 import type { StatusBarController } from './use-status-bar-controller'
 
 export function StatusBarVisibilityMenu({
@@ -18,7 +15,6 @@ export function StatusBarVisibilityMenu({
   controller: StatusBarController
 }): React.JSX.Element {
   const {
-    detectedAgentIds,
     menuOpen,
     menuPoint,
     recordFeatureInteraction,
@@ -38,123 +34,6 @@ export function StatusBarVisibilityMenu({
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-0 w-fit" sideOffset={0} align="start">
-        {isStatusBarItemAvailable('claude', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('claude')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('claude')
-            }}
-          >
-            <ClaudeIcon size={14} />
-            {translate('auto.components.status.bar.StatusBar.3885eb74d8', 'Claude Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        {isStatusBarItemAvailable('codex', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('codex')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('codex')
-            }}
-          >
-            <OpenAIIcon size={14} />
-            {translate('auto.components.status.bar.StatusBar.c0909c686e', 'Codex Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        {isStatusBarItemAvailable('gemini', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('gemini')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('gemini')
-            }}
-          >
-            <GeminiIcon size={14} />
-            {translate('auto.components.status.bar.StatusBar.c1df0d67ec', 'Gemini Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        {isStatusBarItemAvailable('antigravity', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('antigravity')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('antigravity')
-            }}
-          >
-            <AgentIcon agent="antigravity" size={14} />
-            {translate(
-              'auto.components.status.bar.StatusBar.antigravityUsage',
-              'Antigravity Usage'
-            )}
-          </DropdownMenuCheckboxItem>
-        )}
-        <DropdownMenuCheckboxItem
-          checked={statusBarItems.includes('opencode-go')}
-          onCheckedChange={() => {
-            recordFeatureInteraction('usage-tracking')
-            toggleStatusBarItem('opencode-go')
-          }}
-        >
-          <OpenCodeGoIcon size={14} />
-          {translate('auto.components.status.bar.StatusBar.8c86cd77b0', 'OpenCode Go Usage')}
-        </DropdownMenuCheckboxItem>
-        {isStatusBarItemAvailable('kimi', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('kimi')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('kimi')
-            }}
-          >
-            <AgentIcon agent="kimi" size={14} />
-            {translate('auto.components.status.bar.StatusBar.5e59007df4', 'Kimi Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        <DropdownMenuCheckboxItem
-          checked={statusBarItems.includes('minimax')}
-          onCheckedChange={() => {
-            recordFeatureInteraction('usage-tracking')
-            toggleStatusBarItem('minimax')
-          }}
-        >
-          <MiniMaxIcon size={14} />
-          {translate('auto.components.status.bar.StatusBar.3bbf140864', 'MiniMax Usage')}
-        </DropdownMenuCheckboxItem>
-        {isStatusBarItemAvailable('grok', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('grok')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('grok')
-            }}
-          >
-            <AgentIcon agent="grok" size={14} />
-            {translate('auto.components.status.bar.StatusBar.grokUsageMenu', 'Grok Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        {isStatusBarItemAvailable('zcode', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('zcode')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('zcode')
-            }}
-          >
-            <AgentIcon agent="zcode" size={14} />
-            {translate('auto.components.status.bar.StatusBar.zcodeUsageMenu', 'ZCode Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        <DropdownMenuCheckboxItem
-          checked={statusBarItems.includes('cursor')}
-          onCheckedChange={() => {
-            recordFeatureInteraction('usage-tracking')
-            toggleStatusBarItem('cursor')
-          }}
-        >
-          <AgentIcon agent="cursor" size={14} />
-          {translate('auto.components.status.bar.StatusBar.cursorUsageMenu', 'Cursor Usage')}
-        </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={statusBarItems.includes('ssh')}
           onCheckedChange={() => {

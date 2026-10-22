@@ -54,8 +54,7 @@ function row(overrides: Partial<AutomationHostRow>): AutomationHostRow {
     automation: automation(),
     owner: DESKTOP_SELF,
     selector: { kind: 'self' },
-    usageSummary: null,
-    usageKnown: false,
+    lastRunSummary: null,
     ...overrides
   }
 }

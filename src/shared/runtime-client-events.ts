@@ -43,7 +43,7 @@ export type RuntimeClientEvent =
   | {
       type: 'automationsChanged'
       selector?: { kind: 'self' } | { kind: 'ssh'; targetId: string } | { kind: 'orphan' }
-      reason?: 'definition' | 'run' | 'usage'
+      reason?: 'definition' | 'run'
     }
   | {
       type: 'linearLinkedIssueUpdated'

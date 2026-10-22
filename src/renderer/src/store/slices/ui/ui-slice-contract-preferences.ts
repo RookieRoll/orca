@@ -12,11 +12,9 @@ import type {
   WorkspaceHostScope,
   VisibleWorkspaceHostIds
 } from '../../../../../shared/ui-chrome-types'
-import type { UsagePercentageDisplay } from '../../../../../shared/usage-percentage-display'
 import type { AutomationHostFilter } from '../../../../../shared/automation-host-filter'
 import type { WorkspaceStatusDefinition } from '../../../../../shared/worktree/types'
 import type { WorkspacePortScanResult } from '../../../../../shared/workspace-ports'
-import type { StatusBarUsageMode } from '../../../../../shared/status-bar-usage-mode'
 import type { PersistedUIWriteBaseline } from '../persisted-ui-write-baseline'
 import type { UISliceCore } from './ui-slice-contract-core'
 
@@ -107,10 +105,6 @@ export type UISlicePreferences = {
   toggleStatusBarItem: (item: StatusBarItem) => void
   statusBarVisible: boolean
   setStatusBarVisible: (v: boolean) => void
-  usagePercentageDisplay: UsagePercentageDisplay
-  setUsagePercentageDisplay: (display: UsagePercentageDisplay) => void
-  statusBarUsageMode: StatusBarUsageMode
-  setStatusBarUsageMode: (mode: StatusBarUsageMode) => void
 }
 
 export type UISliceSurfaces = {

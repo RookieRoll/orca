@@ -100,10 +100,10 @@ export function buildInterfaceSettingsSections({
     },
     {
       id: 'stats',
-      title: translate('auto.hooks.useSettingsNavigationMetadata.d72a58b5b9', 'Stats & Usage'),
+      title: translate('auto.hooks.useSettingsNavigationMetadata.d72a58b5b9', 'Work activity'),
       description: translate(
         'auto.hooks.useSettingsNavigationMetadata.b351014180',
-        'Orca stats plus Claude, Codex, OpenCode, Muse token analytics and Grok subscription usage.'
+        'Agent activity, work time, and pull requests created in Orca.'
       ),
       icon: BarChart3,
       searchEntries: getStatsPaneSearchEntries(),

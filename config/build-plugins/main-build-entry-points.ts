@@ -26,10 +26,6 @@ export const MAIN_BUILD_ENTRY_POINTS: Record<string, string> = {
   'worker-thread-child-process-entry': resolve(
     'src/main/worker-thread-child-process/worker-thread-child-process-entry.ts'
   ),
-  // Why: the Claude/Codex/OpenCode usage scans walk whole history
-  // corpora and read SQLite synchronously; a worker thread keeps that
-  // off the main-process event loop.
-  'usage-scan-worker-entry': resolve('src/main/usage/usage-scan-worker-entry.ts'),
   'workspace-space-scan-worker-entry': resolve('src/main/workspace-space-scan-worker-entry.ts'),
   // Why: a first account setup can merge a large history tree with sync fs calls.
   'claude-profile-setup-worker-entry': resolve(

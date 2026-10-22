@@ -312,7 +312,6 @@ describe('orcad migration manifest', () => {
         truncated: false
       },
       precheckResult: null,
-      usage: null,
       error: null,
       startedAt: 1,
       dispatchedAt: 1,

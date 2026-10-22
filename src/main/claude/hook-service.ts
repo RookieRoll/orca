@@ -1,4 +1,4 @@
-import { existsSync, rmSync, writeFileSync } from 'node:fs'
+import { rmSync } from 'node:fs'
 import type { AgentHookSource } from '../../shared/agent-hook-relay'
 import type { SFTPWrapper } from 'ssh2'
 import type { AgentHookInstallState, AgentHookInstallStatus } from '../../shared/agent-hook-types'
@@ -25,10 +25,8 @@ import {
 } from './windows-hook-files'
 
 export { getManagedScript }
-import { getManagedStatusLineCommand, getManagedStatusLineScript } from './statusline-script'
 import {
   applyManagedHooks,
-  applyManagedStatusLine,
   CLAUDE_HOOK_SETTINGS,
   getManagedScriptFileName,
   getConfigPath,
@@ -39,8 +37,6 @@ import {
   getRemoteManagedEventCommand,
   getStatusLineInstallMarkerPath,
   getStatusLineScriptFileName,
-  getStatusLineScriptPath,
-  getStatusLineSlotState,
   findManagedEventHookForms,
   removeManagedHooks,
   removeManagedStatusLine,
@@ -152,11 +148,6 @@ export class ClaudeHookService {
     await (this.usesWindowsEntry
       ? refreshWindowsClaudeHookFiles(scriptPath, payload)
       : refreshManagedScriptIfPresent(scriptPath, payload))
-    // Why: no agent gate — the statusline script only ever exists for claude, so presence is the gate.
-    await refreshManagedScriptIfPresent(
-      getStatusLineScriptPath(this.options.settings),
-      getManagedStatusLineScript('local')
-    )
   }
 
   install(options: ClaudeHookTargetOptions = {}): AgentHookInstallStatus {
@@ -187,10 +178,7 @@ export class ClaudeHookService {
     } else {
       writeManagedScript(scriptPath, payload)
     }
-    // Why: a profile's statusLine arrives with the settings copy from the default home.
-    if (options.configDir === undefined && plan.statusLine === 'install') {
-      nextConfig = this.installManagedStatusLine(nextConfig)
-    } else if (options.configDir === undefined && plan.statusLine === 'retire') {
+    if (options.configDir === undefined && plan.statusLine === 'retire') {
       nextConfig = this.retireManagedStatusLine(nextConfig)
     }
     writeHooksJson(configPath, nextConfig)
@@ -199,28 +187,6 @@ export class ClaudeHookService {
 
   // Why: the statusline feed is opportunistic (usage display, not agent status); a user who deleted the
   // managed entry has opted out, and the marker distinguishes that deletion from a first install.
-  private installManagedStatusLine(config: HooksConfig): HooksConfig {
-    const scriptFileName = getStatusLineScriptFileName(this.options.settings)
-    const markerPath = getStatusLineInstallMarkerPath(this.options.settings)
-    const slot = getStatusLineSlotState(config, scriptFileName)
-    if (slot === 'user' || (slot === 'empty' && existsSync(markerPath))) {
-      return config
-    }
-    const statusLineScriptPath = getStatusLineScriptPath(this.options.settings)
-    writeManagedScript(statusLineScriptPath, getManagedStatusLineScript('local'))
-    const next = applyManagedStatusLine(
-      config,
-      getManagedStatusLineCommand(statusLineScriptPath),
-      scriptFileName
-    )
-    try {
-      writeFileSync(markerPath, '')
-    } catch {
-      // Best-effort: a missing marker only means one future user deletion gets re-installed once.
-    }
-    return next
-  }
-
   // Why: a Claude that predates statusLine discards the whole settings file over Orca's; dropping the
   // marker with it keeps an upgrade from reading the removal as the user's opt-out.
   private retireManagedStatusLine(config: HooksConfig): HooksConfig {

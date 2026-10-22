@@ -212,14 +212,18 @@ export function presetToQuery(presetId: TaskViewPresetId | null): string {
 
 export function migrateStatusBarItems(items: readonly string[] | undefined): StatusBarItem[] {
   const source = items ?? DEFAULT_STATUS_BAR_ITEMS
-  const out: string[] = []
+  const out: StatusBarItem[] = []
   for (const id of source) {
     const mapped = id === 'memory' || id === 'sessions' ? 'resource-usage' : id
-    if (!out.includes(mapped)) {
+    if (isStatusBarItem(mapped) && !out.includes(mapped)) {
       out.push(mapped)
     }
   }
-  return out as StatusBarItem[]
+  return out
+}
+
+function isStatusBarItem(value: string): value is StatusBarItem {
+  return value === 'ssh' || value === 'resource-usage' || value === 'ports'
 }
 
 export function hydrateUnexpectedSignoutDismissal(

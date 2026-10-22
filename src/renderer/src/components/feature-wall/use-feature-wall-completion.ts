@@ -16,7 +16,6 @@ import {
   FEATURE_WALL_WORKBENCH_STEP_IDS,
   getFeatureWallCompletionProgress
 } from './feature-wall-completion-progress'
-import { hasFeatureWallUsageTracking } from './feature-wall-usage-tracking'
 import { usePersistedFeatureWallCompletion } from './use-persisted-feature-wall-completion'
 import { useFeatureWallSessionDepth } from './use-feature-wall-session-depth'
 
@@ -43,8 +42,6 @@ export function useFeatureWallCompletion(
   const { onTourDepthSummaryChange } = options
   const settings = useAppStore((s) => s.settings)
   const preflightStatus = useAppStore((s) => s.preflightStatus)
-  const rateLimits = useAppStore((s) => s.rateLimits)
-  const fetchRateLimits = useAppStore((s) => s.fetchRateLimits)
   const githubConfigured =
     preflightStatus?.gh.installed === true && preflightStatus.gh.authenticated === true
   const commitMessageAi = settings?.commitMessageAi
@@ -64,10 +61,6 @@ export function useFeatureWallCompletion(
         ? getCommitMessageAgentCapability(resolvedCommitMessageAgent) !== undefined
         : false)
 
-  const hasUsageAccount = hasFeatureWallUsageTracking({
-    claudeRateLimits: rateLimits.claude,
-    codexRateLimits: rateLimits.codex
-  })
   const persistedCompletion = usePersistedFeatureWallCompletion()
   const {
     visitedWorkflows,
@@ -92,20 +85,12 @@ export function useFeatureWallCompletion(
     isOpen,
     hasConnectedTaskSource,
     isCheckingTaskSources,
-    hasUsageAccount,
     orchestrationSkillInstalled,
     browserUseSkillInstalled,
     githubConfigured,
     aiCommitPrConfigured,
     onTourDepthSummaryChange
   })
-
-  // Refresh CLI usage snapshots when the modal opens.
-  useEffect(() => {
-    if (isOpen) {
-      void fetchRateLimits()
-    }
-  }, [fetchRateLimits, isOpen])
 
   const currentProgress = useMemo(
     () =>
@@ -116,7 +101,6 @@ export function useFeatureWallCompletion(
         visitedReviewSteps,
         hasConnectedTaskSource,
         isCheckingTaskSources,
-        hasUsageAccount,
         orchestrationSkillInstalled,
         browserUseSkillInstalled,
         githubConfigured,
@@ -127,7 +111,6 @@ export function useFeatureWallCompletion(
       browserUseSkillInstalled,
       githubConfigured,
       hasConnectedTaskSource,
-      hasUsageAccount,
       isCheckingTaskSources,
       orchestrationSkillInstalled,
       visitedAgentSteps,
@@ -189,7 +172,6 @@ export function useFeatureWallCompletion(
         completedReviewSteps,
         hasConnectedTaskSource,
         isCheckingTaskSources,
-        hasUsageAccount,
         orchestrationSkillInstalled,
         browserUseSkillInstalled,
         githubConfigured,
@@ -204,7 +186,6 @@ export function useFeatureWallCompletion(
       completedWorkflows,
       githubConfigured,
       hasConnectedTaskSource,
-      hasUsageAccount,
       isCheckingTaskSources,
       orchestrationSkillInstalled,
       visitedAgentSteps,

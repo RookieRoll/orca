@@ -13,7 +13,6 @@ import type {
   AiVaultPrepareSessionResumeArgs,
   AiVaultPrepareSessionResumeResult
 } from '../../shared/ai-vault-resume-preparation'
-import type { ClaudeStatusLineRateLimits } from '../../shared/claude-statusline-rate-limits'
 import { createProviderAccountServices } from '../provider-account-services'
 import { createCodexRuntimeHomeLaunchPreparation } from '../codex/codex-runtime-home-launch-preparation'
 import { createCodexSessionResumeLaunchPreparation } from '../codex/codex-session-resume-launch-preparation'
@@ -21,7 +20,6 @@ import { prepareCodexAiVaultSessionResume } from '../codex/codex-ai-vault-sessio
 import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { resolveHostAgentBaseEnvironment } from '../runtime/structured-agent-shell-environment'
 import { isWslHostOrcadProcess } from '../ipc/wsl-guest-windows-drive-path'
-import type { OrcadRuntimeCleanup } from './orcad-runtime-lifetime'
 
 type StructuredLaunchInput = { launchEnv: NodeJS.ProcessEnv }
 
@@ -51,10 +49,6 @@ export type OrcadAccountServices = {
 /** Null on a WSL host, whose runtime must keep the desktop-pushed CODEX_HOME (no structured resolvers). */
 export function createOrcadAccountServices(args: {
   store: Store
-  setClaudeStatusLineListener: (
-    listener: ((event: ClaudeStatusLineRateLimits) => void) | null
-  ) => void
-  registerCleanup: (cleanup: OrcadRuntimeCleanup) => void
   /** A client-sent account home (launch env CODEX_HOME) wins over this host's selection, as for PTYs. */
   clientCodexHomes: {
     selectLaunchHome: GetSelectedCodexHomePath
@@ -62,19 +56,12 @@ export function createOrcadAccountServices(args: {
   }
   isWslHost?: () => boolean
 }): OrcadAccountServices | null {
-  // A WSL host has no desktop-owned provider account services.
+  // A WSL host has no desktop-owned runtime account services.
   if ((args.isWslHost ?? isWslHostOrcadProcess)()) {
     return null
   }
   const { store, clientCodexHomes } = args
-  const services = createProviderAccountServices(store, {
-    setClaudeStatusLineListener: args.setClaudeStatusLineListener
-  })
-  // Why no start(): like headless desktop serve, usage refreshes on demand (accounts.list, subscribe).
-  args.registerCleanup(() => {
-    services.rateLimits.stop()
-    args.setClaudeStatusLineListener(null)
-  })
+  const services = createProviderAccountServices(store)
   const { codexRuntimeHome } = services
   const prepareCodexHome = createCodexRuntimeHomeLaunchPreparation({
     getRuntimeHome: () => codexRuntimeHome,
@@ -110,10 +97,7 @@ export function createOrcadAccountServices(args: {
     },
     listCodexSessionHomes: () => codexRuntimeHome.getHostCodexHomePathsForSessionDiscovery(),
     attachToRuntime: (runtime) => {
-      runtime.setAccountServices({
-        claudeRuntimeAuth: services.claudeRuntimeAuth,
-        rateLimits: services.rateLimits
-      })
+      runtime.setAccountServices({ claudeRuntimeAuth: services.claudeRuntimeAuth })
       runtime.setCommitMessageAgentEnvironmentResolvers({
         prepareForCodexLaunch: prepareCodexHome,
         prepareForClaudeLaunch: prepareClaudeAuth,

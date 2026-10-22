@@ -4,7 +4,6 @@ import type {
   AgentStatusClearIpcPayload,
   AgentStatusIpcPayload
 } from '../../../shared/agent-status-types'
-import type { ClaudeStatusLineRateLimits } from '../../../shared/claude-statusline-rate-limits'
 import {
   getLegacyStatusListingOrder,
   type HookListenerState
@@ -103,13 +102,6 @@ export abstract class AgentHookServerListeners extends AgentHookServerState {
         console.error('[agent-hooks] replay listener threw', err)
       }
     }
-  }
-
-  // Why: statusline posts carry live Claude usage windows, not agent status; they feed RateLimitService directly.
-  setClaudeStatusLineListener(
-    listener: ((event: ClaudeStatusLineRateLimits) => void) | null
-  ): void {
-    this.onClaudeStatusLine = listener
   }
 
   subscribeStatusChanges(listener: (statuses: AgentHookStatusChangeEntry[]) => void): () => void {

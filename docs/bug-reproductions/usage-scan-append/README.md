@@ -1,4 +1,6 @@
-# Usage scans after a transcript append
+# Historical usage scan after a transcript append
+
+This archive records scanner behavior from an earlier product version. B3-USAGE removed the provider usage scanners and their benchmark tools; the measurements, source hashes, and commands below are historical and cannot be reproduced from the current checkout.
 
 Latest follow-up: [lossless source compression](./source-compression.md) removes the disk increase in three measured histories, with CPU costs reported. Earlier tables below describe the uncompressed implementation.
 
@@ -6,7 +8,7 @@ Claude usage refresh previously cached a transcript only while its modification 
 
 The regression is deterministic: the append test measures bytes returned by the real filesystem reader. Before the fix, a 424-byte append to a 1,083,929-byte transcript read 1,084,353 bytes. The new scan reads a verified suffix and a fixed amount of prefix evidence. It retains all usage history and places no new cap on transcripts, rows or tokens.
 
-## Reproduce
+## Historical reproduction commands
 
 From the repository root:
 

@@ -114,206 +114,33 @@ describe('createUISlice hydratePersistedUI', () => {
     expect(store.getState().worktreeCardProperties).toEqual(['status', 'unread', 'inline-agents'])
   })
 
-  it('adds default-on status items once for older persisted UI', () => {
+  it('drops retired status items and adds the retained ports default once', () => {
     const setUI = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('window', { api: { ui: { set: setUI } } })
     const store = createUIStore()
 
-    store.getState().hydratePersistedUI(
-      makePersistedUI({
-        statusBarItems: ['claude', 'resource-usage'],
-        _portsStatusBarDefaultAdded: false
-      })
-    )
+    const legacyUi = makePersistedUI({ _portsStatusBarDefaultAdded: false })
+    Reflect.set(legacyUi, 'statusBarItems', ['claude', 'resource-usage', 'minimax'])
+    store.getState().hydratePersistedUI(legacyUi)
 
-    expect(store.getState().statusBarItems).toEqual([
-      'claude',
-      'resource-usage',
-      'ports',
-      'kimi',
-      'minimax',
-      'antigravity',
-      'grok',
-      'cursor',
-      'zcode'
-    ])
+    expect(store.getState().statusBarItems).toEqual(['resource-usage', 'ports'])
     expect(setUI).toHaveBeenCalledWith({
-      statusBarItems: [
-        'claude',
-        'resource-usage',
-        'ports',
-        'kimi',
-        'minimax',
-        'antigravity',
-        'grok',
-        'cursor',
-        'zcode'
-      ],
-      _portsStatusBarDefaultAdded: true,
-      _kimiStatusBarDefaultAdded: true,
-      _minimaxStatusBarDefaultAdded: true,
-      _antigravityStatusBarDefaultAdded: true,
-      _grokStatusBarDefaultAdded: true,
-      _cursorStatusBarDefaultAdded: true,
-      _zcodeStatusBarDefaultAdded: true
+      statusBarItems: ['resource-usage', 'ports'],
+      _portsStatusBarDefaultAdded: true
     })
   })
 
-  it('preserves user-hidden default-on status items after one-shot migrations ran', () => {
+  it('preserves retained hidden status items after the ports default migration ran', () => {
     const setUI = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('window', { api: { ui: { set: setUI } } })
     const store = createUIStore()
 
-    store.getState().hydratePersistedUI(
-      makePersistedUI({
-        statusBarItems: ['claude', 'resource-usage'],
-        _portsStatusBarDefaultAdded: true,
-        _kimiStatusBarDefaultAdded: true,
-        _minimaxStatusBarDefaultAdded: true,
-        _antigravityStatusBarDefaultAdded: true,
-        _grokStatusBarDefaultAdded: true,
-        _cursorStatusBarDefaultAdded: true,
-        _zcodeStatusBarDefaultAdded: true
-      })
-    )
+    const legacyUi = makePersistedUI({ _portsStatusBarDefaultAdded: true })
+    Reflect.set(legacyUi, 'statusBarItems', ['claude', 'resource-usage'])
+    store.getState().hydratePersistedUI(legacyUi)
 
-    expect(store.getState().statusBarItems).toEqual(['claude', 'resource-usage'])
+    expect(store.getState().statusBarItems).toEqual(['resource-usage'])
     expect(setUI).not.toHaveBeenCalled()
-  })
-
-  it('persists and hydrates the usage percentage display preference', () => {
-    const setUI = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('window', { api: { ui: { set: setUI } } })
-    const store = createUIStore()
-
-    store.getState().setUsagePercentageDisplay('used')
-
-    expect(store.getState().usagePercentageDisplay).toBe('used')
-    // Why: adapting the control also permanently dismisses the one-time change notice.
-    expect(setUI).toHaveBeenCalledWith({
-      usagePercentageDisplay: 'used',
-      usagePercentageDisplayChangeNoticeDismissed: true
-    })
-    expect(store.getState().usagePercentageDisplayChangeNoticeDismissed).toBe(true)
-
-    store.getState().hydratePersistedUI(makePersistedUI({ usagePercentageDisplay: 'remaining' }))
-    expect(store.getState().usagePercentageDisplay).toBe('remaining')
-  })
-
-  it('hydrates and dismisses the usage percentage display change notice', () => {
-    const setUI = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('window', { api: { ui: { set: setUI } } })
-    const store = createUIStore()
-
-    store
-      .getState()
-      .hydratePersistedUI(makePersistedUI({ usagePercentageDisplayChangeNoticeDismissed: false }))
-    expect(store.getState().usagePercentageDisplayChangeNoticeDismissed).toBe(false)
-
-    store.getState().dismissUsagePercentageDisplayChangeNotice()
-    expect(store.getState().usagePercentageDisplayChangeNoticeDismissed).toBe(true)
-    expect(setUI).toHaveBeenCalledWith({ usagePercentageDisplayChangeNoticeDismissed: true })
-
-    setUI.mockClear()
-    store.getState().dismissUsagePercentageDisplayChangeNotice()
-    expect(setUI).not.toHaveBeenCalled()
-  })
-
-  it('defaults invalid usage percentage display values to used', () => {
-    const store = createUIStore()
-
-    store.getState().hydratePersistedUI(
-      makePersistedUI({
-        usagePercentageDisplay: 'left' as PersistedUIState['usagePercentageDisplay']
-      })
-    )
-
-    expect(store.getState().usagePercentageDisplay).toBe('used')
-  })
-
-  it('initializes new users with compact status bar usage', () => {
-    expect(createUIStore().getState().statusBarUsageMode).toBe('compact')
-  })
-
-  it.each(['verbose', 'compact'] as const)(
-    'persists and hydrates explicit %s usage mode',
-    (mode) => {
-      const setUI = vi.fn().mockResolvedValue(undefined)
-      vi.stubGlobal('window', { api: { ui: { set: setUI } } })
-      const store = createUIStore()
-
-      store.getState().setStatusBarUsageMode(mode)
-
-      expect(store.getState().statusBarUsageMode).toBe(mode)
-      expect(setUI).toHaveBeenCalledWith({ statusBarUsageMode: mode })
-
-      const restoredStore = createUIStore()
-      restoredStore.getState().hydratePersistedUI(makePersistedUI({ statusBarUsageMode: mode }))
-      expect(restoredStore.getState().statusBarUsageMode).toBe(mode)
-    }
-  )
-
-  it.each([undefined, null, 'expanded'])(
-    'hydrates missing or invalid status bar usage mode %j as compact',
-    (value) => {
-      const store = createUIStore()
-      const ui = makePersistedUI()
-      if (value === undefined) {
-        delete ui.statusBarUsageMode
-      } else {
-        Reflect.set(ui, 'statusBarUsageMode', value)
-      }
-
-      store.getState().hydratePersistedUI(ui)
-
-      expect(store.getState().statusBarUsageMode).toBe('compact')
-    }
-  )
-
-  it('hydrates and permanently dismisses the Compact change notice', () => {
-    const setUI = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('window', { api: { ui: { set: setUI } } })
-    const store = createUIStore()
-    expect(store.getState().statusBarCompactChangeNoticeDismissed).toBe(true)
-
-    store
-      .getState()
-      .hydratePersistedUI(makePersistedUI({ statusBarCompactChangeNoticeDismissed: false }))
-    expect(store.getState().statusBarCompactChangeNoticeDismissed).toBe(false)
-    setUI.mockClear()
-    store.getState().dismissStatusBarCompactChangeNotice()
-    expect(store.getState().statusBarCompactChangeNoticeDismissed).toBe(true)
-    expect(setUI).toHaveBeenCalledWith({ statusBarCompactChangeNoticeDismissed: true })
-    store.getState().dismissStatusBarCompactChangeNotice()
-    expect(setUI).toHaveBeenCalledTimes(1)
-  })
-
-  it.each(['verbose', 'compact'] as const)(
-    'dismisses the Compact notice when choosing %s',
-    (mode) => {
-      const setUI = vi.fn().mockResolvedValue(undefined)
-      vi.stubGlobal('window', { api: { ui: { set: setUI } } })
-      const store = createUIStore()
-      store
-        .getState()
-        .hydratePersistedUI(makePersistedUI({ statusBarCompactChangeNoticeDismissed: false }))
-
-      store.getState().setStatusBarUsageMode(mode)
-
-      expect(store.getState().statusBarCompactChangeNoticeDismissed).toBe(true)
-      expect(setUI).toHaveBeenCalledWith({
-        statusBarUsageMode: mode,
-        statusBarCompactChangeNoticeDismissed: true
-      })
-    }
-  )
-
-  it('keeps the Compact notice hidden with an older host that omits its flag', () => {
-    const store = createUIStore()
-    const ui = makePersistedUI()
-    delete ui.statusBarCompactChangeNoticeDismissed
-    store.getState().hydratePersistedUI(ui)
-    expect(store.getState().statusBarCompactChangeNoticeDismissed).toBe(true)
   })
 
   it('clamps persisted workspace board column width', () => {

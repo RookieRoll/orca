@@ -165,7 +165,6 @@ export function buildStoreState(overrides: StoreLike): StoreLike {
     activeTabType: 'terminal',
     editorFontZoomLevel: 0,
     setEditorFontZoomLevel: vi.fn(),
-    setRateLimitsFromPush: vi.fn(),
     updateWorktreeBaseStatus: vi.fn(),
     updateWorktreeRemoteBranchConflict: vi.fn(),
     setSshConnectionState: vi.fn(),

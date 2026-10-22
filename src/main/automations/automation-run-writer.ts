@@ -31,12 +31,12 @@ export function createAutomationRunWriter(
 ): AutomationRunWriter {
   // A run write never moves the record, so its own host is the whole publication.
   // A record that can no longer be named degrades to the authority-wide event.
-  const announce = (automationId: string, reason: 'run' | 'usage'): void => {
+  const announce = (automationId: string): void => {
     if (!publish) {
       return
     }
     const selector = store.automationChangeSelector(automationId)
-    publish({ reason, ...(selector ? { selector } : {}) })
+    publish({ reason: 'run', ...(selector ? { selector } : {}) })
   }
   return {
     advanceNextRun: async (id, now) => {
@@ -47,20 +47,20 @@ export function createAutomationRunWriter(
     createRun: async (automation, scheduledFor, trigger): Promise<AutomationRun> => {
       const run = store.createAutomationRun(automation, scheduledFor, trigger)
       await store.flushPendingOrThrowAsync({ drainToStableGeneration: false })
-      announce(automation.id, 'run')
+      announce(automation.id)
       return run
     },
     updateRun: async (result: AutomationDispatchResult): Promise<AutomationRun> => {
       const run = store.updateAutomationRun(result)
       await store.flushPendingOrThrowAsync({ drainToStableGeneration: false })
-      announce(run.automationId, result.usage ? 'usage' : 'run')
+      announce(run.automationId)
       return run
     },
     repeatSkip: async (automationId, error, scheduledFor): Promise<AutomationRun | null> => {
       const run = store.recordRepeatedAutomationSkip(automationId, error, scheduledFor)
       if (run) {
         await store.flushPendingOrThrowAsync({ drainToStableGeneration: false })
-        announce(automationId, 'run')
+        announce(automationId)
       }
       return run
     }

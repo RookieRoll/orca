@@ -1,9 +1,5 @@
 import { waitForPromiseWithSignal } from '../../../shared/abort-signal-reason'
 import {
-  parseCodexResetCreditAttemptLedger,
-  type CodexResetCreditAttemptLedger
-} from '../../../shared/codex-reset-credit-attempt-ledger'
-import {
   stopAfterFailedPrimaryStateMutation,
   type PrimaryStateWriteOperationsRuntime
 } from './primary-state-write-runtime'
@@ -131,31 +127,6 @@ export class PrimaryStateWriteOperations {
     }
   }
 
-  getCodexResetCreditAttemptLedger(): CodexResetCreditAttemptLedger {
-    return parseCodexResetCreditAttemptLedger(
-      this[primaryStateWriteOperationsContext].runtime.state.codexResetCreditAttemptLedger
-    )
-  }
-
-  replaceCodexResetCreditAttemptLedgerAndFlush(
-    ledger: CodexResetCreditAttemptLedger
-  ): Promise<void> {
-    const { runtime } = this[primaryStateWriteOperationsContext]
-    const next = parseCodexResetCreditAttemptLedger(ledger)
-    return this.runDurableMutation(() => {
-      const previous = runtime.state.codexResetCreditAttemptLedger
-      runtime.state.codexResetCreditAttemptLedger = next
-      runtime.dirtyProfileStateDomains?.add('codexResetCreditAttemptLedger')
-      return {
-        value: undefined,
-        rollback: () => {
-          if (runtime.state.codexResetCreditAttemptLedger === next) {
-            runtime.state.codexResetCreditAttemptLedger = previous
-          }
-        }
-      }
-    })
-  }
 }
 
 export function enqueueWrite(

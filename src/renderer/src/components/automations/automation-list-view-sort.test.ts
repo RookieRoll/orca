@@ -84,13 +84,13 @@ describe('automation list collation', () => {
           key: 'row|host-b|shared',
           automation: duplicate,
           hostLabel: 'b',
-          usageSummary: null
+          lastRunSummary: null
         },
         {
           key: 'row|host-a|shared',
           automation: duplicate,
           hostLabel: 'a',
-          usageSummary: null
+          lastRunSummary: null
         }
       ],
       externalEntries: []

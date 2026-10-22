@@ -9,27 +9,12 @@ import { i18n } from '@/i18n/i18n'
 import { resetRendererAppPlatformCacheForTests } from '@/lib/renderer-app-platform'
 import { getDefaultSettings } from '../../../../shared/constants'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
-import type { StatusBarItem } from '../../../../shared/ui-chrome-types'
 
 const mocks = vi.hoisted(() => ({
   state: {
     appPlatform: 'linux' as NodeJS.Platform,
-    availableStatusBarToggles: [] as {
-      description: string
-      id: StatusBarItem
-      keywords: string[]
-      title: string
-      toggleDescription: string
-    }[],
     settingsSearchQuery: 'automations',
-    statusBarItems: [],
-    toggleStatusBarItem: vi.fn(),
-    usagePercentageDisplay: 'used' as 'used' | 'remaining',
-    setUsagePercentageDisplay: vi.fn(),
-    recordFeatureInteraction: vi.fn(),
     setWorktreeCardMode: vi.fn(),
-    appearanceAccordionDeepLink: null as 'interface' | 'terminal' | 'window' | null,
-    clearAppearanceAccordionDeepLink: vi.fn()
   }
 }))
 
@@ -40,10 +25,6 @@ vi.mock('../../store', () => ({
 vi.mock('@/hooks/useShortcutLabel', async (importOriginal) => ({
   ...(await importOriginal<typeof ShortcutLabelModule>()),
   useShortcutKeyComboDetails: () => []
-}))
-
-vi.mock('../status-bar/use-available-status-bar-toggles', () => ({
-  useAvailableStatusBarToggles: () => mocks.state.availableStatusBarToggles
 }))
 
 vi.mock('./TerminalAppearanceSection', () => ({
@@ -200,11 +181,8 @@ describe('AppearancePane', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resetRendererAppPlatformCacheForTests()
-    mocks.state.availableStatusBarToggles = []
     mocks.state.appPlatform = 'linux'
     mocks.state.settingsSearchQuery = 'automations'
-    mocks.state.appearanceAccordionDeepLink = null
-    mocks.state.usagePercentageDisplay = 'used'
     // UIZoomControl reads window.api.ui on mount; the inline-expansion pane can
     // render the full Interface section, so provide a minimal renderer bridge
     // without clobbering happy-dom's window.location.
@@ -487,86 +465,10 @@ describe('AppearancePane', () => {
   })
 
   it('expands status bar controls for a section-label search', async () => {
-    mocks.state.availableStatusBarToggles = [
-      {
-        id: 'ports',
-        title: 'Ports',
-        description: 'Show live workspace ports in the status bar.',
-        toggleDescription: 'Show Ports in the status bar.',
-        keywords: ['status bar', 'ports']
-      }
-    ]
     mocks.state.settingsSearchQuery = 'status bar'
     const container = await renderAppearancePane(getDefaultSettings('/tmp'))
 
     expect(container.querySelector('button[role="switch"][aria-label="Ports"]')).not.toBeNull()
-  })
-
-  it('updates the usage percentage display from the latest status bar settings section', async () => {
-    mocks.state.settingsSearchQuery = 'remaining'
-    const container = await renderAppearancePane(getDefaultSettings('/tmp'))
-    const remainingButton = Array.from(
-      container.querySelectorAll<HTMLButtonElement>('button[role="radio"]')
-    ).find((button) => button.textContent === 'Remaining')
-
-    expect(container.textContent).toContain('Usage percentages')
-    expect(remainingButton).toBeDefined()
-
-    await act(async () => {
-      remainingButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-
-    expect(mocks.state.setUsagePercentageDisplay).toHaveBeenCalledWith('remaining')
-  })
-
-  it('records MiniMax status bar toggles as usage tracking interactions', async () => {
-    mocks.state.availableStatusBarToggles = [
-      {
-        id: 'minimax',
-        title: 'MiniMax Usage',
-        description: 'Show MiniMax subscription usage in the status bar.',
-        toggleDescription: 'Show MiniMax subscription usage for the active workspace.',
-        keywords: ['status bar', 'minimax', 'usage']
-      }
-    ]
-    mocks.state.settingsSearchQuery = 'minimax'
-    const container = await renderAppearancePane(getDefaultSettings('/tmp'))
-    const miniMaxSwitch = container.querySelector<HTMLButtonElement>(
-      'button[role="switch"][aria-label="MiniMax Usage"]'
-    )
-
-    expect(miniMaxSwitch).not.toBeNull()
-    await act(async () => {
-      miniMaxSwitch?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-
-    expect(mocks.state.recordFeatureInteraction).toHaveBeenCalledWith('usage-tracking')
-    expect(mocks.state.toggleStatusBarItem).toHaveBeenCalledWith('minimax')
-  })
-
-  it('records Antigravity status bar toggles as usage tracking interactions', async () => {
-    mocks.state.availableStatusBarToggles = [
-      {
-        id: 'antigravity',
-        title: 'Antigravity Usage',
-        description: 'Show Antigravity subscription usage in the status bar.',
-        toggleDescription: 'Show Antigravity subscription usage for the active workspace.',
-        keywords: ['status bar', 'antigravity', 'usage']
-      }
-    ]
-    mocks.state.settingsSearchQuery = 'antigravity'
-    const container = await renderAppearancePane(getDefaultSettings('/tmp'))
-    const antigravitySwitch = container.querySelector<HTMLButtonElement>(
-      'button[role="switch"][aria-label="Antigravity Usage"]'
-    )
-
-    expect(antigravitySwitch).not.toBeNull()
-    await act(async () => {
-      antigravitySwitch?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-
-    expect(mocks.state.recordFeatureInteraction).toHaveBeenCalledWith('usage-tracking')
-    expect(mocks.state.toggleStatusBarItem).toHaveBeenCalledWith('antigravity')
   })
 
   it('expands Interface, Terminal, and Window & Sidebar by default', async () => {
@@ -606,31 +508,6 @@ describe('AppearancePane', () => {
     expect(stillExpanded.map((button) => button.textContent).join(' ')).toContain(
       'Window & Sidebar'
     )
-  })
-
-  it('re-opens a collapsed section for appearance deep links without collapsing siblings', async () => {
-    mocks.state.settingsSearchQuery = ''
-    mocks.state.appearanceAccordionDeepLink = null
-    const container = await renderAppearancePane(getDefaultSettings('/tmp'))
-
-    const windowToggle = appearanceSectionToggle(container, 'window')
-    const terminalToggle = appearanceSectionToggle(container, 'terminal')
-    expect(windowToggle?.getAttribute('aria-expanded')).toBe('true')
-
-    await act(async () => {
-      windowToggle?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-    expect(windowToggle?.getAttribute('aria-expanded')).toBe('false')
-    expect(terminalToggle?.getAttribute('aria-expanded')).toBe('true')
-
-    mocks.state.appearanceAccordionDeepLink = 'window'
-    await rerenderAppearancePane()
-
-    expect(appearanceSectionToggle(container, 'window')?.getAttribute('aria-expanded')).toBe('true')
-    expect(appearanceSectionToggle(container, 'terminal')?.getAttribute('aria-expanded')).toBe(
-      'true'
-    )
-    expect(mocks.state.clearAppearanceAccordionDeepLink).toHaveBeenCalled()
   })
 
   it('disables section toggles while searching so clearing search does not surprise-collapse', async () => {

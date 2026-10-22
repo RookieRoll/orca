@@ -15,68 +15,22 @@ vi.mock('./settings-search-keywords', () => ({
   translateSearchKeyword: (_key: string, fallback: string) => [fallback]
 }))
 
-import {
-  getAccountsMiniMaxSearchEntries,
-  getAccountsOpencodeSearchEntries,
-  getAccountsPaneSearchEntries
-} from './accounts-search'
+import { getAccountsAntigravitySearchEntries, getAccountsPaneSearchEntries } from './accounts-search'
 
 describe('getAccountsPaneSearchEntries', () => {
-  it('keeps Antigravity and GLM plan settings discoverable in pane order', () => {
+  it('keeps retained native account settings discoverable', () => {
     const entries = getAccountsPaneSearchEntries()
     const titles = entries.map((entry) => entry.title)
-    expect(
-      titles.filter((title) =>
-        ['Antigravity Accounts', 'Cursor Usage', 'GLM Coding Plan'].includes(title)
-      )
-    ).toEqual(['Antigravity Accounts', 'Cursor Usage', 'GLM Coding Plan'])
+    expect(titles).toContain('Antigravity Accounts')
+    expect(titles).not.toContain('OpenCode Go Workspace ID')
+    expect(titles).not.toContain('Cursor Usage')
+    expect(titles).not.toContain('GLM Coding Plan')
     expect(entries.find((entry) => entry.title === 'Antigravity Accounts')?.keywords).toEqual(
       expect.arrayContaining(['antigravity', 'agy', 'google', 'accounts'])
     )
-    expect(entries.find((entry) => entry.title === 'GLM Coding Plan')?.keywords).toEqual(
-      expect.arrayContaining(['glm', 'zai', 'zhipu', 'bigmodel', 'coding plan'])
+    expect(entries.find((entry) => entry.title === 'Antigravity Accounts')?.keywords).not.toContain(
+      'usage'
     )
-  })
-})
-
-describe('getAccountsMiniMaxSearchEntries', () => {
-  it('returns a single entry that targets MiniMax usage settings', () => {
-    const entries = getAccountsMiniMaxSearchEntries()
-    expect(entries).toHaveLength(1)
-    const [entry] = entries
-    expect(entry.title).toBe('MiniMax Usage')
-    expect(entry.description).toBeUndefined()
-  })
-
-  it('exposes the keywords that drive the Settings search index', () => {
-    const [entry] = getAccountsMiniMaxSearchEntries()
-    // Why: the Settings search needs at least one of these tokens to
-    // surface the MiniMax section when the user types a related term.
-    expect(entry.keywords).toEqual(
-      expect.arrayContaining(['minimax', 'endpoint', 'rate limit', 'status bar'])
-    )
-    expect(entry.keywords).not.toContain('cookie')
-    expect(entry.keywords).not.toContain('api key')
-  })
-
-  it('is included in the rolled-up pane search entries', () => {
-    const allEntries = getAccountsPaneSearchEntries()
-    const titles = allEntries.map((entry) => entry.title)
-    expect(titles).toContain('MiniMax Usage')
-  })
-})
-
-describe('getAccountsOpencodeSearchEntries', () => {
-  it('keeps the non-secret workspace override discoverable for usage lookup', () => {
-    const workspaceEntry = getAccountsOpencodeSearchEntries().find(
-      (entry) => entry.title === 'OpenCode Go Workspace ID'
-    )
-
-    expect(workspaceEntry).toBeDefined()
-    expect(workspaceEntry?.description).toContain('workspace ID override')
-    expect(workspaceEntry?.keywords).toEqual(
-      expect.arrayContaining(['opencode', 'workspace', 'id', 'rate limit'])
-    )
-    expect(getAccountsOpencodeSearchEntries()).toHaveLength(1)
+    expect(getAccountsAntigravitySearchEntries()).toHaveLength(1)
   })
 })

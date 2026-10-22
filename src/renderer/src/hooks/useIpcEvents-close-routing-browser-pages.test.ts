@@ -61,7 +61,6 @@ describe('useIpcEvents browser tab close routing', () => {
           activeTabType: 'browser',
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
-          setRateLimitsFromPush: vi.fn(),
           setSshConnectionState: vi.fn(),
           setSshTargetLabels: vi.fn(),
           setPortForwards: vi.fn(),
@@ -203,10 +202,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
         },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
-        },
         ssh: {
           listTargets: () => Promise.resolve([]),
           listPortForwards: () => Promise.resolve([]),
@@ -289,7 +284,6 @@ describe('useIpcEvents browser tab close routing', () => {
           activeTabType: 'browser',
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
-          setRateLimitsFromPush: vi.fn(),
           setSshConnectionState: vi.fn(),
           setSshTargetLabels: vi.fn(),
           setPortForwards: vi.fn(),
@@ -432,10 +426,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
         },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
-        },
         ssh: {
           listTargets: () => Promise.resolve([]),
           listPortForwards: () => Promise.resolve([]),
@@ -516,7 +506,6 @@ describe('useIpcEvents browser tab close routing', () => {
           activeTabType: 'browser',
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
-          setRateLimitsFromPush: vi.fn(),
           setSshConnectionState: vi.fn(),
           setSshTargetLabels: vi.fn(),
           setPortForwards: vi.fn(),
@@ -655,10 +644,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onNavigationUpdate: () => () => {},
           onActivateView: () => () => {},
           onPaneFocus: () => () => {}
-        },
-        rateLimits: {
-          get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
-          onUpdate: () => () => {}
         },
         ssh: {
           listTargets: () => Promise.resolve([]),

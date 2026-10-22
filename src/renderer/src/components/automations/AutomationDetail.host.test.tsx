@@ -46,7 +46,6 @@ async function render(
       <TooltipProvider>
         <AutomationDetail
           automation={makeAutomation(overrides)}
-          runs={[]}
           projectName="orca"
           workspaceName="main"
           projectDefaultBaseRef="main"

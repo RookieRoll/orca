@@ -27,7 +27,6 @@ async function render(overrides: Partial<Automation>): Promise<HTMLDivElement> {
       <TooltipProvider>
         <AutomationDetail
           automation={makeAutomation(overrides)}
-          runs={[]}
           projectName="orca"
           workspaceName="main"
           projectDefaultBaseRef="main"

@@ -63,9 +63,17 @@ export function normalizeLoadedAutomationRuns(
   if (!Array.isArray(parsed.automationRuns)) {
     return []
   }
-  const runs = pruneAutomationRuns(backfillAutomationRunNumbers(parsed.automationRuns))
+  let retiredUsageFound = false
+  const normalizedRuns = backfillAutomationRunNumbers(parsed.automationRuns).map((run) => {
+    if (Object.hasOwn(run, 'usage')) {
+      retiredUsageFound = true
+      Reflect.deleteProperty(run, 'usage')
+    }
+    return run
+  })
+  const runs = pruneAutomationRuns(normalizedRuns)
   // Why: nothing else marks dirty, so an oversized legacy file would otherwise only shrink at the next unrelated save.
-  if (runs.length !== parsed.automationRuns.length) {
+  if (retiredUsageFound || runs.length !== parsed.automationRuns.length) {
     markNeedsSave()
   }
   return runs

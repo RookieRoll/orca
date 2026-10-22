@@ -43,7 +43,6 @@ const makeRun = (id: string): AutomationRun => ({
   terminalPtyId: null,
   outputSnapshot: null,
   precheckResult: null,
-  usage: null,
   error: null,
   startedAt: null,
   dispatchedAt: null,

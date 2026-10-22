@@ -33,7 +33,7 @@ const DESKTOP_ROW: AutomationListRow = {
   key: automationListRowKey('host:desktop|self', 'a-1'),
   automation: makeAutomation({ id: 'a-1' }),
   hostLabel: 'This computer',
-  usageSummary: null
+  lastRunSummary: null
 }
 
 function Harness(props: { input: SelectedAutomationRunHistoryInput }): null {

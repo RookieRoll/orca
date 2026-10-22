@@ -9,10 +9,6 @@ const contracts = [
   'src/main/runtime/orchestration/db/row-column-lists.test.ts',
   'src/shared/native-chat-tool-attribution-allocation.test.ts',
   'src/shared/native-chat-tool-pairing.performance.test.ts',
-  'src/main/codex-usage/codex-rollout-file-lifetime.test.ts',
-  'src/main/codex-usage/scanner-incremental-append.test.ts',
-  'src/main/usage/jsonl-file-reader.test.ts',
-  'src/main/usage/jsonl-file-snapshot.test.ts',
   'src/renderer/src/components/editor/rich-markdown-list-tokenizers.test.ts',
   'src/renderer/src/components/editor/rich-markdown-lowlight-cache.test.ts',
   'src/renderer/src/components/terminal-pane/agent-completion-coordinator-queued-inspection-disposal.test.ts',
@@ -20,9 +16,7 @@ const contracts = [
   'src/renderer/src/store/store-identity-churn-probe.test.ts',
   'config/scripts/app-store-performance-plugin.test.mjs',
   'config/scripts/quadratic-buffer-concat-plugin.test.mjs',
-  'config/scripts/sort-comparator-performance-plugin.test.mjs',
-  'src/main/claude-usage/scanner-incremental-append.test.ts',
-  'src/main/claude-usage/store-checkpoint-persistence.test.ts'
+  'config/scripts/sort-comparator-performance-plugin.test.mjs'
 ]
 
 for (const contract of contracts) {

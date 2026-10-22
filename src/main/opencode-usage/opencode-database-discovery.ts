@@ -6,7 +6,12 @@ import {
   resolveOpenCodeDataDirectory,
   resolveOpenCodeDatabasePath
 } from '../opencode/opencode-data-directory'
-import type { OpenCodeUsageProcessedDatabase } from './types'
+
+export type OpenCodeDatabaseInfo = {
+  path: string
+  mtimeMs: number
+  size: number
+}
 
 type OpenCodeDatabaseOverride = {
   isConfigured: boolean
@@ -102,7 +107,7 @@ export function compareOpenCodeClaimPriority(left: string, right: string): numbe
 
 export async function getProcessedDatabaseInfo(
   dbPath: string
-): Promise<OpenCodeUsageProcessedDatabase> {
+): Promise<OpenCodeDatabaseInfo> {
   const dbStat = await stat(dbPath)
   return {
     path: dbPath,

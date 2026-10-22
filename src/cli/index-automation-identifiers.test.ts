@@ -75,7 +75,6 @@ describe('orca cli worktree awareness', () => {
           chatSessionId: null,
           terminalSessionId: null,
           outputSnapshot: null,
-          usage: null,
           error: null,
           startedAt: null,
           dispatchedAt: null,

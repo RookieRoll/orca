@@ -15,14 +15,7 @@ import type { EditorSlice } from './slices/editor'
 import type { StatsSlice } from './slices/stats'
 import type { MemorySlice } from './slices/memory'
 import type { WorkspaceSpaceSlice } from './slices/workspace-space'
-import type {
-  ClaudeUsageSlice,
-  CodexUsageSlice,
-  MuseUsageSlice,
-  OpenCodeUsageSlice
-} from './slices/usage-provider-slices'
 import type { BrowserSlice } from './slices/browser'
-import type { RateLimitSlice } from './slices/rate-limits'
 import type { SshSlice } from './slices/ssh'
 import type { RuntimeEnvironmentSshSlice } from './slices/runtime-environment-ssh'
 import type { WslHostsSlice } from './slices/wsl-hosts'
@@ -63,12 +56,7 @@ export type AppState = RepoSlice &
   StatsSlice &
   MemorySlice &
   WorkspaceSpaceSlice &
-  ClaudeUsageSlice &
-  CodexUsageSlice &
-  OpenCodeUsageSlice &
-  MuseUsageSlice &
   BrowserSlice &
-  RateLimitSlice &
   SshSlice &
   RuntimeEnvironmentSshSlice &
   WslHostsSlice &

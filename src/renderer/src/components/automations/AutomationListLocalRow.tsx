@@ -43,11 +43,6 @@ import { formatAutomationDateTimeWithRelative } from './automation-page-parts'
 import { getAutomationTargetAvailability } from './automation-target-availability'
 import { getAgentLabel } from './automation-draft-model'
 import type { AutomationListRow } from './automation-list-row-identity'
-import {
-  formatAutomationCost,
-  formatAutomationTokens,
-  type AutomationUsageSummary
-} from './automation-usage-model'
 import { AUTOMATIONS_TABLE_GRID_CLASS } from './automations-table-layout'
 import {
   LIST_TABLE_ROW_CLASS,
@@ -83,31 +78,6 @@ export type AutomationListLocalRowProps = {
 }
 
 const EMPTY_HOST_LABELS: ReadonlyMap<string, string> = new Map()
-
-function automationUsageText(summary: AutomationUsageSummary | undefined): string {
-  if (!summary || summary.unavailableRuns > 0) {
-    return summary?.knownRuns
-      ? usageAmountText(summary)
-      : translate(
-          'auto.components.automations.AutomationsPage.usageUnavailable',
-          'Usage unavailable'
-        )
-  }
-  return summary.knownRuns > 0
-    ? usageAmountText(summary)
-    : translate('auto.components.automations.AutomationsPage.noRunUsageYet', 'No run usage yet')
-}
-
-function usageAmountText(summary: AutomationUsageSummary): string {
-  return translate(
-    'auto.components.automations.AutomationsPage.runUsageSummary',
-    '{{cost}} est. · {{tokens}} tokens',
-    {
-      cost: formatAutomationCost(summary.estimatedCostUsd),
-      tokens: formatAutomationTokens(summary.totalTokens)
-    }
-  )
-}
 
 export function AutomationListLocalRow({
   row,
@@ -166,7 +136,7 @@ export function AutomationListLocalRow({
     (hostId
       ? (hostLabelById.get(hostId) ?? getExecutionHostLabel(hostId))
       : getLocalExecutionHostLabel())
-  const agentTooltipLabel = `${agentLabel} · ${hostLabel} · ${automationUsageText(row.usageSummary ?? undefined)}`
+  const agentTooltipLabel = `${agentLabel} · ${hostLabel}`
   const canRunNow = automationRunAvailability.canRunNow && allows(row, 'run')
   const lastRun = lastRunByAutomationId.get(automation.id)
   // Without a fetched run, the row's projected summary carries the newest

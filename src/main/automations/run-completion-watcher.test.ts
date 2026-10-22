@@ -258,7 +258,6 @@ describe('authority-owned automation run completion', () => {
       ...LAUNCH_TARGET,
       error: null
     })
-    const afterRenderer = readRun(store, automation.id, run.id)
     const writeSpy = vi.spyOn(store, 'updateAutomationRun')
 
     resolveObservation!({ status: 'dispatch_failed', error: 'watcher lost the terminal' })
@@ -268,7 +267,6 @@ describe('authority-owned automation run completion', () => {
     const afterWatcher = readRun(store, automation.id, run.id)
     expect(afterWatcher.status).toBe('completed')
     expect(afterWatcher.error).toBeNull()
-    expect(afterWatcher.usage).toEqual(afterRenderer.usage)
     writeSpy.mockRestore()
     service.stop()
   })
@@ -327,7 +325,7 @@ describe('automationsChanged publication', () => {
     rmSync(testState.dir, { recursive: true, force: true })
   })
 
-  it('publishes run and usage changes after the write is persisted', async () => {
+  it('publishes run changes after the write is persisted', async () => {
     const store = await createStore()
     const automation = createAutomation(store)
     const seen: { payload: AutomationsChangedPayload; status: string | undefined }[] = []
@@ -351,9 +349,9 @@ describe('automationsChanged publication', () => {
       ...LAUNCH_TARGET,
       error: null
     })
-    expect(seen.map((entry) => entry.payload.reason)).toEqual(['run', 'run', 'run', 'run', 'usage'])
+    expect(seen.map((entry) => entry.payload.reason)).toEqual(['run', 'run', 'run', 'run', 'run'])
     expect(seen.at(-1)?.status).toBe('completed')
-    // Every run/usage write names its own host, so one automation's run cannot
+    // Every run write names its own host, so one automation's run cannot
     // invalidate the rest of the authority.
     expect(seen.every((entry) => entry.payload.selector?.kind === 'self')).toBe(true)
     service.stop()

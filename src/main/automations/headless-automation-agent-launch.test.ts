@@ -87,7 +87,6 @@ function previousRun(overrides: Partial<AutomationRun> = {}): AutomationRun {
     terminalPtyId: 'pty-prev',
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: 1,
     dispatchedAt: 1,

@@ -42,7 +42,6 @@ import type {
   RetiredPaneAlias,
   RetiredPaneFence,
   ServerAgentStatusListener,
-  ServerStatusLineListener,
   StatusChangeListener,
   StatusDropListener,
   StatusFreshnessListener,
@@ -101,7 +100,6 @@ export abstract class AgentHookServerState {
   // Why: identifies this Orca instance so the server can detect dev vs. prod cross-talk; set at start() from packaged-build knowledge.
   protected env = 'production'
   protected onAgentStatus: ServerAgentStatusListener = null
-  protected onClaudeStatusLine: ServerStatusLineListener = null
   protected onStartupPromptClaim: ((body: unknown) => boolean | 'pending') | null = null
   protected clearStartupPromptClaims: (() => void) | null = null
   protected statusHooksEnabled = true

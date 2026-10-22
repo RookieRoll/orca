@@ -77,25 +77,3 @@ export function parsePrecheckResult(value: unknown): void {
     'orcad_migration_dormant_automation_precheck_result_completed_invalid'
   )
 }
-
-export function parseUsage(value: unknown): void {
-  if (value === null) {
-    return
-  }
-  const record = requiredRecord(value, 'orcad_migration_dormant_automation_usage_invalid')
-  if (record.status !== 'known' && record.status !== 'unavailable') {
-    throw new Error('orcad_migration_dormant_automation_usage_status_invalid')
-  }
-  for (const field of [
-    'inputTokens',
-    'outputTokens',
-    'cacheReadTokens',
-    'cacheWriteTokens',
-    'reasoningOutputTokens',
-    'totalTokens',
-    'estimatedCostUsd'
-  ] as const) {
-    optionalFinite(record[field], `orcad_migration_dormant_automation_usage_${field}_invalid`, true)
-  }
-  requiredFinite(record.collectedAt, 'orcad_migration_dormant_automation_usage_collected_invalid')
-}

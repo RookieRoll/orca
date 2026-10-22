@@ -15,7 +15,6 @@ export const LINUX_PACKAGE_TESTS = [
 ]
 
 export const WINDOWS_PACKAGE_TESTS = [
-  'src/main/zcode/zcode-plan-api-key-store-native-windows.test.ts',
   ...LINUX_PACKAGE_TESTS,
   'config/scripts/rebuild-native-deps.test.mjs',
   'config/scripts/rebuild-native-deps-windows-process-tree.test.mjs',
@@ -46,7 +45,6 @@ export const WINDOWS_PACKAGE_TESTS = [
   'src/main/agent-hooks/windows-cmd-hook-command-unicode.test.ts',
   'src/main/agent-hooks/windows-batch-hook-launcher.test.ts',
   'src/main/agent-hooks/windows-powershell-hook-launcher.test.ts',
-  'src/main/claude/claude-status-line-windows.test.ts',
   'src/main/codex/windows-hook-command.test.ts',
   'src/main/codex/windows-hook-upgrade.test.ts',
   'src/main/codex/hook-service-managed-install.test.ts',

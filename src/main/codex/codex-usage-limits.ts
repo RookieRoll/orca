@@ -4,7 +4,6 @@ import {
   type AgentSessionUsageLimit,
   type AgentSessionUsageLimitWindow
 } from '../../shared/agent-session-usage-limit'
-import type { CodexRateLimitWindowsSnapshot } from '../rate-limits/codex-rate-limit-window-classification'
 import {
   readCodexErrorAdditionalDetails,
   readCodexErrorInfo,
@@ -14,7 +13,10 @@ import {
 const RATE_LIMITS_UPDATED = 'notification:account/rateLimits/updated'
 const USAGE_LIMIT_ERRORS = ['usageLimitExceeded', 'rateLimitExceeded']
 
-type CodexAccountRateLimits = CodexRateLimitWindowsSnapshot & {
+type CodexAccountRateLimits = {
+  primary?: { usedPercent?: number; windowDurationMins?: number | null; resetsAt?: number }
+  secondary?: { usedPercent?: number; windowDurationMins?: number | null; resetsAt?: number }
+  credits?: { hasCredits?: boolean; unlimited?: boolean; balance?: number | null }
   rateLimitReachedType?: unknown
   planType?: unknown
 }

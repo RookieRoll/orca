@@ -22,7 +22,6 @@ function run(): AutomationRun {
     terminalPtyId: 'pty-1',
     outputSnapshot: null,
     precheckResult: null,
-    usage: null,
     error: null,
     startedAt: 1_000,
     dispatchedAt: 1_000,

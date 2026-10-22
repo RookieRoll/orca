@@ -8,10 +8,10 @@
  */
 
 import type { Automation } from '../../../../shared/automations-types'
+import type { AutomationLastRunSummary } from '../../../../shared/automation-last-run-summary'
 import type { AutomationListItemSelector } from '../../../../shared/automation-list-scope'
 import type { LegacyAutomationSelector } from '../../../../shared/automation-legacy-list-partition'
 import type { AutomationOwnerRef } from '../../../../shared/automation-owner-ref'
-import type { AutomationUsageSummary } from '../../../../shared/automation-usage-summary'
 
 /** A legacy SSH row carries no registration generation, which is why it can never be fenced. */
 export type AutomationHostRowSelector = AutomationListItemSelector | LegacyAutomationSelector
@@ -21,9 +21,7 @@ export type AutomationHostRow = {
   /** Null when nothing may be mutated through it: legacy unscoped rows and orphans. */
   owner: AutomationOwnerRef | null
   selector: AutomationHostRowSelector
-  usageSummary: AutomationUsageSummary | null
-  /** False on the legacy path, where the authority sends no projection and none may be fetched. */
-  usageKnown: boolean
+  lastRunSummary: AutomationLastRunSummary | null
 }
 
 export type AutomationHostQueryErrorCode =

@@ -20,8 +20,7 @@ import {
 // probe-command leg; the request half (FIFO one-at-a-time dispatch, per-call
 // deadlines, respawn-on-fault) is WorkerThreadRequestQueue and the thread's
 // lifetime is LazyWorkerThreadHost, both shared with
-// src/main/ai-vault/session-scanner-opencode-sqlite-worker-client.ts and
-// src/main/usage/usage-scan-worker-client.ts.
+// src/main/ai-vault/session-scanner-opencode-sqlite-worker-client.ts.
 //
 // This module used to contain the literal text require('electron'), which fails the
 // plain-Node entry guard even inside a try/catch. It reads the AppEnvironment port

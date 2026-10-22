@@ -31,7 +31,6 @@ const run: AutomationRun = {
   terminalPtyId: null,
   outputSnapshot: null,
   precheckResult: null,
-  usage: null,
   error: 'Precheck exited with code 1.',
   startedAt: 1,
   dispatchedAt: null,

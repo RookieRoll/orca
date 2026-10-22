@@ -2,7 +2,6 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { CodexResetCreditAttemptLedger } from '../../../shared/codex-reset-credit-attempt-ledger'
 import { ProfileStateSqliteAuthority } from '../profile-state/profile-state-sqlite-authority'
 import { readProfileStateDomain } from '../profile-state/profile-state-domain-reader'
 import { buildProfileStateCutoverFixture } from '../profile-state-cutover-fixture'
@@ -59,37 +58,11 @@ function fixture(seedState?: unknown) {
   store.flushOrThrow()
   return {
     store,
-    read: (domain: string) => readProfileStateDomain(databasePath, PROFILE_ID, domain),
-    pendSession: () => store.patchWorkspaceSession({ activeWorktreeId: 'pending-workspace' })
+    read: (domain: string) => readProfileStateDomain(databasePath, PROFILE_ID, domain)
   }
 }
 
 describe('SQLite durability barriers with another selective write pending', () => {
-  it('commits a reset-credit claim before returning to its provider caller', async () => {
-    const state = fixture()
-    const ledger: CodexResetCreditAttemptLedger = {
-      version: 1,
-      attempts: [
-        {
-          idempotencyKey: '158a0d86-8d8e-4589-b9c5-f53a59bdcdd8',
-          expectedScope: {
-            target: { runtime: 'host', wslDistro: null },
-            accountId: 'account',
-            accountRevision: 1,
-            offerRevision: 'v1:offer'
-          },
-          state: 'providerPending'
-        }
-      ]
-    }
-    state.pendSession()
-    await state.store.replaceCodexResetCreditAttemptLedgerAndFlush(ledger)
-    expect(state.read('codexResetCreditAttemptLedger')).toMatchObject({
-      kind: 'value',
-      value: ledger
-    })
-  })
-
   it('deletes an automation and its retained runs in the same commit', () => {
     const state = fixture(buildProfileStateCutoverFixture())
     const automation = state.store.listAutomations()[0]

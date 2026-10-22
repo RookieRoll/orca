@@ -102,18 +102,10 @@ function makeCatalogRow(
     key: `row|host|${id}`,
     automation: makeAutomation({ id, ...overrides }),
     hostLabel: 'This computer',
-    usageSummary: lastRunStatus
+    lastRunSummary: lastRunStatus
       ? {
-          knownRuns: 1,
-          unavailableRuns: 0,
-          inputTokens: 0,
-          outputTokens: 0,
-          cacheTokens: 0,
-          reasoningOutputTokens: 0,
-          totalTokens: 0,
-          estimatedCostUsd: null,
-          lastRunStatus,
-          lastRunAt: 111
+          status: lastRunStatus,
+          at: 111
         }
       : null
   }
@@ -256,7 +248,7 @@ describe('automation-list-view', () => {
               selector: { kind: 'ssh', targetId }
             },
       hostLabel: targetId ?? '',
-      usageSummary: null
+      lastRunSummary: null
     })
     const rows = [hostRow('on-a', 'ssh-a'), hostRow('on-b', 'ssh-b'), hostRow('legacy', null)]
     const keyOf = (row: AutomationListRow): string =>
