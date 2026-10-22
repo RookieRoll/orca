@@ -60,17 +60,21 @@ describe('retired managed servers experiment', () => {
   })
 })
 
-describe('retired voice settings', () => {
+describe('retired global settings', () => {
   it('drops legacy voice settings while preserving unrelated saved settings', () => {
     const normalized = normalizeLegacyProfile({
       voice: { enabled: true, dictationMode: 'toggle' },
       telemetry: { optedIn: true, installId: 'legacy-id', existedBeforeTelemetryRelease: false },
+      experimentalPet: true,
+      experimentalSidekick: true,
       terminalFocusFollowsMouse: true
     })
     const serialized = JSON.parse(JSON.stringify(normalized))
 
     expect(serialized).not.toHaveProperty('voice')
     expect(serialized).not.toHaveProperty('telemetry')
+    expect(serialized).not.toHaveProperty('experimentalPet')
+    expect(serialized).not.toHaveProperty('experimentalSidekick')
     expect(serialized.terminalFocusFollowsMouse).toBe(true)
   })
 })

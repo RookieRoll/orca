@@ -7,7 +7,6 @@ const JA_AUDIT_OVERRIDES = {
   'Retry Download': 'ダウンロードを再試行',
   'Enter a reviewer': 'レビュアーを入力',
   'Choose folder': 'フォルダーを選択',
-  'Choose pet': 'ペットを選択',
   'Choose a sound': 'サウンドを選択',
   'Pick your default agent': 'デフォルトの Agent を選択',
   'Complete {{artifact_url}}': '{{artifact_url}} を完了',

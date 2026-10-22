@@ -54,7 +54,6 @@ import { registerLocalhostWorktreeLabelHandlers } from '../localhost-worktree-la
 import { registerAutomationHandlers } from '../automations'
 import { registerKeybindingHandlers } from '../keybindings'
 import { registerShellHandlers } from '../shell'
-import { registerPetHandlers } from '../pet'
 import { registerPluginHandlers } from '../plugins'
 import { registerUIHandlers, setTrustedUIRendererWebContentsId } from '../ui'
 import { registerEmulatorFrameStreamHandlers } from '../emulator-frame-stream'
@@ -238,7 +237,6 @@ export function registerCoreHandlers(
   })
   registerBrowserHandlers()
   registerShellHandlers(store)
-  registerPetHandlers()
   registerSessionHandlers(store, runtime)
   registerUIHandlers(store, { isDashboardPopoutRenderer })
   registerEmulatorFrameStreamHandlers()

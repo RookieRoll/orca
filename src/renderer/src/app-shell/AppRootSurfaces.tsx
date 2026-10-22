@@ -13,13 +13,9 @@ import { NativeChatResumeOnRestartModal } from '../components/NativeChatResumeOn
 import { StarNagAgentValueMomentObserver } from '../components/star-nag/StarNagAgentValueMomentObserver'
 import { StarNagToastHost } from '../components/star-nag/StarNagToastHost'
 import { ZoomOverlay } from '../components/ZoomOverlay'
-import { shouldRenderPetOverlay } from '../components/pet/pet-overlay-visibility'
 import { useAppStore } from '../store'
 import { useLazyModalMounts } from './use-lazy-modal-mounts'
 import { usePreloadWorktreeJumpPalette, WorktreeJumpPalette } from './worktree-jump-palette-preload'
-import {
-  selectAppRootSurfacePetEnabled
-} from './app-root-surface-settings'
 import type { FloatingWorkspacePanelState } from './use-floating-workspace-panel'
 import type { OnboardingGate } from './use-onboarding-and-feature-tips'
 
@@ -68,8 +64,6 @@ const FloatingTerminalPanel = lazy(() =>
     default: module.FloatingTerminalPanel
   }))
 )
-// Why: lazy so the WebP asset + overlay module aren't fetched unless the experimental flag is on.
-const PetOverlay = lazy(() => import('../components/pet/PetOverlay'))
 // Why: lazy so onboarding's step modules + assets aren't fetched for users past first-launch.
 const OnboardingFlow = lazy(() => import('../components/onboarding/OnboardingFlow'))
 
@@ -110,16 +104,10 @@ export function AppRootSurfaces(props: {
   usePreloadWorktreeJumpPalette()
   const activeView = useAppStore((s) => s.activeView)
   const activeModal = useAppStore((s) => s.activeModal)
-  // Keep this always-mounted surface subscribed only to the settings fields it reads. A
-  // settings object replacement for an unrelated preference should not rerender every overlay.
-  const petEnabled = useAppStore(selectAppRootSurfacePetEnabled)
   const statusBarVisible = useAppStore((s) => s.statusBarVisible)
   const persistedUIReady = useAppStore((s) => s.persistedUIReady)
-  const petVisible = useAppStore((s) => s.petVisible)
   const activeContextualTourId = useAppStore((s) => s.activeContextualTourId)
   const hasSshCredentialRequest = useAppStore((s) => s.sshCredentialQueue.length > 0)
-
-  const renderPetOverlay = shouldRenderPetOverlay({ persistedUIReady, petEnabled, petVisible })
 
   return (
     <>
@@ -252,14 +240,6 @@ export function AppRootSurfaces(props: {
       {activeContextualTourId !== null ? (
         <Suspense fallback={null}>
           <ContextualTourOverlay />
-        </Suspense>
-      ) : null}
-      {/* Why: mount only after UI hydration, else a hidden pet flashes while the store still holds default visibility. */}
-      {renderPetOverlay ? (
-        <Suspense fallback={null}>
-          <OverlayBoundary boundaryId="overlay.pet" resetKey={petVisible}>
-            <PetOverlay />
-          </OverlayBoundary>
         </Suspense>
       ) : null}
       <NotificationCardStack>

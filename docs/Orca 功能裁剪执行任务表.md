@@ -26,9 +26,9 @@
 |---|---|---|
 | B0 | 环境、清单映射与基线 | 本地环境事实记录，136 删除 ID 校验通过；环境未验证不得写通过 |
 | B1 | C17 终端主题导入 | 删除入口/解析并确认保留主题功能无回归 |
-| B2 | 语音、宠物、遥测与上传/更新 | VOC、U10、U11已提交；当前进行B2-UPDATER，随后执行B2-PET（T05/T06）；U10本机导出与本地诊断保留 |
-| B3 | 账号/用量与平台集成 | 删除 F 全组及 J 删除项；保留 Jira（J16）和 Git 基础能力 |
-| B4 | 远程、WSL、移动与中继 | B2-UPLOAD（U10）、B2-TELEMETRY（U11）、B4-CLIENT 与 B4-REMOTE-CLIENT 已提交；当前先完成 B2-UPDATER（U06/U07），随后完成 B2-PET（T05/T06）。之后按总体依赖推进其余裁剪；B4-REMOTE-HOST → B5-ISOLATION → B4-REMOTE-SHARED 清理消费者和共享实现，B4-SERVICES 与三个 B4-DEVICE-TOOLS 子项依各自依赖交付。保留本地 daemon、工作区、PTY |
+| B2 | 语音、宠物、遥测与上传/更新 | VOC、U10、U11、U06/U07、B2-PET已提交；U10本机导出与本地诊断保留；PET定向回归未运行 |
+| B3 | 账号/用量与平台集成 | 删除 F01–F11 与 J 删除项；保留系统凭据保护基础设施（F12）、Jira（J16）和 Git 基础能力 |
+| B4 | 远程、WSL、移动与中继 | B2-UPLOAD（U10）、B2-TELEMETRY（U11）、B4-CLIENT、B4-REMOTE-CLIENT、B2-UPDATER（U06/U07）及 B2-PET（T05/T06）已提交；其余按总体依赖推进：B4-REMOTE-HOST → B5-ISOLATION → B4-REMOTE-SHARED 清理消费者和共享实现；B4-SERVICES 与三个 B4-DEVICE-TOOLS 子项依各自依赖交付。保留本地 daemon、工作区、PTY |
 | B5 | 分享、组织、Profile 与跨主机隔离 | 删除 O08–O13、U01–U04 等；O02 本机执行保留 |
 | B6 | Agent 适配裁剪 | 删除 W02/W04/W05/W08–W40 专用适配；Codex/Pi/Claude/OpenCode 保留 |
 | B7 | 公共依赖、构建与回归收尾 | 清理死依赖/入口/IPC/i18n/快捷键/默认后台行为；主体裁剪后执行 `IDENTITY-LITE`，再完成保留项和最终发布回归 |
@@ -50,7 +50,7 @@
 | F09 | 配额重置与限流提示 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | F10 | 用量汇总面板 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | F11 | 会话使用统计与估算成本 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| F12 | 系统凭据保护 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
+| F12 | 系统凭据保护 | B3 | 保留（基础设施范围已裁定） | cleanup_tracker | B3账号删除的消费者边界 | `safeStorage`/OS keychain、Git/GitHub/SSH认证及剩余Agent CLI自有登录态保留；本项不删除底层凭据保护。 |
 | H11 | 公开产物发布 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | H12 | 产物列表、搜索与预览 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | H13 | 产物链接复制与删除 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -128,8 +128,8 @@
 | T02 | 麦克风选择与快捷录音模式 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/renderer/src/hooks/use-audio-capture.ts`、dictation UI/hooks、`src/main/ipc/speech.ts` | Orca 专属录音/设备选择链已按有界验收移除；浏览器/OS 通用媒体权限保留。mobile 专属录音仍待 B4-CLIENT 整体删除。 |
 | T03 | 本地语音模型 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/main/speech/model-*`、`src/renderer/src/components/settings/Voice*`、`src/main/ipc/speech.ts` | 桌面/共享 src 本地模型管理与 UI 已按有界验收移除；mobile 专属模型/客户端引用留待 B4-CLIENT 整体删除。 |
 | T04 | 云端语音识别 | B2-VOC | 完成 | graphify_build | B0；B2-VOC；B7 | `src/main/speech/openai-transcription-client.ts`、`src/main/ipc/speech.ts`、`src/shared/rpc-contract/` | 桌面/共享 src 云转写与 RPC schema 已按有界验收移除；生成 RPC catalog 检查通过。全仓 mobile 语音尚待 B4-CLIENT，不宣称全仓语音清空。 |
-| T05 | 桌面宠物 | B2-PET | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| T06 | 宠物导入与管理 | B2-PET | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
+| T05 | 桌面宠物 | B2-PET | 完成（有界静态审核；测试未运行） | cleanup_tracker / graphify_build / validation_setup | B0；B7 | renderer overlay/statusbar、settings/search、store UI state/hydration、main/preload pet APIs、shared persisted fields | AppRoot overlay、statusbar segment、ExperimentalPane/search入口、renderer pet状态与legacy sidekick hydration及shared settings/UI RPC字段均已移除；旧profile/UI字段在读、写、序列化时剥离。Oxc/RPC静态检查通过；无测试、TC、build运行。 |
+| T06 | 宠物导入与管理 | B2-PET | 完成（有界静态审核；测试未运行） | cleanup_tracker / graphify_build / validation_setup | T05；B0；B7 | renderer组件目录、main/preload导入/存储API、共享sprite默认资源 | 21个tracked renderer pet组件文件、PetStatusSegment、专属main/preload APIs、共享sprite defaults及仅由pet catalog导入的3张sprite均已移除；保留AgentCombobox OpenCode SVG/no-img断言。六份locale各删14个精确pet-only目录项，JA `Choose pet` override及17条pet专属timing已删；JSON parse、引用扫描通过。PET/E2E测试与TC/build未运行。 |
 | U01 | 本地 Profile | B5-PROFILE | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | U02 | 云账号登录与关联 Profile | B5-PROFILE | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | U03 | 组织选择与成员管理 | B5-PROFILE | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -216,7 +216,7 @@
 | 包 ID | 范围 | 状态 | 负责人 | 依赖 | 独立交付/完成证据 |
 |---|---|---|---|---|---|
 | B2-VOC | T01–T04 语音输入/模型/转写与快捷录音模式清理（整体交付） | 完成 | graphify_build | B0；B4-CLIENT 紧随 B2 批次整体删除 `mobile/**` | 完成桌面/共享 src 范围的有界验收；保留通用麦克风选择、浏览器媒体权限及复用音频基础设施。独立 mobile 客户端仍有语音调用，属于 M01–M15 全删范围；不改造将整体删除的客户端，B2 不得宣称全仓 mobile 语音已清空。源码证据：114 个存活 TS-family 改动语法解析零诊断、9 个改动 JSON 可解析、RPC catalog 官方生成与 `--check`、diff-check 通过。23 个唯一测试文件共 397 passed、5 个因缺少既有 Windows native build artifacts 环境失败（其中 3 个 credential migration、2 个 packaging config）、8 skipped；两项修复后的 feature-tip fixture 分别 45/45、26/26 通过。另有 5 个 native-chat field 测试文件因内存预算未运行。相对基线 `a111650acd7154140d1d788749b6103a47589283` 的 changed-code gate 输入为 38 文件/97 新增行；gate 因资源限制中止，完整结果未知，仅完成 code-quality（0 findings）、casting（最初报告两处 fixture 强转，修复后的定向扫描确认新增行无相交诊断）和 focused plugins（0 findings）；type-aware、React Doctor、design-system 与 SAFETY rationale 未完成。全量类型检查未完成且结果未知。 |
-| B2-PET | T05–T06 桌面宠物及导入管理 | 待执行（紧随B2-UPDATER） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/types）；validation_setup（package/config/lock与唯一测试runner） | B0；B2-UPDATER | 移除专属 UI/API/后台行为。已只读盘点：`codex-pet-sprite-defaults.ts` 的当前生产消费者只有 pet bundle 和 pet URL 加载路径，未发现 Codex Agent 或通用动画复用；实现时仍以最终引用闭包复核。共享 settings、UI state、RPC 类型及 importer/helper由 graphify_build 单点编辑；锁文件归 validation_setup。 |
+| B2-PET | T05–T06 桌面宠物及导入管理 | 完成（有界静态审核；回归未运行） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/types）；validation_setup（package/config/lock与唯一测试runner） | B0；B2-UPDATER | 移除专属 UI/API/后台行为。已核 `codex-pet-sprite-defaults.ts` 仅由pet bundle/URL路径消费，未发现通用Codex动画复用；pet renderer、存储导入API、shared settings/UI state/RPC字段和3个sprite已按引用闭包移除；AgentCombobox OpenCode SVG/no-img合同保留。RPC catalog check/Oxc 28存活TS/TSX/locale JSON/static timing parse/diff-check与删模块引用扫描通过。free RAM为1.89GiB，因此PET测试、TC、build及官方全库locale AST scan均未运行；六locale与runtime-required只执行精确宠物专属key剥离并以JSON.parse/retired-key scan校验，不宣称全locale catalog scan通过。 |
 | B2-UPLOAD | U10 反馈/崩溃资料上传清理 | 已提交（8d670ba；静态审查完成，回归未跑） | cleanup_tracker（renderer UI）；graphify_build（backend/shared） | B0 | renderer已移除 feedback 菜单/表单与图片、prefill、drop、draft/store闭包；诊断UI仅保留本机collect/open/discard；崩溃报告移除身份/发送/上传错误，仅保留本地查看、脱敏Copy、Dismiss。UI与backend静态复核完成；六种locale及runtime catalog同步/校验通过，Oxc解析38个存活TS-family文件0错误、0空文件。配置侧 release-javascript-artifact 两文件属于本任务，独立审查通过。回归因当时可用内存2.21 GiB未启动；提交`8d670ba3847272597c13ff407d6ee41d2c030be9`已推送至`cleanup/function-pruning`；前置REMOTE-CLIENT提交`7b8fe8743dc537ea7c5221b189875700b94470fc`也已推送。U11随后由`ced880f7fb0928d85d889b27576677d14bf4c752`提交并推送。临时bundle/TTL不是用户Save As导出。 |
 | B2-TELEMETRY | U11 遥测采集/发送清理 | 已提交（ced880f；有界静态审查完成，回归未跑） | cleanup_tracker（renderer、`.github`、renderer locale、tracker）；graphify_build（main/shared/preload/types/electron.vite）；validation_setup（package/config/lock、独立UI/CI审查） | B0；B2-VOC、B2-UPLOAD | 产品遥测发送、首启同意及Privacy遥测开关已移除；本地诊断collect/open/discard保留。四个release workflow已去PostHog secret/env并改用build-identity verifier，YAML/needs/callers经静态复核通过；构建identity/source/version/package-manager guards保留。Main侧保留本地hang/churn观察、crash breadcrumb、NDJSON/bundle、usage扫描/cache与Stats/Memory/Diagnostics；只去产品遥测、consent/cohort/install-id及token usage报告。AgentLaunchContext、terminal split教育来源和本地 workspace/daemon/PTY/SSH行为保留，workspace-create analytics-only source不再经IPC/RPC。Renderer和混合测试行为合同经独立静态审查；GitHub IPC suite保留viewer/star结果/error传播；纯telemetry suite移除，有价值daemon本地证据用例迁移。独立hunk审查发现并修复了`persistence-ui-state.test.ts`里被误删的两个本地合同（feature-tip IDs去重、feature interaction计数递增）；旧bucket数据剥离与本地交互历史持久化另有覆盖。六locale及runtime-required官方同步/JSON parse通过，16,573 refs核验；既有缺译es177、fr/ja/ko/zh各167项；旧privacy consent/DNT/匿名发送文案和韩语override已清，隐私政策保留。提交`ced880f7fb0928d85d889b27576677d14bf4c752`已推送至`cleanup/function-pruning`。main/shared/preload/types最终独立审查完成；75个删除源模块、0残余引用/mock、0语法解析错误。U11测试、lint/changed-code gate、typecheck、build、E2E及Codex/Pi集成均未运行。 |
 | IDENTITY-LITE | 将应用与产品身份全新调整为 `orca-lite` | 待执行（仅计划） | 待分配 | U06/U07；B7-COMMON | 先盘点 package/app display name、electron-builder `productName`、安装器与可执行文件名、窗口标题、公开文档、CLI命令、app ID、userData、deep-link/protocol及本地pipe/socket命名，再按清单统一建立全新 `orca-lite` 身份；不保留旧应用身份别名、数据迁移或旧协议兼容层。禁止全局盲替换`orca`，保留第三方`@orca`包名和历史/业务标识；不改仓库目录/GitHub远程仓库URL。建议在主体裁剪完成后、B7最终构建/发布回归前执行。 |

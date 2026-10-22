@@ -69,6 +69,8 @@ type RetiredGlobalSettings = {
   openAgentTabsInChatByDefault?: unknown
   voice?: unknown
   telemetry?: unknown
+  experimentalPet?: unknown
+  experimentalSidekick?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -85,6 +87,8 @@ export function stripRetiredGlobalSettings(
     openAgentTabsInChatByDefault: _legacyChatDefaultView,
     voice: _retiredVoiceSettings,
     telemetry: _retiredTelemetrySettings,
+    experimentalPet: _retiredPetExperiment,
+    experimentalSidekick: _retiredSidekickExperiment,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacySetupScriptLaunchMode
@@ -97,6 +101,8 @@ export function stripRetiredGlobalSettings(
   void _legacyChatDefaultView
   void _retiredVoiceSettings
   void _retiredTelemetrySettings
+  void _retiredPetExperiment
+  void _retiredSidekickExperiment
   return rest
 }
 

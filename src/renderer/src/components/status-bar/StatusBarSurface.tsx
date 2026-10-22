@@ -35,9 +35,6 @@ import { useStatusBarController } from './use-status-bar-controller'
 import { isOwnerNotSetUpPlaceholder } from './owner-usage-rate-limits'
 import { StatusBarVisibilityMenu } from './StatusBarVisibilityMenu'
 
-const PetStatusSegment = lazyWithRetry(() =>
-  import('./PetStatusSegment').then((module) => ({ default: module.PetStatusSegment }))
-)
 const ResourceUsageStatusSegment = lazyWithRetry(() =>
   import('./ResourceUsageStatusSegment').then((module) => ({
     default: module.ResourceUsageStatusSegment
@@ -82,7 +79,6 @@ export function StatusBarSurface({
     isEmptyUsageState,
     isRefreshing,
     overflowing,
-    petEnabled,
     remoteOwner,
     rosterProviders,
     segmentsIconOnly,
@@ -295,7 +291,6 @@ export function StatusBarSurface({
           <SkillUpdateStatusSegment iconOnly={segmentsIconOnly} />
           <NativeChatResumeStatusSegment iconOnly={segmentsIconOnly} />
           <React.Suspense fallback={null}>
-            {petEnabled ? <PetStatusSegment /> : null}
             {showResourceUsage ? (
               <ResourceUsageStatusSegment compact={compact} iconOnly={segmentsIconOnly} />
             ) : null}

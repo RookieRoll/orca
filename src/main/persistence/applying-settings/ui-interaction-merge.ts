@@ -58,6 +58,17 @@ export const RETIRED_UPDATER_UI_FIELDS = [
   'updateReassuranceSeen'
 ] as const
 
+const RETIRED_PET_UI_FIELDS = [
+  'petVisible',
+  'petId',
+  'customPets',
+  'petSize',
+  'sidekickVisible',
+  'sidekickId',
+  'customSidekicks',
+  'sidekickSize'
+] as const
+
 export function stripRetiredMainOwnedUIFields(
   value: Partial<PersistedState['ui']> | undefined
 ): Partial<PersistedState['ui']> {
@@ -71,6 +82,9 @@ export function stripRetiredMainOwnedUIFields(
   }
   void _reserved
   for (const field of RETIRED_UPDATER_UI_FIELDS) {
+    Reflect.deleteProperty(ui, field)
+  }
+  for (const field of RETIRED_PET_UI_FIELDS) {
     Reflect.deleteProperty(ui, field)
   }
   return ui

@@ -44,7 +44,7 @@ it.each([undefined, false, null, 1, 'true', {}, true])(
   }
 )
 
-it('strips retired updater preferences from an existing profile without resetting other UI state', () => {
+it('strips retired updater and pet fields without resetting other UI state', () => {
   const defaults = getDefaultPersistedState(homedir())
   const onboarding = defaults.onboarding!
   const parsed = JSON.parse(
@@ -58,7 +58,15 @@ it('strips retired updater preferences from an existing profile without resettin
         releaseChannelOverride: 'rc',
         pendingUpdateNudgeId: 'nudge-1',
         dismissedUpdateNudgeId: 'nudge-2',
-        updateReassuranceSeen: true
+        updateReassuranceSeen: true,
+        petVisible: false,
+        petId: 'codex',
+        customPets: [{ id: 'custom' }],
+        petSize: 96,
+        sidekickVisible: false,
+        sidekickId: 'legacy',
+        customSidekicks: [{ id: 'legacy' }],
+        sidekickSize: 84
       }
     })
   )
@@ -73,7 +81,15 @@ it('strips retired updater preferences from an existing profile without resettin
     'releaseChannelOverride',
     'pendingUpdateNudgeId',
     'dismissedUpdateNudgeId',
-    'updateReassuranceSeen'
+    'updateReassuranceSeen',
+    'petVisible',
+    'petId',
+    'customPets',
+    'petSize',
+    'sidekickVisible',
+    'sidekickId',
+    'customSidekicks',
+    'sidekickSize'
   ]) {
     expect(ui).not.toHaveProperty(field)
   }

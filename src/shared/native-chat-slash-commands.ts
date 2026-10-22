@@ -85,7 +85,6 @@ const CODEX_COMMANDS: readonly SlashCommandSuggestion[] = [
   { name: 'title', description: 'Configure the terminal title' },
   { name: 'statusline', description: 'Configure the status line' },
   { name: 'theme', description: 'Choose a syntax highlighting theme' },
-  { name: 'pets', description: 'Choose or hide the terminal pet' },
   { name: 'mcp', description: 'List configured MCP tools' },
   { name: 'plugins', description: 'Browse plugins' },
   { name: 'logout', description: 'Log out of Codex' },
