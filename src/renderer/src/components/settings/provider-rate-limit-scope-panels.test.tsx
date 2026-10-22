@@ -1,10 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import { getExecutionHostLabel } from '../../../../shared/execution-host'
-import { GitHubRateLimitPanel } from '@/components/github/github-rate-limit-display'
 import { GitLabRateLimitPanel } from '@/components/gitlab/gitlab-rate-limit-display'
-
-const LOCAL_HOST_LABEL = getExecutionHostLabel('local')
 
 type StoreState = {
   settings: { activeRuntimeEnvironmentId: string | null }
@@ -26,23 +22,7 @@ vi.mock('@/store', () => ({
   useAppStore: (selector: (state: StoreState) => unknown) => selector(mocks.store.current)
 }))
 
-describe('provider rate-limit panels account scope', () => {
-  it('shows the Settings host, not the focused server, for GitHub API budget', () => {
-    mocks.store.current = {
-      settings: { activeRuntimeEnvironmentId: 'runtime-focused' },
-      openSettingsPage: vi.fn(),
-      openSettingsTarget: vi.fn()
-    }
-
-    const markup = renderToStaticMarkup(<GitHubRateLimitPanel target={{ kind: 'local' }} />)
-
-    expect(markup).toContain(`Budget scope: ${LOCAL_HOST_LABEL}`)
-    expect(markup).toContain(
-      'GitHub API budget is fetched from the CLI on this desktop client. Choose a server in the Host menu at the top of Settings to see its budget.'
-    )
-    expect(markup).toContain('Open Remote Servers')
-  })
-
+describe('GitLab rate-limit panel account scope', () => {
   it('shows the remote server scope for GitLab API budget', () => {
     mocks.store.current = {
       settings: { activeRuntimeEnvironmentId: null },

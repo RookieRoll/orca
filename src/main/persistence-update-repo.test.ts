@@ -646,26 +646,6 @@ describe('Store', () => {
     expect(reloaded.getRepo('r1')!.issueSourcePreference).toBe('upstream')
   })
 
-  it('updateRepo persists and clears ghAccount bindings', async () => {
-    const store = await createStore()
-    store.addRepo(makeRepo())
-
-    const updated = store.updateRepo(
-      { id: 'r1' },
-      {
-        ghAccount: { host: ' GitHub.COM ', user: ' Alice ' }
-      }
-    )
-    expect(updated!.ghAccount).toEqual({ host: 'github.com', user: 'Alice' })
-
-    store.flush()
-    const reloaded = await createStore()
-    expect(reloaded.getRepo('r1')!.ghAccount).toEqual({ host: 'github.com', user: 'Alice' })
-
-    const cleared = reloaded.updateRepo({ id: 'r1' }, { ghAccount: null })
-    expect(cleared!.ghAccount).toBeUndefined()
-  })
-
   it('updateRepo persists fork sync mode across reloads', async () => {
     const store = await createStore()
     store.addRepo(makeRepo())
@@ -702,6 +682,18 @@ describe('Store', () => {
 
     expect(store.getRepo('r1')!.forkSyncMode).toBeUndefined()
     expect(store.getRepos()[0]!.forkSyncMode).toBeUndefined()
+  })
+
+  it('drops retired repository account bindings during hydration', async () => {
+    const oldRepo = {
+      ...makeRepo(),
+      ghAccount: { host: 'github.com', user: 'old-account' }
+    }
+    writeDataFile({ ...getDefaultPersistedState(testState.dir), repos: [oldRepo] })
+
+    const store = await createStore()
+
+    expect(store.getRepo('r1')).not.toHaveProperty('ghAccount')
   })
 
   it('updateRepo with issueSourcePreference=undefined clears the preference', async () => {

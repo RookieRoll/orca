@@ -30,14 +30,13 @@ describe('handling-host check detail query command', () => {
         displayName: 'folder',
         badgeColor: 'blue',
         addedAt: 1,
-        connectionId: 'ssh-fixture',
-        ghAccount: { host: 'github.enterprise.test', user: 'Alice' }
+        connectionId: 'ssh-fixture'
       }
       const resolveRepo = vi.fn(async (selector: string) => {
         expect(selector).toBe('id:registered-folder')
         return repo
       })
-      const localOptions = { ghAccount: repo.ghAccount, wslDistro: 'Ubuntu-fixture' }
+      const localOptions = { wslDistro: 'Ubuntu-fixture' }
       const query = new RuntimeGitHubReviewQueryCommands({
         resolveRepo,
         getLocalGitArgs: () => [localOptions]

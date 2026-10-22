@@ -18,7 +18,6 @@ beforeEach(() => {
 
 it.each([
   'remote',
-  'account',
   'path',
   'removed',
   'instance',
@@ -82,9 +81,6 @@ it.each([
                       remoteUrl: 'https://github.com/other/repo.git'
                     }
                   }
-                : {}),
-              ...(change === 'account'
-                ? { ghAccount: { host: 'github.com', user: 'another-user' } }
                 : {}),
               ...(change === 'path' ? { path: '/replacement-repo' } : {}),
               ...(change === 'label' ? { displayName: 'Renamed' } : {})

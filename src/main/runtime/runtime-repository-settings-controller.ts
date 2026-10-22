@@ -2,7 +2,6 @@ import { isFolderRepo } from '../../shared/repo-kind'
 import { commitProvenRepoKindChange } from '../folder-repo-git-conversion'
 import type { Repo } from '../../shared/repo-types'
 import type { RuntimeRepoSelector } from './runtime-repo-selector'
-import type { GhAccountBinding } from '../../shared/github/account-binding'
 import { invalidateAuthorizedRootsCache } from '../ipc/registered-worktree-roots-cache'
 import { prepareLocalWorktreeRootForRepo } from '../worktree-root-preparation'
 import type { RuntimeStore } from './runtime-store-contract'
@@ -50,8 +49,6 @@ type RepositoryUpdates = Partial<
 > & {
   sourceControlAi?: Repo['sourceControlAi'] | null
   externalWorktreeDiscoverySuppressedAt?: Repo['externalWorktreeDiscoverySuppressedAt'] | null
-  /** Only `null` clears; `omitUndefined` drops a stripped (undefined) field so it never unbinds. */
-  ghAccount?: GhAccountBinding | null
 }
 
 function omitUndefined<T extends Record<string, unknown>>(value: T): Partial<T> {

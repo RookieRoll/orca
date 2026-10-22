@@ -6,8 +6,6 @@ import {
   createFakeSpawnedChild
 } from '../../../../shared/__fixtures__/fake-spawned-child'
 import type { GhExecOptions } from '../../../git/command-runner/gh-exec-file'
-import { clearGhAccountTokenCacheForTests } from '../../gh-account-token'
-import { clearGhCapabilityStateForTests } from '../../gh-capability-state'
 import { getPRCheckDetails } from './get-pr-check-details'
 import { prCheckLogTailCache } from './check-job-log-tails'
 
@@ -42,8 +40,6 @@ describe('full check details snapshot before admission', () => {
     vi.useFakeTimers()
     children.length = 0
     captures.length = 0
-    clearGhAccountTokenCacheForTests()
-    clearGhCapabilityStateForTests()
     prCheckLogTailCache.clear()
     resolverMock.mockReset().mockResolvedValue({ ownerRepo: repo, ghOptions: { env: {} } })
     spawnMock.mockReset().mockImplementation(() => {
@@ -71,13 +67,15 @@ describe('full check details snapshot before admission', () => {
     expect(children).toHaveLength(4)
     vi.stubEnv('GH_TOKEN', 'ambient-A')
     vi.stubEnv('ADMISSION_AMBIENT', 'ambient-A')
-    const env = { SNAPSHOT_TEST: 'env-A', GITHUB_TOKEN: 'override-A', GH_PROMPT_DISABLED: '' }
-    const binding = { host: ' GitHub.COM ', user: ' Alice ' }
+    const env = {
+      SNAPSHOT_TEST: 'env-A',
+      GH_TOKEN: 'token-Alice',
+      GH_PROMPT_DISABLED: ''
+    }
     const options: GhExecOptions = {
       cwd: '/folder-A',
       encoding: 'utf-8',
       host: ' GitHub.COM ',
-      ghAccount: binding,
       env,
       timeout: 17_000,
       idempotent: false
@@ -95,8 +93,7 @@ describe('full check details snapshot before admission', () => {
     env.SNAPSHOT_TEST = 'env-B'
     env.GITHUB_TOKEN = 'override-B'
     env.GH_PROMPT_DISABLED = 'B'
-    binding.host = 'github.com'
-    binding.user = 'Bob'
+    env.GH_TOKEN = 'token-Bob'
     options.cwd = '/folder-B'
     options.timeout = 9_000
     vi.stubEnv('GH_TOKEN', 'ambient-B')
@@ -107,9 +104,6 @@ describe('full check details snapshot before admission', () => {
       const endpoint = argv.find((arg) => arg.startsWith('repos/')) ?? ''
       if (argv.includes('--help')) {
         queueMicrotask(() => completeFakeSpawn(child, { stdout: '--user' }))
-      } else if (argv[0] === 'auth') {
-        const user = argv[argv.indexOf('--user') + 1]
-        queueMicrotask(() => completeFakeSpawn(child, { stdout: `token-${user}` }))
       } else if (endpoint.endsWith('/logs') && argv.includes('--allow-escape-sequences')) {
         setTimeout(
           () =>
@@ -201,10 +195,8 @@ describe('full check details snapshot before admission', () => {
     const keys = [...prCheckLogTailCache.keys()]
     expect(new Set(keys).size).toBe(2)
     env.SNAPSHOT_TEST = 'env-A'
-    env.GITHUB_TOKEN = 'override-A'
+    env.GH_TOKEN = 'token-Alice'
     env.GH_PROMPT_DISABLED = ''
-    binding.host = ' GitHub.COM '
-    binding.user = ' Alice '
     options.cwd = '/folder-A'
     options.timeout = 17_000
     vi.stubEnv('GH_TOKEN', 'ambient-A')

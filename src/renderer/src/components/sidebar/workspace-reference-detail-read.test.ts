@@ -171,12 +171,6 @@ describe('source-scoped workspace reference status reads', () => {
       referenceRepo
     )
     expect(first.key).not.toBe(second.key)
-    expect(
-      getWorkspaceReferenceRequest(referenceAttachment(), referenceWorkspace, {
-        ...referenceRepo,
-        ghAccount: { host: 'github.com', user: 'other' }
-      }).key
-    ).not.toBe(local.key)
   })
   it('uses the same all-workspaces cache slot as the existing card when no Linear workspace is bound', async () => {
     const source = normalizeTaskSourceContext({

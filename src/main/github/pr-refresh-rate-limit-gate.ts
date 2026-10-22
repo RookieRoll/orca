@@ -1,7 +1,11 @@
 import type { GitHubPRRefreshCandidate } from '../../shared/github/pull-request-refresh-types'
 import { getOriginGitHubApiRepository } from './github-api-repository'
 import { ghRepoExecOptions, githubRepoContext } from './gh-utils'
-import { getRateLimit, repositoryRateLimitGuard, spendsSharedGitHubComQuota } from './rate-limit'
+import {
+  refreshRateLimitSnapshot,
+  repositoryRateLimitGuard,
+  spendsSharedGitHubComQuota
+} from './rate-limit'
 
 const BUCKETS = ['core', 'graphql'] as const
 
@@ -18,7 +22,7 @@ export async function prRefreshRateLimitPausedUntil(
     executionOptions
   )
   if (warmSharedSnapshot && spendsSharedGitHubComQuota(repository, executionOptions)) {
-    await getRateLimit()
+    await refreshRateLimitSnapshot()
   }
   const blockedGuard = BUCKETS.map((bucket) =>
     repositoryRateLimitGuard(repository, bucket, executionOptions)

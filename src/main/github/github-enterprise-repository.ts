@@ -143,7 +143,10 @@ async function resolveAuthenticatedGitHubHost(
   localGitOptions: LocalGitExecOptions = {}
 ): Promise<string | null | undefined> {
   const normalizedHost = normalizeGitHubHost(host)?.authority ?? host.trim().toLowerCase()
-  const cacheKey = `${runtimeCacheKey(repoPath, connectionId, localGitOptions.wslDistro)}\0${normalizedHost}\0${githubReadExecutionScope({ ghAccount: localGitOptions.ghAccount })}`
+  const executionOptions = ghRepoExecOptions(
+    githubRepoContext(repoPath, connectionId, localGitOptions)
+  )
+  const cacheKey = `${runtimeCacheKey(repoPath, connectionId, localGitOptions.wslDistro)}\0${normalizedHost}\0${githubReadExecutionScope(executionOptions)}`
   const now = Date.now()
   pruneHostAuthCache(now)
   const cached = hostAuthCache.get(cacheKey)
@@ -157,9 +160,7 @@ async function resolveAuthenticatedGitHubHost(
   // Why: provider detection and review loading can probe the same runtime at
   // once; coalesce them so one host never spawns duplicate auth subprocesses.
   const probe = (async () => {
-    const execOptions = {
-      ...ghRepoExecOptions(githubRepoContext(repoPath, connectionId, localGitOptions))
-    }
+    const execOptions = executionOptions
     let authenticatedHost: string | null
     try {
       const { stdout, stderr } = await ghExecFileAsync(['auth', 'status'], execOptions)

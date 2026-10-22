@@ -16,7 +16,7 @@ import {
   type GitHubRepoExecOptions
 } from '../../github-api-repository'
 import {
-  getRateLimit,
+  refreshRateLimitSnapshot,
   noteRepositoryRateLimitSpend,
   repositoryRateLimitGuard,
   spendsSharedGitHubComQuota
@@ -96,9 +96,9 @@ export async function countWorkItems(
     ...githubHostExecOptions(ownerRepo)
   }
 
-  // Why: counts are decorative, so stop when the 30/min search budget is gone rather than spawn into 403s (getRateLimit is 30s-cached).
+  // Why: counts are decorative, so stop when the 30/min search budget is gone rather than spawn into 403s (the breaker snapshot is cached for 30s).
   if (spendsSharedGitHubComQuota(ownerRepo, ghOptions)) {
-    await getRateLimit()
+    await refreshRateLimitSnapshot()
   }
   if (
     !usesGraphqlWorkItemSearch(ownerRepo, ghOptions) &&

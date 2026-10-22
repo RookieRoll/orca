@@ -99,8 +99,7 @@ export async function diagnoseGhAuth(
   try {
     // `gh auth status` exits non-zero when no host is logged in but still
     // prints the same diagnostic text we want, so capture both streams.
-    // Why: auth is ambient (no Repo.ghAccount) but must still run on the
-    // repo's WSL/native execution host so inventory matches token resolution.
+    // Why: auth must run on the repo's WSL/native execution host.
     const { stdout, stderr } = await ghExecFileAsync(['auth', 'status'], {
       ...(execOptions.cwd ? { cwd: execOptions.cwd } : {}),
       ...(execOptions.wslDistro ? { wslDistro: execOptions.wslDistro } : {})

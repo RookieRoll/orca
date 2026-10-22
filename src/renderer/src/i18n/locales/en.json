@@ -3004,28 +3004,6 @@
           "66256a73b3": "status",
           "3ce4d5e96e": "prs"
         },
-        "github": {
-          "rate": {
-            "limit": {
-              "display": {
-                "5509443543": "Loading GitHub API budget…",
-                "34973d4695": "GitHub API budget is unavailable.",
-                "d12d3d6f33": "Refresh GitHub API budget",
-                "d5e5de9070": "Orca uses REST, Search, and GraphQL through the GitHub CLI.",
-                "58c5f88216": "GitHub API Budget",
-                "6da1858354": "left · resets in",
-                "f42790d150": "of",
-                "01f7323e58": "GraphQL API",
-                "1daf0f22a9": "GraphQL",
-                "1f2f28a4de": "Search API",
-                "c377a4f06a": "Search",
-                "c392c749a6": "REST API",
-                "bb227706a6": "REST",
-                "budget_scope_prefix": "Budget scope"
-              }
-            }
-          }
-        },
         "CloseReasonDropdown": {
           "e1f2a3b4c5": "Choose close reason"
         },
@@ -7525,17 +7503,12 @@
           "808f9a726e": "No prefix will be applied"
         },
         "GitPane": {
-          "895d3f70b8": "gh",
-          "32dca11189": "github",
           "c4f610d057": "Current GitLab CLI REST rate-limit headers when available.",
           "0de4ae556c": "GitLab API Budget",
           "cdd793134e": "api budget",
           "b9c011fbc2": "rate limit",
           "3072428ac7": "glab",
           "8a527d48e3": "gitlab",
-          "aa204f185f": "Current GitHub CLI REST, Search, and GraphQL rate limits.",
-          "612a440e57": "GitHub API Budget",
-          "2cde9044a8": "graphql",
           "1ec5c91e1d": "Choose whether branch names use your Git username, a custom prefix, or no prefix.",
           "330f584b50": "Branch Prefix",
           "1ffaadf0a0": "Prefix added to branch names when creating worktrees.",
@@ -9934,17 +9907,12 @@
         },
         "git": {
           "search": {
-            "16f53f7323": "gh",
-            "d088806071": "github",
             "40f9b815fd": "api budget",
             "b7e52124c7": "rate limit",
             "ead733645f": "glab",
             "4808f065b3": "gitlab",
             "2b4a72885d": "Current GitLab CLI REST rate-limit headers when available.",
             "83ecb3f470": "GitLab API Budget",
-            "65b69d9f80": "graphql",
-            "1139f61512": "Current GitHub CLI REST, Search, and GraphQL rate limits.",
-            "ff86e354c4": "GitHub API Budget",
             "035134fcd9": "worktree",
             "0c75583ca9": "safely",
             "bae91effdd": "fresh base",
@@ -10432,10 +10400,6 @@
             "keepForkUpToDateDescription": "Safely fast-forward this fork from upstream.",
             "projectRuntime": "Project Runtime",
             "projectRuntimeDescription": "Choose whether this project runs on Windows or WSL.",
-            "githubAccount": "GitHub Account",
-            "githubAccountDescription": "Bind a keyring gh login for this project’s GitHub API calls.",
-            "githubAccountKeyword": "github account",
-            "ghAccount": "gh account",
             "login": "login",
             "token": "token",
             "externalWorktrees": "External worktrees",
@@ -11964,25 +11928,6 @@
           "on": "On",
           "auto": "Agent",
           "off": "Off"
-        },
-        "RepositoryGitHubAccountSection": {
-          "unsupported": "This runtime’s GitHub CLI is too old for account binding (needs gh ≥ 2.40).",
-          "capabilityUnknown": "Could not determine whether this runtime’s GitHub CLI supports account binding. Retry.",
-          "envToken": "Environment-token accounts cannot be bound. Use a keyring login.",
-          "invalidBinding": "That GitHub account binding is invalid.",
-          "unavailable": "That GitHub account is unavailable on this runtime.",
-          "saveFailed": "Could not save the GitHub account binding.",
-          "title": "GitHub Account",
-          "description": "Use a specific gh login for this project’s GitHub issue and pull request calls.",
-          "longDescription": "Orca injects a short-lived token from the selected keyring login into each gh call for this project. Project View stays on the ambient login.",
-          "retry": "Retry",
-          "selectLabel": "Account",
-          "ambient": "Default (ambient gh login)",
-          "unavailableOption": "{{user}} @ {{host}} (unavailable)",
-          "capabilityBlocked": "Binding is unavailable until this runtime’s GitHub CLI supports `gh auth token --user` (gh ≥ 2.40).",
-          "capabilityUnknownHint": "Could not determine GitHub CLI account-binding support on this runtime. Clear the binding or retry.",
-          "notEnforced": "Saved, but not enforced by this runtime (mixed-version host).",
-          "refreshAccounts": "Refresh GitHub accounts"
         },
         "shareSkills": {
           "title": "Share Skills",

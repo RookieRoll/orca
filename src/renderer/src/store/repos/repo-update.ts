@@ -3,7 +3,6 @@ import type { AppState } from '../types'
 import type { Repo } from '../../../../shared/repo-types'
 import { sanitizeRepoIcon } from '../../../../shared/repo-icon'
 import { normalizeRepoBadgeColor } from '../../../../shared/repo-badge-color'
-import { normalizeGhAccountBinding } from '../../../../shared/github/account-binding'
 import { normalizeJiraProjectReference } from '../../../../shared/jira-project-reference'
 import {
   findRepoForHost,
@@ -58,14 +57,6 @@ export function sanitizeRepoUpdate(updates: RepoUpdate): RepoUpdate {
     sanitized.forkSyncMode !== 'off'
   ) {
     delete sanitized.forkSyncMode
-  }
-  if ('ghAccount' in sanitized && sanitized.ghAccount != null) {
-    const normalized = normalizeGhAccountBinding(sanitized.ghAccount)
-    if (!normalized) {
-      delete sanitized.ghAccount
-    } else {
-      sanitized.ghAccount = normalized
-    }
   }
   if ('customWorktreeVisibilitySources' in sanitized) {
     const sources = normalizeCustomWorktreeVisibilitySources(
@@ -158,7 +149,6 @@ export function createRepoUpdateActions(
               const {
                 sourceControlAi,
                 externalWorktreeDiscoverySuppressedAt,
-                ghAccount,
                 externalWorktreeVisibility,
                 agentWorktreeVisibility,
                 ...updatesWithoutClearSentinels
@@ -193,12 +183,6 @@ export function createRepoUpdateActions(
                 mergedRepo = repoWithoutSuppression
               } else if (externalWorktreeDiscoverySuppressedAt !== undefined) {
                 mergedRepo = { ...mergedRepo, externalWorktreeDiscoverySuppressedAt }
-              }
-              if (ghAccount === null) {
-                const { ghAccount: _ghAccount, ...repoWithoutGhAccount } = mergedRepo
-                mergedRepo = repoWithoutGhAccount
-              } else if (ghAccount !== undefined) {
-                mergedRepo = { ...mergedRepo, ghAccount }
               }
               return mergedRepo
             })

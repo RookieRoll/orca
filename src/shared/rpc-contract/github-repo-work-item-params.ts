@@ -33,7 +33,3 @@ export const WorkItemDetails = WorkItem
 export const WorkItemsCount = RepoSelector.extend({
   query: OptionalString
 })
-
-export const RateLimit = z.object({
-  force: z.boolean().optional()
-})

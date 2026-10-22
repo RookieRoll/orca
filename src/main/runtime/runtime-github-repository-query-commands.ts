@@ -11,12 +11,6 @@ import {
   listWorkItems,
   type MainWorkItem
 } from '../github/client'
-import {
-  listGhAccountBindingInventory,
-  validateGhAccountBinding
-} from '../github/gh-account-binding-inventory'
-import { getRateLimit } from '../github/rate-limit'
-import { resolveGhAccountRequiredHost } from '../github/account-binding-required-host'
 import { getWorkItemDetails } from '../github/work-item-details'
 import { getRepoRoutingConnectionId } from '../../shared/execution-host'
 
@@ -147,32 +141,4 @@ export class RuntimeGitHubRepositoryQueryCommands {
     )
   }
 
-  getGitHubRateLimit(options?: {
-    force?: boolean
-  }): Promise<Awaited<ReturnType<typeof getRateLimit>>> {
-    return getRateLimit(options)
-  }
-
-  async listGitHubBindableAccounts(
-    repoSelector: string,
-    options?: { refreshCapability?: boolean }
-  ): Promise<Awaited<ReturnType<typeof listGhAccountBindingInventory>>> {
-    const repo = await this.deps.resolveRepo(repoSelector)
-    const localGitOptions = this.deps.getLocalGitArgs(repo)[0] ?? {}
-    const requiredHost = await resolveGhAccountRequiredHost(repo, localGitOptions)
-    return listGhAccountBindingInventory(localGitOptions, {
-      refreshCapability: options?.refreshCapability === true,
-      ...(requiredHost ? { requiredHost } : {})
-    })
-  }
-
-  async validateGitHubAccountBinding(
-    repoSelector: string,
-    binding: { host: string; user: string }
-  ): Promise<Awaited<ReturnType<typeof validateGhAccountBinding>>> {
-    const repo = await this.deps.resolveRepo(repoSelector)
-    const localGitOptions = this.deps.getLocalGitArgs(repo)[0] ?? {}
-    const requiredHost = await resolveGhAccountRequiredHost(repo, localGitOptions)
-    return validateGhAccountBinding(binding, localGitOptions, requiredHost ? { requiredHost } : {})
-  }
 }

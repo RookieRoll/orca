@@ -1,7 +1,7 @@
 import { ghRepoExecOptions, githubRepoContext, type LocalGitExecOptions } from '../../gh-utils'
 import { getOriginGitHubApiRepository, type GitHubApiRepository } from '../../github-api-repository'
 import {
-  getRateLimit,
+  refreshRateLimitSnapshot,
   repositoryRateLimitGuard,
   spendsSharedGitHubComQuota,
   type RateLimitBucketKind
@@ -43,7 +43,7 @@ export async function getGitHubPRLookupRateLimitBlock(
   if (spendsSharedGitHubComQuota(repository, executionOptions)) {
     // Why: the probe only warms the snapshot and is exempt from limits, so a
     // failure must fail open rather than block the lookup (#7553).
-    await getRateLimit().catch(() => undefined)
+    await refreshRateLimitSnapshot().catch(() => undefined)
   }
   // Why: retrying at the earlier reset would fail again on the bucket that has
   // not reset yet, so the latest blocked reset is the only honest retry time.
@@ -59,7 +59,7 @@ export async function assertRateLimitBudget(
   executionOptions?: Pick<GhExecOptions, 'cwd' | 'wslDistro'>
 ): Promise<void> {
   if (spendsSharedGitHubComQuota(repository, executionOptions)) {
-    await getRateLimit()
+    await refreshRateLimitSnapshot()
   }
   const guard = repositoryRateLimitGuard(repository, bucket, executionOptions)
   if (guard.blocked) {

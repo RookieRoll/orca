@@ -49,11 +49,7 @@ export function registerReviewBaseHandlers(context: WorktreeIpcContext): void {
         }
         throw new SshHostNotServedError(connectionId, SSH_GIT_RECONNECT_MESSAGE)
       }
-      const localGhOptions = connectionId
-        ? repo.ghAccount
-          ? { ghAccount: repo.ghAccount }
-          : undefined
-        : getLocalProjectGhExecOptions(store, repo)
+      const localGhOptions = connectionId ? undefined : getLocalProjectGhExecOptions(store, repo)
       const fetchRemoteTrackingRef = (remote: string, branch: string): Promise<void> =>
         fetchPrHeadTrackingRef(repo, remote, branch, {
           localGitExecOptions: getLocalProjectGitExecOptions(store, repo)

@@ -2759,26 +2759,6 @@
           "3ce4d5e96e": "PRs"
         },
         "github": {
-          "rate": {
-            "limit": {
-              "display": {
-                "5509443543": "GitHub API 予算を読み込み中…",
-                "34973d4695": "GitHub API の予算が利用できません。",
-                "d12d3d6f33": "GitHub API 予算を更新する",
-                "d5e5de9070": "Orca は、GitHub CLI を通じて REST、Search、GraphQL を使用します。",
-                "58c5f88216": "GitHub API の予算",
-                "6da1858354": "左 · リセット",
-                "f42790d150": "の",
-                "01f7323e58": "GraphQL API",
-                "1daf0f22a9": "GraphQL",
-                "1f2f28a4de": "検索API",
-                "c377a4f06a": "検索",
-                "c392c749a6": "REST API",
-                "bb227706a6": "REST",
-                "budget_scope_prefix": "予算スコープ"
-              }
-            }
-          }
         },
         "CloseReasonDropdown": {
           "e1f2a3b4c5": "クローズ理由を選択"
@@ -7228,17 +7208,12 @@
           "808f9a726e": "プレフィックスは適用されません"
         },
         "GitPane": {
-          "895d3f70b8": "gh",
-          "32dca11189": "GitHub",
           "c4f610d057": "現在の GitLab CLI REST レート制限ヘッダー (利用可能な場合)。",
           "0de4ae556c": "GitLab API の予算",
           "cdd793134e": "APIの予算",
           "b9c011fbc2": "レート制限",
           "3072428ac7": "glab",
           "8a527d48e3": "gitlab",
-          "aa204f185f": "現在の GitHub CLI REST、Search、および GraphQL のレート制限。",
-          "612a440e57": "GitHub API の予算",
-          "2cde9044a8": "graphql",
           "1ec5c91e1d": "ブランチ名に Git ユーザー名を使用するか、カスタムプレフィックスを使用するか、プレフィックスを使用しないかを選択します。",
           "330f584b50": "ブランチプレフィックス",
           "1ffaadf0a0": "ワークツリーの作成時にブランチ名に追加されるプレフィックス。",
@@ -9624,17 +9599,12 @@
         },
         "git": {
           "search": {
-            "16f53f7323": "gh",
-            "d088806071": "GitHub",
             "40f9b815fd": "APIの予算",
             "b7e52124c7": "レート制限",
             "ead733645f": "glab",
             "4808f065b3": "gitlab",
             "2b4a72885d": "現在の GitLab CLI REST レート制限ヘッダー (利用可能な場合)。",
             "83ecb3f470": "GitLab API の予算",
-            "65b69d9f80": "graphql",
-            "1139f61512": "現在の GitHub CLI REST、Search、および GraphQL のレート制限。",
-            "ff86e354c4": "GitHub API の予算",
             "035134fcd9": "ワークツリー",
             "0c75583ca9": "安全に",
             "bae91effdd": "フレッシュベース",
@@ -10119,10 +10089,6 @@
             "keepForkUpToDateDescription": "このフォークを upstream から安全に fast-forward します。",
             "projectRuntime": "プロジェクトのランタイム",
             "projectRuntimeDescription": "このプロジェクトを Windows と WSL のどちらで実行するかを選択します。",
-            "githubAccount": "GitHub アカウント",
-            "githubAccountDescription": "このプロジェクトの GitHub API 呼び出し用のキーリング gh ログインをバインドします。",
-            "githubAccountKeyword": "GitHub アカウント",
-            "ghAccount": "gh アカウント",
             "login": "ログイン",
             "token": "token",
             "externalWorktrees": "外部ワークツリー",
@@ -10563,25 +10529,6 @@
           "on": "オン",
           "auto": "Agent",
           "off": "オフ"
-        },
-        "RepositoryGitHubAccountSection": {
-          "unsupported": "このランタイムの GitHub CLI はアカウントバインディングには古すぎます (gh ≥ 2.40 が必要です)。",
-          "capabilityUnknown": "このランタイムの GitHub CLI がアカウントバインディングをサポートしているかどうかを判断できませんでした。再試行してください。",
-          "envToken": "環境トークンのアカウントはバインドできません。キーリングのログインを使用してください。",
-          "invalidBinding": "その GitHub アカウントバインディングは無効です。",
-          "unavailable": "その GitHub アカウントはこのランタイムでは使用できません。",
-          "saveFailed": "GitHub アカウントバインディングを保存できませんでした。",
-          "title": "GitHub アカウント",
-          "description": "このプロジェクトの GitHub Issue および PR の呼び出しには、特定の gh ログインを使用してください。",
-          "longDescription": "Orca は、選択したキーリングのログインから有効期間の短いトークンを取得し、このプロジェクトの各 gh 呼び出しに注入します。プロジェクトビューはアクティブな gh ログインを使い続けます。",
-          "retry": "再試行",
-          "selectLabel": "アカウント",
-          "ambient": "デフォルト (アクティブな gh ログイン)",
-          "unavailableOption": "{{user}} @ {{host}} (利用不可)",
-          "capabilityBlocked": "このランタイムの GitHub CLI が `gh auth token --user` (gh ≥ 2.40) をサポートするまで、バインディングは使用できません。",
-          "capabilityUnknownHint": "このランタイムでの GitHub CLI アカウントバインディングのサポートを確認できませんでした。バインディングをクリアするか、再試行してください。",
-          "notEnforced": "保存されましたが、このランタイム (混合バージョンのホスト) では適用されません。",
-          "refreshAccounts": "GitHub アカウントを更新する"
         },
         "agent-status-hooks-copy": {
           "7707c15abb": "Agent 状態フック",

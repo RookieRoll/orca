@@ -4,7 +4,6 @@ import {
   completeFakeSpawn,
   createFakeSpawnedChild
 } from '../../../../shared/__fixtures__/fake-spawned-child'
-import type { GhExecOptions } from '../../../git/command-runner/gh-exec-file'
 
 const { spawnMock, resolverMock, signalMock, forceMock } = vi.hoisted(() => ({
   spawnMock: vi.fn(),
@@ -24,8 +23,6 @@ import {
   runCheckDetailsCall
 } from './check-details-admission-lifetime'
 import { prCheckLogTailCache } from './check-job-log-tails'
-import { clearGhCapabilityStateForTests } from '../../gh-capability-state'
-import { clearGhAccountTokenCacheForTests } from '../../gh-account-token'
 
 const repo = { owner: 'acme', repo: 'widgets' }
 const children: ChildProcess[] = []
@@ -46,8 +43,6 @@ describe('check details existing admission ownership', () => {
       .mockResolvedValue({ ownerRepo: repo, ghOptions: { cwd: '/folder', env: {} } })
     signalMock.mockResolvedValue(false)
     forceMock.mockResolvedValue(false)
-    clearGhCapabilityStateForTests()
-    clearGhAccountTokenCacheForTests()
     prCheckLogTailCache.clear()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
@@ -221,48 +216,4 @@ describe('check details existing admission ownership', () => {
     expect(JSON.stringify(vi.mocked(console.warn).mock.calls)).not.toContain('private-output')
   })
 
-  it('retains all four creator permits through joined help and later token continuations after departure', async () => {
-    const options: GhExecOptions = {
-      cwd: '/folder',
-      ghAccount: { host: 'github.com', user: 'Alice' },
-      env: {}
-    }
-    resolverMock.mockResolvedValue({ ownerRepo: repo, ghOptions: options })
-    const controllers = Array.from({ length: 4 }, () => new AbortController())
-    const results = controllers.map((controller) =>
-      getPRCheckDetails('/folder', { checkRunId: 1 }, undefined, {}, controller.signal).catch(
-        () => null
-      )
-    )
-    await vi.advanceTimersByTimeAsync(0)
-    expect(children).toHaveLength(1)
-    expect(spawnMock.mock.calls[0][1]).toEqual(['auth', 'token', '--help'])
-    for (const controller of controllers) {
-      controller.abort()
-    }
-    await Promise.all(results)
-    resolverMock.mockResolvedValue({ ownerRepo: repo, ghOptions: { cwd: '/folder', env: {} } })
-    const fifth = getPRCheckDetails('/folder', { checkRunId: 5 })
-    await vi.advanceTimersByTimeAsync(0)
-    expect(children).toHaveLength(1)
-    completeFakeSpawn(children[0], { stdout: '--user' })
-    await vi.advanceTimersByTimeAsync(0)
-    expect(children).toHaveLength(5)
-    for (const call of spawnMock.mock.calls.slice(1)) {
-      expect(call[1]).toContain('Alice')
-    }
-    for (const tokenChild of children.slice(1)) {
-      tokenChild.emit('error', new Error('token delivery failed'))
-    }
-    await vi.advanceTimersByTimeAsync(0)
-    expect(children).toHaveLength(5)
-    children[1].emit('close', 1, null)
-    await vi.advanceTimersByTimeAsync(0)
-    expect(children).toHaveLength(6)
-    completeFakeSpawn(children[5], { stdout: '{"name":"fifth"}' })
-    await vi.advanceTimersByTimeAsync(0)
-    completeFakeSpawn(children[6], { stdout: '[]' })
-    await expect(fifth).resolves.toMatchObject({ name: 'fifth' })
-    expect(spawnMock.mock.calls.filter((call) => call[1][0] === 'api')).toHaveLength(2)
-  })
 })

@@ -2,7 +2,6 @@ import { defineMethod } from '../core'
 import { RepoSelector } from '../../../../shared/rpc-contract/github-repo-target-params'
 import {
   IssuesList,
-  RateLimit,
   WorkItem,
   WorkItemByOwnerRepo,
   WorkItemDetails,
@@ -22,12 +21,6 @@ export const GITHUB_REPO_WORK_ITEM_METHODS = [
     permission: 'workspace',
     params: RepoSelector,
     handler: async (params, { runtime }) => runtime.getRepoUpstream(params.repo)
-  }),
-  defineMethod({
-    name: 'github.rateLimit',
-    permission: 'workspace',
-    params: RateLimit,
-    handler: async (params, { runtime }) => runtime.getGitHubRateLimit(params)
   }),
   defineMethod({
     name: 'github.listWorkItems',

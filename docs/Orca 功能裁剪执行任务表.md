@@ -54,7 +54,7 @@
 | H11 | 公开产物发布 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | ArtifactsPage/设置与导航入口、EditorPanelHeader、NativeChatInlineVisual、BrowserPane/DocPreview 分享入口 | 删除公开发布和链接写入；保留本地文件 URL 转换、普通文件预览/授权及 ipynb 能力。 |
 | H12 | 产物列表、搜索与预览 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | ArtifactsPage 列表/搜索/预览/路由、搜索目录与导航状态 | 移除已发布产物管理；不影响本地文件搜索和预览。 |
 | H13 | 产物链接复制与删除 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | Published link/client、publish/share flows、列表行操作与撤销/删除入口 | 不发服务端删除请求；保留 H05 本地 terminal artifacts、SkillCloud 配置及 Orcad artifacts。K18 的浏览器分享出口随 H 组覆盖，B4-REMOTE-SHARED 后续核验是否仍有独立远程代码。最终静态闭合：45个删除生产模块、226个候选引用零悬空引用/零解析错误；82个存活变更TS/TSX Oxc零错误、8个JSON有效、27个删除测试无遗留timing、0空文件、diff-check通过；本地文件URL定向测试2项通过。全量tests/typecheck/build/E2E未运行。 |
-| J01 | GitHub 账号与认证诊断 | B3-PLATFORM | 待执行（J 子组，H 提交后开始） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | H11–H13；B0；B7 | 待核 GitHub 专用 account/status UI 与共享认证消费者 | 保留普通 Git/GitHub/SSH 认证基础设施；不删 Jira J16。 |
+| J01 | GitHub 账号与认证诊断 | B3-PLATFORM | 进行中（JGITHUB 首个独立提交） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | H11–H13；B0；B7 | Repository GitHub account binding 设置、仓库绑定状态/搜索与专用 IPC/RPC；逐项区分账户绑定和 CLI 自有登录 | 删除 Orca 专属绑定/账号诊断产品面；保留正常 gh auth、仓库 remote identity、clone/fetch/push、keychain 与通用 Git。 |
 | J02 | GitHub Issues | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | J03 | GitHub Projects | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | J04 | GitHub PR 创建与关联 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -246,8 +246,15 @@
 | 子项 | 删除编号 | 状态 | 交付顺序与边界 |
 |---|---|---|---|
 | B3-PLATFORM-H | H11–H13（含重叠的 K18 浏览器公开分享出口） | 已完成（独立子项） | 删除云端公开产物发布、列表/管理、分享链接与删除入口；保留 H05 本地 terminal artifacts、Orcad artifacts、SkillCloud `artifact-cloud-config.ts`、本地文件 URL 转换、普通本地预览/授权与 ipynb。此子项完成不代表 B3-PLATFORM 整包完成。 |
-| B3-PLATFORM-JGITHUB | J01–J08 | 待执行，H 子项提交后开始 | 删除 Orca 专属 GitHub 账号诊断与 Issues/Projects/PR 产品入口；保留基础 Git/GitHub/SSH 认证与共享 client 的非产品消费者。 |
+| B3-PLATFORM-JGITHUB | J01–J08 | 进行中（J01 首个独立提交） | 先单独移除 J01 的 repository account binding/诊断面，再依次交付 J02–J08 Issues/Projects/PR 产品入口删除；当前提交只做 J01。保留基础 Git/GitHub/SSH 认证与共享 client 的非产品消费者。 |
 | B3-PLATFORM-JOTHERS | J09–J15、J17–J18 | 待执行，GitHub 子项之后 | 删除 GitLab、Bitbucket、Gitea、Azure DevOps、Linear、统一任务页及 Hosted Review 专属入口；保留 Jira J16 和通用本地 Git/工作区行为。 |
+
+### B3-PLATFORM-JGITHUB 子项计划
+
+| 子项 | 删除编号 | 状态 | 边界 |
+|---|---|---|---|
+| B3-PLATFORM-J01 | J01 GitHub 账号与认证诊断 | 已完成（独立提交） | 删除 Orca 专属仓库账号选择/binding 与 GitHub 配额诊断 UI/API；保留用户自己的 gh login、普通 Git/GitHub/SSH 认证、repository remote identity、PR/Issue 通用认证帮助及内部 rate-limit breaker。验证：13个删除生产模块/3个候选文件 AST 审计为0悬空引用、0解析错误；65个存活 TS/TSX/JS Oxc 解析通过；7个 JSON 有效；9个删除测试无残留 timing；0空文件、diff-check、RPC catalog generation/check、ratchet 90 均通过。`rate-limit.test.ts` 未运行（CPU 99%，超过资源门槛）；全量 tests/typecheck/build/E2E 未运行。 |
+| B3-PLATFORM-J02-08 | J02–J08 Issues、Projects、PR 工作流 | 待执行，J01 提交后开始 | 分别盘点并删除 Orca 的 GitHub Issues/Projects/PR 产品入口；不扩展至基础 Git 客户端或普通认证。 |
 
 ### B5 跨功能边界单列
 

@@ -17,8 +17,6 @@ import type { OrcaRuntimeService } from './orca-runtime'
 import { OrcaRuntimeRpcServer } from './runtime-rpc'
 import { RuntimeGitHubReviewQueryCommands } from './runtime-github-review-query-commands'
 import { GITHUB_PULL_REQUEST_METHODS } from './rpc/methods/github-pull-request-methods'
-import { clearGhAccountTokenCacheForTests } from '../github/gh-account-token'
-import { clearGhCapabilityStateForTests } from '../github/gh-capability-state'
 import { prCheckLogTailCache } from '../github/client/check/check-job-log-tails'
 import { withPairedCheckDetailsCleanup } from './github-check-details-paired-cleanup.test-fixture'
 
@@ -72,8 +70,6 @@ describe('paired check details over real encrypted loopback transport', () => {
     captures.signals.length = 0
     detailsDelegate.mockClear()
     terminationMock.mockReset().mockResolvedValue(false)
-    clearGhAccountTokenCacheForTests()
-    clearGhCapabilityStateForTests()
     prCheckLogTailCache.clear()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
@@ -92,8 +88,7 @@ describe('paired check details over real encrypted loopback transport', () => {
         kind: 'folder',
         displayName: 'folder',
         badgeColor: 'blue',
-        addedAt: 1,
-        ghAccount: { host: 'github.enterprise.test', user: 'Alice' }
+        addedAt: 1
       }
       const resolveRepo = vi.fn(async (selector: string) => {
         if (selector !== 'id:folder') {
@@ -103,7 +98,7 @@ describe('paired check details over real encrypted loopback transport', () => {
       })
       const query = new RuntimeGitHubReviewQueryCommands({
         resolveRepo,
-        getLocalGitArgs: (registered) => [{ ghAccount: registered.ghAccount }]
+        getLocalGitArgs: () => [{}]
       })
       const delegate = vi.spyOn(query, 'getRepoPRCheckDetails')
       let hostSettled = false
@@ -121,10 +116,14 @@ describe('paired check details over real encrypted loopback transport', () => {
       resolverMock.mockImplementation(async (path, prRepo, connection, options) => {
         expect(path).toBe(hostFolder)
         expect(connection).toBeNull()
-        expect(options.ghAccount).toEqual(repo.ghAccount)
         return {
           ownerRepo: prRepo,
-          ghOptions: { ...options, cwd: hostFolder, host: 'github.enterprise.test', env: {} }
+          ghOptions: {
+            ...options,
+            cwd: hostFolder,
+            host: 'github.enterprise.test',
+            env: { GH_ENTERPRISE_TOKEN: 'fixture-token' }
+          }
         }
       })
       spawnMock
@@ -144,11 +143,7 @@ describe('paired check details over real encrypted loopback transport', () => {
           queueMicrotask(() =>
             completeFakeSpawn(
               child,
-              argv.includes('--help')
-                ? { stdout: '--user' }
-                : argv[0] === 'auth'
-                  ? { stdout: 'fixture-bound-token' }
-                  : !disconnect
+              !disconnect
                     ? { code: 1, stderr: 'fixture-ordinary-failure' }
                     : {
                         stdout: JSON.stringify({
@@ -272,7 +267,7 @@ describe('paired check details over real encrypted loopback transport', () => {
           for (const call of apiCalls) {
             expect(call[1]).toContain('github.enterprise.test')
             expect(call[2].cwd).toBe(hostFolder)
-            expect(call[2].env.GH_ENTERPRISE_TOKEN).toBe('fixture-bound-token')
+            expect(call[2].env.GH_ENTERPRISE_TOKEN).toBe('fixture-token')
           }
           expect(prCheckLogTailCache.size).toBe(0)
         },

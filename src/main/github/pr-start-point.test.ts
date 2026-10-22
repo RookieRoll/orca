@@ -396,7 +396,7 @@ describe('resolveGitHubPrStartPoint', () => {
       repoPath: '/repo-root',
       prNumber: 1738,
       issueSourcePreference: 'origin',
-      localGitOptions: { ghAccount: { host: 'github.com', user: 'alice' } },
+      localGitOptions: {},
       gitExec,
       fetchRemoteTrackingRef,
       fetchPullRequestHeadRef: fetchPullRequestHeadRefMock,
@@ -408,16 +408,14 @@ describe('resolveGitHubPrStartPoint', () => {
       1738,
       'pr',
       null,
-      {
-        ghAccount: { host: 'github.com', user: 'alice' }
-      },
+      {},
       'origin'
     )
     expect(getPullRequestPushTargetMock).toHaveBeenCalledWith(
       '/repo-root',
       1738,
       null,
-      { ghAccount: { host: 'github.com', user: 'alice' } },
+      {},
       'origin'
     )
     expect(result).toEqual({

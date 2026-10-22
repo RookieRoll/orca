@@ -72,7 +72,7 @@ describe('PR lookup coalescing', () => {
     expect(mocks.resolve).toHaveBeenCalledTimes(1)
   })
 
-  it('isolates heads, fallback hints, accounts, execution hosts, and credentials', async () => {
+  it('isolates heads, fallback hints, execution hosts, and credentials', async () => {
     mocks.resolve.mockResolvedValue(outcome)
     const requests = [
       getPRForBranchOutcome('/repo', 'topic'),
@@ -83,14 +83,11 @@ describe('PR lookup coalescing', () => {
       getPRForBranchOutcome('/repo', 'topic', null, null, null, {
         localGitExecOptions: { wslDistro: 'Ubuntu' }
       }),
-      getPRForBranchOutcome('/repo', 'topic', null, null, null, {
-        localGitExecOptions: { ghAccount: { host: 'github.com', user: 'other' } }
-      })
     ]
     vi.stubEnv('GH_TOKEN', 'test-only-other-token')
     requests.push(getPRForBranchOutcome('/repo', 'topic'))
     await Promise.all(requests)
-    expect(mocks.resolve).toHaveBeenCalledTimes(8)
+    expect(mocks.resolve).toHaveBeenCalledTimes(7)
   })
 
   it('cleans up errors so later reads can recover', async () => {

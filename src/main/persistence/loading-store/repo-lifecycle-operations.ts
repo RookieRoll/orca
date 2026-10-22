@@ -2,7 +2,6 @@ import type { WorkspaceSessionState } from '../../../shared/workspace-session-st
 import type { ProjectHostSetup, ProjectHostSetupUpdateArgs } from '../../../shared/project-types'
 import type { Repo } from '../../../shared/repo-types'
 import type { RepoHostTarget } from '../../../shared/repo-host-identity'
-import type { GhAccountBinding } from '../../../shared/github/account-binding'
 import {
   removeRepoFromHostWorkspaceSessions,
   removeRepoFromWorkspaceSession
@@ -187,7 +186,6 @@ export class RepoLifecycleOperations {
       agentWorktreeVisibility?: Repo['agentWorktreeVisibility'] | null
       sourceControlAi?: Repo['sourceControlAi'] | null
       externalWorktreeDiscoverySuppressedAt?: Repo['externalWorktreeDiscoverySuppressedAt'] | null
-      ghAccount?: GhAccountBinding | null
     }
   ): Repo | null {
     return getRepoUpdateOperations(this).updateRepo(target, updates)

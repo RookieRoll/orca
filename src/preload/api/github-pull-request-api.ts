@@ -21,7 +21,6 @@ import type {
   GitHubViewer,
   PRInfo
 } from '../../shared/github/pull-request-types'
-import type { GetRateLimitResult } from '../../shared/github/rate-limit-types'
 import type { GitHubRepoSelectorArgs } from './github-work-item-api'
 
 export type GithubPullRequestApi = {
@@ -196,12 +195,6 @@ export type GithubPullRequestApi = {
   ) => Promise<GitHubCommentResult>
   checkOrcaStarred: () => Promise<boolean | null>
   starOrca: () => Promise<boolean>
-  /**
-   * GitHub API rate-limit snapshot. Does NOT consume quota (the
-   * `rate_limit` endpoint is exempt). Cached 30s server-side — pass
-   * `force: true` to bust after a known-expensive op.
-   */
-  rateLimit: (args?: { force?: boolean }) => Promise<GetRateLimitResult>
   /** Explains scope_missing ProjectV2 failures — notably a shell `GITHUB_TOKEN` shadowing the keyring credential, where `gh auth refresh` is a no-op. */
   diagnoseAuth: (args?: { host?: string }) => Promise<GhAuthDiagnostic>
 }

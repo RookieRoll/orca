@@ -2759,26 +2759,6 @@
           "3ce4d5e96e": "PR"
         },
         "github": {
-          "rate": {
-            "limit": {
-              "display": {
-                "5509443543": "正在加载 GitHub API 预算...",
-                "34973d4695": "GitHub API 预算不可用。",
-                "d12d3d6f33": "刷新 GitHub API 预算",
-                "d5e5de9070": "Orca 通过 GitHub CLI 使用 REST、搜索和 GraphQL。",
-                "58c5f88216": "GitHub API 预算",
-                "6da1858354": "剩余 · 重置于",
-                "f42790d150": "的",
-                "01f7323e58": "GraphQL API",
-                "1daf0f22a9": "GraphQL",
-                "1f2f28a4de": "搜索 API",
-                "c377a4f06a": "搜索",
-                "c392c749a6": "REST API",
-                "bb227706a6": "REST",
-                "budget_scope_prefix": "预算范围"
-              }
-            }
-          }
         },
         "CloseReasonDropdown": {
           "e1f2a3b4c5": "选择关闭原因"
@@ -7228,17 +7208,12 @@
           "808f9a726e": "不会应用前缀"
         },
         "GitPane": {
-          "895d3f70b8": "gh",
-          "32dca11189": "github",
           "c4f610d057": "当前 GitLab CLI REST 速率限制标头（如果可用）。",
           "0de4ae556c": "GitLab API预算",
           "cdd793134e": "API预算",
           "b9c011fbc2": "速率限制",
           "3072428ac7": "光亮的",
           "8a527d48e3": "GitLab",
-          "aa204f185f": "当前 GitHub CLI REST、搜索和 GraphQL 速率限制。",
-          "612a440e57": "GitHub API 预算",
-          "2cde9044a8": "graphql",
           "1ec5c91e1d": "选择分支名称是使用您的 Git 用户名、自定义前缀还是不使用前缀。",
           "330f584b50": "分支前缀",
           "1ffaadf0a0": "创建工作树时添加到分支名称的前缀。",
@@ -9624,17 +9599,12 @@
         },
         "git": {
           "search": {
-            "16f53f7323": "gh",
-            "d088806071": "GitHub",
             "40f9b815fd": "API预算",
             "b7e52124c7": "速率限制",
             "ead733645f": "光亮的",
             "4808f065b3": "GitLab",
             "2b4a72885d": "当前 GitLab CLI REST 速率限制标头（如果可用）。",
             "83ecb3f470": "GitLab API预算",
-            "65b69d9f80": "Graqh QL",
-            "1139f61512": "当前 GitHub CLI REST、搜索和 GraphQL 速率限制。",
-            "ff86e354c4": "GitHub API 预算",
             "035134fcd9": "工作树",
             "0c75583ca9": "安全地",
             "bae91effdd": "新基线",
@@ -10119,10 +10089,6 @@
             "keepForkUpToDateDescription": "从 upstream 安全地快进此 Fork。",
             "projectRuntime": "项目运行时",
             "projectRuntimeDescription": "选择此项目运行在 Windows 还是 WSL。",
-            "githubAccount": "GitHub 账户",
-            "githubAccountDescription": "为该项目的 GitHub API 调用绑定密钥环中的 gh 登录。",
-            "githubAccountKeyword": "GitHub 账户",
-            "ghAccount": "gh 账户",
             "login": "登录",
             "token": "token",
             "externalWorktrees": "外部工作树",
@@ -10563,25 +10529,6 @@
           "on": "开启",
           "auto": "智能体",
           "off": "关闭"
-        },
-        "RepositoryGitHubAccountSection": {
-          "unsupported": "此运行时的 GitHub CLI 版本过旧，不支持账户绑定（需要 gh ≥ 2.40）。",
-          "capabilityUnknown": "无法确定此运行时的 GitHub CLI 是否支持账户绑定。请重试。",
-          "envToken": "环境令牌账户无法绑定。请使用密钥环登录。",
-          "invalidBinding": "该 GitHub 账户绑定无效。",
-          "unavailable": "该 GitHub 账户在此运行时不可用。",
-          "saveFailed": "无法保存 GitHub 账户绑定。",
-          "title": "GitHub 账户",
-          "description": "为此项目的 GitHub 议题和拉取请求调用使用特定的 gh 登录。",
-          "longDescription": "Orca 会将所选密钥环登录的短期令牌注入此项目的每次 gh 调用。项目视图继续使用当前活动的 gh 登录。",
-          "retry": "重试",
-          "selectLabel": "账户",
-          "ambient": "默认（当前活动的 gh 登录）",
-          "unavailableOption": "{{user}} @ {{host}}（不可用）",
-          "capabilityBlocked": "在此运行时的 GitHub CLI 支持 `gh auth token --user`（gh ≥ 2.40）之前，无法使用账户绑定。",
-          "capabilityUnknownHint": "无法确定此运行时的 GitHub CLI 是否支持账户绑定。请清除绑定或重试。",
-          "notEnforced": "已保存，但此运行时（混合版本主机）不会强制执行。",
-          "refreshAccounts": "刷新 GitHub 帐户"
         },
         "agent-status-hooks-copy": {
           "7707c15abb": "智能体状态钩子",

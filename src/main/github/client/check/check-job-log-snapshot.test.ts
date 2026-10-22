@@ -6,8 +6,6 @@ import {
 } from '../../../../shared/__fixtures__/fake-spawned-child'
 import { attachLogFixture, failedLogJob } from './check-job-log-test-fixture'
 import { prCheckLogTailCache } from './check-job-log-tails'
-import { clearGhAccountTokenCacheForTests } from '../../gh-account-token'
-import { clearGhCapabilityStateForTests } from '../../gh-capability-state'
 const { spawnMock } = vi.hoisted(() => ({ spawnMock: vi.fn() }))
 vi.mock('node:child_process', async (original) => ({ ...(await original()), spawn: spawnMock }))
 const children: ChildProcess[] = []
@@ -21,8 +19,6 @@ describe('execution snapshot is the environment actually captured', () => {
     spawnMock.mockReset()
     children.length = 0
     prCheckLogTailCache.clear()
-    clearGhCapabilityStateForTests()
-    clearGhAccountTokenCacheForTests()
   })
   afterEach(() => {
     for (const child of children) {
@@ -85,36 +81,6 @@ describe('execution snapshot is the environment actually captured', () => {
     })
     expect(spawnMock.mock.calls[0][2].env.GH_TOKEN).toBeUndefined()
     expect(jobs[0].logTail).toBe('override-A')
-  })
-  it('old tenancy credential selection ignores injected cloud token and bypasses B to C stored-account reuse', async () => {
-    let stored = 'stored-B'
-    spawnMock.mockImplementation((_program, argv: string[], options: SpawnOptions) => {
-      const child = spawn()
-      const stdout = argv.includes('--help')
-        ? '--user'
-        : argv[0] === 'auth'
-          ? 'requested-A'
-          : stored
-      if (argv[0] === 'api') {
-        expect(options.env?.GH_TOKEN).toBe('requested-A')
-      }
-      queueMicrotask(() => completeFakeSpawn(child, { stdout }))
-      return child
-    })
-    const repo = { owner: 'acme', repo: 'widgets', host: 'tenant.ghe.com' }
-    const options = {
-      cwd: '/folder',
-      ghAccount: { host: repo.host, user: 'requested-user' },
-      env: {}
-    }
-    const jobs = [failedLogJob()]
-    await attachLogFixture(jobs, { repo, options })
-    expect(jobs[0].logTail).toBe('stored-B')
-    stored = 'stored-C'
-    await attachLogFixture(jobs, { repo, options })
-    expect(jobs[0].logTail).toBe('stored-C')
-    expect(spawnMock.mock.calls.filter((call) => call[1][0] === 'api')).toHaveLength(2)
-    expect(prCheckLogTailCache.size).toBe(0)
   })
   it('equivalent option ordering shares but a changed applicable or ignored env value misses conservatively', async () => {
     spawnMock.mockImplementation((_program, _argv, options: SpawnOptions) => {

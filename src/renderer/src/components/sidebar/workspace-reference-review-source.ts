@@ -17,9 +17,7 @@ export function canReadWorkspaceReferenceReview(
   if (
     sourceContext &&
     (sourceContext.hostId !== getRepoExecutionHostId(repo) ||
-      (sourceContext.repoId && sourceContext.repoId !== repo.id) ||
-      (sourceContext.accountLabel &&
-        (item.provider !== 'github' || sourceContext.accountLabel !== repo.ghAccount?.user)))
+      (sourceContext.repoId && sourceContext.repoId !== repo.id))
   ) {
     return false
   }

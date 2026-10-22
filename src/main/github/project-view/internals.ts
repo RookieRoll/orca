@@ -35,9 +35,8 @@ export type { RateLimitBucketKind }
  * gh exec routing shared by the project-view read/write paths. `host` pins
  * GHES requests to the enterprise server via the runner's host qualifier.
  *
- * Intentionally ambient: Project View does not honor `Repo.ghAccount` (Part A).
- * Work-items drawer / create-worktree search use bound injection; Project View
- * keeps the process login so host-scoped project boards stay stable.
+ * Uses the user's active `gh` CLI authentication for project queries.
+ * Project View uses the same process login as the other GitHub features.
  */
 export type ProjectGhExecOptions = { cwd?: string; host?: string }
 

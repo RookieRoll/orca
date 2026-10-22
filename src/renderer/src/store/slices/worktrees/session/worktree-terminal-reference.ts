@@ -33,7 +33,6 @@ function terminalReviewSourceKey(repo: Repo | null | undefined): string {
     host?.id,
     repo?.connectionId,
     repo?.gitRemoteIdentity?.canonicalKey,
-    repo?.ghAccount,
     getProviderRuntimeContextKey(null),
     host?.kind === 'runtime' ? getRuntimeEnvironmentRevision(host.environmentId) : null
   ])

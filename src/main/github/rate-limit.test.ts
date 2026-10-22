@@ -14,7 +14,7 @@ vi.mock('./gh-utils', () => ({
 }))
 
 import {
-  getRateLimit,
+  refreshRateLimitSnapshot,
   rateLimitGuard,
   noteRateLimitSpend,
   spendsSharedGitHubComQuota,
@@ -37,7 +37,7 @@ const PAYLOAD = JSON.stringify({
   }
 })
 
-describe('getRateLimit', () => {
+describe('internal rate-limit snapshot refresh', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
@@ -49,61 +49,41 @@ describe('getRateLimit', () => {
     vi.useRealTimers()
   })
 
-  it('parses bucket counts from gh api rate_limit', async () => {
+  it('reuses a successful snapshot until the 30-second TTL expires', async () => {
     ghExecFileAsyncMock.mockResolvedValue({ stdout: PAYLOAD })
 
-    const result = await getRateLimit()
+    await refreshRateLimitSnapshot()
+    await refreshRateLimitSnapshot()
 
-    expect(result).toEqual({
-      ok: true,
-      snapshot: {
-        core: { limit: 5000, remaining: 4200, resetAt: 1_700_000_000 },
-        search: { limit: 30, remaining: 28, resetAt: 1_700_000_000 },
-        graphql: { limit: 5000, remaining: 4900, resetAt: 1_700_000_000 },
-        fetchedAt: 1_000
-      }
-    })
-    // The runner injects --hostname at spawn from the `host` option, so the
-    // probe passes bare argv and pins the host to github.com through options.
-    expect(ghExecFileAsyncMock).toHaveBeenCalledWith(['api', 'rate_limit'], {
-      encoding: 'utf-8',
-      host: 'github.com'
-    })
-  })
-
-  it('caches a failed probe for the TTL instead of re-spawning gh', async () => {
-    // Why: refreshes fail open past a probe failure, so without a negative cache
-    // an auth or transport failure would spawn the same doomed gh call repeatedly.
-    ghExecFileAsyncMock.mockRejectedValue(new Error('HTTP 404: Rate limiting is not enabled.'))
-
-    const first = await getRateLimit()
-    const second = await getRateLimit()
-
-    expect(first).toEqual({ ok: false, error: 'HTTP 404: Rate limiting is not enabled.' })
-    expect(second).toEqual(first)
-    expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('re-probes after the failure TTL elapses and recovers on success', async () => {
-    ghExecFileAsyncMock.mockRejectedValueOnce(new Error('boom'))
-    ghExecFileAsyncMock.mockResolvedValue({ stdout: PAYLOAD })
-
-    expect((await getRateLimit()).ok).toBe(false)
-    expect((await getRateLimit()).ok).toBe(false)
     expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(1)
 
-    vi.setSystemTime(1_000 + 30_000)
+    vi.setSystemTime(31_000)
+    await refreshRateLimitSnapshot()
 
-    expect((await getRateLimit()).ok).toBe(true)
     expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(2)
   })
 
-  it('bypasses the failure cache when forced', async () => {
-    ghExecFileAsyncMock.mockRejectedValueOnce(new Error('boom'))
+  it('caches probe failures and retries after the TTL expires', async () => {
+    ghExecFileAsyncMock.mockRejectedValueOnce(new Error('probe unavailable'))
+
+    await expect(refreshRateLimitSnapshot()).resolves.toBeUndefined()
+    await refreshRateLimitSnapshot()
+
+    expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(1)
+
+    vi.setSystemTime(31_000)
+    ghExecFileAsyncMock.mockResolvedValue({ stdout: PAYLOAD })
+    await refreshRateLimitSnapshot()
+
+    expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('allows breaker refinement to force a probe past the cache', async () => {
     ghExecFileAsyncMock.mockResolvedValue({ stdout: PAYLOAD })
 
-    expect((await getRateLimit()).ok).toBe(false)
-    expect((await getRateLimit({ force: true })).ok).toBe(true)
+    await refreshRateLimitSnapshot()
+    await refreshRateLimitSnapshot({ force: true })
+
     expect(ghExecFileAsyncMock).toHaveBeenCalledTimes(2)
   })
 })
@@ -130,7 +110,8 @@ describe('rateLimitGuard', () => {
         }
       })
     })
-    expect((await getRateLimit()).ok).toBe(true)
+    notifyGhPrimaryRateLimit('core')
+    await vi.waitFor(() => expect(rateLimitGuard('core')).toMatchObject({ blocked: true }))
   }
 
   it('blocks below the floor while resetAt is in the future', async () => {
@@ -181,7 +162,8 @@ describe('shared-quota host scoping', () => {
         }
       })
     })
-    expect((await getRateLimit()).ok).toBe(true)
+    notifyGhPrimaryRateLimit('core')
+    await vi.waitFor(() => expect(rateLimitGuard('core')).toMatchObject({ blocked: true }))
   }
 
   it('treats github.com / no host on the native runtime as sharing the budget', () => {

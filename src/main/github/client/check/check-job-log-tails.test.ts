@@ -6,8 +6,6 @@ import {
 } from '../../../../shared/__fixtures__/fake-spawned-child'
 import { attachLogFixture, failedLogJob } from './check-job-log-test-fixture'
 import { prCheckLogTailCache } from './check-job-log-tails'
-import { clearGhCapabilityStateForTests } from '../../gh-capability-state'
-import { clearGhAccountTokenCacheForTests } from '../../gh-account-token'
 import parserFixture from './__fixtures__/gh-api-unknown-escape-flag.json'
 const { spawnMock } = vi.hoisted(() => ({ spawnMock: vi.fn() }))
 vi.mock('node:child_process', async (original) => ({ ...(await original()), spawn: spawnMock }))
@@ -37,8 +35,6 @@ describe('completed scoped excerpts through actual capture and runner', () => {
     raw = 'Error: retained diagnostic'
     spawnMock.mockReset().mockImplementation(automaticSpawn)
     prCheckLogTailCache.clear()
-    clearGhCapabilityStateForTests()
-    clearGhAccountTokenCacheForTests()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
   afterEach(async () => {
@@ -208,33 +204,6 @@ describe('completed scoped excerpts through actual capture and runner', () => {
     await attachLogFixture([failedLogJob()])
     expect(spawnMock).toHaveBeenCalledTimes(5)
   })
-  it.each(['github.com', 'github.localhost', 'github.enterprise.test'])(
-    'proven bound %s is cold/warm/concurrent 1/0/1 and isolates exact account user',
-    async (host) => {
-      const repo = { owner: 'acme', repo: 'widgets', host }
-      const options = { cwd: '/folder', ghAccount: { host, user: 'Alice' }, env: {} }
-      await attachLogFixture([failedLogJob()], { repo, options })
-      const countLogs = () => spawnMock.mock.calls.filter((call) => call[1][0] === 'api').length
-      expect(countLogs()).toBe(1)
-      await attachLogFixture([failedLogJob()], { repo, options })
-      expect(countLogs()).toBe(1)
-      prCheckLogTailCache.clear()
-      await Promise.all([
-        attachLogFixture([failedLogJob()], { repo, options }),
-        attachLogFixture([failedLogJob()], { repo, options })
-      ])
-      expect(countLogs()).toBe(2)
-      await attachLogFixture([failedLogJob()], {
-        repo,
-        options: { ...options, ghAccount: { host, user: 'alice' } }
-      })
-      expect(countLogs()).toBe(3)
-      const api = spawnMock.mock.calls.find((call) => call[1][0] === 'api')
-      expect(
-        api?.[2].env[host === 'github.enterprise.test' ? 'GH_ENTERPRISE_TOKEN' : 'GH_TOKEN']
-      ).toBe('bound-Alice')
-    }
-  )
   it('classic Enterprise secondary token retains 1/0/1 and changed token misses', async () => {
     const repo = { owner: 'acme', repo: 'widgets', host: 'github.enterprise.test' }
     const options = {

@@ -2867,26 +2867,6 @@
           "3ce4d5e96e": "prs"
         },
         "github": {
-          "rate": {
-            "limit": {
-              "display": {
-                "5509443543": "Chargement du quota d'API GitHub…",
-                "34973d4695": "Le quota d'API GitHub est indisponible.",
-                "d12d3d6f33": "Actualiser le quota d'API GitHub",
-                "d5e5de9070": "Orca utilise REST, Search et GraphQL via GitHub CLI.",
-                "58c5f88216": "Quota d'API GitHub",
-                "6da1858354": "restant · réinitialisation dans",
-                "f42790d150": "sur",
-                "01f7323e58": "API GraphQL",
-                "1daf0f22a9": "GraphQL",
-                "1f2f28a4de": "API Search",
-                "c377a4f06a": "Recherche",
-                "c392c749a6": "API REST",
-                "bb227706a6": "REST",
-                "budget_scope_prefix": "Périmètre du quota"
-              }
-            }
-          }
         },
         "CloseReasonDropdown": {
           "e1f2a3b4c5": "Choisir le motif de clôture"
@@ -7352,17 +7332,12 @@
           "808f9a726e": "Aucun préfixe ne sera appliqué"
         },
         "GitPane": {
-          "895d3f70b8": "gh",
-          "32dca11189": "github",
           "c4f610d057": "En-têtes de limite de débit REST actuels de la CLI GitLab, lorsqu'ils sont disponibles.",
           "0de4ae556c": "Budget API GitLab",
           "cdd793134e": "budget api",
           "b9c011fbc2": "limite de débit",
           "3072428ac7": "glab",
           "8a527d48e3": "gitlab",
-          "aa204f185f": "Limites de débit REST, Search et GraphQL actuelles de la CLI GitHub.",
-          "612a440e57": "Quota d'API GitHub",
-          "2cde9044a8": "graphql",
           "1ec5c91e1d": "Choisissez si les noms de branches utilisent votre nom d'utilisateur Git, un préfixe personnalisé ou aucun préfixe.",
           "330f584b50": "Préfixe de branche",
           "1ffaadf0a0": "Préfixe ajouté aux noms de branches à la création des worktrees.",
@@ -9753,17 +9728,12 @@
         },
         "git": {
           "search": {
-            "16f53f7323": "gh",
-            "d088806071": "github",
             "40f9b815fd": "budget api",
             "b7e52124c7": "limite de débit",
             "ead733645f": "glab",
             "4808f065b3": "gitlab",
             "2b4a72885d": "En-têtes de limite de débit REST actuels de la CLI GitLab, lorsqu'ils sont disponibles.",
             "83ecb3f470": "Budget API GitLab",
-            "65b69d9f80": "graphql",
-            "1139f61512": "Limites de débit REST, Search et GraphQL actuelles de la CLI GitHub.",
-            "ff86e354c4": "Quota d'API GitHub",
             "035134fcd9": "worktree",
             "0c75583ca9": "sans risque",
             "bae91effdd": "base à jour",
@@ -10253,10 +10223,6 @@
             "projectRuntimeDescription": "Choisissez si ce projet s'exécute sous Windows ou WSL.",
             "externalWorktrees": "Worktrees externes",
             "externalWorktreesDescription": "Définir si les worktrees créés hors d'Orca apparaissent pour ce projet.",
-            "githubAccount": "Compte GitHub",
-            "githubAccountDescription": "Liez un trousseau de clés de connexion pour les appels de l'API GitHub de ce projet.",
-            "githubAccountKeyword": "compte github",
-            "ghAccount": "compte gh",
             "login": "se connecter",
             "token": "token",
             "waitForSetupBeforeAgent": "attendez la configuration avant de démarrer l'agent",
@@ -11898,25 +11864,6 @@
           "7c4e18d2f6": "Arme les gestes de capture audacieux sur cette machine : {{samplingShortcut}} démarre une rafale d'échantillonnage ; {{captureShortcut}} capture les preuves du volet sur le disque.",
           "b09f24a51d": "Diagnostic de rendu du terminal",
           "f2c81d904a": "Paramètres expérimentaux cachés"
-        },
-        "RepositoryGitHubAccountSection": {
-          "unsupported": "La CLI GitHub de ce runtime est trop ancienne pour la liaison de compte (nécessite gh ≥ 2,40).",
-          "capabilityUnknown": "Impossible de déterminer si la CLI GitHub de ce runtime prend en charge la liaison de compte. Réessayez.",
-          "envToken": "Les comptes de jetons d'environnement ne peuvent pas être liés. Utilisez une connexion par trousseau de clés.",
-          "invalidBinding": "Cette liaison de compte GitHub n'est pas valide.",
-          "unavailable": "Ce compte GitHub n'est pas disponible sur ce runtime.",
-          "saveFailed": "Impossible d'enregistrer la liaison du compte GitHub.",
-          "title": "Compte GitHub",
-          "description": "Utilisez une connexion gh spécifique pour le problème GitHub de ce projet et les appels de pull request.",
-          "longDescription": "Orca injecte un jeton de courte durée à partir de la connexion au trousseau de clés sélectionné dans chaque appel gh pour ce projet. La vue du projet reste sur la connexion ambiante.",
-          "retry": "Réessayer",
-          "selectLabel": "Compte",
-          "ambient": "Par défaut (connexion gh ambiante)",
-          "unavailableOption": "{{user}} @ {{host}} (indisponible)",
-          "capabilityBlocked": "La liaison n'est pas disponible jusqu'à ce que la CLI GitHub de ce runtime prenne en charge « gh auth token --user » (gh ≥ 2,40).",
-          "capabilityUnknownHint": "Impossible de déterminer la prise en charge de la liaison de compte GitHub CLI sur ce runtime. Effacez la liaison ou réessayez.",
-          "notEnforced": "Enregistré, mais non appliqué par ce runtime (hôte à version mixte).",
-          "refreshAccounts": "Actualiser les comptes GitHub"
         },
         "contrast": {
           "title": "Contraste des couleurs",

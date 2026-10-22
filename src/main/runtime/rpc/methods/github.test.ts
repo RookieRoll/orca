@@ -26,19 +26,6 @@ describe('github RPC methods', () => {
     })
   })
 
-  it('fetches GitHub rate limits on the runtime server', async () => {
-    const runtime = {
-      getRuntimeId: () => 'test-runtime',
-      getGitHubRateLimit: vi.fn().mockResolvedValue({ ok: true, snapshot: { core: {} } })
-    } as unknown as OrcaRuntimeService
-    const dispatcher = new RpcDispatcher({ runtime, methods: GITHUB_METHODS })
-
-    const response = await dispatcher.dispatch(makeRequest('github.rateLimit', { force: true }))
-
-    expect(runtime.getGitHubRateLimit).toHaveBeenCalledWith({ force: true })
-    expect(response).toMatchObject({ ok: true, result: { ok: true } })
-  })
-
   it('lists work items on the runtime server', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',

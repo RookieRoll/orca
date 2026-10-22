@@ -1,4 +1,3 @@
-import { normalizeGhAccountBinding } from '../../../../shared/github/account-binding'
 import { parseWslPath } from '../../../wsl'
 import { githubReadExecutionScope } from '../../github-read-execution-scope'
 import type { GitHubApiRepository } from '../../github-api-repository'
@@ -30,35 +29,27 @@ export function snapshotCheckJobLogExecution(
   if (options.host !== undefined && options.host.trim().toLowerCase() !== host) {
     throw new Error('GitHub check details host is unavailable.')
   }
-  const binding = normalizeGhAccountBinding(options.ghAccount)
   const env: NodeJS.ProcessEnv = Object.freeze({
     ...(options.env ?? process.env),
     GH_PROMPT_DISABLED: (options.env ?? process.env).GH_PROMPT_DISABLED ?? '1'
   })
-  const ghAccount = binding
-    ? Object.freeze({ host: binding.host, user: binding.user })
-    : options.ghAccount
-      ? Object.freeze({ ...options.ghAccount })
-      : undefined
-  const ghOptions = Object.freeze({ ...options, host, env, ...(ghAccount ? { ghAccount } : {}) })
+  const ghOptions = Object.freeze({ ...options, host, env })
   const native =
     process.platform !== 'win32' ||
     Boolean(options.cwd && !options.wslDistro && !parseWslPath(options.cwd))
   const family = reusableHost(host)
-  const bound = Boolean(binding && binding.host === host)
   const token =
     family === 'cloud'
       ? env.GH_TOKEN || env.GITHUB_TOKEN
       : env.GH_ENTERPRISE_TOKEN || env.GITHUB_ENTERPRISE_TOKEN
-  if (!native || !family || (options.ghAccount ? !bound : !token)) {
+  if (!native || !family || !token) {
     return { ghOptions, executionScope: null }
   }
   const projection = {
     ...(options.cwd === undefined ? {} : { cwd: options.cwd }),
     encoding: options.encoding ?? 'utf-8',
     ...(options.wslDistro === undefined ? {} : { wslDistro: options.wslDistro }),
-    host,
-    ...(binding ? { ghAccount: { host: binding.host, user: binding.user } } : {})
+    host
   }
   return { ghOptions, executionScope: githubReadExecutionScope(projection, env) }
 }

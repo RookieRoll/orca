@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { normalizeRepoSourceControlAiOverrides } from '../source-control-ai'
 import { normalizeRepoBadgeColor } from '../repo-badge-color'
 import { sanitizeRepoIcon } from '../repo-icon'
-import { normalizeGhAccountBinding } from '../github/account-binding'
 import { normalizeJiraProjectReference } from '../jira-project-reference'
 import {
   normalizeCustomWorktreeVisibilitySources,
@@ -59,19 +58,6 @@ export function createRepoUpdateSchema<T extends Readonly<Record<string, z.ZodTy
       symlinkPaths: z.array(z.string()).optional(),
       issueSourcePreference: z.enum(['auto', 'upstream', 'origin']).optional(),
       defaultJiraProject: z.unknown().optional().transform(normalizeJiraProjectReference),
-      ghAccount: z
-        .unknown()
-        .optional()
-        .transform((value) => {
-          if (value === undefined) {
-            return undefined
-          }
-          if (value === null) {
-            return null
-          }
-          // Why: malformed bindings must omit the key (IPC deletes); never clear via undefined.
-          return normalizeGhAccountBinding(value) ?? undefined
-        }),
       forkSyncMode: z.enum(['ask', 'safe-auto', 'off']).optional(),
       externalWorktreeVisibility: z.enum(['hide', 'show']).nullable().optional(),
       externalWorktreeVisibilityPromptDismissedAt: z.number().finite().optional(),

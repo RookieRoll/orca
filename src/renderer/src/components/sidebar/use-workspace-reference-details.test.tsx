@@ -166,7 +166,7 @@ it('keeps failed exact refreshes stale while retaining their last known details'
     review: { number: 1 }
   })
 })
-it.each(['host', 'remote', 'account'])('drops cached success after %s rebinding', (kind) => {
+it.each(['host', 'remote'])('drops cached success after %s rebinding', (kind) => {
   const request = getWorkspaceReferenceRequest(referenceAttachment(1), workspace, referenceRepo)
   useAppStore.setState({
     hostedReviewCache: { [request.key]: { data: referenceReview(1), fetchedAt: Date.now() } }
@@ -183,15 +183,13 @@ it.each(['host', 'remote', 'account'])('drops cached success after %s rebinding'
       ...referenceRepo,
       ...(kind === 'host'
         ? { executionHostId: 'runtime:other' }
-        : kind === 'account'
-          ? { ghAccount: { host: 'github.com', user: 'other' } }
-          : {
-              gitRemoteIdentity: {
-                canonicalKey: 'github.com/other/project',
-                remoteName: 'origin',
-                remoteUrl: 'https://github.com/other/project.git'
-              }
-            })
+        : {
+            gitRemoteIdentity: {
+              canonicalKey: 'github.com/other/project',
+              remoteName: 'origin',
+              remoteUrl: 'https://github.com/other/project.git'
+            }
+          })
     }
   })
   expect(hook.result.current[getWorkspaceAttachmentKey(request.item)]).toBeUndefined()

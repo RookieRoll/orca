@@ -6,8 +6,6 @@ import { getRepoExecutionHostId } from '../../../shared/execution-host'
 import { isLegacyRepoForExternalWorktreeVisibility } from '../../../shared/external-worktree-visibility'
 import { normalizeRepoSourceControlAiOverrides } from '../../../shared/source-control-ai'
 import { normalizeWorktreeVisibilitySourcePreferences } from '../../../shared/worktree/visibility-sources'
-import type { GhAccountBinding } from '../../../shared/github/account-binding'
-import { invalidateGhAccountTokenCache } from '../../github/gh-account-token'
 import { sanitizeRepoUpdatesForPersistence } from './repo-sanitization'
 import { isFolderRepo } from '../../../shared/repo-kind'
 import { findExtraFolderWorkspaceIds } from '../../folder-workspace-meta-presence'
@@ -128,7 +126,6 @@ export class RepoUpdatePersistenceOperations {
       agentWorktreeVisibility?: Repo['agentWorktreeVisibility'] | null
       sourceControlAi?: Repo['sourceControlAi'] | null
       externalWorktreeDiscoverySuppressedAt?: Repo['externalWorktreeDiscoverySuppressedAt'] | null
-      ghAccount?: GhAccountBinding | null
     }
   ): Repo | null {
     const repo = findRepoRowForHostScopedWrite(
@@ -140,7 +137,6 @@ export class RepoUpdatePersistenceOperations {
       return null
     }
     assertKindChangeKeepsFolderWorkspaces(repo, updates.kind, this.state.worktreeMeta)
-    const previousGhAccount = repo.ghAccount
     const sanitizedUpdates = sanitizeRepoUpdatesForPersistence(updates)
     if (
       'executionHostId' in updates &&
@@ -198,10 +194,6 @@ export class RepoUpdatePersistenceOperations {
       delete repo.issueSourcePreference
       delete sanitizedUpdates.issueSourcePreference
     }
-    if ('ghAccount' in sanitizedUpdates && sanitizedUpdates.ghAccount == null) {
-      delete repo.ghAccount
-      delete sanitizedUpdates.ghAccount
-    }
     if ('worktreeBasePath' in sanitizedUpdates && sanitizedUpdates.worktreeBasePath === undefined) {
       delete repo.worktreeBasePath
       delete sanitizedUpdates.worktreeBasePath
@@ -251,13 +243,6 @@ export class RepoUpdatePersistenceOperations {
         delete sanitizedUpdates.sourceControlAi
       } else {
         sanitizedUpdates.sourceControlAi = normalizedSourceControlAi
-      }
-    }
-    if ('ghAccount' in updates) {
-      // Why: a rebind or unbind must not reuse a token cached for the previous login.
-      invalidateGhAccountTokenCache(previousGhAccount)
-      if (sanitizedUpdates.ghAccount) {
-        invalidateGhAccountTokenCache(sanitizedUpdates.ghAccount)
       }
     }
     Object.assign(repo, sanitizedUpdates)

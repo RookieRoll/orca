@@ -60,43 +60,16 @@ describe('effective check log execution snapshot', () => {
     'bad/host'
   ])('bypasses ambiguous host %s', (host) => {
     expect(
-      snapshotCheckJobLogExecution(
-        { ...repo, host },
-        { ghAccount: { host, user: 'Alice' }, env: { GH_TOKEN: 'a', GH_ENTERPRISE_TOKEN: 'b' } }
-      ).executionScope
+      snapshotCheckJobLogExecution({ ...repo, host }, {
+        env: { GH_TOKEN: 'a', GH_ENTERPRISE_TOKEN: 'b' }
+      }).executionScope
     ).toBeNull()
   })
-  it('bypasses keyring, host mismatch and invalid bindings', () => {
+  it('bypasses keyring and rejects a host mismatch', () => {
     expect(snapshotCheckJobLogExecution(repo, { env: {} }).executionScope).toBeNull()
     expect(() =>
       snapshotCheckJobLogExecution(repo, { host: 'other.test', env: { GH_TOKEN: 'a' } })
     ).toThrow('GitHub check details host is unavailable.')
-    expect(
-      snapshotCheckJobLogExecution(repo, {
-        ghAccount: { host: 'github.com', user: '' },
-        env: { GH_TOKEN: 'a' }
-      }).executionScope
-    ).toBeNull()
-  })
-  it('uses normalized binding and fixed projection order but exact login casing', () => {
-    const a = snapshotCheckJobLogExecution(repo, {
-      cwd: '/folder',
-      ghAccount: { user: ' Alice ', host: ' GitHub.COM ' },
-      env: {}
-    })
-    const b = snapshotCheckJobLogExecution(repo, {
-      env: {},
-      ghAccount: { host: 'github.com', user: 'Alice' },
-      cwd: '/folder',
-      encoding: 'utf-8'
-    })
-    const c = snapshotCheckJobLogExecution(repo, {
-      env: {},
-      ghAccount: { host: 'github.com', user: 'alice' },
-      cwd: '/folder'
-    })
-    expect(a.executionScope).toBe(b.executionScope)
-    expect(a.executionScope).not.toBe(c.executionScope)
   })
   it.each([undefined, 'C:\\folder', String.raw`\\wsl.localhost\Ubuntu\home\repo`])(
     'keeps Windows runtime proof conservative for %s',

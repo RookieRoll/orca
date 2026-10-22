@@ -70,7 +70,6 @@ export function useWorktreeJumpPaletteTaskSearch({
       repo.path,
       getRepoExecutionHostId(repo),
       repo.gitRemoteIdentity,
-      repo.ghAccount,
       repo.issueSourcePreference,
       repo.kind
     ]),

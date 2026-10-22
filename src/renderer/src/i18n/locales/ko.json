@@ -2759,26 +2759,6 @@
           "3ce4d5e96e": "PR"
         },
         "github": {
-          "rate": {
-            "limit": {
-              "display": {
-                "5509443543": "GitHub API 예산 로드 중…",
-                "34973d4695": "GitHub API 예산을 사용할 수 없습니다.",
-                "d12d3d6f33": "GitHub API 예산 새로 고침",
-                "d5e5de9070": "Orca는 GitHub CLI를 통해 REST, 검색 및 GraphQL을 사용합니다.",
-                "58c5f88216": "GitHub API 예산",
-                "6da1858354": "남음 · 재설정까지",
-                "f42790d150": "/",
-                "01f7323e58": "GraphQL API",
-                "1daf0f22a9": "GraphQL",
-                "1f2f28a4de": "검색 API",
-                "c377a4f06a": "검색",
-                "c392c749a6": "REST API",
-                "bb227706a6": "REST",
-                "budget_scope_prefix": "예산 범위"
-              }
-            }
-          }
         },
         "CloseReasonDropdown": {
           "e1f2a3b4c5": "닫기 사유 선택"
@@ -7228,17 +7208,12 @@
           "808f9a726e": "접두사가 적용되지 않습니다"
         },
         "GitPane": {
-          "895d3f70b8": "gh",
-          "32dca11189": "GitHub",
           "c4f610d057": "사용 가능한 경우 현재 GitLab CLI REST 속도 제한 헤더입니다.",
           "0de4ae556c": "GitLab API 예산",
           "cdd793134e": "API 예산",
           "b9c011fbc2": "속도 제한",
           "3072428ac7": "glab",
           "8a527d48e3": "gitlab",
-          "aa204f185f": "현재 GitHub CLI REST, 검색 및 GraphQL 속도 제한.",
-          "612a440e57": "GitHub API 예산",
-          "2cde9044a8": "graphql",
           "1ec5c91e1d": "브랜치 이름에 Git 사용자 이름, 사용자 지정 접두사 또는 접두사 없음을 사용할지 선택합니다.",
           "330f584b50": "브랜치 접두사",
           "1ffaadf0a0": "작업 트리를 생성할 때 브랜치 이름에 접두사가 추가됩니다.",
@@ -9624,17 +9599,12 @@
         },
         "git": {
           "search": {
-            "16f53f7323": "gh",
-            "d088806071": "GitHub",
             "40f9b815fd": "API 예산",
             "b7e52124c7": "속도 제한",
             "ead733645f": "glab",
             "4808f065b3": "gitlab",
             "2b4a72885d": "사용 가능한 경우 현재 GitLab CLI REST 속도 제한 헤더입니다.",
             "83ecb3f470": "GitLab API 예산",
-            "65b69d9f80": "graphql",
-            "1139f61512": "현재 GitHub CLI REST, 검색 및 GraphQL 속도 제한.",
-            "ff86e354c4": "GitHub API 예산",
             "035134fcd9": "작업 트리",
             "0c75583ca9": "안전하게",
             "bae91effdd": "최신 기준 브랜치",
@@ -10119,10 +10089,6 @@
             "keepForkUpToDateDescription": "이 포크를 upstream에서 안전하게 fast-forward합니다.",
             "projectRuntime": "프로젝트 런타임",
             "projectRuntimeDescription": "이 프로젝트를 Windows에서 실행할지 WSL에서 실행할지 선택합니다.",
-            "githubAccount": "GitHub 계정",
-            "githubAccountDescription": "이 프로젝트의 GitHub API 호출에 키링 gh 로그인을 바인딩합니다.",
-            "githubAccountKeyword": "GitHub 계정",
-            "ghAccount": "gh 계정",
             "login": "로그인",
             "token": "token",
             "externalWorktrees": "외부 작업 트리",
@@ -10563,25 +10529,6 @@
           "on": "켜짐",
           "auto": "에이전트",
           "off": "꺼짐"
-        },
-        "RepositoryGitHubAccountSection": {
-          "unsupported": "이 런타임의 GitHub CLI는 계정 바인딩을 지원하기에는 너무 오래되었습니다(gh ≥ 2.40 필요).",
-          "capabilityUnknown": "이 런타임의 GitHub CLI가 계정 바인딩을 지원하는지 확인할 수 없습니다. 다시 시도하세요.",
-          "envToken": "환경 토큰 계정은 바인딩할 수 없습니다. 키링 로그인을 사용하세요.",
-          "invalidBinding": "해당 GitHub 계정 바인딩이 유효하지 않습니다.",
-          "unavailable": "이 런타임에서는 해당 GitHub 계정을 사용할 수 없습니다.",
-          "saveFailed": "GitHub 계정 바인딩을 저장할 수 없습니다.",
-          "title": "GitHub 계정",
-          "description": "이 프로젝트의 GitHub 이슈 및 PR 호출에 특정 gh 로그인을 사용하세요.",
-          "longDescription": "Orca는 선택한 키링 로그인의 단기 토큰을 이 프로젝트의 각 gh 호출에 주입합니다. 프로젝트 보기는 활성 gh 로그인을 계속 사용합니다.",
-          "retry": "다시 시도",
-          "selectLabel": "계정",
-          "ambient": "기본값 (활성 gh 로그인)",
-          "unavailableOption": "{{user}} @ {{host}} (사용할 수 없음)",
-          "capabilityBlocked": "이 런타임의 GitHub CLI가 `gh auth token --user`(gh ≥ 2.40)를 지원할 때까지 바인딩을 사용할 수 없습니다.",
-          "capabilityUnknownHint": "이 런타임에서 GitHub CLI 계정 바인딩 지원을 확인할 수 없습니다. 바인딩을 지우거나 다시 시도하세요.",
-          "notEnforced": "저장되었지만 이 런타임(혼합 버전 호스트)에서는 적용되지 않습니다.",
-          "refreshAccounts": "GitHub 계정 새로 고침"
         },
         "agent-status-hooks-copy": {
           "7707c15abb": "Agent 상태 훅",

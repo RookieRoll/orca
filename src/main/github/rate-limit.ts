@@ -1,18 +1,4 @@
-/**
- * GitHub API rate-limit probe.
- *
- * Why: heavy fan-out (listWorkItems × repos, org-walks) can drain the core/search buckets; surfacing remaining budget lets users self-regulate rather than throttle.
- * The probe itself is exempt from rate-limit accounting per GitHub docs.
- *
- * Part A: breaker stays host/runtime-scoped (not account-scoped). Bound-account
- * calls can trip a host breaker that ambient reset probes later clear — known
- * cross-account bleed, accepted for Part A.
- */
-import type {
-  GetRateLimitResult,
-  GitHubRateLimitBucket,
-  GitHubRateLimitSnapshot
-} from '../../shared/github/rate-limit-types'
+/** GitHub API rate-limit breaker state and reset probing. */
 import { isDefaultGitHubHost } from '../../shared/github/repository-identity-key'
 import { isWslUncPath } from '../../shared/wsl-paths'
 import { acquire, release } from './gh-utils'
@@ -27,11 +13,17 @@ import {
   type GhRateLimitBucket
 } from '../git/gh-rate-limit-breaker'
 
-// Why: GET /rate_limit is exempt from limits, so caching only avoids a gh subprocess per render; 30s stays live while absorbing 1/s polling.
+// Why: a 403 reset probe refines the runner's host/runtime-scoped breaker.
 const RATE_LIMIT_CACHE_TTL_MS = 30_000
-let cached: GitHubRateLimitSnapshot | null = null
-// Why: cache failures too — a host that 404s every probe (GHES with rate limiting off) would otherwise spawn a gh subprocess per refresh.
-let probeFailure: { at: number; error: string } | null = null
+type RateLimitBucketSnapshot = { limit: number; remaining: number; resetAt: number }
+type RateLimitSnapshot = {
+  core: RateLimitBucketSnapshot
+  search: RateLimitBucketSnapshot
+  graphql: RateLimitBucketSnapshot
+}
+let cached: RateLimitSnapshot | null = null
+let cachedAtMs = 0
+let probeFailureAtMs: number | null = null
 
 type GhRateLimitPayload = {
   resources?: {
@@ -49,8 +41,7 @@ function parseBucket(
         reset?: number
       }
     | undefined
-): GitHubRateLimitBucket {
-  // Why: absent bucket → 0/0/now so the UI reads "unknown" rather than a misleading "plenty left".
+): RateLimitBucketSnapshot {
   return {
     limit: typeof raw?.limit === 'number' ? raw.limit : 0,
     remaining: typeof raw?.remaining === 'number' ? raw.remaining : 0,
@@ -61,7 +52,8 @@ function parseBucket(
 /** @internal — test-only */
 export function _resetRateLimitCache(): void {
   cached = null
-  probeFailure = null
+  cachedAtMs = 0
+  probeFailureAtMs = null
   scopeProbeFailureAtMs.clear()
   scopeRefinementInFlight.clear()
 }
@@ -174,12 +166,12 @@ function refineBreakerFromSnapshot(): void {
   }
   resetRefinementInFlight = (async () => {
     try {
-      const result = await getRateLimit({ force: true })
-      if (!result.ok) {
+      const snapshot = await getRateLimitSnapshot(true)
+      if (!snapshot) {
         return
       }
       for (const bucket of ['core', 'search', 'graphql'] as GhRateLimitBucket[]) {
-        const b = result.snapshot[bucket]
+        const b = snapshot[bucket]
         if (b.limit > 0 && b.remaining <= 0) {
           recordGhPrimaryRateLimit(bucket, b.resetAt * 1000)
         } else if (b.limit > 0) {
@@ -276,16 +268,20 @@ function refineBreakerForScope(scope: string): void {
 registerGhRateLimitResetProbe((_bucket, scope) => refineBreakerForScope(scope))
 
 // Why: single-flight so a concurrent fan-out resolves to one probe — the TTL cache can't dedupe calls that start before the first lands.
-let probeInFlight: Promise<GetRateLimitResult> | null = null
+let probeInFlight: Promise<RateLimitSnapshot | null> | null = null
 
-export async function getRateLimit(options?: { force?: boolean }): Promise<GetRateLimitResult> {
-  if (!options?.force && cached && Date.now() - cached.fetchedAt < RATE_LIMIT_CACHE_TTL_MS) {
-    return { ok: true, snapshot: cached }
+async function getRateLimitSnapshot(force = false): Promise<RateLimitSnapshot | null> {
+  if (!force && cached && Date.now() - cachedAtMs < RATE_LIMIT_CACHE_TTL_MS) {
+    return cached
   }
-  if (!options?.force && probeFailure && Date.now() - probeFailure.at < RATE_LIMIT_CACHE_TTL_MS) {
-    return { ok: false, error: probeFailure.error }
+  if (
+    !force &&
+    probeFailureAtMs !== null &&
+    Date.now() - probeFailureAtMs < RATE_LIMIT_CACHE_TTL_MS
+  ) {
+    return null
   }
-  if (!options?.force && probeInFlight) {
+  if (!force && probeInFlight) {
     return probeInFlight
   }
   const probe = fetchRateLimitSnapshot()
@@ -299,9 +295,15 @@ export async function getRateLimit(options?: { force?: boolean }): Promise<GetRa
   }
 }
 
-async function fetchRateLimitSnapshot(): Promise<GetRateLimitResult> {
-  await acquire()
+export async function refreshRateLimitSnapshot(options?: { force?: boolean }): Promise<void> {
+  await getRateLimitSnapshot(options?.force)
+}
+
+async function fetchRateLimitSnapshot(): Promise<RateLimitSnapshot | null> {
+  let acquired = false
   try {
+    await acquire()
+    acquired = true
     // Why: this singleton snapshot guards native github.com traffic. Pin the
     // host so a process-level GH_HOST cannot make it describe a GHES account.
     const { stdout } = await ghExecFileAsync(['api', 'rate_limit'], {
@@ -309,20 +311,21 @@ async function fetchRateLimitSnapshot(): Promise<GetRateLimitResult> {
       host: 'github.com'
     })
     const parsed = JSON.parse(stdout) as GhRateLimitPayload
-    const snapshot: GitHubRateLimitSnapshot = {
+    const snapshot: RateLimitSnapshot = {
       core: parseBucket(parsed.resources?.core),
       search: parseBucket(parsed.resources?.search),
-      graphql: parseBucket(parsed.resources?.graphql),
-      fetchedAt: Date.now()
+      graphql: parseBucket(parsed.resources?.graphql)
     }
     cached = snapshot
-    probeFailure = null
-    return { ok: true, snapshot }
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
-    probeFailure = { at: Date.now(), error: message }
-    return { ok: false, error: message }
+    cachedAtMs = Date.now()
+    probeFailureAtMs = null
+    return snapshot
+  } catch {
+    probeFailureAtMs = Date.now()
+    return null
   } finally {
-    release()
+    if (acquired) {
+      release()
+    }
   }
 }
