@@ -1,4 +1,4 @@
-/** Shared row semantics for the list tables (automations, artifacts, …). */
+/** Shared row semantics for list tables. */
 
 /** True when a portaled Radix menu click re-bubbles through a row's React tree. */
 export function isPortaledRowMenuClick(event: {

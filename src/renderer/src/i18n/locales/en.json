@@ -1412,8 +1412,8 @@
         "pluginsTitle": "Plugins",
         "pluginsDescription": "Install and manage experimental Orca plugins.",
         "tasksDescription": "Connect providers, install the Linear skill, and choose what appears in Tasks.",
-        "artifactsTitle": "Artifacts",
-        "artifactsDescription": "Share HTML and Markdown files with your team and manage their public links.",
+
+
         "automationsTitle": "Automations",
         "automationsDescription": "Schedule agent work and choose whether Automations appears in the sidebar.",
         "shareSkillsTitle": "Share Skills",
@@ -5520,7 +5520,7 @@
           "0ccba862b8": "Open GitHub tasks",
           "fee535205b": "Tasks",
           "d599269755": "Hide from sidebar",
-          "artifacts": "Artifacts",
+
           "skills": "Skills"
         },
         "SidebarRepositoryFilterSection": {
@@ -7496,9 +7496,9 @@
           "0e9fc0eadc": "Workspace Directory",
           "e2955d9ccb": "Configure where new workspaces are created.",
           "7511097c5d": "Workspace",
-          "31e300af1c": "Ask Before Deleting Artifacts",
-          "fb29a73a17": "Show a confirmation dialog before deleting a shared artifact and breaking its public link.",
-          "bf46474e33": "Show a confirmation before deleting a shared artifact. Anyone holding its public link loses access.",
+
+
+
           "externalWorktrees": "External worktrees",
           "externalWorktreesDescription": "Choose whether worktrees created outside Orca appear by default.",
           "show": "Show",
@@ -11911,53 +11911,12 @@
           "openManageSessions": "Open Manage Sessions",
           "title": "macOS permission grants aren’t reaching terminals"
         },
-        "artifacts": {
-          "enable": "Enable Artifacts",
-          "enableDescription": "Add Artifacts to the sidebar so you can open and delete shared files.",
-          "account": "Orca account",
-          "connected": "Connected",
-          "signInRequired": "Sign in is required to upload and manage artifacts.",
-          "signIn": "Sign in to Orca",
-          "title": "Artifacts",
-          "description": "Share HTML and Markdown files with your team and manage their public links.",
-          "howToTitle": "How to use Artifacts",
-          "howToDescription": "Publish HTML or Markdown files as public links, then share them with your team.",
-          "shareStepTitle": "Choose a file to share",
-          "shareStepDescription": "Open an HTML or Markdown file and select Share as artifact, or ask an agent to share it.",
-          "linkStepTitle": "Copy the public link",
-          "linkStepDescription": "After publishing, copy the link and send it to your team.",
-          "manageStepTitle": "Manage it in Orca",
-          "manageStepDescription": "Open Artifacts from the sidebar to preview or remove links.",
-          "openArtifacts": "Open Artifacts",
-          "openArtifactsDescription": "View and delete links shared through your account.",
-          "showButton": "Show Artifacts Button",
-          "showButtonDescription": "Show the Artifacts shortcut in the sidebar.",
-          "openArtifactsDescriptionV2": "Preview, copy, and manage links shared through your account.",
-          "signInTitle": "Sign in to share artifacts",
-          "signInDescription": "Use your Orca account to upload artifacts and manage their public links.",
-          "signInAgain": "Sign in again",
-          "enableStepTitle": "Enable artifact sharing",
-          "enableStepWebDescription": "Open Settings → Artifacts in the Orca desktop app on the host device and enable publishing.",
-          "enableStepDescription": "Turn on “Allow publishing public artifact links” above.",
-          "allowPublishing": "Allow publishing public artifact links",
-          "allowPublishingWebDescription": "Desktop only. Open Settings → Artifacts on the host device to change this setting.",
-          "allowPublishingDescription": "Publish HTML and Markdown files as links anyone with the URL can open. Existing links remain until you delete them from Artifacts.",
-          "howToDescriptionDisabled": "Enable artifact sharing above to publish HTML or Markdown files as public links.",
-          "allowPublishingSearchDescription": "Allow Orca to publish HTML and Markdown files as public links.",
-          "keywordArtifacts": "artifacts",
-          "keywordShare": "share",
-          "keywordPublish": "publish",
-          "keywordPublic": "public",
-          "keywordPermission": "permission",
-          "keywordHtml": "HTML",
-          "keywordMarkdown": "Markdown",
-          "keywordUpload": "upload"
-        },
+
         "orcaAccount": {
           "connected": "Connected",
           "reconnectRequired": "Your session expired. Sign in again to use cloud features.",
           "unavailable": "Orca sign-in is unavailable in this build.",
-          "signedOut": "Sign in to extend Orca with cloud features, including Artifacts and Orca Relay.",
+          "signedOut": "Sign in to connect Orca Relay and share Skills.",
           "checking": "Checking account status…",
           "account": "Orca account",
           "signOut": "Sign out",
@@ -11965,10 +11924,10 @@
           "signIn": "Sign in to Orca",
           "title": "Orca Account",
           "description": "Share work instantly and reach your desktop from Orca Mobile wherever you are.",
-          "searchDescription": "Sign in or out of the account used by Artifacts and Orca Relay.",
+          "searchDescription": "Sign in or out of the account used for Orca Relay and Skill sharing.",
           "benefitsTitle": "Included with your account",
-          "artifactsTitle": "Artifact sharing",
-          "artifactsDescription": "Publish HTML and Markdown files, then manage every shared link from Orca.",
+
+
           "relayTitle": "Orca Relay",
           "relayDescription": "Connect Orca Mobile to this desktop across cellular or any Wi-Fi.",
           "skillsTitle": "Skill sharing",
@@ -17449,7 +17408,7 @@
           "signout": {
             "confirm": {
               "title": "Sign out of Orca?",
-              "description": "Artifacts and Orca Relay will be unavailable until you sign in again. Your local projects and worktrees won't be affected.",
+              "description": "Skill sharing and Orca Relay will be unavailable until you sign in again. Your local projects and worktrees won't be affected.",
               "cancel": "Cancel",
               "action": "Sign out"
             }
@@ -17571,121 +17530,7 @@
         "streamRestartFailed": "Failed to restart remote browser stream.",
         "streamCapabilityUnsupported": "The selected runtime does not support remote browser streaming."
       },
-      "artifacts": {
-        "ArtifactsPage": {
-          "signInAgain": "Sign in to Orca again to load artifacts.",
-          "loadFailed": "Could not load artifacts.",
-          "deleteTitle": "Delete artifact?",
-          "deleteDescription": "“{{name}}” will no longer be available at its public link.",
-          "delete": "Delete",
-          "deleteFailed": "Could not delete the artifact.",
-          "title": "Artifacts",
-          "refresh": "Refresh",
-          "signInHeading": "Sign in to Orca",
-          "signInCopy": "Sign in to view and manage artifacts shared through your account.",
-          "signIn": "Sign in to Orca",
-          "empty": "No shared artifacts",
-          "emptyCopy": "Open an HTML or Markdown file and select Share as artifact, or ask your agent to share it.",
-          "openArtifact": "Open artifact",
-          "deleteArtifact": "Delete artifact",
-          "moreAvailable": "More artifacts are available",
-          "moreAvailableCopy": "Load the next page to continue.",
-          "loadMoreFailed": "Could not load more artifacts.",
-          "publishingOff": "Publishing is turned off",
-          "publishingOffCopy": "Nothing on this device can create a public artifact link yet. Allow publishing in Settings → Artifacts, then share from an open HTML or Markdown file or ask your agent.",
-          "openArtifactsSettings": "Open Settings → Artifacts",
-          "retry": "Retry",
-          "reconnectHeading": "Sign in to Orca again",
-          "reconnectCopy": "Sign in again to view and manage the artifacts shared through your account.",
-          "signInAgainAction": "Sign in again",
-          "unconfiguredCopy": "Orca account sign-in is not configured on this machine yet.",
-          "openAccountSettings": "Open account settings"
-        },
-        "copySuccess": "Artifact link copied",
-        "copyFailed": "Could not copy artifact link",
-        "copyLink": "Copy link",
-        "openInBrowser": "Open in browser",
-        "preview": "Artifact preview",
-        "previewUnavailable": "Preview unavailable",
-        "previewUnavailableDescription": "Open this artifact in your browser to view it.",
-        "actions": "Artifact actions",
-        "ArtifactActions": {
-          "more": "More artifact actions"
-        },
-        "ArtifactCollection": {
-          "loadMore": "Load more",
-          "noMatches": "No matches"
-        },
-        "ArtifactDetailHeader": {
-          "publicLink": "Anyone with this link can view it",
-          "close": "Close"
-        },
-        "updatedAt": "Updated {{when}}",
-        "updatedRecently": "recently",
-        "expiryUnknown": "Expiry unknown",
-        "expired": "Link expired",
-        "expires": "Link expires {{when}}",
-        "ArtifactPublishButton": {
-          "a4a49da6af": "Share as artifact",
-          "confirmTitle": "Share as artifact",
-          "confirmDescription": "This publishes the current file at a link anyone with the URL can view.",
-          "accountTitle": "Orca account",
-          "accountDescription": "Sign in to create and manage this link.",
-          "signInAgain": "Sign in again",
-          "signIn": "Sign in",
-          "publishingOffTitle": "Artifact sharing is off",
-          "publishingOffDescription": "Learn about public links and enable sharing in Settings.",
-          "openSettings": "Open Artifacts settings",
-          "sharing": "Sharing…",
-          "sharePublicLink": "Generate link",
-          "publishedDescription": "Anyone with this link can view the shared file.",
-          "checkingLink": "Checking for an existing link…",
-          "checkFailed": "Could not check for an existing link.",
-          "tryAgain": "Try again"
-        },
-        "artifact-publish-flow": {
-          "9a078a0c65": "Artifact sharing is unavailable",
-          "bba20daa6d": "Sign in to Orca and try again.",
-          "54b1805328": "Could not share artifact",
-          "430019efd0": "Artifact shared",
-          "2fc727c831": "Artifact updated",
-          "5cb4f5ec36": "Copy link",
-          "fbb5018602": "This file is empty.",
-          "6112db5a1c": "This artifact is too large to share.",
-          "e2ed5acd8c": "Orca couldn't read this file. Open it from a workspace and try again.",
-          "visualUnreadable": "Couldn't read this visual to share it.",
-          "6d475e9b25": "Only local HTML and Markdown files can be shared as artifacts.",
-          "29a406be09": "Artifacts must contain text."
-        },
-        "ArtifactPublishedLinkPanel": {
-          "copyLink": "Copy link",
-          "openLink": "Open link",
-          "updating": "Updating…",
-          "update": "Update shared content"
-        },
-        "ArtifactDetailDrawer": {
-          "description": "Preview and manage this shared artifact."
-        },
-        "ArtifactListSearchField": {
-          "label": "Search artifacts",
-          "placeholder": "Search...",
-          "clear": "Clear search"
-        },
-        "ArtifactListTableHeader": {
-          "name": "Name",
-          "type": "Type",
-          "size": "Size",
-          "updated": "Updated",
-          "expires": "Expires",
-          "actions": "Actions"
-        },
-        "ArtifactsPageSkeleton": {
-          "loading": "Loading artifacts"
-        },
-        "expiredCompact": "Expired",
-        "typeMarkdown": "Markdown",
-        "typeHtml": "HTML"
-      },
+
       "BrowserCookieImportMachineNotice": {
         "clientLabel": "Browsers on this device",
         "remoteLabel": "Browsers on {{value0}}",
@@ -17742,11 +17587,11 @@
       "UnexpectedSignoutCard": {
         "9f2c1a4b7d": "You've been signed out",
         "3e8f5c2a91": "Dismiss",
-        "7b4d9e1f2a": "Sign in again as {{value0}} to restore Artifact sharing, Orca Relay, and skill sharing.",
-        "5a1c8d3e6f": "Sign in again to restore Artifact sharing, Orca Relay, and skill sharing.",
+        "7b4d9e1f2a": "Sign in again as {{value0}} to restore Orca Relay and skill sharing.",
+        "5a1c8d3e6f": "Sign in again to restore Orca Relay and skill sharing.",
         "1f6b2c9d4e": "What you get back",
-        "8d2e4f7a1b": "Artifact sharing",
-        "2c9a5b6e8d": "Publish HTML and Markdown files and manage every shared link from Orca.",
+
+
         "6e3f1a9c5b": "Orca Relay",
         "4b7d2e8f1a": "Connect Orca Mobile to this desktop across cellular or any Wi-Fi.",
         "9a4c6b2d7e": "Skill sharing",

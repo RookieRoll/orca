@@ -27,7 +27,7 @@
 | B0 | 环境、清单映射与基线 | 本地环境事实记录，136 删除 ID 校验通过；环境未验证不得写通过 |
 | B1 | C17 终端主题导入 | 删除入口/解析并确认保留主题功能无回归 |
 | B2 | 语音、宠物、遥测与上传/更新 | VOC、U10、U11、U06/U07、B2-PET已提交；U10本机导出与本地诊断保留；PET定向回归未运行 |
-| B3 | 账号/用量与平台集成 | 先完成 B3-ACCOUNT（F01–F07），再完成独立 B3-USAGE（F08–F11），最后按 B3-PLATFORM 清理 J 删除项；保留 F12 凭据保护、Jira（J16）、Git 基础能力及 DEP07 本地工作活动统计 |
+| B3 | 账号/用量与平台集成 | B3-ACCOUNT 与 B3-USAGE 已提交；B3-PLATFORM 进行中，先独立交付 H11–H13 公开产物闭包，再清理 J01–J15/J17–J18 平台入口后整体完成。保留 F12 凭据保护、Jira（J16）、Git 基础能力及 DEP07 本地工作活动统计 |
 | B4 | 远程、WSL、移动与中继 | B2-UPLOAD（U10）、B2-TELEMETRY（U11）、B4-CLIENT、B4-REMOTE-CLIENT、B2-UPDATER（U06/U07）及 B2-PET（T05/T06）已提交；其余按总体依赖推进：B4-REMOTE-HOST → B5-ISOLATION → B4-REMOTE-SHARED 清理消费者和共享实现；B4-SERVICES 与三个 B4-DEVICE-TOOLS 子项依各自依赖交付。保留本地 daemon、工作区、PTY |
 | B5 | 分享、组织、Profile 与跨主机隔离 | 删除 O08–O13、U01–U04 等；O02 本机执行保留 |
 | B6 | Agent 适配裁剪 | 删除 W02/W04/W05/W08–W40 专用适配；Codex/Pi/Claude/OpenCode 保留 |
@@ -51,10 +51,10 @@
 | F10 | 用量汇总面板 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；保留 DEP07 本地工作活动统计。 |
 | F11 | 会话使用统计与估算成本 | B3-USAGE | 待执行 | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B7 | 入口待盘点；删除账号用量及成本估算，不删除 DEP07 本地工作活动统计。 |
 | F12 | 系统凭据保护 | B3 | 保留（基础设施范围已裁定） | cleanup_tracker | B3账号删除的消费者边界 | `safeStorage`/OS keychain、Git/GitHub/SSH认证及剩余Agent CLI自有登录态保留；本项不删除底层凭据保护。 |
-| H11 | 公开产物发布 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| H12 | 产物列表、搜索与预览 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| H13 | 产物链接复制与删除 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
-| J01 | GitHub 账号与认证诊断 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
+| H11 | 公开产物发布 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | ArtifactsPage/设置与导航入口、EditorPanelHeader、NativeChatInlineVisual、BrowserPane/DocPreview 分享入口 | 删除公开发布和链接写入；保留本地文件 URL 转换、普通文件预览/授权及 ipynb 能力。 |
+| H12 | 产物列表、搜索与预览 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | ArtifactsPage 列表/搜索/预览/路由、搜索目录与导航状态 | 移除已发布产物管理；不影响本地文件搜索和预览。 |
+| H13 | 产物链接复制与删除 | B3-PLATFORM | 已完成（H 独立子项） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT | Published link/client、publish/share flows、列表行操作与撤销/删除入口 | 不发服务端删除请求；保留 H05 本地 terminal artifacts、SkillCloud 配置及 Orcad artifacts。K18 的浏览器分享出口随 H 组覆盖，B4-REMOTE-SHARED 后续核验是否仍有独立远程代码。最终静态闭合：45个删除生产模块、226个候选引用零悬空引用/零解析错误；82个存活变更TS/TSX Oxc零错误、8个JSON有效、27个删除测试无遗留timing、0空文件、diff-check通过；本地文件URL定向测试2项通过。全量tests/typecheck/build/E2E未运行。 |
+| J01 | GitHub 账号与认证诊断 | B3-PLATFORM | 待执行（J 子组，H 提交后开始） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | H11–H13；B0；B7 | 待核 GitHub 专用 account/status UI 与共享认证消费者 | 保留普通 Git/GitHub/SSH 认证基础设施；不删 Jira J16。 |
 | J02 | GitHub Issues | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | J03 | GitHub Projects | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
 | J04 | GitHub PR 创建与关联 | B3 | 待执行 | 待分配 | B0；B7 | 待盘点 | 入口待盘点；无验证证据。 |
@@ -223,8 +223,8 @@
 | IDENTITY-LITE | 将应用与产品身份全新调整为 `orca-lite` | 待执行（仅计划） | 待分配 | U06/U07；B7-COMMON | 先盘点 package/app display name、electron-builder `productName`、安装器与可执行文件名、窗口标题、公开文档、CLI命令、app ID、userData、deep-link/protocol及本地pipe/socket命名，再按清单统一建立全新 `orca-lite` 身份；不保留旧应用身份别名、数据迁移或旧协议兼容层。禁止全局盲替换`orca`，保留第三方`@orca`包名和历史/业务标识；不改仓库目录/GitHub远程仓库URL。建议在主体裁剪完成后、B7最终构建/发布回归前执行。 |
 | B2-UPDATER | U06/U07 自动更新、下载安装与更新推荐清理 | 完成（有界静态审核） | cleanup_tracker（renderer/CI/docs/tracker）；graphify_build（main/preload/shared/types/native CLI）；validation_setup（package/config/lock及独立CI审查） | B0；B2-VOC/B2-UPLOAD/B2-TELEMETRY已完成代码清理 | 删除桌面与remote-control自动check/download/install、Squirrel自动更新补丁、AppImage自动替换与预发布/本地构建切换入口；保留当前版本/build identity、人工发布安装包、Orcad本地bundle一致性、Electron普通退出/重启/session恢复及serve监督/信号转发/ready。CLI保留暂时缺少可执行文件时的hold、普通失败重试及异步preflight期间停止屏障；无生产writer的desktop-install park协调链已删除。`publishAutoUpdate:false`下electron-builder仍嵌入静态`app-update.yml`，但不存在runtime updater SDK/reader/check/download/install消费者；不做可能影响签名/target时序的afterpack/aftersign过滤。Homebrew和公开安装/设置/session恢复文档已改为人工下载安装。validation独立CI/UI/配置静态检查通过；源代码Oxc语法解析157个存活变更TS/TSX文件零诊断，关键删除模块/符号无活动引用，`git diff --check`通过；测试、typecheck、build、E2E未运行。 |
 | B3-ACCOUNT | F01–F07 应用托管 Agent 账号、Profile、热切换、provider API key 与配置隔离 | 已交付（F01–F03、F05–F07；F04 专用集成移至 B6 对应 W 项；回归未运行） | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types/source tests）；validation_setup（config/package/lock与唯一静态审查） | B0 | 应用托管账号/profile/切换、API key 写入与账号 RPC、legacy account-home/auth/config 镜像已移除。保留 CLI 自有登录与标准/显式 home、session discovery/resume/backfill、PTY home registry/shared-server fail-closed 检查、普通终端重挂、Codex reset-credit 幂等、provider usage status/read 与 refresh、OS keychain/safeStorage、Git/GitHub/SSH 认证和 DEP07 本地工作活动统计。最终静态闭合：140个删除生产模块、2406个候选引用扫描零悬空引用/零解析错误；345个存活变更TS/TSX Oxc解析零错误/零空文件，7个JSON解析通过，diff-check通过。Vitest、typecheck、build、E2E均未运行；最近可用内存样本1.98GiB低于2.5GiB测试门槛。619个精确候选路径已提交；外部 `.gitignore` 改动未纳入。 |
-| B3-USAGE | F08–F11 provider quota、账号用量、汇总与成本估算 | 进行中（A 组静态审查通过；回归未运行） | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types/source tests）；validation_setup（config/package/lock与唯一测试runner） | B3-ACCOUNT；B0 | A 组移除 provider 历史用量与成本面板，保留 DEP07 的本地 agent/work-time/PR 活动统计。进行中的 FeatureWall 清理移除 quota snapshot poller 与 Usage 步骤，同时保留 Visibility、Orchestration 和其余 tour 行为。后续按组移除 provider quota/reset 状态与账号用量入口，以及 Automation History 的 Spend/Tokens 列；保留 CLI context token 用于 compaction/request correctness、CPU/RAM/process stats、CLI 登录指导、普通 auth/rate-limit 错误和 F12 凭据保护。F04 专用 provider CRUD 不在此项扩删，随 B6 的 W04/W11/W28/W30 对应集成删除项闭合。共享 benchmark/JSONL 工具仅在证明无非账号用途后移除。 |
-| B3-PLATFORM | H11–H13 公开产物链及 J01–J15/J17–J18 平台集成删除项 | 待执行 | 待分配 | B0；B3-ACCOUNT | 清理对应公开产物发布/管理与第三方平台产品闭包；保留 Jira J16 和普通 Git/GitHub/SSH 认证基础设施。共享 GitHub client 按残余消费者决定，不能整模块删除。 |
+| B3-USAGE | F08–F11 provider quota、账号用量、汇总与成本估算 | 已提交（e437ab3；有界静态审查与4个定向测试通过） | cleanup_tracker（renderer/locale/docs）；graphify_build（main/shared/preload/types/source tests）；validation_setup（config/package/lock与唯一runner） | B3-ACCOUNT；B0 | 移除 provider quota/reset/status、账号用量、会话 token/cost 扫描及汇总、Automation History Spend/Tokens；保留 DEP07 本地 agent/work-time/PR 活动统计、CPU/RAM/process memory、CLI context token/context-window与正确性错误处理、CLI 登录引导、F12凭据保护和 F04 provider CRUD（后者转 B6 对应 W 项）。FeatureWall仅去用量步骤/轮询，其余状态/编排导航保留；Automation run 状态/时间/工作区/输出/错误/恢复/留存保留，列表使用中性 `lastRunSummary`。最终审查：304 个删除生产模块、20,795 AST 候选，0 悬空引用/解析错误；204 个存活改动TS/TSX通过Oxc、11个JSON/JSONC有效、208个删除测试 timing 零残留、0空文件与diff-check通过。4个聚焦Vitest文件43项通过：`automation-usage-summary.test.ts`、`automation-list-scope.test.ts`、`automation-list-response.test.ts`、`resource-memory-metric-copy.test.ts`。全量TC/build/E2E/native未运行。提交`e437ab34371fae68d64d951594306d94f734f219`已推送至`cleanup/function-pruning`；外部 `.gitignore` 改动未纳入。 |
+| B3-PLATFORM | H11–H13 公开产物链及 J01–J15/J17–J18 平台集成删除项 | 进行中（H11–H13 首个独立子提交） | cleanup_tracker（renderer/docs/locale/Git）；graphify_build（main/shared/preload/CLI）；validation_setup（config与测试） | B0；B3-ACCOUNT；B3-USAGE | 按子项顺序交付：H11–H13公开产物发布/列表/链接/删除（当前先独立审查与提交）；随后J01–J15/J17–J18第三方平台入口整体清理后本包才完成。J16 Jira与普通Git/GitHub/SSH认证基础设施保留；共享GitHub client按残余消费者决定，不整模块删除。K18 浏览器分享出口随H组覆盖，B4-REMOTE-SHARED 后续核验是否仍有独立远程代码。H范围保留本地文件 URL转换、普通本地预览/授权与ipynb能力；H05本地terminal artifacts、SkillCloud `artifact-cloud-config.ts`、Orcad artifacts及普通云端skills/profile auth不在范围。 |
 | B5-PROFILE | U01–U04 本地 Profile/云账号/组织/切换裁剪 | 待执行 | 待分配 | B0 | 去除组织/云 Profile 流程并确认仍需保留的本地配置归属；共享设置/store 由协调者串行分配。 |
 | B5-SHARE | P05–P07 私有 Skills 分发/版本/WSL目标清理 | 待执行 | 待分配 | B0；B4-WSL 完成后清理 WSL 目标残余 | 保留本地 Skills/MCP/插件能力；删除私有分发、安装源、版本回滚和 WSL 目标专属流程。 |
 | B5-ISOLATION | O08–O13 Cloud VM、recipe、资源管理及 Docker 隔离裁剪 | 待执行 | 待分配 | B0 | 去除远程/云/Docker 专属环境，保留 O02 本机隔离及普通本地进程执行；复核共享执行器。完成后才能清理与这些环境共用的远程 runtime/protocol（B4-REMOTE-SHARED）。 |
@@ -240,6 +240,14 @@
 | B4-DEVICE-AGENT | R09 模拟器 Agent 工具与技能 | 待执行 | 待分配 | B4-DEVICE-TOOLS；B0 | 删除模拟器 Agent 工具与技能入口；实施前盘点其与保留 Codex/Pi Agent registry 的边界。 |
 | B6-AGENT | W02/W04/W05/W08–W40 非保留 Agent 专用适配 | 待执行 | 待分配 | B0；B3-ACCOUNT | 删除不保留 Agent 的专用适配/管理入口；保留 W01/W03/W06/W07 及本地真实验证 Codex/Pi。共享 Agent registry、CLI 自有 auth、session discovery/resume 需按 consumer 拆分。 |
 | B7-COMMON | 公共依赖/构建/类型/IPC/快捷键/i18n/默认后台/测试清理 | 待执行 | 待分配 | B1–B6 所有代码包完成 | 独立清理确认无保留用途的死代码/依赖；锁文件只由指定者改；运行对应类型、构建、合同与回归证据。 |
+
+### B3-PLATFORM 子项计划
+
+| 子项 | 删除编号 | 状态 | 交付顺序与边界 |
+|---|---|---|---|
+| B3-PLATFORM-H | H11–H13（含重叠的 K18 浏览器公开分享出口） | 已完成（独立子项） | 删除云端公开产物发布、列表/管理、分享链接与删除入口；保留 H05 本地 terminal artifacts、Orcad artifacts、SkillCloud `artifact-cloud-config.ts`、本地文件 URL 转换、普通本地预览/授权与 ipynb。此子项完成不代表 B3-PLATFORM 整包完成。 |
+| B3-PLATFORM-JGITHUB | J01–J08 | 待执行，H 子项提交后开始 | 删除 Orca 专属 GitHub 账号诊断与 Issues/Projects/PR 产品入口；保留基础 Git/GitHub/SSH 认证与共享 client 的非产品消费者。 |
+| B3-PLATFORM-JOTHERS | J09–J15、J17–J18 | 待执行，GitHub 子项之后 | 删除 GitLab、Bitbucket、Gitea、Azure DevOps、Linear、统一任务页及 Hosted Review 专属入口；保留 Jira J16 和通用本地 Git/工作区行为。 |
 
 ### B5 跨功能边界单列
 

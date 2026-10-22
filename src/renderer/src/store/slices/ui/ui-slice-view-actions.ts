@@ -83,19 +83,6 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
       }))
     },
     clearPendingSkillsSharedView: () => set({ pendingSkillsSharedView: false }),
-    openArtifactsPage: () => {
-      get().recordViewVisit('artifacts')
-      set((state) => ({
-        activeView: 'artifacts',
-        previousViewBeforeArtifacts:
-          state.activeView === 'artifacts' ? state.previousViewBeforeArtifacts : state.activeView
-      }))
-    },
-    closeArtifactsPage: () =>
-      set((state) => ({
-        activeView: state.previousViewBeforeArtifacts,
-        worktreeNavHistoryIndex: rewindHistoryIndexPastView(state, 'artifacts')
-      })),
     openMobilePage: () =>
       set((state) => ({
         activeView: 'mobile',

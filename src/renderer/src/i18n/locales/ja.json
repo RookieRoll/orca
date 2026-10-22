@@ -1216,8 +1216,8 @@
         "pluginsTitle": "プラグイン",
         "pluginsDescription": "実験的機能の Orca プラグインをインストール・管理します。",
         "tasksDescription": "プロバイダーを接続し、Linear スキルをインストールして、タスクに表示する項目を選択します。",
-        "artifactsTitle": "アーティファクト",
-        "artifactsDescription": "HTML および Markdown ファイルをチームと共有し、パブリックリンクを管理します。",
+
+
         "automationsTitle": "自動化",
         "automationsDescription": "Agent の作業をスケジュールし、自動化をサイドバーに表示するかどうかを選択します。",
         "shareSkillsTitle": "スキルを共有する",
@@ -5214,7 +5214,7 @@
           "0ccba862b8": "GitHub タスクを開く",
           "fee535205b": "タスク",
           "d599269755": "サイドバーから非表示",
-          "artifacts": "アーティファクト",
+
           "skills": "スキル"
         },
         "SidebarRepositoryFilterSection": {
@@ -7205,10 +7205,7 @@
           "externalWorktrees": "外部ワークツリー",
           "externalWorktreesDescription": "Orca 外で作成されたワークツリーをデフォルトで表示するかどうかを選択します。",
           "show": "表示",
-          "hide": "非表示",
-          "31e300af1c": "アーティファクトを削除する前に確認する",
-          "fb29a73a17": "共有アーティファクトを削除し、そのパブリックリンクを解除する前に、確認ダイアログを表示します。",
-          "bf46474e33": "共有アーティファクトを削除する前に確認を表示します。そのパブリックリンクを保持している人はアクセスできなくなります。"
+          "hide": "非表示"
         },
         "GhosttyImportModal": {
           "9d3e56ca36": "変更を適用する",
@@ -11661,53 +11658,12 @@
           "openManageSessions": "セッションの管理を開く",
           "title": "macOS の権限付与がターミナルに届かない"
         },
-        "artifacts": {
-          "enable": "アーティファクトを有効にする",
-          "enableDescription": "サイドバーにアーティファクトを追加すると、共有ファイルを開いたり削除したりできるようになります。",
-          "account": "Orca アカウント",
-          "connected": "接続済み",
-          "signInRequired": "アーティファクトをアップロードして管理するには、サインインが必要です。",
-          "signIn": "Orca にサインインする",
-          "title": "アーティファクト",
-          "description": "HTML および Markdown ファイルをチームと共有し、パブリックリンクを管理します。",
-          "howToTitle": "アーティファクトの使用方法",
-          "howToDescription": "HTML または Markdown ファイルをパブリックリンクとして公開し、チームと共有します。",
-          "shareStepTitle": "共有するファイルを選択してください",
-          "shareStepDescription": "HTML または Markdown ファイルを開き、[成果物として共有] を選択するか、Agent に共有を依頼します。",
-          "linkStepTitle": "パブリックリンクをコピーする",
-          "linkStepDescription": "公開したら、リンクをコピーしてチームに送信します。",
-          "manageStepTitle": "Orca で管理する",
-          "manageStepDescription": "サイドバーからアーティファクトを開いて、リンクをプレビューまたは削除します。",
-          "openArtifacts": "オープンアーティファクト",
-          "openArtifactsDescription": "アカウントを通じて共有されたリンクを表示および削除します。",
-          "showButton": "「成果物を表示」ボタン",
-          "showButtonDescription": "サイドバーにアーティファクトのショートカットを表示します。",
-          "openArtifactsDescriptionV2": "アカウントを通じて共有されたリンクをプレビュー、コピー、管理します。",
-          "signInTitle": "サインインして成果物を共有する",
-          "signInDescription": "Orca アカウントを使用して、アーティファクトをアップロードし、そのパブリックリンクを管理します。",
-          "signInAgain": "再度サインインしてください",
-          "enableStepTitle": "アーティファクトの共有を有効にする",
-          "enableStepWebDescription": "ホストデバイスの Orca デスクトップアプリで [設定] → [アーティファクト] を開き、公開を有効にします。",
-          "enableStepDescription": "上の「パブリックアーティファクトリンクの公開を許可」をオンにします。",
-          "allowPublishing": "パブリックアーティファクトリンクの公開を許可する",
-          "allowPublishingWebDescription": "デスクトップのみ。この設定を変更するには、ホストデバイスで「設定」→「アーティファクト」を開きます。",
-          "allowPublishingDescription": "HTML ファイルと Markdown ファイルを、URL を知っている人なら誰でも開くことができるリンクとして公開します。既存のリンクは、アーティファクトから削除するまで残ります。",
-          "howToDescriptionDisabled": "上記のアーティファクト共有を有効にして、HTML または Markdown ファイルをパブリックリンクとして公開します。",
-          "allowPublishingSearchDescription": "Orca が HTML および Markdown ファイルをパブリックリンクとして公開できるようにします。",
-          "keywordArtifacts": "アーティファクト",
-          "keywordShare": "共有",
-          "keywordPublish": "公開",
-          "keywordPublic": "公共",
-          "keywordPermission": "許可",
-          "keywordHtml": "HTML",
-          "keywordMarkdown": "Markdown",
-          "keywordUpload": "アップロード"
-        },
+
         "orcaAccount": {
           "connected": "接続済み",
           "reconnectRequired": "セッションの有効期限が切れました。クラウド機能を使用するには、再度サインインします。",
           "unavailable": "このビルドでは Orca サインインは利用できません。",
-          "signedOut": "サインインして、Artifacts や Orca Relay などのクラウド機能を使用して Orca を拡張します。",
+          "signedOut": "Orca Relay に接続して Skills を共有するにはサインインしてください。",
           "checking": "アカウントのステータスを確認しています…",
           "account": "Orca アカウント",
           "signOut": "サインアウト",
@@ -11715,10 +11671,9 @@
           "signIn": "Orca にサインインする",
           "title": "Orca アカウント",
           "description": "作業を即座に共有し、どこにいても Orca Mobile からデスクトップにアクセスできます。",
-          "searchDescription": "Artifacts と Orca Relay で使用されるアカウントにサインインまたはサインアウトします。",
+          "searchDescription": "Orca Relay と Skills の共有に使うアカウントにサインインまたはサインアウトします。",
           "benefitsTitle": "アカウントに含まれています",
-          "artifactsTitle": "成果物の共有",
-          "artifactsDescription": "HTML ファイルと Markdown ファイルを公開し、Orca からのすべての共有リンクを管理します。",
+
           "relayTitle": "Orca リレー",
           "relayDescription": "Orca Mobile を携帯電話または Wi-Fi 経由でこのデスクトップに接続します。",
           "skillsTitle": "スキルの共有",
@@ -17160,7 +17115,7 @@
           "signout": {
             "confirm": {
               "title": "Orca からログアウトしますか？",
-              "description": "このデバイスで Orca からログアウトします。ローカルのプロジェクトとワークツリーには影響しません。",
+              "description": "再度サインインするまで、Skills の共有と Orca Relay は利用できません。ローカルのプロジェクトと worktree には影響しません。",
               "cancel": "キャンセル",
               "action": "サインアウト"
             }
@@ -17253,121 +17208,7 @@
         "needsActionChip": "{{value0}} 件の対応が必要",
         "unresolvedChip": "{{value0}} 件未解決"
       },
-      "artifacts": {
-        "ArtifactsPage": {
-          "deleteTitle": "成果物を削除しますか？",
-          "deleteDescription": "「{{name}}」は公開リンクで利用できなくなります。",
-          "delete": "削除",
-          "signInAgain": "再度 Orca にサインインして、アーティファクトをロードします。",
-          "loadFailed": "アーティファクトをロードできませんでした。",
-          "deleteFailed": "アーティファクトを削除できませんでした。",
-          "title": "アーティファクト",
-          "refresh": "更新",
-          "signInHeading": "Orca にサインインする",
-          "signInCopy": "サインインして、アカウントを通じて共有されたアーティファクトを表示および管理します。",
-          "signIn": "Orca にサインインする",
-          "empty": "共有アーティファクトなし",
-          "emptyCopy": "HTML または Markdown ファイルを開き、[成果物として共有] を選択するか、Agent に共有するように依頼します。",
-          "openArtifact": "開いたアーティファクト",
-          "deleteArtifact": "アーティファクトの削除",
-          "moreAvailable": "さらに多くのアーティファクトが利用可能です",
-          "moreAvailableCopy": "続行するには次のページをロードしてください。",
-          "loadMoreFailed": "これ以上のアーティファクトをロードできませんでした。",
-          "publishingOff": "公開はオフになっています",
-          "publishingOffCopy": "このデバイスにはまだパブリックアーティファクトリンクを作成できるものはありません。 [設定] → [アーティファクト] で公開を許可し、開いている HTML または Markdown ファイルから共有するか、Agent に問い合わせてください。",
-          "openArtifactsSettings": "「設定」→「アーティファクト」を開きます",
-          "retry": "再試行",
-          "reconnectHeading": "Orca に再度サインインします",
-          "reconnectCopy": "アカウントを通じて共有されたアーティファクトを表示および管理するには、再度サインインします。",
-          "signInAgainAction": "再度サインインしてください",
-          "unconfiguredCopy": "このマシンでは Orca アカウントのサインインがまだ設定されていません。",
-          "openAccountSettings": "アカウント設定を開く"
-        },
-        "ArtifactPublishButton": {
-          "a4a49da6af": "成果物として共有",
-          "confirmTitle": "成果物として共有",
-          "confirmDescription": "これにより、現在のファイルが URL を知っている誰でも閲覧できるリンクに公開されます。",
-          "accountTitle": "Orca アカウント",
-          "accountDescription": "このリンクを作成・管理するにはサインインしてください。",
-          "signInAgain": "再度サインイン",
-          "signIn": "サインイン",
-          "publishingOffTitle": "成果物の共有はオフになっています",
-          "publishingOffDescription": "公開リンクについて確認し、設定で共有を有効にしてください。",
-          "openSettings": "成果物の設定を開く",
-          "sharing": "共有中…",
-          "sharePublicLink": "リンクを生成",
-          "publishedDescription": "このリンクを知っている人は誰でも共有ファイルを閲覧できます。",
-          "checkingLink": "既存のリンクを確認しています…",
-          "checkFailed": "既存のリンクを確認できませんでした。",
-          "tryAgain": "再試行"
-        },
-        "artifact-publish-flow": {
-          "9a078a0c65": "成果物の共有は利用できません",
-          "bba20daa6d": "Orca にサインインしてもう一度お試しください。",
-          "54b1805328": "成果物を共有できませんでした",
-          "430019efd0": "成果物を共有しました",
-          "2fc727c831": "成果物を更新しました",
-          "5cb4f5ec36": "リンクをコピー",
-          "fbb5018602": "このファイルは空です。",
-          "6112db5a1c": "この成果物は大きすぎるため共有できません。",
-          "e2ed5acd8c": "Orca はこのファイルを読み取れませんでした。ワークスペースから開いて再試行してください。",
-          "visualUnreadable": "共有するためにこのビジュアルを読み取れませんでした。",
-          "6d475e9b25": "成果物として共有できるのはローカルの HTML ファイルと Markdown ファイルのみです。",
-          "29a406be09": "成果物にはテキストが含まれている必要があります。"
-        },
-        "ArtifactPublishedLinkPanel": {
-          "copyLink": "リンクをコピー",
-          "openLink": "リンクを開く",
-          "updating": "更新中…",
-          "update": "共有コンテンツを更新する"
-        },
-        "copySuccess": "アーティファクトリンクがコピーされました",
-        "copyFailed": "アーティファクトのリンクをコピーできませんでした",
-        "copyLink": "リンクをコピー",
-        "openInBrowser": "ブラウザで開く",
-        "preview": "アーティファクトのプレビュー",
-        "previewUnavailable": "プレビューは利用できません",
-        "previewUnavailableDescription": "このアーティファクトをブラウザで開いて表示します。",
-        "actions": "アーティファクトの操作",
-        "ArtifactActions": {
-          "more": "その他のアーティファクト操作"
-        },
-        "ArtifactCollection": {
-          "loadMore": "さらにロードする",
-          "noMatches": "一致なし"
-        },
-        "ArtifactDetailHeader": {
-          "publicLink": "このリンクを知っている人は誰でも閲覧できます",
-          "close": "閉じる"
-        },
-        "updatedAt": "{{when}} を更新しました",
-        "updatedRecently": "最近",
-        "expiryUnknown": "有効期限不明",
-        "expired": "リンクの有効期限が切れました",
-        "expires": "リンクの有効期限が切れます {{when}}",
-        "ArtifactDetailDrawer": {
-          "description": "この共有アーティファクトをプレビューして管理します。"
-        },
-        "ArtifactListSearchField": {
-          "label": "アーティファクトの検索",
-          "placeholder": "検索…",
-          "clear": "検索をクリア"
-        },
-        "ArtifactListTableHeader": {
-          "name": "名前",
-          "type": "タイプ",
-          "size": "サイズ",
-          "updated": "更新済み",
-          "expires": "有効期限が切れます",
-          "actions": "操作"
-        },
-        "ArtifactsPageSkeleton": {
-          "loading": "アーティファクトを読み込んでいます"
-        },
-        "expiredCompact": "期限切れ",
-        "typeMarkdown": "Markdown",
-        "typeHtml": "HTML"
-      },
+
       "ComposerParentWorktreePicker": {
         "label": "親ワークツリー",
         "noParent": "親なし",
@@ -17481,11 +17322,10 @@
       "UnexpectedSignoutCard": {
         "9f2c1a4b7d": "サインアウトされました",
         "3e8f5c2a91": "閉じる",
-        "7b4d9e1f2a": "アーティファクトの共有、Orca Relay、およびスキルの共有を復元するには、{{value0}} として再度サインインします。",
-        "5a1c8d3e6f": "再度サインインして、アーティファクトの共有、Orca Relay、およびスキルの共有を復元します。",
+        "7b4d9e1f2a": "{{value0}} として再度サインインすると、Orca Relay と Skills の共有を利用できます。",
+        "5a1c8d3e6f": "再度サインインすると、Orca Relay と Skills の共有を利用できます。",
         "1f6b2c9d4e": "何が戻ってくるか",
-        "8d2e4f7a1b": "成果物の共有",
-        "2c9a5b6e8d": "HTML ファイルと Markdown ファイルを公開し、Orca からのすべての共有リンクを管理します。",
+
         "6e3f1a9c5b": "Orca リレー",
         "4b7d2e8f1a": "Orca Mobile を携帯電話または Wi-Fi 経由でこのデスクトップに接続します。",
         "9a4c6b2d7e": "スキルの共有",

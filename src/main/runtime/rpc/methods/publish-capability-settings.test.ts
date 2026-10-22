@@ -8,7 +8,7 @@ vi.mock('electron', () => ({
   app: { getPath: () => '/orca-state', isPackaged: true }
 }))
 
-const CAPABILITIES = ['artifactSharingEnabled', 'agentSkillSharingEnabled'] as const
+const CAPABILITIES = ['agentSkillSharingEnabled'] as const
 
 function runtimeWithSharing(
   capability: (typeof CAPABILITIES)[number],
@@ -26,7 +26,7 @@ function runtimeWithSharing(
   return new OrcaRuntimeService(store as RuntimeStore)
 }
 
-// A client may read the host's publish permissions, but cannot grant them over RPC.
+// A client may read the host's skill-publishing permission, but cannot grant it over RPC.
 describe.each(CAPABILITIES)('%s cannot be granted over RPC', (capability) => {
   it('rejects settings.update attempts to enable it', () => {
     expect(SettingsUpdate.safeParse({ [capability]: true }).success).toBe(false)
@@ -43,9 +43,12 @@ describe.each(CAPABILITIES)('%s cannot be granted over RPC', (capability) => {
   })
 })
 
-describe('publish capability settings schema', () => {
-  it('rejects the deprecated artifactsEnabled alias too', () => {
+describe('retired artifact settings', () => {
+  it('does not accept the removed cloud-publishing permission or navigation settings', () => {
+    expect(SettingsUpdate.safeParse({ artifactSharingEnabled: true }).success).toBe(false)
     expect(SettingsUpdate.safeParse({ artifactsEnabled: true }).success).toBe(false)
+    expect(SettingsUpdate.safeParse({ showArtifactsButton: true }).success).toBe(false)
+    expect(SettingsUpdate.safeParse({ skipDeleteArtifactConfirm: true }).success).toBe(false)
   })
 
   it('still accepts an unrelated allowlisted setting', () => {

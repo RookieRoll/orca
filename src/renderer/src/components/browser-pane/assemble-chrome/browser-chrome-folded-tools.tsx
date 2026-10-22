@@ -17,18 +17,11 @@ export type BrowserChromeFoldedTool = {
   count?: number
   /** Present for toggle tools, including false, so the menu preserves their pressed state. */
   active?: boolean
-  /**
-   * Run only after the menu has closed and skip its focus return. A tool that opens its own
-   * popover needs this: focus landing back on the ⋯ trigger would dismiss that popover at once.
-   */
-  deferUntilMenuClose?: boolean
 }
 
 export type BrowserChromeOverflowMenuProps = {
   triggerRef: React.RefObject<HTMLButtonElement | null>
   tools: readonly BrowserChromeFoldedTool[]
-  deferUntilClose: (action: () => void) => void
-  onMenuCloseAutoFocus: (event: Event) => void
 }
 
 function FoldedToolContent({ tool }: { tool: BrowserChromeFoldedTool }): React.JSX.Element {
@@ -55,19 +48,11 @@ function FoldedToolContent({ tool }: { tool: BrowserChromeFoldedTool }): React.J
   )
 }
 
-function FoldedToolRow({
-  tool,
-  deferUntilClose
-}: {
-  tool: BrowserChromeFoldedTool
-  deferUntilClose: (action: () => void) => void
-}): React.JSX.Element {
-  const onSelect = (): void =>
-    tool.deferUntilMenuClose ? deferUntilClose(tool.onSelect) : tool.onSelect()
+function FoldedToolRow({ tool }: { tool: BrowserChromeFoldedTool }): React.JSX.Element {
   return (
     <DropdownMenuItem
       disabled={tool.disabled}
-      onSelect={onSelect}
+      onSelect={tool.onSelect}
       // Why: keeps toggle semantics without the checkbox item's reserved leading column,
       // which would misalign this row's icon against the plain rows in the same menu.
       {...(tool.active === undefined
@@ -81,9 +66,8 @@ function FoldedToolRow({
 
 /** The toolbar tools that no longer fit, rendered at the top of a surface's ⋯ menu. */
 export function BrowserChromeFoldedMenuItems({
-  tools,
-  deferUntilClose
-}: Pick<BrowserChromeOverflowMenuProps, 'tools' | 'deferUntilClose'>): React.JSX.Element | null {
+  tools
+}: Pick<BrowserChromeOverflowMenuProps, 'tools'>): React.JSX.Element | null {
   if (tools.length === 0) {
     return null
   }
@@ -94,11 +78,11 @@ export function BrowserChromeFoldedMenuItems({
   return (
     <>
       {toggleTools.map((tool) => (
-        <FoldedToolRow key={tool.stage} tool={tool} deferUntilClose={deferUntilClose} />
+        <FoldedToolRow key={tool.stage} tool={tool} />
       ))}
       {toggleTools.length > 0 && actionTools.length > 0 ? <DropdownMenuSeparator /> : null}
       {actionTools.map((tool) => (
-        <FoldedToolRow key={tool.stage} tool={tool} deferUntilClose={deferUntilClose} />
+        <FoldedToolRow key={tool.stage} tool={tool} />
       ))}
       <DropdownMenuSeparator />
     </>

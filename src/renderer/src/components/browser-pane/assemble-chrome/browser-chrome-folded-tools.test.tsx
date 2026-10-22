@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { Share2 } from 'lucide-react'
+import { Crosshair } from 'lucide-react'
 
 vi.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenuItem: ({
@@ -28,40 +28,15 @@ import { BrowserChromeFoldedMenuItems } from './browser-chrome-folded-tools'
 afterEach(cleanup)
 
 describe('BrowserChromeFoldedMenuItems', () => {
-  it('runs ordinary actions directly', () => {
+  it('runs folded actions directly', () => {
     const onSelect = vi.fn()
     render(
       <BrowserChromeFoldedMenuItems
-        tools={[{ stage: 'share', label: 'Share', icon: Share2, onSelect }]}
-        deferUntilClose={vi.fn()}
+        tools={[{ stage: 'external', label: 'Open', icon: Crosshair, onSelect }]}
       />
     )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Share' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }))
     expect(onSelect).toHaveBeenCalledOnce()
-  })
-
-  it('defers popover actions until the menu closes', () => {
-    const onSelect = vi.fn()
-    const deferUntilClose = vi.fn()
-    render(
-      <BrowserChromeFoldedMenuItems
-        tools={[
-          {
-            stage: 'share',
-            label: 'Share',
-            icon: Share2,
-            onSelect,
-            deferUntilMenuClose: true
-          }
-        ]}
-        deferUntilClose={deferUntilClose}
-      />
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Share' }))
-    expect(onSelect).not.toHaveBeenCalled()
-    expect(deferUntilClose).toHaveBeenCalledWith(onSelect)
   })
 
   it('preserves active state for folded toggle tools', () => {
@@ -71,12 +46,11 @@ describe('BrowserChromeFoldedMenuItems', () => {
           {
             stage: 'draw',
             label: 'Draw',
-            icon: Share2,
+            icon: Crosshair,
             onSelect: vi.fn(),
             active: true
           }
         ]}
-        deferUntilClose={vi.fn()}
       />
     )
 
@@ -89,14 +63,13 @@ describe('BrowserChromeFoldedMenuItems', () => {
     const { container } = render(
       <BrowserChromeFoldedMenuItems
         tools={[
-          { stage: 'draw', label: 'Draw', icon: Share2, onSelect: vi.fn(), active: false },
-          { stage: 'share', label: 'Share', icon: Share2, onSelect: vi.fn() }
+          { stage: 'draw', label: 'Draw', icon: Crosshair, onSelect: vi.fn(), active: false },
+          { stage: 'external', label: 'Open', icon: Crosshair, onSelect: vi.fn() }
         ]}
-        deferUntilClose={vi.fn()}
       />
     )
 
-    // Rendered order: Draw, divider, Share, closing divider.
+    // Rendered order: Draw, divider, Open, closing divider.
     expect(Array.from(container.querySelectorAll('button, hr')).map((el) => el.tagName)).toEqual([
       'BUTTON',
       'HR',

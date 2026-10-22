@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookOpen, Check, CircleUserRound, Files, Smartphone } from 'lucide-react'
+import { BookOpen, Check, CircleUserRound, Smartphone } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useOrcaProfileAuthStatusRefresh } from '@/hooks/use-orca-profile-auth-status-refresh'
@@ -31,7 +31,7 @@ function accountStatusCopy(
   if (state === 'local') {
     return translate(
       'auto.components.settings.orcaAccount.signedOut',
-      'Sign in to extend Orca with cloud features, including Artifacts and Orca Relay.'
+      'Sign in to connect Orca Relay and share Skills.'
     )
   }
   return translate('auto.components.settings.orcaAccount.checking', 'Checking account status…')
@@ -133,22 +133,9 @@ export function OrcaAccountSettingsPane(): React.JSX.Element {
             )}
           </p>
           <div className="space-y-5">
-            <div className="grid gap-5 md:grid-cols-2 md:gap-0 md:divide-x md:divide-border/60">
-              <AccountBenefit
-                icon={Files}
-                className="md:pr-6"
-                title={translate(
-                  'auto.components.settings.orcaAccount.artifactsTitle',
-                  'Artifact sharing'
-                )}
-                description={translate(
-                  'auto.components.settings.orcaAccount.artifactsDescription',
-                  'Publish HTML and Markdown files, then manage every shared link from Orca.'
-                )}
-              />
+            <div className="grid gap-5">
               <AccountBenefit
                 icon={Smartphone}
-                className="md:pl-6"
                 title={translate('auto.components.settings.orcaAccount.relayTitle', 'Orca Relay')}
                 description={translate(
                   'auto.components.settings.orcaAccount.relayDescription',
@@ -156,8 +143,6 @@ export function OrcaAccountSettingsPane(): React.JSX.Element {
                 )}
               />
             </div>
-            {/* Why: a third column would squeeze all three; a full-width row
-                below keeps the pair's divider and reads as one list. */}
             <AccountBenefit
               icon={BookOpen}
               className="border-t border-border/60 pt-5"

@@ -1,5 +1,5 @@
 /**
- * Shared chrome for the full-width list tables (automations, artifacts, …).
+ * Shared chrome for the full-width list tables.
  * Each list owns only its own column template; everything else lives here so
  * the tables cannot drift apart.
  */

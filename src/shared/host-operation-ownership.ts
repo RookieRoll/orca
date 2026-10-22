@@ -18,7 +18,6 @@ export const HOST_OPERATION_OWNERSHIP = {
   agentSessionAttachment: 'host',
   agentTeams: 'host',
   aiVault: 'host',
-  artifacts: 'host',
   automation: 'host',
   browser: 'host',
   clipboard: 'host',

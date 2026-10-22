@@ -67,6 +67,10 @@ type RetiredGlobalSettings = {
   opencodeGoApiKey?: unknown
   opencodeSessionCookie?: unknown
   opencodeWorkspaceId?: unknown
+  artifactSharingEnabled?: unknown
+  artifactsEnabled?: unknown
+  showArtifactsButton?: unknown
+  skipDeleteArtifactConfirm?: unknown
   minimaxGroupId?: unknown
   minimaxUsageModels?: unknown
   minimaxEndpoint?: unknown
@@ -99,6 +103,10 @@ export function stripRetiredGlobalSettings(
     opencodeGoApiKey: _legacyOpenCodeGoApiKey,
     opencodeSessionCookie: _retiredOpenCodeSessionCookie,
     opencodeWorkspaceId: _retiredOpenCodeWorkspaceId,
+    artifactSharingEnabled: _retiredArtifactSharingEnabled,
+    artifactsEnabled: _retiredArtifactsEnabled,
+    showArtifactsButton: _retiredShowArtifactsButton,
+    skipDeleteArtifactConfirm: _retiredSkipDeleteArtifactConfirm,
     minimaxGroupId: _retiredMiniMaxGroupId,
     minimaxUsageModels: _retiredMiniMaxUsageModels,
     minimaxEndpoint: _retiredMiniMaxEndpoint,
@@ -127,6 +135,10 @@ export function stripRetiredGlobalSettings(
   void _legacyOpenCodeGoApiKey
   void _retiredOpenCodeSessionCookie
   void _retiredOpenCodeWorkspaceId
+  void _retiredArtifactSharingEnabled
+  void _retiredArtifactsEnabled
+  void _retiredShowArtifactsButton
+  void _retiredSkipDeleteArtifactConfirm
   void _retiredMiniMaxGroupId
   void _retiredMiniMaxUsageModels
   void _retiredMiniMaxEndpoint

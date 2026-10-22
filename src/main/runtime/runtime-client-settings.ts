@@ -1,5 +1,4 @@
 import { getAppEnvironment } from '../../shared/app-environment'
-import { isArtifactSharingEnabled } from '../../shared/artifact-sharing-gate'
 import { isAgentSkillSharingEnabled } from '../../shared/agent-skill-sharing-gate'
 import { applyPRBotAuthorOverride } from '../../shared/pr-bot-author-overrides'
 import { TASK_PROVIDERS } from '../../shared/task-providers'
@@ -77,7 +76,6 @@ export class RuntimeClientSettingsController {
       experimentalStructuredNativeChat: settings.experimentalNativeChat === true,
       compactWorktreeCards: settings.compactWorktreeCards === true,
       prBotAuthorOverrides: settings.prBotAuthorOverrides ?? [],
-      artifactSharingEnabled: isArtifactSharingEnabled(settings),
       worktreeVisibilityDefaults: settings.worktreeVisibilityDefaults ?? { external: 'hide' },
       agentSkillSharingEnabled: isAgentSkillSharingEnabled(settings),
       machineName: settings.machineName ?? '',

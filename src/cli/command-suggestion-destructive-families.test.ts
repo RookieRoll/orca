@@ -13,7 +13,6 @@ const blocked = [
   ['orchestration resume', 'orchestration reset'],
   ['orchestration rerun', 'orchestration reset'],
   ['orchestration repl', 'orchestration reset'],
-  ['artifacts deset', 'artifacts delete'],
   ['emulator ball', 'emulator kill'],
   ['emulator showdown', 'emulator shutdown'],
   ['orchestration worker-showw', 'orchestration worker-stop'],
@@ -36,7 +35,6 @@ const recovery = [
   ['tab clone', 'tab close'],
   ['environment rollbac', 'environment rollback'],
   ['environment remov', 'environment rm'],
-  ['artifacts delet', 'artifacts delete'],
   ['worktree remov', 'worktree remove'],
   ['worktree delet', 'worktree delete'],
   ['orchestration chek', 'orchestration check'],
@@ -95,8 +93,8 @@ describe('declared destructive alias families', () => {
   const reset = destructiveSpec(['orchestration', 'reset'])
 
   it('does not let intent for reset unlock a deletion candidate', () => {
-    const specs = [deletion, reset, destructiveSpec(['artifacts', 'delete'])]
-    expect(suggestCommands(specs, ['artifacts', 'deset'])).toEqual([])
+    const specs = [deletion, reset, destructiveSpec(['profile', 'delete'])]
+    expect(suggestCommands(specs, ['profile', 'delet'])).toEqual([])
   })
 
   it('shares only declared equivalent verbs with another command', () => {

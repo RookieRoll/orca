@@ -33,7 +33,6 @@ import { OrcadMigrationBlobChunkRequestSchema } from '../orcad-migration/orcad-m
 import { OrcadMigrationSnapshotChunkRequestSchema } from '../orcad-migration/orcad-migration-scrollback'
 import { OrcadTerminalCensusParamsSchema } from '../orcad-terminal-census'
 import { pluginConsentRequestSchema } from '../plugins/plugin-consent-request'
-import { AccountsUnsubscribeParams, ListAccountsParams } from './accounts-params'
 import { PrepareCodexForWslPaneParams } from './agent-hooks-params'
 import { AgentLaunch, AgentLaunchReplay } from './agent-launch-params'
 import { AgentLaunchSettingsMutation } from './agent-launch-settings-params'
@@ -57,7 +56,6 @@ import {
   AntigravityChatSignInCompleteParams,
   AntigravityChatSignInFlowParams
 } from './antigravity-accounts-params'
-import { ArtifactsDeleteParams, ListOptions, SourceRequest, WriteRequest } from './artifacts-params'
 import {
   AutomationCreate,
   AutomationId,
@@ -638,11 +636,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'accounts.antigravityList': AntigravityAccountTargetParams,
   'accounts.antigravityRemove': AntigravityAccountMutationParams,
   'accounts.antigravitySelect': AntigravityAccountMutationParams,
-  'accounts.list': ListAccountsParams,
-  'accounts.minimaxCredentialsStatus': null,
-  'accounts.subscribe': null,
-  'accounts.unsubscribe': AccountsUnsubscribeParams,
-  'accounts.zcodePlanCredentialsStatus': null,
   'agent.launch': AgentLaunch,
   'agent.launchReplay': AgentLaunchReplay,
   'agentHooks.prepareCodexForWslPane': PrepareCodexForWslPaneParams,
@@ -702,13 +695,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'aiVault.searchSessions': AiVaultSearchRequestSchema,
   'aiVault.searchStatus': AiVaultSearchStatusRequestSchema,
   'aiVault.setSearchEnabled': AiVaultSetSearchEnabledParamsSchema,
-  'artifacts.delete': ArtifactsDeleteParams,
-  'artifacts.getPublishedLink': SourceRequest,
-  'artifacts.list': ListOptions,
-  'artifacts.publish': WriteRequest,
-  'artifacts.share': WriteRequest,
-  'artifacts.unshare': SourceRequest,
-  'artifacts.update': WriteRequest,
   'automation.create': AutomationCreate,
   'automation.delete': AutomationId,
   'automation.list': AutomationList,

@@ -1215,8 +1215,8 @@
         "pluginsTitle": "Plugins",
         "pluginsDescription": "Instala y administra plugins experimentales de Orca.",
         "tasksDescription": "Conecta proveedores, instala la habilidad de Linear y elige qué aparece en Tareas.",
-        "artifactsTitle": "Artefactos",
-        "artifactsDescription": "Comparte archivos HTML y Markdown con tu equipo y gestiona sus enlaces públicos.",
+
+
         "automationsTitle": "Automatizaciones",
         "automationsDescription": "Programa el trabajo del agente y elige si Automatizaciones aparece en la barra lateral.",
         "shareSkillsTitle": "Compartir skills",
@@ -5228,7 +5228,7 @@
           "0ccba862b8": "Abrir tareas de GitHub",
           "fee535205b": "Tareas",
           "d599269755": "Ocultar de la barra lateral",
-          "artifacts": "Artefactos",
+
           "skills": "Habilidades"
         },
         "SidebarRepositoryFilterSection": {
@@ -7215,10 +7215,7 @@
           "externalWorktrees": "Worktrees externos",
           "externalWorktreesDescription": "Elige si los worktrees creados fuera de Orca aparecen de forma predeterminada.",
           "show": "Mostrar",
-          "hide": "Ocultar",
-          "31e300af1c": "Preguntar antes de eliminar artefactos",
-          "fb29a73a17": "Muestra un cuadro de diálogo de confirmación antes de eliminar un artefacto compartido y romper su enlace público.",
-          "bf46474e33": "Muestra una confirmación antes de eliminar un artefacto compartido. Cualquiera que mantenga su enlace público pierde el acceso."
+          "hide": "Ocultar"
         },
         "GhosttyImportModal": {
           "9d3e56ca36": "Aplicar cambios",
@@ -11651,48 +11648,7 @@
           "body": "El demonio de terminal se inició mediante una instalación de Orca que ya no existe, por lo que macOS no puede atribuir sus comandos a Orca: las concesiones de accesibilidad y automatización se ignoran silenciosamente (osascript falla con el error -25211). Reiniciar el demonio soluciona este problema; Se cerrarán las sesiones de terminal en ejecución.",
           "title": "Las concesiones de permisos de macOS no llegan a los terminales"
         },
-        "artifacts": {
-          "title": "Artefactos",
-          "description": "Comparte archivos HTML y Markdown con tu equipo y gestiona sus enlaces públicos.",
-          "keywordPermission": "permiso",
-          "connected": "Conectado",
-          "enable": "Habilitar artefactos",
-          "enableDescription": "Agregue artefactos a la barra lateral para poder abrir y eliminar archivos compartidos.",
-          "account": "cuenta Orca",
-          "signInRequired": "Es necesario iniciar sesión para cargar y administrar artefactos.",
-          "signIn": "Iniciar sesión en Orca",
-          "howToTitle": "Cómo utilizar artefactos",
-          "howToDescription": "Publique archivos HTML o Markdown como enlaces públicos y luego compártalos con su equipo.",
-          "shareStepTitle": "Elige un archivo para compartir",
-          "shareStepDescription": "Abra un archivo HTML o Markdown y seleccione Compartir como artefacto o pídale a un agente que lo comparta.",
-          "linkStepTitle": "Copia el enlace público",
-          "linkStepDescription": "Después de publicar, copie el enlace y envíelo a su equipo.",
-          "manageStepTitle": "Gestionarlo en Orca",
-          "manageStepDescription": "Abra Artefactos desde la barra lateral para obtener una vista previa o eliminar enlaces.",
-          "openArtifacts": "Artefactos abiertos",
-          "openArtifactsDescription": "Ver y eliminar enlaces compartidos a través de su cuenta.",
-          "showButton": "Botón Mostrar artefactos",
-          "showButtonDescription": "Muestra el acceso directo a Artefactos en la barra lateral.",
-          "signInTitle": "Inicia sesión para compartir artefactos",
-          "signInAgain": "Iniciar sesión nuevamente",
-          "openArtifactsDescriptionV2": "Obtenga una vista previa, copie y administre enlaces compartidos a través de su cuenta.",
-          "signInDescription": "Utilice su cuenta Orca para cargar artefactos y administrar sus enlaces públicos.",
-          "enableStepTitle": "Habilitar el intercambio de artefactos",
-          "enableStepWebDescription": "Abra Configuración → Artefactos en la aplicación de escritorio Orca en el dispositivo host y habilite la publicación.",
-          "enableStepDescription": "Active \"Permitir la publicación de enlaces de artefactos públicos\" arriba.",
-          "allowPublishing": "Permitir la publicación de enlaces de artefactos públicos",
-          "allowPublishingWebDescription": "Solo escritorio. Abra Configuración → Artefactos en el dispositivo host para cambiar esta configuración.",
-          "allowPublishingDescription": "Publique archivos HTML y Markdown como enlaces que cualquiera con la URL puede abrir. Los enlaces existentes permanecen hasta que los elimine de Artifacts.",
-          "howToDescriptionDisabled": "Habilite el uso compartido de artefactos arriba para publicar archivos HTML o Markdown como enlaces públicos.",
-          "allowPublishingSearchDescription": "Permita que Orca publique archivos HTML y Markdown como enlaces públicos.",
-          "keywordArtifacts": "artefactos",
-          "keywordShare": "compartir",
-          "keywordPublish": "publicar",
-          "keywordPublic": "público",
-          "keywordHtml": "HTML",
-          "keywordMarkdown": "Markdown",
-          "keywordUpload": "subir"
-        },
+
         "orcaAccount": {
           "keywordLogin": "acceso",
           "connected": "Conectado",
@@ -11702,15 +11658,14 @@
           "signIn": "Iniciar sesión en Orca",
           "reconnectRequired": "Tu sesión expiró. Inicie sesión nuevamente para utilizar las funciones de la nube.",
           "unavailable": "El inicio de sesión de Orca no está disponible en esta compilación.",
-          "signedOut": "Inicie sesión para ampliar Orca con funciones en la nube, incluidos Artifacts y Orca Relay.",
+          "signedOut": "Inicia sesión para conectar Orca Relay y compartir Skills.",
           "checking": "Comprobando el estado de la cuenta...",
           "signOut": "desconectar",
           "title": "Cuenta Orca",
           "description": "Comparte tu trabajo al instante y accede a tu escritorio desde Orca Mobile estés donde estés.",
-          "searchDescription": "Iniciar o cerrar sesión en la cuenta utilizada por Artifacts y Orca Relay.",
+          "searchDescription": "Inicia o cierra sesión en la cuenta usada para Orca Relay y compartir Skills.",
           "benefitsTitle": "Incluido con tu cuenta",
-          "artifactsTitle": "Compartir artefactos",
-          "artifactsDescription": "Publique archivos HTML y Markdown, luego administre cada enlace compartido desde Orca.",
+
           "relayTitle": "Relevo de Orca",
           "relayDescription": "Conecte Orca Mobile a esta computadora de escritorio a través de celular o cualquier Wi-Fi.",
           "skillsTitle": "Compartir habilidades",
@@ -17155,7 +17110,7 @@
           "signout": {
             "confirm": {
               "title": "¿Cerrar sesión en Orca?",
-              "description": "Se cerrará tu sesión de Orca en este dispositivo. Tus proyectos y worktrees locales no se verán afectados.",
+              "description": "El uso compartido de Skills y Orca Relay no estará disponible hasta que vuelvas a iniciar sesión. Tus proyectos locales y worktrees no se verán afectados.",
               "cancel": "Cancelar",
               "action": "Cerrar sesión"
             }
@@ -17248,121 +17203,7 @@
         "needsActionChip": "{{value0}} requiere acción",
         "unresolvedChip": "{{value0}} sin resolver"
       },
-      "artifacts": {
-        "ArtifactsPage": {
-          "deleteTitle": "¿Eliminar el artefacto?",
-          "deleteDescription": "“{{name}}” ya no estará disponible en su enlace público.",
-          "delete": "Eliminar",
-          "title": "Artefactos",
-          "retry": "Reintentar",
-          "signInHeading": "Iniciar sesión en Orca",
-          "signIn": "Iniciar sesión en Orca",
-          "signInAgainAction": "Iniciar sesión nuevamente",
-          "refresh": "Refrescar",
-          "signInAgain": "Inicia sesión en Orca de nuevo para cargar los artefactos.",
-          "loadFailed": "No se pudieron cargar los artefactos.",
-          "deleteFailed": "No se pudo eliminar el artefacto.",
-          "signInCopy": "Inicia sesión para ver y gestionar los artefactos compartidos desde tu cuenta.",
-          "empty": "No hay artefactos compartidos",
-          "emptyCopy": "Abre un archivo HTML o Markdown y selecciona Compartir como artefacto, o pídele a tu agente que lo comparta.",
-          "openArtifact": "Abrir artefacto",
-          "deleteArtifact": "Eliminar artefacto",
-          "moreAvailable": "Hay más artefactos disponibles",
-          "moreAvailableCopy": "Carga la página siguiente para continuar.",
-          "loadMoreFailed": "No se pudieron cargar más artefactos.",
-          "publishingOff": "La publicación está desactivada",
-          "publishingOffCopy": "Nada en este dispositivo puede crear aún un enlace público de artefacto. Permite la publicación en Ajustes → Artefactos, luego comparte desde un archivo HTML o Markdown abierto o pídele a tu agente.",
-          "openArtifactsSettings": "Abrir Ajustes → Artefactos",
-          "reconnectHeading": "Inicia sesión en Orca de nuevo",
-          "reconnectCopy": "Inicia sesión de nuevo para ver y gestionar los artefactos compartidos desde tu cuenta.",
-          "unconfiguredCopy": "El inicio de sesión de la cuenta de Orca aún no está configurado en esta máquina.",
-          "openAccountSettings": "Abrir ajustes de la cuenta"
-        },
-        "ArtifactPublishButton": {
-          "a4a49da6af": "Compartir como artefacto",
-          "confirmTitle": "Compartir como artefacto",
-          "confirmDescription": "Esto publica el archivo actual en un enlace que cualquier persona con la URL puede ver.",
-          "accountTitle": "Cuenta de Orca",
-          "accountDescription": "Inicia sesión para crear y gestionar este enlace.",
-          "signInAgain": "Iniciar sesión de nuevo",
-          "signIn": "Iniciar sesión",
-          "publishingOffTitle": "El uso compartido de artefactos está desactivado",
-          "publishingOffDescription": "Obtén más información sobre los enlaces públicos y activa el uso compartido en Ajustes.",
-          "openSettings": "Abrir los ajustes de artefactos",
-          "sharing": "Compartiendo…",
-          "sharePublicLink": "Generar enlace",
-          "publishedDescription": "Cualquier persona con este enlace puede ver el archivo compartido.",
-          "checkingLink": "Comprobando si existe un enlace…",
-          "checkFailed": "No se pudo comprobar si existe un enlace.",
-          "tryAgain": "Reintentar"
-        },
-        "artifact-publish-flow": {
-          "9a078a0c65": "El uso compartido de artefactos no está disponible",
-          "bba20daa6d": "Inicia sesión en Orca e inténtalo de nuevo.",
-          "54b1805328": "No se pudo compartir el artefacto",
-          "430019efd0": "Artefacto compartido",
-          "2fc727c831": "Artefacto actualizado",
-          "5cb4f5ec36": "Copiar enlace",
-          "fbb5018602": "Este archivo está vacío.",
-          "6112db5a1c": "Este artefacto es demasiado grande para compartirlo.",
-          "e2ed5acd8c": "Orca no pudo leer este archivo. Ábrelo desde un espacio de trabajo e inténtalo de nuevo.",
-          "visualUnreadable": "No se pudo leer esta visualización para compartirla.",
-          "6d475e9b25": "Solo los archivos HTML y Markdown locales se pueden compartir como artefactos.",
-          "29a406be09": "Los artefactos deben contener texto."
-        },
-        "ArtifactPublishedLinkPanel": {
-          "copyLink": "Copiar enlace",
-          "openLink": "Abrir enlace",
-          "updating": "Actualizando…",
-          "update": "Actualizar el contenido compartido"
-        },
-        "copyLink": "Copiar enlace",
-        "ArtifactDetailHeader": {
-          "close": "Cerrar",
-          "publicLink": "Cualquiera con este enlace puede verlo"
-        },
-        "ArtifactListTableHeader": {
-          "updated": "Actualizado",
-          "actions": "Comportamiento",
-          "name": "Nombre",
-          "type": "Tipo",
-          "size": "Tamaño",
-          "expires": "Caduca"
-        },
-        "typeMarkdown": "Markdown",
-        "typeHtml": "HTML",
-        "previewUnavailable": "Vista previa no disponible",
-        "copySuccess": "Enlace del artefacto copiado",
-        "copyFailed": "No se pudo copiar el enlace del artefacto",
-        "openInBrowser": "Abrir en el navegador",
-        "preview": "Vista previa del artefacto",
-        "previewUnavailableDescription": "Abre este artefacto en tu navegador para verlo.",
-        "actions": "Acciones del artefacto",
-        "ArtifactActions": {
-          "more": "Más acciones del artefacto"
-        },
-        "ArtifactCollection": {
-          "loadMore": "Cargar más",
-          "noMatches": "Sin resultados"
-        },
-        "updatedAt": "Actualizado {{when}}",
-        "updatedRecently": "recientemente",
-        "expiryUnknown": "Caducidad desconocida",
-        "expired": "Enlace caducado",
-        "expires": "El enlace caduca {{when}}",
-        "ArtifactDetailDrawer": {
-          "description": "Previsualiza y gestiona este artefacto compartido."
-        },
-        "ArtifactListSearchField": {
-          "label": "Buscar artefactos",
-          "placeholder": "Buscar...",
-          "clear": "Borrar búsqueda"
-        },
-        "ArtifactsPageSkeleton": {
-          "loading": "Cargando artefactos"
-        },
-        "expiredCompact": "Caducado"
-      },
+
       "ComposerParentWorktreePicker": {
         "label": "Worktree padre",
         "noParent": "Sin worktree padre",
@@ -17468,15 +17309,15 @@
       "UnexpectedSignoutCard": {
         "3e8f5c2a91": "Descartar",
         "c5b3e8a17d": "Iniciar sesión en Orca",
-        "8d2e4f7a1b": "Compartir artefactos",
+
         "6e3f1a9c5b": "Relevo de Orca",
         "4b7d2e8f1a": "Conecte Orca Mobile a esta computadora de escritorio a través de celular o cualquier Wi-Fi.",
         "9a4c6b2d7e": "Compartir habilidades",
         "9f2c1a4b7d": "Se cerró tu sesión",
-        "7b4d9e1f2a": "Inicia sesión de nuevo como {{value0}} para restaurar el uso compartido de artefactos, Orca Relay y el uso compartido de skills.",
-        "5a1c8d3e6f": "Inicia sesión de nuevo para restaurar el uso compartido de artefactos, Orca Relay y el uso compartido de skills.",
+        "7b4d9e1f2a": "Vuelve a iniciar sesión como {{value0}} para recuperar Orca Relay y el uso compartido de Skills.",
+        "5a1c8d3e6f": "Vuelve a iniciar sesión para recuperar Orca Relay y el uso compartido de Skills.",
         "1f6b2c9d4e": "Lo que recuperas",
-        "2c9a5b6e8d": "Publica archivos HTML y Markdown y gestiona todos los enlaces compartidos desde Orca.",
+
         "3d8e5f1b9c": "Comparte skills mediante un enlace no listado e instálalos en cualquier máquina que uses."
       },
       "linear-issue-attribute-filter-coverage-notice": {

@@ -24,7 +24,6 @@ export type RuntimeClientSettings = Pick<
   | 'experimentalNativeChat'
   | 'compactWorktreeCards'
   | 'prBotAuthorOverrides'
-  | 'artifactSharingEnabled'
   | 'worktreeVisibilityDefaults'
   | 'agentSkillSharingEnabled'
   | 'machineName'

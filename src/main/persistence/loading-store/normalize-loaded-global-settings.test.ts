@@ -65,6 +65,10 @@ describe('retired global settings', () => {
     const normalized = normalizeLegacyProfile({
       voice: { enabled: true, dictationMode: 'toggle' },
       telemetry: { optedIn: true, installId: 'legacy-id', existedBeforeTelemetryRelease: false },
+      artifactSharingEnabled: true,
+      artifactsEnabled: true,
+      showArtifactsButton: true,
+      skipDeleteArtifactConfirm: true,
       experimentalPet: true,
       experimentalSidekick: true,
       claudeManagedAccounts: [
@@ -96,6 +100,10 @@ describe('retired global settings', () => {
 
     expect(serialized).not.toHaveProperty('voice')
     expect(serialized).not.toHaveProperty('telemetry')
+    expect(serialized).not.toHaveProperty('artifactSharingEnabled')
+    expect(serialized).not.toHaveProperty('artifactsEnabled')
+    expect(serialized).not.toHaveProperty('showArtifactsButton')
+    expect(serialized).not.toHaveProperty('skipDeleteArtifactConfirm')
     expect(serialized).not.toHaveProperty('experimentalPet')
     expect(serialized).not.toHaveProperty('experimentalSidekick')
     expect(serialized).not.toHaveProperty('claudeManagedAccounts')

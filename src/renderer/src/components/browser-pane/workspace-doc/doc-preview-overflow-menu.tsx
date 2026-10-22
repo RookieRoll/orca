@@ -49,11 +49,8 @@ export function DocPreviewOverflowMenu({
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onCloseAutoFocus={overflow.onMenuCloseAutoFocus}>
-        <BrowserChromeFoldedMenuItems
-          tools={overflow.tools}
-          deferUntilClose={overflow.deferUntilClose}
-        />
+      <DropdownMenuContent align="end">
+        <BrowserChromeFoldedMenuItems tools={overflow.tools} />
         <DropdownMenuItem onSelect={onReload}>
           <RefreshCw className="size-3.5" />
           {translate('auto.components.browser.pane.BrowserPane.0e080d820e', 'Reload')}

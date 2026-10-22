@@ -1,10 +1,9 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import {
   Crosshair,
   ExternalLink,
   MessageSquarePlus,
   PenTool,
-  Share2,
   SquareCode
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -42,12 +41,6 @@ export type BrowserChromeMarkupTool = {
    * who came for a document, before the browsing pane ever offered it.
    */
   canShowDiscoveryHint: boolean
-}
-
-export type BrowserChromeShareControl = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  anchorRef?: React.RefObject<HTMLButtonElement | null>
 }
 
 export type BrowserChromeToolAction = {
@@ -96,7 +89,6 @@ export function BrowserChromeToolbar({
   importControl,
   elementTools,
   markup,
-  shareControl,
   viewSource,
   openExternal,
   overflowMenu,
@@ -111,7 +103,6 @@ export function BrowserChromeToolbar({
   importControl?: ((compact: boolean) => React.ReactNode) | null
   elementTools: BrowserChromeElementTools | null
   markup: BrowserChromeMarkupTool
-  shareControl?: (control: BrowserChromeShareControl) => React.ReactNode
   viewSource: BrowserChromeToolAction | null
   openExternal: BrowserChromeToolAction | null
   overflowMenu: (props: BrowserChromeOverflowMenuProps) => React.ReactNode
@@ -127,7 +118,6 @@ export function BrowserChromeToolbar({
     import: importControl != null,
     external: openExternal !== null,
     devtools: viewSource !== null,
-    share: shareControl != null,
     draw: true,
     grab: elementTools !== null,
     annotate: elementTools !== null
@@ -137,8 +127,6 @@ export function BrowserChromeToolbar({
   )
   const folded = useBrowserChromeToolFold(rowRef, stages)
 
-  const [sharePopoverOpen, setSharePopoverOpen] = useState(false)
-  const afterMenuCloseRef = useRef<(() => void) | null>(null)
 
   const foldedTools: BrowserChromeFoldedTool[] = []
   if (elementTools && folded.has('grab')) {
@@ -177,18 +165,6 @@ export function BrowserChromeToolbar({
       active: markup.active
     })
   }
-  if (shareControl && folded.has('share')) {
-    foldedTools.push({
-      stage: 'share',
-      label: translate(
-        'auto.components.artifacts.ArtifactPublishButton.a4a49da6af',
-        'Share as artifact'
-      ),
-      icon: Share2,
-      onSelect: () => setSharePopoverOpen(true),
-      deferUntilMenuClose: true
-    })
-  }
   if (viewSource && folded.has('devtools') && !viewSource.alreadyInOverflowMenu) {
     foldedTools.push({ stage: 'devtools', icon: SquareCode, ...viewSource })
   }
@@ -196,18 +172,6 @@ export function BrowserChromeToolbar({
     foldedTools.push({ stage: 'external', icon: ExternalLink, ...openExternal })
   }
 
-  const runAfterMenuClose = (action: () => void): void => {
-    afterMenuCloseRef.current = action
-  }
-  const onMenuCloseAutoFocus = (event: Event): void => {
-    const action = afterMenuCloseRef.current
-    if (!action) {
-      return
-    }
-    afterMenuCloseRef.current = null
-    event.preventDefault()
-    action()
-  }
   const showFoldedAnnotationDot = folded.has('annotate') && (elementTools?.annotationCount ?? 0) > 0
 
   return (
@@ -239,12 +203,6 @@ export function BrowserChromeToolbar({
         />
       )}
 
-      {shareControl?.({
-        open: sharePopoverOpen,
-        onOpenChange: setSharePopoverOpen,
-        anchorRef: folded.has('share') ? overflowTriggerRef : undefined
-      })}
-
       {viewSource && !folded.has('devtools') ? (
         <BrowserChromeActionButton action={viewSource} icon={SquareCode} />
       ) : null}
@@ -256,9 +214,7 @@ export function BrowserChromeToolbar({
       <span className="relative inline-flex">
         {overflowMenu({
           triggerRef: overflowTriggerRef,
-          tools: foldedTools,
-          deferUntilClose: runAfterMenuClose,
-          onMenuCloseAutoFocus
+          tools: foldedTools
         })}
         {/* Why: keeps pending annotations visible once the annotate button has folded into ⋯. */}
         {showFoldedAnnotationDot ? (

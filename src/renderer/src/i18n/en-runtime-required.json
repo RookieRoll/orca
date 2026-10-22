@@ -216,16 +216,7 @@
           "markManyUnread_other": "Mark {{count}} Agents Unread"
         }
       },
-      "artifacts": {
-        "ArtifactsPage": {
-          "openArtifact": "Open artifact",
-          "signInCopy": "Sign in to view and manage artifacts shared through your account.",
-          "signInHeading": "Sign in to Orca"
-        },
-        "artifact-publish-flow": {
-          "5cb4f5ec36": "Copy link"
-        }
-      },
+
       "automations": {
         "AutomationCustomCronPanel": {
           "cadb7b0bc9": "invalid"
@@ -1782,16 +1773,7 @@
             "ff8de8a2ad": "display"
           }
         },
-        "artifacts": {
-          "account": "Orca account",
-          "allowPublishingWebDescription": "Desktop only. Open Settings → Artifacts on the host device to change this setting.",
-          "connected": "Connected",
-          "enable": "Enable Artifacts",
-          "enableDescription": "Add Artifacts to the sidebar so you can open and delete shared files.",
-          "enableStepWebDescription": "Open Settings → Artifacts in the Orca desktop app on the host device and enable publishing.",
-          "openArtifactsDescription": "View and delete links shared through your account.",
-          "signInRequired": "Sign in is required to upload and manage artifacts."
-        },
+
         "auto": {
           "rename": {
             "branch": {

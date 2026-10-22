@@ -53,7 +53,6 @@ vi.mock('../runtime/orca-runtime', () => ({
     rehydrateClientHostedBrowserPages() {}
     setAgentBrowserBridge() {}
     setEmulatorBridge() {}
-    setArtifactService() {}
     setSkillCloudService() {}
     setAccountServices() {}
     setCommitMessageAgentEnvironmentResolvers() {}
@@ -69,7 +68,6 @@ vi.mock('../ai-vault-search/session-search-enablement', () => ({
 vi.mock('../runtime/agent-state-rules/agent-state-rules-live-update', () => ({
   startAgentStateRulesLiveUpdates: () => {}
 }))
-vi.mock('../artifacts/artifact-cloud-service', () => ({ ArtifactCloudService: class {} }))
 vi.mock('../skills/skill-cloud-service', () => ({ SkillCloudService: class {} }))
 vi.mock('../codex/codex-hook-reconcile', () => ({ startCodexHooks: vi.fn() }))
 vi.mock('../star-nag/service', () => ({

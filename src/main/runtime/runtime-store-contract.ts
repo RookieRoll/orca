@@ -144,7 +144,6 @@ export type RuntimeStore = {
     experimentalNewWorktreeCardStyle?: GlobalSettings['experimentalNewWorktreeCardStyle']
     compactWorktreeCards?: GlobalSettings['compactWorktreeCards']
     prBotAuthorOverrides?: GlobalSettings['prBotAuthorOverrides']
-    artifactSharingEnabled?: GlobalSettings['artifactSharingEnabled']
     terminalQuickCommands?: GlobalSettings['terminalQuickCommands']
     gitlabProjects?: GlobalSettings['gitlabProjects']
     mobileAutoRestoreFitMs?: number | null

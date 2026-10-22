@@ -1,4 +1,3 @@
-import type { RuntimeArtifactController } from './runtime-artifact-controller'
 import { afterEach, expect, it, vi } from 'vitest'
 import { RuntimeFileCommands } from './orca-runtime-files'
 import { OrcaRuntimeService } from './orca-runtime'
@@ -21,10 +20,6 @@ const host = {
   openFile: unexpectedHostRead,
   openDiff: unexpectedHostRead
 } satisfies RuntimeFileCommandHost
-
-const reachedArtifactOwner = (): never => {
-  throw new Error('artifact_owner_reached')
-}
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -147,35 +142,6 @@ it('preserves omitted argument slots, owner receivers, and the returned promise'
   vi.spyOn(runtime, 'readFileExplorerPreview').mockReturnValueOnce(replacement)
   expect(runtime.readFileExplorerPreview('other-worktree', 'other-file')).toBe(replacement)
   expect(read).toHaveBeenCalledTimes(2)
-})
-
-it('delegates artifact listing to the current owner with the original argument and promise', () => {
-  const runtime = new OrcaRuntimeService(null)
-  const owner = runtime['artifacts']
-  const events: string[] = []
-  const returned: ReturnType<RuntimeArtifactController['list']> = Promise.resolve({
-    status: 'unconfigured',
-    message: 'not connected'
-  })
-  const list = vi.spyOn(owner, 'list').mockImplementation(function (
-    this: RuntimeArtifactController
-  ) {
-    events.push('list')
-    expect(this).toBe(owner)
-    expect(arguments.length).toBe(1)
-    return returned
-  })
-  Object.defineProperty(runtime, 'artifacts', {
-    get() {
-      events.push('owner')
-      return owner
-    }
-  })
-  const options = { cursor: 'next', apiUrl: 'https://artifacts.example.test' }
-
-  expect(runtime.listArtifacts(options)).toBe(returned)
-  expect(list).toHaveBeenCalledExactlyOnceWith(options)
-  expect(events).toEqual(['owner', 'list'])
 })
 
 it('replaces the database after clearing its old routing state and then uses runtime overrides', () => {

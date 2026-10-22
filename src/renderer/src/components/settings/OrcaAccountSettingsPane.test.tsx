@@ -92,7 +92,7 @@ describe('OrcaAccountSettingsPane', () => {
 
     expect(
       screen.getByText(
-        'Sign in to extend Orca with cloud features, including Artifacts and Orca Relay.'
+        'Sign in to connect Orca Relay and share Skills.'
       )
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Sign in to Orca' }))

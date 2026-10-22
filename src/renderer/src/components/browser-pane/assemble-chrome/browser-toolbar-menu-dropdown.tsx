@@ -89,11 +89,9 @@ export function BrowserToolbarMenuDropdown({
       <DropdownMenuContent
         align="end"
         className="w-56"
-        onCloseAutoFocus={overflow.onMenuCloseAutoFocus}
       >
         <BrowserChromeFoldedMenuItems
           tools={overflow.tools}
-          deferUntilClose={overflow.deferUntilClose}
         />
         {onOpenSourceFile ? (
           <>
